@@ -5,7 +5,6 @@
 #include <signal.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <time.h>
 
 #include "sst.h"
 #include "sstlinux.h"
@@ -63,7 +62,7 @@ void iostart(int usecurses)
 	report_window     = newwin(10, 0,  1,       25);
 	lrscan_window     = newwin(10, 0,  0,       64); 
 	message_window    = newwin(0,  0,  12,      0);
-	prompt_window     = newwin(1,  0,  LINES-1, 0); 
+	prompt_window     = newwin(1,  0,  LINES-2, 0); 
 	scrollok(message_window, TRUE);
 	setwnd(fullscreen_window);
 	textcolor(DEFAULT);
@@ -163,7 +162,6 @@ void prout(char *fmt, ...)
 void prouts(char *fmt, ...) 
 /* print slowly! */
 {
-    clock_t endTime;
     char *s, buf[BUFSIZ];
     va_list ap;
     va_start(ap, fmt);
@@ -171,8 +169,7 @@ void prouts(char *fmt, ...)
     va_end(ap);
     skip(1);
     for (s = buf; *s; s++) {
-	endTime = clock() + CLOCKS_PER_SEC*0.05;
-	while (clock() < endTime) continue;
+	delay(500);
 	if (curses) {
 	    waddch(curwnd, *s);
 	    wrefresh(curwnd);
