@@ -135,48 +135,44 @@ commands[] = {
 #endif /* SERGEEV */
 #define ORBIT	15
 	{"ORBIT",	ORBIT},
-#define TRANSPORT	17
+#define TRANSPORT	16
 	{"TRANSPORT",	TRANSPORT},
-#define MINE	18
+#define MINE	17
 	{"MINE",	MINE},
-#define CRYSTALS 19
+#define CRYSTALS 18
 	{"CRYSTALS",	CRYSTALS},
-#define SHUTTLE	20
+#define SHUTTLE	19
 	{"SHUTTLE",	SHUTTLE},
-#define PLANETS	21
+#define PLANETS	20
 	{"PLANETS",	PLANETS},
-#ifdef SERGEEV
-#define REQUEST	22
-	{"REQUEST",	REQUEST},
-#endif /* SERGEEV */
-#define REPORT	23
+#define REPORT	21
 	{"REPORT",	REPORT},
-#define COMPUTER	24
+#define COMPUTER	23
 	{"COMPUTER",	COMPUTER},
-#define COMMANDS	25
+#define COMMANDS	24
 	{"COMMANDS",	COMMANDS},
-#define EMEXIT	26
+#define EMEXIT	25
 	{"EMEXIT",	EMEXIT},
-#define PROBE	27
+#define PROBE	26
 	{"PROBE",	PROBE},
-#define SAVE	28
+#define SAVE	27
 	{"SAVE",	SAVE},
 	{"FREEZE",	SAVE},
-#define ABANDON	29
+#define ABANDON	28
 	{"ABANDON",	ABANDON},
-#define DESTRUCT 30
+#define DESTRUCT 29
 	{"DESTRUCT",	DESTRUCT},
-#define DEATHRAY 31
+#define DEATHRAY 30
 	{"DEATHRAY",	DEATHRAY},
-#define DEBUGCMD	32
+#define DEBUGCMD	31
 	{"DEBUG",	DEBUGCMD},
-#define MAYDAY	33
+#define MAYDAY	32
 	{"MAYDAY",	MAYDAY},
 	{"SOS",		MAYDAY},
 	{"CALL",	MAYDAY},
-#define QUIT	34
+#define QUIT	33
 	{"QUIT",	QUIT},
-#define HELP	35
+#define HELP	34
 	{"HELP",	HELP},
 };
 
@@ -664,7 +660,7 @@ int scan(void) {
 			chew();
 			return IHEOL;
 		}
-		getline(line, sizeof(line));
+		cgetline(line, sizeof(line));
 #ifdef SERGEEV
                 fflush(stdin);
                 if (curwnd==BOTTOM_WINDOW){
