@@ -48,18 +48,17 @@ remainder of the command line before standard input.  Thus, for
 example, you can invoke the program as</para>
 
 <programlisting>
-sst regular medium good foobar
+sst regular medium good
 </programlisting>
 
-<para>to start a regular medium game as a good player 
-with password "foobar".</para>
+<para>to start a regular medium game as a good player.</para>
 </refsect1>
 
-<refsect1 id='authors'><title>AUTHORS</title> <para>Super Star Trek
-was designed and written by David Matuszek, Paul Reynolds, and Don
-Smith in the 1970s.  It was resurrected by Tom Almy.  The
-screen-oriented interface is by Stas Seergeev. This version has been
-cleaned up and documented by Eric S. Raymond
+<refsect1 id='authors'><title>AUTHORS</title> 
+<para>Super Star Trek was designed and written by David Matuszek, Paul
+Reynolds, and Don Smith in the 1970s.  It was resurrected by Tom Almy.
+The screen-oriented interface is by Stas Seergeev. This version has
+been cleaned up and documented by Eric S. Raymond
 <email>esr@snark.thyrsus.com</email>.  There is a <ulink
 url='https://developer.berlios.de/projects/sst/'>project
 page</ulink>.</para>
