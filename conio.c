@@ -305,20 +305,24 @@ void textmode (int mode)
 
 int wherex (void)
 {
+#ifdef SERGEEV
    int y;
    int x;
    getyx(conio_scr,y,x);
    x++;
    return(x);
+#endif /* SERGEEV */
 }
 
 int wherey (void)
 {
+#ifdef SERGEEV
    int y;
    int x;
    getyx(conio_scr,y,x);
    y++;
    return(y);
+#endif /* SERGEEV */
 }
 
 void window (int left,int top,int right,int bottom)
