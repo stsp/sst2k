@@ -953,7 +953,7 @@ void phasers(void) {
 				key = scan();
 			}
 			if (key != IHREAL && nenhere != 0) {
-				prout("Phasers locked on target. Energy available = %3.2f", ifast?energy-200.0:energy);
+				prout("Phasers locked on target. Energy available = %.2f", ifast?energy-200.0:energy);
 			}
 			do {
 				while (key != IHREAL) {
@@ -963,7 +963,7 @@ void phasers(void) {
 				}
 				rpow = aaitem;
 				if (rpow >= (ifast?energy-200:energy)) {
-				    proutn("Energy available= %3.2f",
+				    proutn("Energy available= %.2f",
 					ifast?energy-200:energy);
 					skip(1);
 					key = IHEOL;
@@ -1034,7 +1034,7 @@ void phasers(void) {
 				int ii = game.kx[k], jj = game.ky[k];
 				int ienm = game.quad[ii][jj];
 				if (msgflag) {
-					proutn("Energy available= %5.2f",
+					proutn("Energy available= %.2f",
 					       energy-.006-(ifast?200:0));
 					skip(1);
 					msgflag = 0;

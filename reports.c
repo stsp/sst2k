@@ -290,7 +290,7 @@ void srscan(int l) {
 						if (condit == IHDOCKED)
 							proutn("DAMAGED, supported by starbase");
 						else
-							proutn("DAMAGED, reserves=%4.2f", lsupres);
+							proutn("DAMAGED, reserves=%.2f", lsupres);
 					}
 					else
 						proutn("ACTIVE");
@@ -438,16 +438,16 @@ void eta(void) {
 		}
 		else
 			proutn("Remaining");
-		prout(" energy will be %5.2f.", energy-tpower);
+		prout(" energy will be %.2f.", energy-tpower);
 		if (wfl) {
-			prout("And we will arrive at stardate %5.2f.",
+			prout("And we will arrive at stardate %.2f.",
 				game.state.date+ttime);
 		}
 		else if (twarp==1.0)
 			prout("Any warp speed is adequate.");
 		else {
-			prout("Minimum warp needed is %5.2f,", twarp);
-			prout("and we will arrive at stardate %5.2f.",
+			prout("Minimum warp needed is %.2f,", twarp);
+			prout("and we will arrive at stardate %.2f.",
 				game.state.date+ttime);
 		}
 		if (game.state.remtime < ttime)

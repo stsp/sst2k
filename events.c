@@ -634,7 +634,7 @@ void snova(int insx, int insy) {
 			/* it isn't here, or we just entered (treat as inroute) */
 			if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				skip(1);
-				prout("Message from Starfleet Command       Stardate %5.2f", game.state.date);
+				prout("Message from Starfleet Command       Stardate %.2f", game.state.date);
 				proutn("     Supernova in %s; caution advised.",
 				       cramlc(quadrant, nqx, nqy));
 			}

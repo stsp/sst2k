@@ -677,7 +677,7 @@ void debugme(void) {
 				case FSCMOVE: proutn("SC Move         "); break;
 				case FSCDBAS: proutn("SC Base Destroy "); break;
 			}
-			proutn("%82.2f", future[i]-game.state.date);
+			proutn("%.2f", future[i]-game.state.date);
 			chew();
 			proutn("  ?");
 			key = scan();

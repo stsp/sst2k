@@ -79,7 +79,7 @@ void orbit(void) {
 	newcnd();
 	if (consumeTime()) return;
 	height = (1400.+7200.*Rand());
-	prout("Sulu-  \"Entered orbit at altitude %4.2f kilometers.\"", height);
+	prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", height);
 	inorbit = 1;
 	return;
 }
