@@ -124,9 +124,12 @@ char *cgets (char *str) /* ugly function :-( */
 }
 
 void clreol (void)
+/* clear to end of line -- can be a no-op in tty mode */
 {
+#ifdef SERGEEV
    wclrtoeol(conio_scr);
    wrefresh(conio_scr);
+#endif /* SERGEEV */
 }
 
 void clrscr (void)
@@ -215,17 +218,22 @@ void gettextinfo(struct text_info *inforec)
 } 
 
 void gotoxy (int x, int y)
+/* address cusor -- OK for this to be a no-op in TTY mode */
 {
+#ifdef SERGEEV
    y--;
    x--;
    wmove(conio_scr,y,x);
    wrefresh(conio_scr);
+#endif /* SERGEEV */
 }
 
 void highvideo (void)
 {
+#ifdef SERGEEV
    textcolor(15); /* White */
    textbackground(0); /* Black */
+#endif /* SERGEEV */
 }
 
 void insline (void)

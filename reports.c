@@ -5,20 +5,6 @@
 #include "conio.h"
 #include "sstlinux.h"
 
-#ifdef SERGEEV
-int c_printf (char *format, ... )
-{
-    char buffer[BUFSIZ]; /* Well, BUFSIZ is from ncurses...  */
-    va_list argp;
-    va_start(argp,format);
-    vsprintf(buffer,format,argp);
-    va_end(argp);
-    return waddstr(conio_scr,buffer);
-}
-#else
-#define c_printf proutn
-#endif /* SERGEEV */
-
 void attakreport(int l) {
      if (!l) {
 	if (game.future[FCDBAS] < 1e30) {
@@ -39,9 +25,7 @@ void attakreport(int l) {
         if (isatb == 1)
            proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, game.future[FSCDBAS]);
      }
-#ifdef SERGEEV
      clreol();
-#endif /* SERGEEV */
 }
 	
 
@@ -213,9 +197,7 @@ void chart(int nn) {
                                 strcpy(buf, "...");
 			else if (game.starch[i][j] > 999)
                                 if ((i==quadx)&&(j==quady)){
-#ifdef SERGEEV
                                    gotoxy(wherex()-1,wherey());
-#endif /* SERGEEV */
                                    if (game.starch[i][i]<2000)
 				       sprintf(buf, "%03d", game.starch[i][j]-1000);
                                    else 
@@ -227,9 +209,7 @@ void chart(int nn) {
                                     else 
 					strcpy(buf, "***");
                         else if ((i==quadx)&&(j==quady)){
-#ifdef SERGEEV
                                 gotoxy(wherex()-1,wherey());
-#endif /* SERGEEV */
                                 sprintf(buf, "%03d", game.state.galaxy[i][j]);
                         }
                         else if (game.state.galaxy[i][j]>=1000)
@@ -244,11 +224,7 @@ void chart(int nn) {
                 c_printf("  |");
                 if (i<8) c_printf("\n\r");
 	}
-#ifdef SERGEEV
-	proutn("");	/* flush output */
-#else
-	skip(2);
-#endif
+	prout("");	/* flush output */
 }
 		
 		
@@ -298,13 +274,9 @@ int srscan(int l) {
                                                 case IHDOCKED: textcolor(LIGHTGRAY); break;
                                                 case IHDEAD: textcolor(WHITE);
                                         }
-#ifdef SERGEEV
                                         if (game.quad[i][j]!=ship) highvideo();
-#endif /* SERGEEV */
                                    }
-#ifdef SERGEEV
                                    if (game.quad[i][j] & 128) highvideo();
-#endif /* SERGEEV */
                                    c_printf("%c ",game.quad[i][j] & 127);
                                    textcolor(LIGHTGRAY);
                                 }
@@ -377,11 +349,7 @@ int srscan(int l) {
 	        if (k!=0) return(goodScan);
 	}
 	if (nn) chart(1);
-#ifdef SERGEEV
-	proutn("");
-#else
-	skip(2);
-#endif /* SERGEEV */
+	prout("");
         return(goodScan);
 }
 			
