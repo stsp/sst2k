@@ -78,10 +78,16 @@ void orbit(void) {
 	height = (1400.+7200.*Rand());
 	prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", height);
 	inorbit = 1;
-	return;
+#ifdef SERGEEV
+        ididit=1;
+#endif /* SERGEEV */
 }
 
 void sensor(void) {
+#ifdef SERGEEV
+    if (game.damage[DSRSENS] != 0.0) return;
+    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
+#else
 	skip(1);
 	chew();
 	if (game.damage[DSRSENS] != 0.0) {
@@ -92,6 +98,7 @@ void sensor(void) {
 		prout("No planet in this quadrant.");
 		return;
 	}
+#endif /* SERGEEV */
 	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
 	skip(1);
 	prout("         Planet at %s is of class %s.", 
@@ -103,7 +110,9 @@ void sensor(void) {
 	if (game.state.plnets[iplnet].crystals == 0) proutn(" no");
 	prout(" dilithium crystals present.\"");
 	if (game.state.plnets[iplnet].known == unknown) game.state.plnets[iplnet].known = known;
-	return;
+#ifdef SERGEEV
+    }
+#endif /* SERGEEV */
 }
 
 void beam(void) {
@@ -167,6 +176,9 @@ void beam(void) {
 		skip(1);
 		prout("Kirk-  \"Energize.\"");
 	}
+#ifdef SERGEEV
+        ididit=1;
+#endif /* SERGEEV */
 	skip(1);
 	prouts("WWHOOOIIIIIRRRRREEEE.E.E.  .  .  .  .   .    .");
 	skip(2);
@@ -193,8 +205,6 @@ void beam(void) {
 }
 
 void mine(void) {
-
-	ididit = 0;
 	skip(1);
 	chew();
 	if (landed!= 1) {
@@ -220,11 +230,13 @@ void mine(void) {
 	if (consumeTime()) return;
 	prout("Mining operation complete.");
 	imine = 1;
-	return;
+#ifdef SERGEEV
+        ididit=1;
+#endif /* SERGEEV */
 }
 
 void usecrystals(void) {
-
+	ididit=0;
 	skip(1);
 	chew();
 	if (icrystl!=1) {
@@ -270,14 +282,15 @@ void usecrystals(void) {
 	prout("   are going crazy, but I think it's");
 	prout("   going to work!!  Congratulations, Sir!\"");
 	cryprob *= 2.0;
-	return;
+#ifdef SERGEEV
+	ididit=1;
+#endif /* SERGEEV */
 }
 
 void shuttle(void) {
 
 	chew();
 	skip(1);
-	ididit = 0;
 	if(game.damage[DSHUTTL] != 0.0) {
 		if (game.damage[DSHUTTL] == -1.0) {
 			if (inorbit && game.state.plnets[iplnet].known == shuttle_down)
@@ -387,7 +400,6 @@ void shuttle(void) {
 		return;
 	}
 }
-		
 
 void deathray(void) {
 	double r = Rand();

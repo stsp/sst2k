@@ -31,6 +31,7 @@ char color_warning=1;
 int directvideo;
 WINDOW *conio_scr;
 
+#ifdef SERGEEV 
 /* Some internals... */
 static int colortab(int a) /* convert LINUX Color code to DOS-standard */
 {
@@ -46,6 +47,7 @@ static int colortab(int a) /* convert LINUX Color code to DOS-standard */
    }
    return COLOR_BLACK;
 } 
+#endif /* SERGEEV */
 
 static void docolor (int color) /* Set DOS-like text mode colors */
 {

@@ -1,3 +1,6 @@
+#ifdef SERGEEV
+#include <conio.h>
+#endif /* SERGEEV */
 #include "sst.h"
 #include <string.h>
 #include <time.h>
@@ -9,23 +12,34 @@ void dstrct() {
 		prout("Computer damaged; cannot execute destruct sequence.");
 		return;
 	}
-	skip(1);
 	prouts("---WORKING---"); skip(1);
-	prout("SELF-DESTRUCT-SEQUENCE-ACTIVATED");
+        prouts("SELF-DESTRUCT-SEQUENCE-ACTIVATED"); skip(1);
 	prouts("   10"); skip(1);
 	prouts("       9"); skip(1);
 	prouts("          8"); skip(1);
 	prouts("             7"); skip(1);
 	prouts("                6"); skip(1);
+#ifdef SERGEEV
+	skip(1);
+#endif /* SERGEEV */
 	prout("ENTER-CORRECT-PASSWORD-TO-CONTINUE-");
+#ifdef SERGEEV
+	skip(1);
+#endif /* SERGEEV */
 	prout("SELF-DESTRUCT-SEQUENCE-OTHERWISE-");
+#ifdef SERGEEV
+	skip(1);
+#endif /* SERGEEV */
 	prout("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED");
+#ifdef SERGEEV
+	skip(1);
+#endif /* SERGEEV */
 	scan();
 	chew();
 	if (strcmp(game.passwd, citem) != 0) {
 		prouts("PASSWORD-REJECTED;"); skip(1);
-		prout("CONTINUITY-EFFECTED");
-		skip(1);
+		prouts("CONTINUITY-EFFECTED");
+		skip(2);
 		return;
 	}
 	prouts("PASSWORD-ACCEPTED"); skip(1);
@@ -38,7 +52,6 @@ void dstrct() {
 		prouts("GOODBYE-CRUEL-WORLD");
 		skip(1);
 	}
-	skip(2);
 	kaboom();
 }
 
@@ -69,13 +82,13 @@ void finish(FINTYPE ifin) {
 	alldone = 1;
 	skip(3);
 	prout("It is stardate %.1f.", game.state.date);
-	prout("");
+        skip(1);
 	switch (ifin) {
 		case FWON: // Game has been won
 			if (game.state.nromrem != 0)
 				prout("The remaining %d Romulans surrender to Starfleet Command.",
 					   game.state.nromrem);
-			
+
 			prout("You have smashed the Klingon invasion fleet and saved");
 			prout("the Federation.");
 			gamewon=1;
@@ -110,14 +123,19 @@ void finish(FINTYPE ifin) {
 							break;
 						case 5:
 							skip(1);
-							prout("Computer-  ERROR-ERROR-ERROR-ERROR");
+                                                        proutn("Computer-  ");
+							prouts("ERROR-ERROR-ERROR-ERROR");
+                                                        skip(2);
+                                                        prouts("  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM");
+                                                        skip(1);
+                                                        prouts("  THIS-PROGRAM-MUST-SURVIVE");
+                                                        skip(1);
+                                                        prouts("  THIS-PROGRAM-MUST-SURVIVE");
 							skip(1);
-							prout("  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM");
-							prout("  THIS-PROGRAM-MUST-SURVIVE");
-							prout("  THIS-PROGRAM-MUST-SURVIVE");
-							prout("  THIS-PROGRAM-MUST-SURVIVE");
-							prout("  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI");
+                                                        prouts("  THIS-PROGRAM-MUST-SURVIVE");
 							skip(1);
+                                                        prouts("  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI");
+                                                        skip(2);
 							prout("Now you can retire and write your own Star Trek game!");
 							skip(1);
 							break;
@@ -130,8 +148,7 @@ void finish(FINTYPE ifin) {
 							)
 							prout("You cannot get a citation, so...");
 						else {
-							prout("Do you want your Commodore Emeritus Citation printed?");
-							proutn("(You need a 132 column printer.)");
+							proutn("Do you want your Commodore Emeritus Citation printed? ");
 							chew();
 							if (ja()) {
 								igotit = 1;
@@ -307,8 +324,6 @@ void score(void) {
 	double timused = game.state.date - indate;
 	int ithperd, iwon, klship;
 
-	pause_game(0);
-
 	iskill = skill;
 	if ((timused == 0 || game.state.remkl != 0) && timused < 5.0) timused = 5.0;
 	perdate = (game.state.killc + game.state.killk + game.state.nsckill)/timused;
@@ -341,7 +356,7 @@ void score(void) {
 		prout("%6d Super-Commander destroyed          %5d",
 			   game.state.nsckill, 200*game.state.nsckill);
 	if (ithperd)
-		prout("%.2f Klingons per stardate              %5d",
+		prout("%6.2f Klingons per stardate              %5d",
 			   perdate, ithperd);
 	if (game.state.starkl)
 		prout("%6d stars destroyed by your action     %5d",
@@ -364,7 +379,6 @@ void score(void) {
 	if (alive==0)
 		prout("Penalty for getting yourself killed        -200");
 	if (gamewon) {
-		skip(1);
 		proutn("Bonus for winning ");
 		switch (skill) {
 			case 1: proutn("Novice game  "); break;
@@ -375,7 +389,7 @@ void score(void) {
 		}
 		prout("           %5d", iwon);
 	}
-	skip(2);
+	skip(1);
 	prout("TOTAL SCORE                               %5d", iscore);
 }
 
@@ -389,28 +403,38 @@ void plaque(void) {
 	skip(2);
 	
 	while (fp == NULL) {
+#ifdef SERGEEV
+                proutn("File or device name for your plaque: ");
+                getline(winner, sizeof(winner));
+#else
 		proutn("File or device name for your plaque:");
 		fgets(winner, 128, stdin);
 		winner[strlen(winner)-1] = '\0';
+#endif /* SERGEEV */
 		fp = fopen(winner, "w");
 		if (fp==NULL) {
-			prout("Invalid name.");
+                        prout("Invalid name.");
 		}
 	}
 
-	proutn("Enter name to go on plaque (up to 30 characters):");
-	fgets(winner, 128, stdin);
-	winner[strlen(winner)-1] = '\0';
+        proutn("Enter name to go on plaque (up to 30 characters): ");
+        getline(winner, sizeof(winner));
+        proutn("Enter name to go on plaque (up to 30 characters): ");
+        getline(winner, sizeof(winner));
 	winner[30] = '\0';
+#ifdef SERGEEV
+	nskip = 38 - strlen(winner)/2;
+#else
 	nskip = 64 - strlen(winner)/2;
+#endif /* SERGEEV */
 
 	fprintf(fp,"\n\n\n\n");
 	/* --------DRAW ENTERPRISE PICTURE. */
-	fprintf(fp, "                                                                EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n" );
+        fprintf(fp, "                                       EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n" );
 	fprintf(fp, "                                      EEE                      E  : :                                         :  E\n" );
 	fprintf(fp, "                                    EE   EEE                   E  : :                   NCC-1701              :  E\n");
-	fprintf(fp, "                    EEEEEEEEEEEEEEEE        EEEEEEEEEEEEEEE    E  : :                                         : E\n");
-	fprintf(fp, "                     E                                     E    EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
+        fprintf(fp, "EEEEEEEEEEEEEEEE        EEEEEEEEEEEEEEE  : :                              : E\n");
+        fprintf(fp, " E                                     EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
 	fprintf(fp, "                      EEEEEEEEE               EEEEEEEEEEEEE                 E  E\n");
 	fprintf(fp, "                               EEEEEEE   EEEEE    E          E              E  E\n");
 	fprintf(fp, "                                      EEE           E          E            E  E\n");

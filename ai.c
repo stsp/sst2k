@@ -25,7 +25,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	if (game.damage[DSRSENS] == 0.0 || game.damage[DLRSENS] == 0.0 ||
 		condit == IHDOCKED) {
     		crmena(1, ienm, 2, game.kx[loccom], game.ky[loccom]);
-		proutn(" escapes to %s (and regains strength).",
+		prout(" escapes to %s (and regains strength).",
 		       cramlc(quadrant, iqx, iqy));
 	}
 	/* handle local matters related to escape */
@@ -252,9 +252,8 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		if (game.damage[DSRSENS] == 0 || condit == IHDOCKED) {
 			proutn("***");
 			cramen(ienm);
-			proutn(" from");
-			cramlc(2, comx, comy);
-			if (game.kdist[loccom] < dist1) proutn(" advances to");
+			proutn(" from %s", cramlc(2, comx, comy));
+			if (game.kdist[loccom] < dist1) proutn(" advances to ");
 			else proutn(" retreats to ");
 			prout(cramlc(sector, nextx, nexty));
 		}

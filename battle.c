@@ -1235,7 +1235,7 @@ void phasers(void) {
 void hittem(double *hits) {
 	double kp, kpow, wham, hit, dustfac, kpini;
 #ifdef SERGEEV
-	int cx, cy;
+	int crx, cry;
 #endif /* SERGEEV */
 	int nenhr2=nenhere, k=1, kk=1, ii, jj, ienm;
 

@@ -169,14 +169,14 @@ void skip(int i) {
 }
 
 static void vproutn(char *fmt, va_list ap) {
-    char *strbuf, *p, *s;
-    vasprintf(&strbuf, fmt, ap);
-    p=s=strbuf;
+    char *s, *p;
+    vasprintf(&s, fmt, ap);
+    p=s;
     if ((curwnd==4)&&(wherey()==wnds[curwnd].wndbottom-wnds[curwnd].wndtop)){
-       if (strchr(strbuf,'\n')){
-          p=strchr(strbuf,'\n');
+       if (strchr(s,'\n')) {
+          p=strchr(s,'\n');
           p[0]=0;
-          cprintf("%s",strbuf);
+          cprintf("%s",s);
           p++;
           pause_game(0);
        }
@@ -188,7 +188,7 @@ static void vproutn(char *fmt, va_list ap) {
 //        setwnd(curwnd);
     if (strchr(s,'\n') || strchr(s,'\r')) clreol();
     cprintf("%s",p);
-    free(strbuf);
+    free(s);
 #endif /* SERGEEV */
 }
 
@@ -245,10 +245,11 @@ static void prchr(char *s){
 }
 
 static void vprouts(char *fmt, va_list ap) {
-    char *s;
+    char *s, *p;
     vasprintf(&s, fmt, ap);
-    while (*s) {
-        prchr(s++);
+    p=s;
+    while (*p) {
+        prchr(p++);
         delay(30);
     }
     free(s);
