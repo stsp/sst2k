@@ -341,5 +341,21 @@ void getline(char *line, int max) {
     }
 }
 
+void setwnd(short wndnum){
+/* change windows -- OK for this to be a no-op in tty mode */
+#ifdef SERGEEV
+     int cury;
+     cury=wherey()+wnds[curwnd].wndtop-wnds[wndnum].wndtop;
+     if ((curwnd==0)&&(wndnum!=0)) clrscr();
+     window(wnds[wndnum].wndleft, wnds[wndnum].wndtop, wnds[wndnum].wndright, wnds[wndnum].wndbottom);
+     if ((curwnd==wndnum)&&(cury>wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1)){
+        gotoxy(wnds[wndnum].wndright-wnds[wndnum].wndleft+1,wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1);
+	skip(1);
+     }
+     curwnd=wndnum;
+     gotoxy(1,cury);
+#endif /* SERGEEV */
+}
+
 void commandhook(char *cmd, int before) {
 }

@@ -170,21 +170,6 @@ static void listCommands(int x) {
 	if (x) prout("   HELP");
 }
 
-#ifdef SERGEEV
-void setwnd(short wndnum){
-     int cury;
-     cury=wherey()+wnds[curwnd].wndtop-wnds[wndnum].wndtop;
-     if ((curwnd==0)&&(wndnum!=0)) clrscr();
-     window(wnds[wndnum].wndleft, wnds[wndnum].wndtop, wnds[wndnum].wndright, wnds[wndnum].wndbottom);
-     if ((curwnd==wndnum)&&(cury>wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1)){
-        gotoxy(wnds[wndnum].wndright-wnds[wndnum].wndleft+1,wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1);
-	skip(1);
-     }
-     curwnd=wndnum;
-     gotoxy(1,cury);
-}
-#endif /* SERGEEV */
-
 static void helpme(void) {
 	int i, j;
 	char cmdbuf[32], *cp;
