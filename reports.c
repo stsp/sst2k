@@ -147,7 +147,7 @@ void dreprt(void) {
 	int jdam = FALSE, i;
 	chew();
 
-	for (i = 1; i <= ndevice; i++) {
+	for (i = 1; i <= NDEVICES; i++) {
 		if (game.damage[i] > 0.0) {
 			if (!jdam) {
 				skip(1);

@@ -1,7 +1,8 @@
 #include "sst.h"
 
-static char classes[4][2]={"","M","N","O"};
 static int height;
+
+static char *classes[] = {"M","N","O"};
 
 static int consumeTime(void) {
 /* I think most of this avoidance was caused by overlay scheme.
@@ -31,7 +32,7 @@ void preport(void) {
 	chew();
 	prout("Spock-  \"Planet report follows, Captain.\"");
 	skip(1);
-	for (i = 1; i <= inplan; i++) {
+	for (i = 0; i < inplan; i++) {
 		if (game.state.plnets[i].known != unknown
 #ifdef DEBUG
 			|| ( idebug && game.state.plnets[i].x !=0)

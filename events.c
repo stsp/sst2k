@@ -51,7 +51,7 @@ void events(void) {
 		repair = xtime;
 		if (condit == IHDOCKED) repair /= docfac;
 		/* Don't fix Deathray here */
-		for (l=1; l<=ndevice; l++)
+		for (l=1; l<=NDEVICES; l++)
 			if (game.damage[l] > 0.0 && l != DDRAY)
 				game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 		/* If radio repaired, update star chart and attack reports */
@@ -473,7 +473,7 @@ void nova(int ix, int iy) {
 						game.state.nplankl++;
 						crmena(1, IHP, 2, ii, jj);
 						prout(" destroyed.");
-						game.state.plnets[iplnet] = nulplanet;
+						DESTROY(&game.state.plnets[iplnet]);
 						iplnet = plnetx = plnety = 0;
 						if (landed == 1) {
 							finish(FPNOVA);
@@ -715,9 +715,9 @@ void snova(int insx, int insy) {
 	npdead = num - nrmdead*10;
 	if (npdead) {
 		int l;
-		for (l = 1; l <= inplan; l++)
+		for (l = 0; l < inplan; l++)
 			if (game.state.plnets[l].x == nqx && game.state.plnets[l].y == nqy) {
-				game.state.plnets[l] = nulplanet;
+			    DESTROY(&game.state.plnets[l]);
 			}
 	}
 	/* Destroy any base in supernovaed quadrant */

@@ -344,11 +344,11 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 		sortkl();
 	}
 	/* check for a helpful planet */
-	for (i = 1; i <= inplan; i++) {
+	for (i = 0; i < inplan; i++) {
 		if (game.state.plnets[i].x==game.state.isx && game.state.plnets[i].y==game.state.isy &&
 			game.state.plnets[i].crystals == 1) {
 			/* destroy the planet */
-			game.state.plnets[i] = nulplanet;
+		        DESTROY(&game.state.plnets[i]);
 			game.state.newstuf[game.state.isx][game.state.isy] -= 1;
 			if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				if (*ipage==0) pause(1);

@@ -764,7 +764,7 @@ void timwrp() {
 		/* Make sure Galileo is consistant -- Snapshot may have been taken
 		   when on planet, which would give us two Galileos! */
 		gotit = 0;
-		for (l = 1; l <= inplan; l++) {
+		for (l = 0; l < inplan; l++) {
 			if (game.state.plnets[l].known == shuttle_down) {
 				gotit = 1;
 				if (iscraft==1 && ship==IHE) {

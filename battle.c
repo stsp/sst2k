@@ -156,7 +156,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	crami(icas, 1);
 	prout(" casualties.");
 	casual += icas;
-	for (l=1; l <= ndevice; l++) {
+	for (l=1; l <= NDEVICES; l++) {
 		if (l == DDRAY) continue; // Don't damage deathray 
 		if (game.damage[l] < 0) continue;
 		extradm = (10.0*type*Rand()+1.0)*damfac;
@@ -311,7 +311,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				prout(" destroyed.");
 				game.state.nplankl++;
 				game.state.newstuf[quadx][quady] -= 1;
-				game.state.plnets[iplnet] = nulplanet;
+				DESTROY(&game.state.plnets[iplnet]);
 				iplnet = 0;
 				plnetx = plnety = 0;
 				game.quad[ix][iy] = IHDOT;
@@ -412,7 +412,7 @@ static void fry(double hit) {
 	/* Select devices and cause damage */
 	for (l = 1; l <= ncrit; l++) {
 		do {
-			j = ndevice*Rand()+1.0;
+			j = NDEVICES*Rand()+1.0;
 			/* Cheat to prevent shuttle damage unless on ship */
 		} while (game.damage[j] < 0.0 || (j == DSHUTTL && iscraft != 1) ||
 				 j == DDRAY);
@@ -1017,7 +1017,7 @@ void phasers(void) {
 				for (i = 1; i <= nenhere; i++) {
 					hits[i] = 0.0;
 					if (powrem <= 0) continue;
-					hits[i] = fabs(game.kpower[i])/(phasefac*pow(0.90,game.kdist[i]));
+					hits[i] = fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]));
 					over = (0.01 + 0.05*Rand())*hits[i];
 					temp = powrem;
 					powrem -= hits[i] + over;
@@ -1080,7 +1080,7 @@ void phasers(void) {
 				if (key == IHEOL) {
 					chew();
 					if (ipoop && k > kz) {
-						int irec=(fabs(game.kpower[k])/(phasefac*pow(0.9,game.kdist[k])))*
+						int irec=(fabs(game.kpower[k])/(PHASEFAC*pow(0.9,game.kdist[k])))*
 								 (1.01+0.05*Rand()) + 1.0;
 						kz = k;
 						proutn("(");
@@ -1179,7 +1179,7 @@ void hittem(double *hits) {
 		hit = wham*pow(dustfac,game.kdist[kk]);
 		kpini = game.kpower[kk];
 		kp = fabs(kpini);
-		if (phasefac*hit < kp) kp = phasefac*hit;
+		if (PHASEFAC*hit < kp) kp = PHASEFAC*hit;
 		game.kpower[kk] -= (game.kpower[kk] < 0 ? -kp: kp);
 		kpow = game.kpower[kk];
 		ii = game.kx[kk];

@@ -161,7 +161,7 @@ void abandn(void) {
 	iscraft=0; /* Gallileo disappears */
 	/* Resupply ship */
 	condit=IHDOCKED;
-	for (l = 1; l <= ndevice; l++) game.damage[l] = 0.0;
+	for (l = 1; l <= NDEVICES; l++) game.damage[l] = 0.0;
 	game.damage[DSHUTTL] = -1;
 	energy = inenrg = 3000.0;
 	shield = inshld = 1250.0;
@@ -195,7 +195,7 @@ void setup(void) {
 	nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
 	warpfac = 5.0;
 	wfacsq = warpfac * warpfac;
-	for (i=0; i <= ndevice; i++) game.damage[i] = 0.0;
+	for (i=0; i <= NDEVICES; i++) game.damage[i] = 0.0;
 	// Set up assorted game parameters
 	batx = baty = 0;
 	game.state.date = indate = 100.0*(int)(31.0*Rand()+20.0);
@@ -298,13 +298,13 @@ void setup(void) {
 		game.state.cy[i] = iy;
 	}
 	// Locate planets in galaxy
-	for (i = 1; i <= inplan; i++) {
+	for (i = 0; i < inplan; i++) {
 		do iran8(&ix, &iy);
 		while (game.state.newstuf[ix][iy] > 0);
 		game.state.newstuf[ix][iy] = 1;
 		game.state.plnets[i].x = ix;
 		game.state.plnets[i].y = iy;
-		game.state.plnets[i].pclass = Rand()*3.0 + 1.0; // Planet class M N or O
+		game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
 		game.state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
 		game.state.plnets[i].known = unknown;
 	}
@@ -593,9 +593,9 @@ void newqad(int shutup) {
 	
 	if (nplan) {
 		// If quadrant needs a planet, put it in
-		for (i=1; i <= inplan; i++)
+		for (i=0; i < inplan; i++)
 			if (game.state.plnets[i].x == quadx && game.state.plnets[i].y == quady) break;
-		if (i <= inplan) {
+		if (i < inplan) {
 			iplnet = i;
 			dropin(IHP, &plnetx, &plnety);
 		}

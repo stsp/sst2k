@@ -10,18 +10,20 @@
 
 // #define DEBUG
 
-#define ndevice (15)	// Number of devices
-#define phasefac (2.0)
+#define NDEVICES (15)	// Number of devices
+#define PHASEFAC (2.0)
 #define PLNETMAX (10)
 #define NEVENTS (8)
 
 typedef struct {
     int x;	/* Quadrant location of planet */
     int y;
-    int pclass; /* class M, N, or O (1, 2, or 3) */
+    enum {M=0, N=1, O=2} pclass;
     int crystals; /* has crystals */
     enum {unknown, known, shuttle_down} known;
 } planet;
+
+#define DESTROY(pl)	memset(pl, '\0', sizeof(planet))
 
 typedef struct {
     int snap,		// snapshot taken
@@ -43,7 +45,7 @@ typedef struct {
 	nromrem,		// Romulans remaining
 	nsckill,		// super commanders killed
 	nplankl;		// destroyed planets
-	planet plnets[PLNETMAX+1];  // Planet information
+	planet plnets[PLNETMAX];  // Planet information
 	double date,		// stardate
 	    remres,		// remaining resources
 	    remtime;		// remaining time
@@ -54,14 +56,17 @@ typedef struct {
 // original names. Gee, I could have done this with the d structure,
 // but I just didn't think of it back when I started.
 
+#define SSTMAGIC	"SST2.0\n"
+
 EXTERN struct {
+    char magic[sizeof(SSTMAGIC)];
     snapshot state;
     snapshot snapsht;
     char quad[11][11];		// contents of our quadrant
     double kpower[21];		// enemy energy levels
     double kdist[21];		// enemy distances
     double kavgd[21];		// average distances
-    double damage[ndevice+1];	// damage encountered
+    double damage[NDEVICES+1];	// damage encountered
     double future[NEVENTS+1];	// future events
     char passwd[10];		// Self Destruct password
     int kx[21];			// enemy sector locations
@@ -247,8 +252,7 @@ EXTERN struct {
 
 /* the following global state doesn't need to be saved */
 EXTERN int fromcommandline; // Game start from command line options
-EXTERN char	*device[ndevice+1];
-EXTERN planet nulplanet;	// zeroed planet structure
+EXTERN char	*device[NDEVICES+1];
 EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
 EXTERN double aaitem;
@@ -290,8 +294,7 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 #define FDSPROB 8   // Move deep space probe
 
 #ifdef INCLUDED
-planet nulplanet = {0};
-char *device[ndevice+1] = {
+char *device[NDEVICES+1] = {
 	"",
 	"S. R. Sensors",
 	"L. R. Sensors",

@@ -637,7 +637,7 @@ void debugme(void) {
 	proutn("Reset damage? ");
 	if (ja() != 0) {
 		int i;
-		for (i=0; i <= ndevice; i++) if (damage[i] > 0.0) damage[i] = 0.0;
+		for (i=0; i <= NDEVICES; i++) if (damage[i] > 0.0) damage[i] = 0.0;
 		stdamtim = 1e30;
 	}
 	proutn("Toggle idebug? ");
@@ -649,7 +649,7 @@ void debugme(void) {
 	proutn("Cause selective damage? ");
 	if (ja() != 0) {
 		int i, key;
-		for (i=1; i <= ndevice; i++) {
+		for (i=1; i <= NDEVICES; i++) {
 			proutn("Kill ");
 			proutn(device[i]);
 			proutn("? ");
