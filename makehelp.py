@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Generate an on-line help file for SST from the text generated from
+# Generate an on-line help file for SST 2K from the text generated from
 # the XML documentation.
 #
 # By Eric S. Raymond for the Super Star Trek project
