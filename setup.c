@@ -1,11 +1,10 @@
 #include <time.h>
-#ifdef SERGEEV
 #include <sys/stat.h>
+#ifdef SERGEEV
 #include <conio.h>
 #endif /* SERGEEV */
 #include "sst.h"
 
-#ifdef SERGEEV
 #ifdef __linux__
 static long filelength(int fd) {
 struct stat buf;
@@ -13,7 +12,6 @@ struct stat buf;
     return buf.st_size;
 }
 #endif
-#endif /* SERGEEV */
 
 void prelim(void) {
 	skip(2);
@@ -84,7 +82,7 @@ int thaw(void) {
 		return 1;
 	}
 	fread(&game, sizeof(game), 1, fp);
-	if (strcmp(game.magic, SSTMAGIC)) {
+	if (feof(fp) || ftell(fp) != filelength(fileno(fp)) || strcmp(game.magic, SSTMAGIC)) {
 		prout("Game file format is bad, should begin with " SSTMAGIC);
 		skip(1);
 		fclose(fp);
@@ -402,13 +400,16 @@ void randomize(void) {
 }
 
 int choose(int needprompt) {
+#ifdef SERGEEV
+        int i;
+#endif /* SERGEEV */
+        while (TRUE) {
 	tourn = 0;
 	thawed = 0;
 	skill = 0;
 	length = 0;
-	while (TRUE) {
 		if (needprompt) /* Can start with command line options */
-		    proutn("Would you like a regular, tournament, or frozen game?");
+                        proutn("Would you like a regular, tournament, or saved game? ");
 		scan();
 		if (strlen(citem)==0) continue; // Try again
 		if (isit("tournament")) {
@@ -424,22 +425,27 @@ int choose(int needprompt) {
 			srand((unsigned int)(int)aaitem);
 			break;
 		}
+#ifdef SERGEEV
+                if (isit("saved")) {
+                        if (thaw()) continue;
+#else
 		if (isit("frozen")) {
 			thaw();
+#endif /* SERGEEV */
 			chew();
+#ifndef SERGEEV
 			if (*game.passwd==0) continue;
 			randomize();
 			Rand(); Rand(); Rand(); Rand();
+#endif
 			if (!alldone) thawed = 1; // No plaque if not finished
-			report(1);
+                        report();
+#ifdef SERGEEV
+                        getche();
+#endif /* SERGEEV */
 			return TRUE;
 		}
-		if (isit("regular")) {
-			skip(2);
-			randomize();
-			Rand(); Rand(); Rand(); Rand();
-			break;
-		}
+                if (isit("regular")) break;
 		proutn("What is \"");
 		proutn(citem);
 		prout("\"?");
@@ -599,7 +605,6 @@ void newqad(int shutup) {
 		game.kdist[i] = game.kavgd[i] = sqrt(square(sectx-ix) + square(secty-iy));
 		game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*skill;
 	}
-	sortkl();
 	// If quadrant needs a starbase, put it in
 	if (quadnum >= 10) {
 		quadnum -= 10;

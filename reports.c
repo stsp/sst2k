@@ -2,9 +2,15 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef SERGEEV
+#include <conio.h>
+#include "sstlinux.h"
+#else
+#define c_printf proutn
+#endif /* SERGEEV */
 
 void attakreport(int l) {
-    if (!l) {
+     if (!l) {
 	if (game.future[FCDBAS] < 1e30) {
 		prout("Starbase in %s is currently under Commander attack.",
 		      cramlc(quadrant, batx, baty));
@@ -23,10 +29,13 @@ void attakreport(int l) {
         if (isatb == 1)
            proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, game.future[FSCDBAS]);
      }
+#ifdef SERGEEV
+     clreol();
+#endif /* SERGEEV */
 }
 	
 
-void report(int f) {
+void report(void) {
 	char *s1,*s2,*s3;
 
 	chew();
@@ -50,7 +59,7 @@ void report(int f) {
 		   alldone? "were": "are now", s1, s2, s3);
 	if (skill>3 && thawed && !alldone) prout("No plaque is allowed.");
 	if (tourn) prout("This is tournament game %d.", tourn);
-	if (f) prout("Your secret password is \"%s\"",game.passwd);
+	prout("Your secret password is \"%s\"",game.passwd);
 	proutn("%d of %d Klingons have been killed",
 		   game.state.killk+game.state.killc+game.state.nsckill, inkling);
 	if (game.state.killc) prout(", including %d Commander%s.", game.state.killc, game.state.killc==1?"":"s");
@@ -120,26 +129,24 @@ void lrscan(void) {
 			prout("LONG-RANGE SENSORS DAMAGED.");
 			return;
 		}
-		skip(1);
-		proutn("Starbase's long-range scan for");
+		proutn("Starbase's long-range scan");
 	}
 	else {
-		skip(1);
-		proutn("Long-range scan for ");
+		prout("Long-range scan");
 	}
-	prout(cramlc(quadrant, quadx, quady));
 	for (x = quadx-1; x <= quadx+1; x++) {
+		proutn(" ");
 		for (y = quady-1; y <= quady+1; y++) {
 			if (x == 0 || x > 8 || y == 0 || y > 8)
-				proutn("   -1");
+                                proutn("  -1");
 			else {
-				proutn("%5d", game.state.galaxy[x][y]);
-				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+1000 :1;
+                                if (game.state.galaxy[x][y]<1000) proutn(" %3d", game.state.galaxy[x][y]);
+                                else proutn("***");
+				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+1000 : 1;
 			}
 		}
-		skip(1);
+                prout(" ");
 	}
-
 }
 
 void dreprt(void) {
@@ -149,7 +156,6 @@ void dreprt(void) {
 	for (i = 1; i <= NDEVICES; i++) {
 		if (game.damage[i] > 0.0) {
 			if (!jdam) {
-				skip(1);
 				prout("DEVICE            -REPAIR TIMES-");
 				prout("                IN FLIGHT   DOCKED");
 				jdam = TRUE;
@@ -165,15 +171,12 @@ void dreprt(void) {
 
 void chart(int nn) {
 	int i,j;
-
+	char *cp;
 	chew();
-	skip(1);
 	if (stdamtim != 1e30 && stdamtim != game.state.date && condit == IHDOCKED) {
-		prout("Spock-  \"I revised the Star Chart from the");
-		prout("  starbase's records.\"");
-		skip(1);
+                c_printf("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
 	}
-	if (nn == 0) prout("STAR CHART FOR THE KNOWN GALAXY");
+        if (nn == 0) c_printf("       STAR CHART FOR THE KNOWN GALAXY\n\r");
 	if (stdamtim != 1e30) {
 		if (condit == IHDOCKED) {
 			/* We are docked, so restore chart from base information */
@@ -187,85 +190,116 @@ void chart(int nn) {
 			   (int)(game.state.date-stdamtim));
 		}
 	}
-	if (nn ==0) skip(1);
 
 	prout("      1    2    3    4    5    6    7    8");
-	prout("    ----------------------------------------");
-	/* if (nn==0) prout("  -"); */
 	for (i = 1; i <= 8; i++) {
-	        proutn("%d -", i);
+                c_printf("%d |", i);
 		for (j = 1; j <= 8; j++) {
+		    char buf[4];
+                        c_printf("  ");
 			if (game.starch[i][j] < 0)
-				proutn("  .1.");
+                                strcpy(buf, ".1.");
 			else if (game.starch[i][j] == 0)
-				proutn("  ...");
+                                strcpy(buf, "...");
 			else if (game.starch[i][j] > 999)
-				proutn("%5d", game.starch[i][j]-1000);
+                                if ((i==quadx)&&(j==quady)){
+#ifdef SERGEEV
+                                   gotoxy(wherex()-1,wherey());
+#endif /* SERGEEV */
+                                   if (game.starch[i][i]<2000)
+				       sprintf(buf, "%03d", game.starch[i][j]-1000);
+                                   else 
+				       strcpy(buf, "***");
+                                }
+                                else
+                                    if (game.starch[i][j]<2000) 
+					sprintf(buf, "%03d", game.starch[i][j]-1000);
+                                    else 
+					strcpy(buf, "***");
+                        else if ((i==quadx)&&(j==quady)){
+#ifdef SERGEEV
+                                gotoxy(wherex()-1,wherey());
+#endif /* SERGEEV */
+                                sprintf(buf, "%03d", game.state.galaxy[i][j]);
+                        }
+                        else if (game.state.galaxy[i][j]>=1000)
+                                strcpy(buf, "***");
 			else
-				proutn("%5d", game.state.galaxy[i][j]);
+				sprintf(buf, "%03d", game.state.galaxy[i][j]);
+			for (cp = buf; cp < buf + sizeof(buf); cp++)
+			    if (*cp == '0')
+				*cp = '.';
+			c_printf(buf);
 		}
-		prout("  -");
+                c_printf("  |");
+                if (i<8) c_printf("\n\r");
 	}
-	if (nn == 0) {
-		skip(1);
-		crmshp();
-		prout(" is currently in %s", cramlc(quadrant, quadx, quady));
-}
+#ifdef SERGEEV
+	proutn("");	/* flush output */
+#else
+	skip(2);
+#endif
 }
 		
 		
-void srscan(int l) {
-	static char requests[][3] =
-		{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
-	char *cp = NULL;
-	int leftside=TRUE, rightside=TRUE, i, j, k=0, nn=FALSE;
+int srscan(int l) {
+        char *cp = NULL;
+        int leftside=TRUE, rightside=TRUE, i, j, jj, k=0, nn=FALSE, t, dam=0;
 	int goodScan=TRUE;
 	switch (l) {
 		case 1: // SRSCAN
 			if (game.damage[DSRSENS] != 0) {
 				/* Allow base's sensors if docked */
 				if (condit != IHDOCKED) {
-					prout("SHORT-RANGE SENSORS DAMAGED");
+                                        prout("   S.R. SENSORS DAMAGED!");
 					goodScan=FALSE;
 				}
 				else
-					prout("[Using starbase's sensors]");
+                                        prout("  [Using Base's sensors]");
 			}
-			if (goodScan)
-			    game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ?
-									   game.state.galaxy[quadx][quady]+1000:1;
+                        else c_printf("     Short-range scan\n\r");
+                        if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+1000:1;
 			scan();
 			if (isit("chart")) nn = TRUE;
-			if (isit("no")) rightside = FALSE;
+			rightside = FALSE;
 			chew();
-			prout("\n    1 2 3 4 5 6 7 8 9 10");
+                        c_printf("    1 2 3 4 5 6 7 8 9 10\n\r");
 			break;
 		case 2: // REQUEST
-			while (scan() == IHEOL)
-				proutn("Information desired? ");
-			chew();
-			for (k = 1; k <= 10; k++)
-				if (strncmp(citem,requests[k],min(2,strlen(citem)))==0)
-					break;
-			if (k > 10) {
-				prout("UNRECOGNIZED REQUEST. Legal requests are:\n"
-					 "  date, condition, position, lsupport, warpfactor,\n"
-					 "  energy, torpedoes, shields, klingons, time.");
-				return;
-			}
-			// no "break"
+                        leftside=FALSE;
+                        break;
 		case 3: // STATUS
 			chew();
 			leftside = FALSE;
 			skip(1);
 	}
+	if (condit != IHDOCKED) newcnd();
 	for (i = 1; i <= 10; i++) {
-		int jj = (k!=0 ? k : i);
+		jj = (k!=0 ? k : i);
 		if (leftside) {
 			proutn("%2d  ", i);
 			for (j = 1; j <= 10; j++) {
-				if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1))
-					proutn("%c ",game.quad[i][j]);
+                                if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1)){
+                                   if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
+#ifdef SERGEEV
+                                        switch (condit) {
+                                                case IHRED: textcolor(RED); break;
+                                                case IHGREEN: textcolor(GREEN); break;
+                                                case IHYELLOW: textcolor(YELLOW); break;
+                                                case IHDOCKED: textcolor(LIGHTGRAY); break;
+                                                case IHDEAD: textcolor(WHITE);
+                                        }
+                                        if (game.quad[i][j]!=ship) highvideo();
+#endif /* SERGEEV */
+                                   }
+#ifdef SERGEEV
+                                   if (game.quad[i][j] & 128) highvideo();
+#endif /* SERGEEV */
+                                   c_printf("%c ",game.quad[i][j] & 127);
+#ifdef SERGEEV
+                                   textcolor(LIGHTGRAY);
+#endif /* SERGEEV */
+                                }
 				else
 					proutn("- ");
 			}
@@ -273,7 +307,7 @@ void srscan(int l) {
 		if (rightside) {
 			switch (jj) {
 				case 1:
-					proutn(" Stardate      %.1f", game.state.date);
+                                        proutn("Stardate      %.1f, Time Left %.2f", game.state.date, game.state.remtime);
 					break;
 				case 2:
 					if (condit != IHDOCKED) newcnd();
@@ -282,37 +316,38 @@ void srscan(int l) {
 						case IHGREEN: cp = "GREEN"; break;
 						case IHYELLOW: cp = "YELLOW"; break;
 						case IHDOCKED: cp = "DOCKED"; break;
+                                                case IHDEAD: cp="DEAD"; break;
 					}
-					proutn(" Condition     %s", cp);
+                                        for (t=0;t<=NDEVICES;t++)
+                                            if (game.damage[t]>0) dam++;
+                                        proutn("Condition     %s, %i DAMAGES", cp, dam);
 					break;
 				case 3:
-					proutn(" Position      ");
-					proutn(cramlc(neither, quadx, quady));
-					proutn(" , ");
-					proutn(cramlc(neither, sectx, secty));
+                                        proutn("Position      %d - %d , %d - %d",
+					    quadx, quady, sectx, secty);
 					break;
 				case 4:
-					proutn(" Life Support  ");
+                                        proutn("Life Support  ");
 					if (game.damage[DLIFSUP] != 0.0) {
 						if (condit == IHDOCKED)
-							proutn("DAMAGED, supported by starbase");
+                                                        proutn("DAMAGED, Base provides");
 						else
-							proutn("DAMAGED, reserves=%.2f", lsupres);
+                                                        proutn("DAMAGED, reserves=%4.2f", lsupres);
 					}
 					else
 						proutn("ACTIVE");
 					break;
 				case 5:
-					proutn(" Warp Factor   %.1f", warpfac);
+					proutn("Warp Factor   %.1f", warpfac);
 					break;
 				case 6:
-					proutn(" Energy        %.2f", energy);
+					proutn("Energy        %.2f", energy);
 					break;
 				case 7:
-					proutn(" Torpedoes     %d", torps);
+					proutn("Torpedoes     %d", torps);
 					break;
 				case 8:
-					proutn(" Shields       ");
+					proutn("Shields       ");
 					if (game.damage[DSHIELD] != 0)
 						proutn("DAMAGED,");
 					else if (shldup)
@@ -323,23 +358,28 @@ void srscan(int l) {
 						   (int)((100.0*shield)/inshld + 0.5), shield);
 					break;
 				case 9:
-					proutn(" Klingons Left %d", game.state.remkl);
+					proutn("Klingons Left %d", game.state.remkl);
 					break;
 				case 10:
-					attakreport(1);
+                                        attakreport(1);
 					break;
 			}
-					
 		}
-		skip(1);
-		if (k!=0) return;
+    		if (i<10) c_printf("\n\r");
+	        if (k!=0) return(goodScan);
 	}
 	if (nn) chart(1);
+#ifdef SERGEEV
+	proutn("");
+#else
+	skip(2);
+#endif /* SERGEEV */
+        return(goodScan);
 }
 			
 			
 void eta(void) {
-	int ix1, ix2, iy1, iy2, prompt=FALSE;
+        int ix1, ix2, iy1, iy2, prompt=FALSE;
 	int wfl;
 	double ttime, twarp, tpower;
 	if (game.damage[DCOMPTR] != 0.0) {

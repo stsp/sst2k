@@ -408,7 +408,7 @@ static void makemoves(void) {
 				srscan(2);
 				break;
 			case 21:			// Game Report 
-				report(0);
+				report();
 				break;
 			case 22:			// use COMPUTER!
 				eta();
@@ -417,12 +417,15 @@ static void makemoves(void) {
 				listCommands(TRUE);
 				break;
 			case 24:		// Emergency exit
-				clearscreen();	// Hide screen
+#ifdef SERGEEV
+				clrscr();	// Hide screen
+#endif /* SERGEEV */
 				freeze(TRUE);	// forced save
 				exit(1);		// And quick exit
 				break;
 			case 25:
 				probe();		// Launch probe
+                                if (ididit) hitme = TRUE;
 				break;
 			case 26:			// Abandon Ship
 				abandn();
@@ -432,8 +435,11 @@ static void makemoves(void) {
 				break;
 			case 28:			// Save Game
 				freeze(FALSE);
+#ifdef SERGEEV
+                                clrscr();
+#endif /* SERGEEV */
 				if (skill > 3)
-					prout("WARNING--Frozen games produce no plaques!");
+                                        prout("WARNING--Saved games produce no plaques!");
 				break;
 			case 29:			// Try a desparation measure
 				deathray();
@@ -472,7 +478,6 @@ static void makemoves(void) {
 				atover(0);
 				continue;
 			}
-			if (nenhere == 0) movetho();
 			if (hitme && justin==0) {
 				attack(2);
 				if (alldone) break;
@@ -490,7 +495,8 @@ static void makemoves(void) {
 
 
 int main(int argc, char **argv) {
-    int i, option, usecurses = TRUE;
+	int i, option, usecurses = TRUE;
+
 	while ((option = getopt(argc, argv, "t")) != -1) {
 	    switch (option) {
 	    case 't':
@@ -516,14 +522,14 @@ int main(int argc, char **argv) {
 		strcat(line, " ");
 	}
 	while (TRUE) { /* Play a game */
-		prelim(); 
+	        prelim();
 		setup(line[0] == '\0');
 		if (alldone) {
 			score();
 			alldone = 0;
 		}
 		else makemoves();
-		skip(2);
+		skip(1);
 		stars();
 		skip(1);
 
@@ -576,7 +582,7 @@ char *cramlc(enum loctype key, int x, int y) {
 	buf[0] = '\0';
 	if (key == quadrant) strcpy(buf, "Quadrant ");
 	else if (key == sector) strcpy(buf, "Sector ");
-	sprintf(buf+strlen(buf), "%d-%d", x, y);
+	sprintf(buf+strlen(buf), "%d - %d", x, y);
 	return buf;
 }
 
@@ -652,6 +658,7 @@ int scan(void) {
                    clrscr();
                    setwnd(4);
                    clrscr();
+                }
 #endif /* SERGEEV */
 		linep = line;
 	}

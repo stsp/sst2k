@@ -386,7 +386,7 @@ static void getcd(int isprobe, int akey) {
 		if (!isprobe) {
 			if (itemp) {
 				if (iprompt) {
-					proutn("Helmsman Sulu- \"Course locked in for %s.\"",
+					prout("Helmsman Sulu- \"Course locked in for %s.\"",
 						cramlc(sector, irows, icols));
 				}
 			}
@@ -983,29 +983,47 @@ void help(void) {
 		proutn(" attempt to re-materialize ");
 		crmshp();
 		prouts(" . . . . . ");
+#ifdef SERGEEV
+                posx=wherex();
+                posy=wherey();
+                drawmaps(1);
+                setwnd(4);
+                gotoxy(posx,posy);
+                sound(50);
+                delay(1000);
+                nosound();
+#endif /* SERGEEV */
 		if (Rand() > probf) break;
+#ifdef SERGEEV
+                switch (l){
+                       case 1: game.quad[ix][iy]=IHMATER1;
+                               break;
+                       case 2: game.quad[ix][iy]=IHMATER2;
+                               break;
+                       case 3: game.quad[ix][iy]=IHQUEST;
+                               break;
+                }
+                textcolor(RED);
+#endif /* SERGEEV */
 		prout("fails.");
+#ifdef SERGEEV
+                delay(500);
+                textcolor(LIGHTGRAY);
+#endif /* SERGEEV */
 	}
 	if (l > 3) {
 		finish(FMATERIALIZE);
 		return;
 	}
-	/* Rematerialization attempt should succeed if can get adj to base */
-	for (l = 1; l <= 5; l++) {
-		ix = basex+3.0*Rand()-1;
-		iy = basey+3.0*Rand()-1;
-		if (ix>=1 && ix<=10 && iy>=1 && iy<=10 && game.quad[ix][iy]==IHDOT) {
-			/* found one -- finish up */
-			prout("succeeds.");
-			sectx=ix;
-			secty=iy;
-			game.quad[ix][iy]=ship;
-			dock(0);
-			skip(1);
-			prout("Lt. Uhura-  \"Captain, we made it!\"");
-			return;
-		}
-	}
-	finish(FMATERIALIZE);
-	return;
+	game.quad[ix][iy]=ship;
+#ifdef SERGEEV
+	textcolor(WHITE);
+#endif /* SERGEEV */
+	prout("succeeds.");
+#ifdef SERGEEV
+	textcolor(LIGHTGRAY);
+#endif /* SERGEEV */
+	dock(0);
+	skip(1);
+	prout("Lt. Uhura-  \"Captain, we made it!\"");
 }

@@ -589,7 +589,7 @@ safely even in the midst of battle.</para>
 Mnemonic:  MOVE
 Shortest abbreviation:  M
 Full command:  MOVE MANUAL &lt;displacement&gt;
-               MOVE AUTOMATIC &lt;estination*gt;
+               MOVE AUTOMATIC &lt;destination&gt;
 </literallayout>
 
 <para>This command is the usual way to move from one place to another
@@ -635,7 +635,7 @@ scan shown earlier.</para>
 
 <para>&lt;para&gt;where &lt;qrow&gt; and &lt;qcol&gt; are the row and column
 numbers of the destination quadrant, and &lt;srow&gt; and &lt;scol&gt;
-are the row and column numbers of thedestination sector in that
+are the row and column numbers of the destination sector in that
 quadrant.  This command also moves your ship in a straight line path
 to the destination.  For moving within a quadrant, &lt;qrow&gt; and
 &lt;qcol&gt; may be omitted. For example, to move to sector 2 - 9 in

@@ -61,6 +61,8 @@ typedef struct {
 
 #define SSTMAGIC	"SST2.0\n"
 
+EXTERN short curwnd;
+
 EXTERN struct {
     char magic[sizeof(SSTMAGIC)];
     snapshot state;
@@ -356,7 +358,7 @@ int choose(int);
 void setup(int);
 void score(void);
 void atover(int);
-void srscan(int);
+int srscan(int);
 void lrscan(void);
 void phasers(void);
 void photon(void);
@@ -369,7 +371,7 @@ void impuls(void);
 void wait(void);
 void setwrp(void);
 void events(void);
-void report(int);
+void report(void);
 void eta(void);
 void help(void);
 void abandn(void);

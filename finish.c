@@ -403,11 +403,10 @@ void plaque(void) {
 	skip(2);
 	
 	while (fp == NULL) {
-#ifdef SERGEEV
                 proutn("File or device name for your plaque: ");
+#ifdef SERGEEV
                 getline(winner, sizeof(winner));
 #else
-		proutn("File or device name for your plaque:");
 		fgets(winner, 128, stdin);
 		winner[strlen(winner)-1] = '\0';
 #endif /* SERGEEV */
@@ -419,14 +418,8 @@ void plaque(void) {
 
         proutn("Enter name to go on plaque (up to 30 characters): ");
         getline(winner, sizeof(winner));
-        proutn("Enter name to go on plaque (up to 30 characters): ");
-        getline(winner, sizeof(winner));
-	winner[30] = '\0';
-#ifdef SERGEEV
+	/* The 38 below must be 64 for 132-column paper */
 	nskip = 38 - strlen(winner)/2;
-#else
-	nskip = 64 - strlen(winner)/2;
-#endif /* SERGEEV */
 
 	fprintf(fp,"\n\n\n\n");
 	/* --------DRAW ENTERPRISE PICTURE. */
