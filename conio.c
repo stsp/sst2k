@@ -276,11 +276,14 @@ void textbackground (int color)
    docolor(color);
 }
 
+
 void textcolor (int color)
 {
+#ifdef SERGEEV
    fgc=color;
    color=(bgc*16)+fgc;
    docolor(color);
+#endif /* SERGEEV */
 }
  
 void textmode (int mode)

@@ -286,6 +286,23 @@ void prouts(char *fmt, ...) {
 #endif /* SERGEEV */
 }
 
+void warble(void)
+{
+#ifdef SERGEEV
+    int posx, posy;
+    posx=wherex();
+    posy=wherey();
+    drawmaps(1);
+    setwnd(4);
+    gotoxy(posx,posy);
+    sound(50);
+    delay(1000);
+    nosound();
+#else
+    prouts(" . . . . . ");
+#endif /* SERGEEV */
+}
+
 void getline(char *line, int max) {
     if (curses) {
 #ifndef SERGEEV

@@ -2,10 +2,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef SERGEEV
-#include <conio.h>
+#include "conio.h"
 #include "sstlinux.h"
-#else
+#ifndef SERGEEV
 #define c_printf proutn
 #endif /* SERGEEV */
 
@@ -281,7 +280,6 @@ int srscan(int l) {
 			for (j = 1; j <= 10; j++) {
                                 if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1)){
                                    if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
-#ifdef SERGEEV
                                         switch (condit) {
                                                 case IHRED: textcolor(RED); break;
                                                 case IHGREEN: textcolor(GREEN); break;
@@ -289,6 +287,7 @@ int srscan(int l) {
                                                 case IHDOCKED: textcolor(LIGHTGRAY); break;
                                                 case IHDEAD: textcolor(WHITE);
                                         }
+#ifdef SERGEEV
                                         if (game.quad[i][j]!=ship) highvideo();
 #endif /* SERGEEV */
                                    }
@@ -296,9 +295,7 @@ int srscan(int l) {
                                    if (game.quad[i][j] & 128) highvideo();
 #endif /* SERGEEV */
                                    c_printf("%c ",game.quad[i][j] & 127);
-#ifdef SERGEEV
                                    textcolor(LIGHTGRAY);
-#endif /* SERGEEV */
                                 }
 				else
 					proutn("- ");

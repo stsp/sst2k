@@ -441,6 +441,7 @@ void ioend(void);
 #ifdef SERGEEV
 void setwnd(short);
 #endif /* SERGEEV */
+void warble(void);
 void getline(char *, int);
 void commandhook(char *, int);
 

@@ -1,7 +1,5 @@
-#ifdef SERGEEV
-#include <conio.h>
+#include "conio.h"
 #include "sstlinux.h"
-#endif /* SERGEEV */
 #include <unistd.h>
 #include "sst.h"
 
@@ -55,12 +53,13 @@ void imove(void) {
 									  (iy-game.ky[l])*(double)(iy-game.ky[l]));
 						game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
 					}
-#ifdef SERGEEV
+					/*
+					 * Stas Sergeev added the condition
+					 * that attacks only happen if Klingons
+					 * are present and your skill is > 3.
+					 */
                                         if (skill > 3 && klhere > 0 && game.state.galaxy[quadx][quady] != 1000)
 					    attack(0);
-#else
-					if (game.state.galaxy[quadx][quady] != 1000) attack(0);
-#endif /* SERGEEV */
 					if (alldone) return;
 				}
 				/* compute final position -- new quadrant and sector */
@@ -824,9 +823,7 @@ void timwrp() {
 		game.damage[DRADIO] += Time;
 	}
 	newqad(0);
-#ifdef SERGEEV
-        events();
-#endif /* SERGEEV */
+        events();	/* Stas Sergeev added this -- do pending events */
 }
 
 void probe(void) {
@@ -905,9 +902,6 @@ void help(void) {
 	/* There's more than one way to move in this game! */
 	double ddist, xdist, probf;
 	int line = 0, l, ix, iy;
-#ifdef SERGEEV
-	int posx, posy;
-#endif /* SERGEEV */
 
 	chew();
 	/* Test for conditions which prevent calling for help */
@@ -982,19 +976,8 @@ void help(void) {
 		}
 		proutn(" attempt to re-materialize ");
 		crmshp();
-		prouts(" . . . . . ");
-#ifdef SERGEEV
-                posx=wherex();
-                posy=wherey();
-                drawmaps(1);
-                setwnd(4);
-                gotoxy(posx,posy);
-                sound(50);
-                delay(1000);
-                nosound();
-#endif /* SERGEEV */
+		warble();
 		if (Rand() > probf) break;
-#ifdef SERGEEV
                 switch (l){
                        case 1: game.quad[ix][iy]=IHMATER1;
                                break;
@@ -1004,25 +987,18 @@ void help(void) {
                                break;
                 }
                 textcolor(RED);
-#endif /* SERGEEV */
 		prout("fails.");
-#ifdef SERGEEV
                 delay(500);
                 textcolor(LIGHTGRAY);
-#endif /* SERGEEV */
 	}
 	if (l > 3) {
 		finish(FMATERIALIZE);
 		return;
 	}
 	game.quad[ix][iy]=ship;
-#ifdef SERGEEV
 	textcolor(WHITE);
-#endif /* SERGEEV */
 	prout("succeeds.");
-#ifdef SERGEEV
 	textcolor(LIGHTGRAY);
-#endif /* SERGEEV */
 	dock(0);
 	skip(1);
 	prout("Lt. Uhura-  \"Captain, we made it!\"");
