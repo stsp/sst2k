@@ -1,9 +1,5 @@
 		Super Star Trek TO-DO list
 
-* Remove the assumption that sst.doc lives in the current directory.
-
-* Improve the internal pager.
-
 * Yes-no confirmations and "press-to-continue" situations should print
   a recognizable standard prompt.
 
