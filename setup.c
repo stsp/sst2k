@@ -1,4 +1,8 @@
 #include <time.h>
+#ifdef SERGEEV
+#include <sys/stat.h>
+#include <conio.h>
+#endif /* SERGEEV */
 #include "sst.h"
 
 #ifdef SERGEEV
