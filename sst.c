@@ -751,7 +751,7 @@ void debugme(void)
 	for (i=0; i < NDEVICES; i++) 
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
-	stdamtim = 1e30;
+	stdamtim = FOREVER;
     }
     proutn("Toggle idebug? ");
     if (ja() != 0) {
@@ -770,7 +770,8 @@ void debugme(void)
 	    key = scan();
 	    if (key == IHALPHA &&  isit("y")) {
 		game.damage[i] = 10.0;
-		if (i == DRADIO) stdamtim = game.state.date;
+		if (i == DRADIO) 
+		    stdamtim = game.state.date;
 	    }
 	}
     }
@@ -779,7 +780,7 @@ void debugme(void)
 	int i;
 	for (i = 1; i < NEVENTS; i++) {
 	    int key;
-	    if (game.future[i] == 1e30) continue;
+	    if (game.future[i] == FOREVER) continue;
 	    switch (i) {
 	    case FSNOVA:  proutn("Supernova       "); break;
 	    case FTBEAM:  proutn("T Beam          "); break;

@@ -6,7 +6,7 @@
 void attakreport(int curt) 
 {
     if (!curt) {
-	if (game.future[FCDBAS] < 1e30) {
+	if (game.future[FCDBAS] < FOREVER) {
 	    prout("Starbase in %s is currently under Commander attack.",
 		  cramlc(quadrant, batx, baty));
 	    prout("It can hold out until Stardate %d.", 
@@ -19,7 +19,7 @@ void attakreport(int curt)
 		  (int)game.future[FSCDBAS]);
 	}
     } else {
-        if (game.future[FCDBAS] < 1e30)
+        if (game.future[FCDBAS] < FOREVER)
 	    proutn("Base in %i - %i attacked by C. Alive until %.1f", batx, baty, game.future[FCDBAS]);
         if (isatb == 1)
 	    proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, game.future[FSCDBAS]);
@@ -89,7 +89,7 @@ void report(void)
 	prout(".");
     }
     if ((game.damage[DRADIO] == 0.0 || condit == IHDOCKED)&&
-	game.future[FDSPROB] != 1e30) {
+	game.future[FDSPROB] != FOREVER) {
 	if (isarmed) 
 	    proutn("An armed deep space probe is in");
 	else
@@ -190,11 +190,11 @@ void chart(int nn)
     int i,j;
     char *cp;
     chew();
-    if (stdamtim != 1e30 && stdamtim != game.state.date && condit == IHDOCKED) {
+    if (stdamtim != FOREVER && stdamtim != game.state.date && condit == IHDOCKED) {
 	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
     }
     if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n\r");
-    if (stdamtim != 1e30) {
+    if (stdamtim != FOREVER) {
 	if (condit == IHDOCKED) {
 	    /* We are docked, so restore chart from base information */
 	    rechart();

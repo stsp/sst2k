@@ -237,12 +237,12 @@ void setup(int needprompt)
     game.future[FTBEAM] = game.state.date + expran(1.5 * (intime / game.state.remcom));
     game.future[FSNAP] = game.state.date + 1.0 + Rand(); // Force an early snapshot
     game.future[FBATTAK] = game.state.date + expran(0.3*intime);
-    game.future[FCDBAS] = 1e30;
-    game.future[FSCMOVE] = game.state.nscrem ? game.state.date+0.2777 : 1e30;
-    game.future[FSCDBAS] = 1e30;
-    game.future[FDSPROB] = 1e30;
-    // Starchart is functional
-    stdamtim = 1e30;
+    game.future[FCDBAS] = FOREVER;
+    game.future[FSCMOVE] = game.state.nscrem ? game.state.date+0.2777 : FOREVER;
+    game.future[FSCDBAS] = FOREVER;
+    game.future[FDSPROB] = FOREVER;
+    // Starchart is functional but we've never seen it
+    stdamtim = FOREVER;
     // Put stars in the galaxy
     instar = 0;
     for_quadrants(i)

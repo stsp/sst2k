@@ -115,6 +115,8 @@ typedef struct {
 #define DDSP    14  // Added deep space probe
 #define NDEVICES (15)	// Number of devices
 
+#define FOREVER	1e30
+
 /* Define future events */
 #define FSPY	0	// Spy event happens always (no future[] entry)
 					// can cause SC to tractor beam Enterprise

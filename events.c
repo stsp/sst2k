@@ -50,7 +50,7 @@ void events(void)
 		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 	/* If radio repaired, update star chart and attack reports */
 	if (radio_was_broken && game.damage[DRADIO] == 0.0) {
-	    stdamtim = 1e30;
+	    stdamtim = FOREVER;
 	    prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
 	    prout("   surveillance reports are coming in.");
 	    skip(1);
@@ -91,7 +91,7 @@ void events(void)
 	case FTBEAM: /* Tractor beam */
 	    if (line==FTBEAM) {
 		if (game.state.remcom == 0) {
-		    game.future[FTBEAM] = 1e30;
+		    game.future[FTBEAM] = FOREVER;
 		    break;
 		}
 		i = Rand()*game.state.remcom+1.0;
@@ -162,7 +162,7 @@ void events(void)
 	    /* Adjust finish time to time of tractor beaming */
 	    fintim = game.state.date+Time;
 	    attack(0);
-	    if (game.state.remcom <= 0) game.future[FTBEAM] = 1e30;
+	    if (game.state.remcom <= 0) game.future[FTBEAM] = FOREVER;
 	    else game.future[FTBEAM] = game.state.date+Time+expran(1.5*intime/game.state.remcom);
 	    break;
 	case FSNAP: /* Snapshot of the universe (for time warp) */
@@ -173,7 +173,7 @@ void events(void)
 	case FBATTAK: /* Commander attacks starbase */
 	    if (game.state.remcom==0 || game.state.rembase==0) {
 		/* no can do */
-		game.future[FBATTAK] = game.future[FCDBAS] = 1e30;
+		game.future[FBATTAK] = game.future[FCDBAS] = FOREVER;
 		break;
 	    }
 	    i = 0;
@@ -190,7 +190,7 @@ void events(void)
 	    if (j>game.state.rembase) {
 		/* no match found -- try later */
 		game.future[FBATTAK] = game.state.date + expran(0.3*intime);
-		game.future[FCDBAS] = 1e30;
+		game.future[FCDBAS] = FOREVER;
 		break;
 	    }
 	    /* commander + starbase combination found -- launch attack */
@@ -224,7 +224,7 @@ void events(void)
 	    }
 	    break;
 	case FSCDBAS: /* Supercommander destroys base */
-	    game.future[FSCDBAS] = 1e30;
+	    game.future[FSCDBAS] = FOREVER;
 	    isatb = 2;
 	    if (!game.state.galaxy[game.state.isx][game.state.isy].starbase) 
 		break; /* WAS RETURN! */
@@ -234,7 +234,7 @@ void events(void)
 	    baty = game.state.isy;
 	case FCDBAS: /* Commander succeeds in destroying base */
 	    if (line==FCDBAS) {
-		game.future[FCDBAS] = 1e30;
+		game.future[FCDBAS] = FOREVER;
 		/* find the lucky pair */
 		for_commanders(i)
 		    if (game.state.cx[i]==batx && game.state.cy[i]==baty) 
@@ -318,7 +318,7 @@ void events(void)
 			    proutn("is no longer transmitting");
 			prout(".\"");
 		    }
-		    game.future[FDSPROB] = 1e30;
+		    game.future[FDSPROB] = FOREVER;
 		    break;
 		}
 		if (game.damage[DRADIO]==0.0   || condit == IHDOCKED) {
@@ -343,7 +343,7 @@ void events(void)
 		game.state.galaxy[probecx][probecy].stars) {
 		/* lets blow the sucker! */
 		snova(1,0);
-		game.future[FDSPROB] = 1e30;
+		game.future[FDSPROB] = FOREVER;
 		if (game.state.galaxy[quadx][quady].supernova) 
 		    return;
 	    }
@@ -686,7 +686,7 @@ void snova(int insx, int insy)
 	/* did in the Supercommander! */
 	game.state.nscrem = game.state.isx = game.state.isy = isatb = iscate = 0;
 	iscdead = 1;
-	game.future[FSCMOVE] = game.future[FSCDBAS] = 1e30;
+	game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
     }
     game.state.remkl -= kldead;
     if (game.state.remcom) {
@@ -699,7 +699,7 @@ void snova(int insx, int insy)
 		game.state.remcom--;
 		kldead--;
 		comdead++;
-		if (game.state.remcom==0) game.future[FTBEAM] = 1e30;
+		if (game.state.remcom==0) game.future[FTBEAM] = FOREVER;
 		break;
 	    }
 	}

@@ -233,8 +233,8 @@ void dock(int l)
     shield = inshld;
     torps = intorps;
     lsupres = inlsr;
-    if (stdamtim != 1e30 &&
-	(game.future[FCDBAS] < 1e30 || isatb == 1) && iseenit == 0) {
+    if (stdamtim != FOREVER &&
+	(game.future[FCDBAS] < FOREVER || isatb == 1) && iseenit == 0) {
 	/* get attack report from base */
 	prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
 	attakreport(0);
@@ -783,7 +783,7 @@ void timwrp()
 										  be sooner */
 	if (game.state.nscrem) game.future[FSCMOVE] = 0.2777;
 	isatb = 0;
-	game.future[FCDBAS] = game.future[FSCDBAS] = 1e30;
+	game.future[FCDBAS] = game.future[FSCDBAS] = FOREVER;
 	batx = baty = 0;
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
@@ -842,7 +842,7 @@ void probe(void)
 	prout("Engineer Scott- \"The probe launcher is damaged, Sir.\"");
 	return;
     }
-    if (game.future[FDSPROB] != 1e30) {
+    if (game.future[FDSPROB] != FOREVER) {
 	chew();
 	skip(1);
 	if (game.damage[DRADIO] != 0 && condit != IHDOCKED) {
@@ -928,7 +928,7 @@ void help(void)
 	ddist = sqrt(square(basex-sectx)+square(basey-secty));
     }
     else {
-	ddist = 1e30;
+	ddist = FOREVER;
 	for_starbases(l) {
 	    xdist=10.0*sqrt(square(game.state.baseqx[l]-quadx)+square(game.state.baseqy[l]-quady));
 	    if (xdist < ddist) {
