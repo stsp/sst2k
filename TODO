@@ -8,4 +8,5 @@
   IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT CHART,
   REST, DOCK, QUIT, and DAMAGE were in the original non-"super" version.
 
-* Add a field to the report indicating whether we have dilithium.
+* Fix the color support.
+
