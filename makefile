@@ -39,12 +39,12 @@ sst.6: sst.xml
 	xmlto --skip-validation man sst.xml
 
 sst-doc.txt: sst-doc.xml
-	xmlto -m sst-layer.xsl --skip-validation txt sst-doc.xml
+	xmlto -m sst-layer.xsl txt sst-doc.xml
 sst.doc: sst-doc.txt
 	makehelp.py >sst.doc
 
 sst-doc.html: sst-doc.xml
-	xmlto --skip-validation xhtml-nochunks sst-doc.xml
+	xmlto xhtml-nochunks sst-doc.xml
 
 install: uninstall sst.6 sst.doc sst-doc.html 
 	install -m 755 -o 0 -g 0 -d $(ROOT)/usr/bin/

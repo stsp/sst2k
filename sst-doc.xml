@@ -473,8 +473,9 @@ it reaches zero, the federation is conquered and you lose.</para>
 </varlistentry>
 </variablelist>
 
-<para>Status information is free&mdash;it uses no time or energy, and if you are
-in battle, the Klingons are not given another chance to hit you.</para>
+<para>Status information is free&mdash;it uses no time or energy, and
+if you are in battle, the Klingons are not given another chance to hit
+you.</para>
 
 <para>Status information can also be obtained by doing a short-range scan.
 See the SRSCAN command for details.</para>
@@ -602,7 +603,7 @@ damaged devices were fixed en route.</para>
 <para>Damage reports are free.  They use no energy or time, and can be done
 safely even in the midst of battle.</para>
 
-</sect1>                                                                      9
+</sect1>
 <sect1><title>Move Under Warp Drive</title>
 
 <literallayout>
