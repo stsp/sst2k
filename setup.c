@@ -373,6 +373,9 @@ void setup(int needprompt) {
 	skip(2);
 	prout("Good Luck!");
 	if (game.state.nscrem) prout("  YOU'LL NEED IT.");
+#ifdef SERGEEV
+        getche();
+#endif /* SERGEEV */
 	newqad(0);
         if (nenhere-iqhere-ithere) shldup=1.0;
 	if (neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
@@ -445,9 +448,10 @@ int choose(int needprompt) {
 		else {
 			chew();
 			if (length==0) proutn("Would you like a Short, Medium, or Long game? ");
-			else if (skill == 0) proutn("Are you a Novice, Fair, Good, Expert, or Emeritus player?");
+			else if (skill == 0) proutn("Are you a Novice, Fair, Good, Expert, or Emeritus player? ");
 		}
 	}
+#ifndef SERGEEV
 	while (TRUE) {
 		scan();
 		strcpy(game.passwd, citem);
@@ -455,6 +459,10 @@ int choose(int needprompt) {
 		if (*game.passwd != 0) break;
 		proutn("Please type in a secret password-");
 	}
+#else
+        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
+        game.passwd[3]=0;
+#endif /* SERGEEV */
 #ifdef DEBUG
 	if (strcmp(game.passwd, "debug")==0) idebug = 1;
 #endif
@@ -492,6 +500,7 @@ void newcnd(void) {
 	if (energy < 1000.0) condit = IHYELLOW;
 	if (game.state.galaxy[quadx][quady] > 99 || game.state.newstuf[quadx][quady] > 9)
 		condit = IHRED;
+        if (!alive) condit=IHDEAD;
 }
 
 

@@ -222,7 +222,7 @@ void events(void) {
 				prout(".\"");
 				if (resting) {
 					skip(1);
-					proutn("Mr. Spock-  \"Captain, shall we cancel the rest period?\"");
+					proutn("Mr. Spock-  \"Captain, shall we cancel the rest period?\" ");
 					if (ja()) {
 						resting = 0;
 						Time = 0.0;

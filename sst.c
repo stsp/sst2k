@@ -78,7 +78,8 @@ SERGEEV, not yet merged):
        There are other minor adjustments to what yields an attack
        and what does not.
 
-    10. Ramming a black hole is no longer instant death.  
+    10. Ramming a black hole is no longer instant death.  There is a
+        chance you might get timewarped instead.
 
    */
 
@@ -198,6 +199,27 @@ static void helpme(void) {
 	}
 	fclose(fp);
 }
+
+#ifdef SERGEEV
+void drawmaps(short l){
+     _setcursortype(_NOCURSOR);
+     if (l==1) sensor();
+     if (l!=2) setwnd(1);
+     gotoxy(1,1);
+     strcpy(line,"s");
+     srscan(1);
+     if (l!=2){
+        setwnd(2);
+        clrscr();
+        srscan(2);
+        setwnd(3);
+        clrscr();
+        strcpy(line,"l");
+        lrscan();
+        _setcursortype(_NORMALCURSOR);
+     }
+}
+#endif /* SERGEEV */
 
 static void makemoves(void) {
 	int i, hitme;

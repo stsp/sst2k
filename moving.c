@@ -201,6 +201,9 @@ label100:
 	}
 	newcnd();
 	iattak = 0;
+#ifdef SERGEEV
+	drawmaps(0);
+#endif /* SERGEEV */
 	return;
 }
 
@@ -812,6 +815,9 @@ void timwrp() {
 		game.damage[DRADIO] += Time;
 	}
 	newqad(0);
+#ifdef SERGEEV
+        events();
+#endif /* SERGEEV */
 }
 
 void probe(void) {
@@ -882,6 +888,7 @@ void probe(void) {
 	probecy = quady;
 	game.future[FDSPROB] = game.state.date + 0.01; // Time to move one sector
 	prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
+	ididit = 1;
 	return;
 }
 

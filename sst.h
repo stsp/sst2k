@@ -421,6 +421,9 @@ int isit(char *);
 void preport(void);
 void orbit(void);
 void sensor(void);
+#ifdef SERGEEV
+void drawmaps(short);
+#endif /* SERGEEV */
 void beam(void);
 void mine(void);
 void usecrystals(void);
