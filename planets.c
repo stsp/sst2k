@@ -11,7 +11,7 @@ static int consumeTime(void) {
 	ididit = 1;
 #if 0
 	/* Don't wory about this */
-	if (future[FTBEAM] <= d.date+Time && d.remcom != 0 && condit != IHDOCKED) {
+	if (future[FTBEAM] <= state.date+Time && state.remcom != 0 && condit != IHDOCKED) {
 		/* We are about to be tractor beamed -- operation fails */
 		return 1;
 	}
@@ -21,7 +21,7 @@ static int consumeTime(void) {
 	events();	/* Used to avoid if future[FSCMOVE] within time */
 //	future[FSNOVA] = asave;
 	/*fails if game over, quadrant super-novas or we've moved to new quadrant*/
-	if (alldone || d.galaxy[quadx][quady] == 1000 || justin != 0) return 1;
+	if (alldone || state.galaxy[quadx][quady] == 1000 || justin != 0) return 1;
 	return 0;
 }
 
@@ -32,22 +32,22 @@ void preport(void) {
 	prout("Spock-  \"Planet report follows, Captain.\"");
 	skip(1);
 	for (i = 1; i <= inplan; i++) {
-		if (d.plnets[i].known
+		if (state.plnets[i].known
 #ifdef DEBUG
-			|| ( idebug && d.plnets[i].x !=0)
+			|| ( idebug && state.plnets[i].x !=0)
 #endif
 			) {
 			iknow = 1;
 #ifdef DEBUG
-			if (idebug && d.plnets[i].known==0) proutn("(Unknown) ");
+			if (idebug && state.plnets[i].known==0) proutn("(Unknown) ");
 #endif
-			cramlc(1, d.plnets[i].x, d.plnets[i].y);
+			cramlc(1, state.plnets[i].x, state.plnets[i].y);
 			proutn("   class ");
-			proutn(classes[d.plnets[i].pclass]);
+			proutn(classes[state.plnets[i].pclass]);
 			proutn("   ");
-			if (d.plnets[i].crystals == 0) proutn("no ");
+			if (state.plnets[i].crystals == 0) proutn("no ");
 			prout("dilithium crystals present.");
-			if (d.plnets[i].known==2) 
+			if (state.plnets[i].known==2) 
 				prout("    Shuttle Craft Galileo on surface.");
 		}
 	}
@@ -102,14 +102,14 @@ void sensor(void) {
 	proutn("         Planet at");
 	cramlc(2, plnetx, plnety);
 	proutn(" is of class ");
-	proutn(classes[d.plnets[iplnet].pclass]);
+	proutn(classes[state.plnets[iplnet].pclass]);
 	prout(".");
-	if (d.plnets[iplnet].known==2) 
+	if (state.plnets[iplnet].known==2) 
 		prout("         Sensors show Galileo still on surface.");
 	proutn("         Readings indicate");
-	if (d.plnets[iplnet].crystals == 0) proutn(" no");
+	if (state.plnets[iplnet].crystals == 0) proutn(" no");
 	prout(" dilithium crystals present.\"");
-	if (d.plnets[iplnet].known == 0) d.plnets[iplnet].known = 1;
+	if (state.plnets[iplnet].known == 0) state.plnets[iplnet].known = 1;
 	return;
 }
 
@@ -118,7 +118,7 @@ void beam(void) {
 	skip(1);
 	if (damage[DTRANSP] != 0) {
 		prout("Transporter damaged.");
-		if (damage[DSHUTTL]==0 && (d.plnets[iplnet].known==2 || iscraft == 1)) {
+		if (damage[DSHUTTL]==0 && (state.plnets[iplnet].known==2 || iscraft == 1)) {
 			skip(1);
 			prout("Spock-  \"May I suggest the shuttle craft, Sir?\" ");
 			if (ja() != 0) shuttle();
@@ -134,7 +134,7 @@ void beam(void) {
 		prout("Impossible to transport through shields.");
 		return;
 	}
-	if (d.plnets[iplnet].known==0) {
+	if (state.plnets[iplnet].known==0) {
 		prout("Spock-  \"Captain, we have no information on this planet");
 		prout("  and Starfleet Regulations clearly state that in this situation");
 		prout("  you may not go down.\"");
@@ -142,7 +142,7 @@ void beam(void) {
 	}
 	if (landed==1) {
 		/* Coming from planet */
-		if (d.plnets[iplnet].known==2) {
+		if (state.plnets[iplnet].known==2) {
 			proutn("Spock-  \"Wouldn't you rather take the Galileo?\" ");
 			if (ja() != 0) {
 				chew();
@@ -159,7 +159,7 @@ void beam(void) {
 	}
 	else {
 		/* Going to planet */
-		if (d.plnets[iplnet].crystals==0) {
+		if (state.plnets[iplnet].crystals==0) {
 			prout("Spock-  \"Captain, I fail to see the logic in");
 			prout("  exploring a planet with no dilithium crystals.");
 			proutn("  Are you sure this is wise?\" ");
@@ -188,7 +188,7 @@ void beam(void) {
 	skip(2);
 	prout("Transport complete.");
 	landed = -landed;
-	if (landed==1 && d.plnets[iplnet].known==2) {
+	if (landed==1 && state.plnets[iplnet].known==2) {
 		prout("The shuttle craft Galileo is here!");
 	}
 	if (landed!=1 && imine==1) {
@@ -208,7 +208,7 @@ void mine(void) {
 		prout("Mining party not on planet.");
 		return;
 	}
-	if (d.plnets[iplnet].crystals == 0) {
+	if (state.plnets[iplnet].crystals == 0) {
 		prout("No dilithium crystals on this planet.");
 		return;
 	}
@@ -223,7 +223,7 @@ void mine(void) {
 		prout("there's no reason to mine more at this time.");
 		return;
 	}
-	Time = (0.1+0.2*Rand())*d.plnets[iplnet].pclass;
+	Time = (0.1+0.2*Rand())*state.plnets[iplnet].pclass;
 	if (consumeTime()) return;
 	prout("Mining operation complete.");
 	imine = 1;
@@ -287,7 +287,7 @@ void shuttle(void) {
 	ididit = 0;
 	if(damage[DSHUTTL] != 0.0) {
 		if (damage[DSHUTTL] == -1.0) {
-			if (inorbit && d.plnets[iplnet].known == 2)
+			if (inorbit && state.plnets[iplnet].known == 2)
 				prout("Ye Faerie Queene has no shuttle craft bay to dock it at.");
 			else
 				prout("Ye Faerie Queene had no shuttle craft.");
@@ -302,11 +302,11 @@ void shuttle(void) {
 		prout(" not in standard orbit.");
 		return;
 	}
-	if ((d.plnets[iplnet].known != 2) && iscraft != 1) {
+	if ((state.plnets[iplnet].known != 2) && iscraft != 1) {
 		prout("Shuttle craft not currently available.");
 		return;
 	}
-	if (landed==-1 && d.plnets[iplnet].known==2) {
+	if (landed==-1 && state.plnets[iplnet].known==2) {
 		prout("You will have to beam down to retrieve the shuttle craft.");
 		return;
 	}
@@ -314,17 +314,17 @@ void shuttle(void) {
 		prout("Shuttle craft cannot pass through shields.");
 		return;
 	}
-	if (d.plnets[iplnet].known==0) {
+	if (state.plnets[iplnet].known==0) {
 		prout("Spock-  \"Captain, we have no information on this planet");
 		prout("  and Starfleet Regulations clearly state that in this situation");
 		prout("  you may not fly down.\"");
 		return;
 	}
 	Time = 3.0e-5*height;
-	if (Time >= 0.8*d.remtime) {
+	if (Time >= 0.8*state.remtime) {
 		prout("First Officer Spock-  \"Captain, I compute that such");
 		prout("  a maneuver would require approximately ");
-		cramf(100*Time/d.remtime,0,4);
+		cramf(100*Time/state.remtime,0,4);
 		prout("% of our");
 		prout("remaining time.");
 		prout("Are you sure this is wise?\" ");
@@ -351,7 +351,7 @@ void shuttle(void) {
 			iscraft = 0;
 			skip(1);
 			if (consumeTime()) return;
-			d.plnets[iplnet].known=2;
+			state.plnets[iplnet].known=2;
 			prout("Trip complete.");
 			return;
 		}
@@ -361,7 +361,7 @@ void shuttle(void) {
 			prout("shuttle craft for the trip back to the Enterprise.");
 			skip(1);
 			prout("The short hop begins . . .");
-			d.plnets[iplnet].known=1;
+			state.plnets[iplnet].known=1;
 			icraft = 1;
 			skip(1);
 			landed = -1;
@@ -388,7 +388,7 @@ void shuttle(void) {
 		icraft = 1;
 		iscraft = 0;
 		if (consumeTime()) return;
-		d.plnets[iplnet].known = 2;
+		state.plnets[iplnet].known = 2;
 		landed = 1;
 		icraft = 0;
 		prout("Trip complete");
@@ -439,7 +439,7 @@ void deathray(void) {
 		while (nenhere > 0)
 			deadkl(kx[1],ky[1],quad[kx[1]][ky[1]],kx[1],ky[1]);
 		prout("Ensign Chekov-  \"Congratulations, Captain!\"");
-		if (d.remkl == 0) finish(FWON);
+		if (state.remkl == 0) finish(FWON);
 		prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
 		if (Rand() <= 0.05) {
 			prout("   is still operational.\"");

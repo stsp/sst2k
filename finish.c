@@ -68,26 +68,26 @@ void finish(FINTYPE ifin) {
 	int igotit = 0;
 	alldone = 1;
 	skip(3);
-	printf("It is stardate %.1f .\n\n", d.date);
+	printf("It is stardate %.1f .\n\n", state.date);
 	switch (ifin) {
 		case FWON: // Game has been won
-			if (d.nromrem != 0)
+			if (state.nromrem != 0)
 				printf("The remaining %d Romulans surrender to Starfleet Command.\n",
-					   d.nromrem);
+					   state.nromrem);
 			
 			prout("You have smashed the Klingon invasion fleet and saved");
 			prout("the Federation.");
 			gamewon=1;
 			if (alive) {
 				double badpt;
-				badpt = 5.*d.starkl + casual + 10.*d.nplankl +
-						45.*nhelp+100.*d.basekl;
+				badpt = 5.*state.starkl + casual + 10.*state.nplankl +
+						45.*nhelp+100.*state.basekl;
 				if (ship == IHF) badpt += 100.0;
 				else if (ship == 0) badpt += 200.0;
 				if (badpt < 100.0) badpt = 0.0;	// Close enough!
-				if (d.date-indate < 5.0 ||
+				if (state.date-indate < 5.0 ||
 					// killsPerDate >= RateMax
-					(d.killk+d.killc+d.nsckill)/(d.date-indate) >=
+					(state.killk+state.killc+state.nsckill)/(state.date-indate) >=
 					0.1*skill*(skill+1.0) + 0.1 + 0.008*badpt) {
 					skip(1);
 					prout("In fact, you have done so well that Starfleet Command");
@@ -105,7 +105,7 @@ void finish(FINTYPE ifin) {
 							prout("promotes you to Commodore Emeritus.");
 							skip(1);
 							prout("Now that you think you're really good, try playing");
-							prout("the \"Emeritus\" game. It will splatter your ego.");
+							prout("the \"Emeritus\" frozen. It will splatter your ego.");
 							break;
 						case 5:
 							skip(1);
@@ -150,7 +150,7 @@ void finish(FINTYPE ifin) {
 			prout("conquered.  Your starship is now Klingon property,");
 			prout("and you are put on trial as a war criminal.  On the");
 			proutn("basis of your record, you are ");
-			if (d.remkl*3.0 > inkling) {
+			if (state.remkl*3.0 > inkling) {
 				prout("aquitted.");
 				skip(1);
 				prout("LIVE LONG AND PROSPER.");
@@ -275,9 +275,9 @@ void finish(FINTYPE ifin) {
 	if (ship==IHF) ship= 0;
 	else if (ship == IHE) ship = IHF;
 	alive = 0;
-	if (d.remkl != 0) {
-		double goodies = d.remres/inresor;
-		double baddies = (d.remkl + 2.0*d.remcom)/(inkling+2.0*incom);
+	if (state.remkl != 0) {
+		double goodies = state.remres/inresor;
+		double baddies = (state.remkl + 2.0*state.remcom)/(inkling+2.0*incom);
 		if (goodies/baddies >= 1.0+0.5*Rand()) {
 			prout("As a result of your actions, a treaty with the Klingon");
 			prout("Empire has been signed. The terms of the treaty are");
@@ -303,54 +303,54 @@ void finish(FINTYPE ifin) {
 }
 
 void score(void) {
-	double timused = d.date - indate;
+	double timused = state.date - indate;
 	int ithperd, iwon, klship;
 
 	pause(0);
 
 	iskill = skill;
-	if ((timused == 0 || d.remkl != 0) && timused < 5.0) timused = 5.0;
-	perdate = (d.killc + d.killk + d.nsckill)/timused;
+	if ((timused == 0 || state.remkl != 0) && timused < 5.0) timused = 5.0;
+	perdate = (state.killc + state.killk + state.nsckill)/timused;
 	ithperd = 500*perdate + 0.5;
 	iwon = 0;
 	if (gamewon) iwon = 100*skill;
 	if (ship == IHE) klship = 0;
 	else if (ship == IHF) klship = 1;
 	else klship = 2;
-	if (gamewon == 0) d.nromrem = 0; // None captured if no win
-	iscore = 10*d.killk + 50*d.killc + ithperd + iwon
-			 - 100*d.basekl - 100*klship - 45*nhelp -5*d.starkl - casual
-			 + 20*d.nromkl + 200*d.nsckill - 10*d.nplankl + d.nromrem;
+	if (gamewon == 0) state.nromrem = 0; // None captured if no win
+	iscore = 10*state.killk + 50*state.killc + ithperd + iwon
+			 - 100*state.basekl - 100*klship - 45*nhelp -5*state.starkl - casual
+			 + 20*state.nromkl + 200*state.nsckill - 10*state.nplankl + state.nromrem;
 	if (alive == 0) iscore -= 200;
 	skip(2);
 	prout("Your score --");
-	if (d.nromkl)
+	if (state.nromkl)
 		printf("%6d Romulans destroyed                 %5d\n",
-			   d.nromkl,20*d.nromkl);
-	if (d.nromrem)
+			   state.nromkl,20*state.nromkl);
+	if (state.nromrem)
 		printf("%6d Romulans captured                  %5d\n",
-			   d.nromrem, d.nromrem);
-	if (d.killk)
+			   state.nromrem, state.nromrem);
+	if (state.killk)
 		printf("%6d ordinary Klingons destroyed        %5d\n",
-			   d.killk, 10*d.killk);
-	if (d.killc)
+			   state.killk, 10*state.killk);
+	if (state.killc)
 		printf("%6d Klingon commanders destroyed       %5d\n",
-			   d.killc, 50*d.killc);
-	if (d.nsckill)
+			   state.killc, 50*state.killc);
+	if (state.nsckill)
 		printf("%6d Super-Commander destroyed          %5d\n",
-			   d.nsckill, 200*d.nsckill);
+			   state.nsckill, 200*state.nsckill);
 	if (ithperd)
 		printf("%6.2f Klingons per stardate              %5d\n",
 			   perdate, ithperd);
-	if (d.starkl)
+	if (state.starkl)
 		printf("%6d stars destroyed by your action     %5d\n",
-			   d.starkl, -5*d.starkl);
-	if (d.nplankl)
+			   state.starkl, -5*state.starkl);
+	if (state.nplankl)
 		printf("%6d planets destroyed by your action   %5d\n",
-			   d.nplankl, -10*d.nplankl);
-	if (d.basekl)
+			   state.nplankl, -10*state.nplankl);
+	if (state.basekl)
 		printf("%6d bases destroyed by your action     %5d\n",
-			   d.basekl, -100*d.basekl);
+			   state.basekl, -100*state.basekl);
 	if (nhelp)
 		printf("%6d calls for help from starbase       %5d\n",
 			   nhelp, -45*nhelp);

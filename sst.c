@@ -323,7 +323,7 @@ static void makemoves(void) {
 				events();
 				if (alldone) break;		// Events did us in
 			}
-			if (d.galaxy[quadx][quady] == 1000) { // Galaxy went Nova!
+			if (state.galaxy[quadx][quady] == 1000) { // Galaxy went Nova!
 				atover(0);
 				continue;
 			}
@@ -331,7 +331,7 @@ static void makemoves(void) {
 			if (hitme && justin==0) {
 				attack(2);
 				if (alldone) break;
-				if (d.galaxy[quadx][quady] == 1000) {	// went NOVA! 
+				if (state.galaxy[quadx][quady] == 1000) {	// went NOVA! 
 					atover(0);
 					hitme = TRUE;
 					continue;
@@ -657,7 +657,7 @@ void debugme(void) {
 			key = scan();
 			if (key == IHALPHA &&  isit("y")) {
 				damage[i] = 10.0;
-				if (i == DRADIO) stdamtim = d.date;
+				if (i == DRADIO) stdamtim = state.date;
 			}
 		}
 	}
@@ -676,12 +676,12 @@ void debugme(void) {
 				case FSCMOVE: proutn("SC Move         "); break;
 				case FSCDBAS: proutn("SC Base Destroy "); break;
 			}
-			cramf(future[i]-d.date, 8, 2);
+			cramf(future[i]-state.date, 8, 2);
 			chew();
 			proutn("  ?");
 			key = scan();
 			if (key == IHREAL) {
-				future[i] = d.date + aaitem;
+				future[i] = state.date + aaitem;
 			}
 		}
 		chew();

@@ -24,11 +24,11 @@ void move(void) {
 	deltax /= bigger;
 
 	/* If tractor beam is to occur, don't move full distance */
-	if (d.date+Time >= future[FTBEAM]) {
+	if (state.date+Time >= future[FTBEAM]) {
 		trbeam = 1;
 		condit = IHRED;
-		dist = dist*(future[FTBEAM]-d.date)/Time + 0.1;
-		Time = future[FTBEAM] - d.date + 1e-5;
+		dist = dist*(future[FTBEAM]-state.date)/Time + 0.1;
+		Time = future[FTBEAM] - state.date + 1e-5;
 	}
 	/* Move within the quadrant */
 	quad[sectx][secty] = IHDOT;
@@ -50,7 +50,7 @@ void move(void) {
 									  (iy-ky[l])*(double)(iy-ky[l]));
 						kavgd[l] = 0.5 * (finald+kdist[l]);
 					}
-					if (d.galaxy[quadx][quady] != 1000) attack(0);
+					if (state.galaxy[quadx][quady] != 1000) attack(0);
 					if (alldone) return;
 				}
 				/* compute final position -- new quadrant and sector */
@@ -179,7 +179,7 @@ label100:
 			kdist[l] = finald;
 		}
 		sortkl();
-		if (d.galaxy[quadx][quady] != 1000 && iattak == 0)
+		if (state.galaxy[quadx][quady] != 1000 && iattak == 0)
 			attack(0);
 		for (l = 1 ; l <= nenhere; l++) kavgd[l] = kdist[l];
 	}
@@ -443,7 +443,7 @@ void impuls(void) {
 	}
 	/* Make sure enough time is left for the trip */
 	Time = dist/0.095;
-	if (Time >= d.remtime) {
+	if (Time >= state.remtime) {
 		prout("First Officer Spock- \"Captain, our speed under impulse");
 		prout("power is only 0.95 sectors per stardate. Are you sure");
 		prout("we dare spend the time?\"");
@@ -515,11 +515,11 @@ void warp(int i) {
 						
 		/* Make sure enough time is left for the trip */
 		Time = 10.0*dist/wfacsq;
-		if (Time >= 0.8*d.remtime) {
+		if (Time >= 0.8*state.remtime) {
 			skip(1);
 			prout("First Officer Spock- \"Captain, I compute that such");
 			proutn("  a trip would require approximately ");
-			cramf(100.0*Time/d.remtime, 0, 2);
+			cramf(100.0*Time/state.remtime, 0, 2);
 			prout(" percent of our");
 			prout(" remaining time.  Are you sure this is wise?\"");
 			if (ja() == 0) { ididit = 0; return;}
@@ -703,7 +703,7 @@ void atover(int igrab) {
 		crmshp();
 		skip(1);
 		prout("safely out of quadrant.");
-		starch[quadx][quady] = damage[DRADIO] > 0.0 ? d.galaxy[quadx][quady]+1000:1;
+		starch[quadx][quady] = damage[DRADIO] > 0.0 ? state.galaxy[quadx][quady]+1000:1;
 
 		/* Try to use warp engines */
 		if (damage[DWARPEN]) {
@@ -735,28 +735,28 @@ void atover(int igrab) {
 			return;
 		}
 		/* Repeat if another snova */
-	} while (d.galaxy[quadx][quady] == 1000);
-	if (d.remkl==0) finish(FWON); /* Snova killed remaining enemy. */
+	} while (state.galaxy[quadx][quady] == 1000);
+	if (state.remkl==0) finish(FWON); /* Snova killed remaining enemy. */
 }
 
 void timwrp() {
 	int l, ll, gotit;
 	prout("***TIME WARP ENTERED.");
-	if (d.snap && Rand() < 0.5) {
+	if (state.snap && Rand() < 0.5) {
 		/* Go back in time */
 		proutn("You are traveling backwards in time ");
-		cramf(d.date-snapsht.date, 0, 2);
+		cramf(state.date-snapsht.date, 0, 2);
 		prout(" stardates.");
-		d = snapsht;
-		d.snap = 0;
-		if (d.remcom) {
-			future[FTBEAM] = d.date + expran(intime/d.remcom);
-			future[FBATTAK] = d.date + expran(0.3*intime);
+		state = snapsht;
+		state.snap = 0;
+		if (state.remcom) {
+			future[FTBEAM] = state.date + expran(intime/state.remcom);
+			future[FBATTAK] = state.date + expran(0.3*intime);
 		}
-		future[FSNOVA] = d.date + expran(0.5*intime);
-		future[FSNAP] = d.date +expran(0.25*d.remtime); /* next snapshot will
+		future[FSNOVA] = state.date + expran(0.5*intime);
+		future[FSNAP] = state.date +expran(0.25*state.remtime); /* next snapshot will
 													   be sooner */
-		if (d.nscrem) future[FSCMOVE] = 0.2777;
+		if (state.nscrem) future[FSCMOVE] = 0.2777;
 		isatb = 0;
 		future[FCDBAS] = future[FSCDBAS] = 1e30;
 		batx = baty = 0;
@@ -765,7 +765,7 @@ void timwrp() {
 		   when on planet, which would give us two Galileos! */
 		gotit = 0;
 		for (l = 1; l <= inplan; l++) {
-			if (d.plnets[l].known == 2) {
+			if (state.plnets[l].known == 2) {
 				gotit = 1;
 				if (iscraft==1 && ship==IHE) {
 					prout("Checkov-  \"Security reports the Galileo has disappeared, Sir!");
@@ -781,13 +781,13 @@ void timwrp() {
 		}
 
 		/* Revert star chart to earlier era, if it was known then*/
-		if (damage[DRADIO]==0.0 || stdamtim > d.date) {
+		if (damage[DRADIO]==0.0 || stdamtim > state.date) {
 			for (l = 1; l <= 8; l++)
 				for (ll = 1; ll <= 8; ll++)
 					if (starch[l][ll] > 1)
-						starch[l][ll]=damage[DRADIO]>0.0 ? d.galaxy[l][ll]+1000 :1;
+						starch[l][ll]=damage[DRADIO]>0.0 ? state.galaxy[l][ll]+1000 :1;
 			prout("Spock has reconstructed a correct star chart from memory");
-			if (damage[DRADIO] > 0.0) stdamtim = d.date;
+			if (damage[DRADIO] > 0.0) stdamtim = state.date;
 		}
 	}
 	else {
@@ -870,7 +870,7 @@ void probe(void) {
 	probey = quady*10 + secty - 1;
 	probecx = quadx;
 	probecy = quady;
-	future[FDSPROB] = d.date + 0.01; // Time to move one sector
+	future[FDSPROB] = state.date + 0.01; // Time to move one sector
 	prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
 	return;
 }
@@ -890,7 +890,7 @@ void help(void) {
 		prout("Subspace radio damaged.");
 		return;
 	}
-	if (d.rembase==0) {
+	if (state.rembase==0) {
 		prout("Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\"");
 		return;
 	}
@@ -908,16 +908,16 @@ void help(void) {
 	}
 	else {
 		ddist = 1e30;
-		for (l = 1; l <= d.rembase; l++) {
-			xdist=10.0*sqrt(square(d.baseqx[l]-quadx)+square(d.baseqy[l]-quady));
+		for (l = 1; l <= state.rembase; l++) {
+			xdist=10.0*sqrt(square(state.baseqx[l]-quadx)+square(state.baseqy[l]-quady));
 			if (xdist < ddist) {
 				ddist = xdist;
 				line = l;
 			}
 		}
 		/* Since starbase not in quadrant, set up new quadrant */
-		quadx = d.baseqx[line];
-		quady = d.baseqy[line];
+		quadx = state.baseqx[line];
+		quady = state.baseqy[line];
 		newqad(1);
 	}
 	/* dematerialize starship */

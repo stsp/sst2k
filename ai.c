@@ -6,14 +6,14 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	iqx = quadx+(lookx+9)/10 - 1;
 	iqy = quady+(looky+9)/10 - 1;
 	if (iqx < 1 || iqx > 8 || iqy < 1 || iqy > 8 ||
-		d.galaxy[iqx][iqy] > 899)
+		state.galaxy[iqx][iqy] > 899)
 		return 0; /* no can do -- neg energy, supernovae, or >8 Klingons */
 	if (ienm == IHR) return 0; /* Romulans cannot escape! */
 	if (irun == 0) {
 		/* avoid intruding on another commander's territory */
 		if (ienm == IHC) {
-			for (l = 1; l <= d.remcom; l++)
-				if (d.cx[l]==iqx && d.cy[l]==iqy) return 0;
+			for (l = 1; l <= state.remcom; l++)
+				if (state.cx[l]==iqx && state.cy[l]==iqy) return 0;
 			/* refuse to leave if currently attacking starbase */
 			if (batx==quadx && baty==quady) return 0;
 		}
@@ -40,23 +40,23 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	nenhere--;
 	if (condit != IHDOCKED) newcnd();
 	/* Handle global matters related to escape */
-	d.galaxy[quadx][quady] -= 100;
-	d.galaxy[iqx][iqy] += 100;
+	state.galaxy[quadx][quady] -= 100;
+	state.galaxy[iqx][iqy] += 100;
 	if (ienm==IHS) {
 		ishere=0;
 		iscate=0;
 		ientesc=0;
 		isatb=0;
-		future[FSCMOVE]=0.2777+d.date;
+		future[FSCMOVE]=0.2777+state.date;
 		future[FSCDBAS]=1e30;
-		d.isx=iqx;
-		d.isy=iqy;
+		state.isx=iqx;
+		state.isy=iqy;
 	}
 	else {
-		for (l=1; l<=d.remcom; l++) {
-			if (d.cx[l]==quadx && d.cy[l]==quady) {
-				d.cx[l]=iqx;
-				d.cy[l]=iqy;
+		for (l=1; l<=state.remcom; l++) {
+			if (state.cx[l]==quadx && state.cy[l]==quady) {
+				state.cx[l]=iqx;
+				state.cy[l]=iqy;
 				break;
 			}
 		}
@@ -311,18 +311,18 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 
 	if ((iqx==quadx && iqy==quady) ||
 		iqx < 1 || iqx > 8 || iqy < 1 || iqy > 8 ||
-		d.galaxy[iqx][iqy] > 899) return 1;
+		state.galaxy[iqx][iqy] > 899) return 1;
 	if (flag) {
 		/* Avoid quadrants with bases if we want to avoid Enterprise */
-		for (i = 1; i <= d.rembase; i++)
-			if (d.baseqx[i]==iqx && d.baseqy[i]==iqy) return 1;
+		for (i = 1; i <= state.rembase; i++)
+			if (state.baseqx[i]==iqx && state.baseqy[i]==iqy) return 1;
 	}
 
 	/* do the move */
-	d.galaxy[d.isx][d.isy] -= 100;
-	d.isx = iqx;
-	d.isy = iqy;
-	d.galaxy[d.isx][d.isy] += 100;
+	state.galaxy[state.isx][state.isy] -= 100;
+	state.isx = iqx;
+	state.isy = iqy;
+	state.galaxy[state.isx][state.isy] += 100;
 	if (iscate) {
 		/* SC has scooted, Remove him from current quadrant */
 		iscate=0;
@@ -345,17 +345,17 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 	}
 	/* check for a helpful planet */
 	for (i = 1; i <= inplan; i++) {
-		if (d.plnets[i].x==d.isx && d.plnets[i].y==d.isy &&
-			d.plnets[i].crystals == 1) {
+		if (state.plnets[i].x==state.isx && state.plnets[i].y==state.isy &&
+			state.plnets[i].crystals == 1) {
 			/* destroy the planet */
-			d.plnets[i] = nulplanet;
-			d.newstuf[d.isx][d.isy] -= 1;
+			state.plnets[i] = nulplanet;
+			state.newstuf[state.isx][state.isy] -= 1;
 			if (damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				if (*ipage==0) pause(1);
 				*ipage = 1;
 				prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
 				proutn("   a planet in");
-				cramlc(1, d.isx, d.isy);
+				cramlc(1, state.isx, state.isy);
 				prout(" has been destroyed");
 				prout("   by the Super-commander.\"");
 			}
@@ -380,39 +380,39 @@ void scom(int *ipage) {
 #endif
 
 	/* Decide on being active or passive */
-	flag = ((d.killc+d.killk)/(d.date+0.01-indate) < 0.1*skill*(skill+1.0) ||
-			(d.date-indate) < 3.0);
+	flag = ((state.killc+state.killk)/(state.date+0.01-indate) < 0.1*skill*(skill+1.0) ||
+			(state.date-indate) < 3.0);
 	if (iscate==0 && flag) {
 		/* compute move away from Enterprise */
-		ideltax = d.isx-quadx;
-		ideltay = d.isy-quady;
+		ideltax = state.isx-quadx;
+		ideltay = state.isy-quady;
 		if (sqrt(ideltax*(double)ideltax+ideltay*(double)ideltay) > 2.0) {
 			/* circulate in space */
-			ideltax = d.isy-quady;
-			ideltay = quadx-d.isx;
+			ideltax = state.isy-quady;
+			ideltay = quadx-state.isx;
 		}
 	}
 	else {
 		/* compute distances to starbases */
-		if (d.rembase <= 0) {
+		if (state.rembase <= 0) {
 			/* nothing left to do */
 			future[FSCMOVE] = 1e30;
 			return;
 		}
-		sx = d.isx;
-		sy = d.isy;
-		for (i = 1; i <= d.rembase; i++) {
+		sx = state.isx;
+		sy = state.isy;
+		for (i = 1; i <= state.rembase; i++) {
 			basetbl[i] = i;
-			ibqx = d.baseqx[i];
-			ibqy = d.baseqy[i];
+			ibqx = state.baseqx[i];
+			ibqy = state.baseqy[i];
 			bdist[i] = sqrt(square(ibqx-sx) + square(ibqy-sy));
 		}
-		if (d.rembase > 1) {
+		if (state.rembase > 1) {
 			/* sort into nearest first order */
 			int iswitch;
 			do {
 				iswitch = 0;
-				for (i=1; i < d.rembase-1; i++) {
+				for (i=1; i < state.rembase-1; i++) {
 					if (bdist[i] > bdist[i+1]) {
 						int ti = basetbl[i];
 						double t = bdist[i];
@@ -429,34 +429,34 @@ void scom(int *ipage) {
 		   without too many Klingons, and not already under attack. */
 		ifindit = iwhichb = 0;
 
-		for (i2 = 1; i2 <= d.rembase; i2++) {
+		for (i2 = 1; i2 <= state.rembase; i2++) {
 			i = basetbl[i2];	/* bug in original had it not finding nearest*/
-			ibqx = d.baseqx[i];
-			ibqy = d.baseqy[i];
+			ibqx = state.baseqx[i];
+			ibqy = state.baseqy[i];
 			if ((ibqx == quadx && ibqy == quady) ||
 				(ibqx == batx && ibqy == baty) ||
-				d.galaxy[ibqx][ibqy] > 899) continue;
+				state.galaxy[ibqx][ibqy] > 899) continue;
 			/* if there is a commander, an no other base is appropriate,
 			   we will take the one with the commander */
-			for (j = 1; j <= d.remcom; j++) {
-				if (ibqx==d.cx[j] && ibqy==d.cy[j] && ifindit!= 2) {
+			for (j = 1; j <= state.remcom; j++) {
+				if (ibqx==state.cx[j] && ibqy==state.cy[j] && ifindit!= 2) {
 						ifindit = 2;
 						iwhichb = i;
 						break;
 				}
 			}
-			if (j > d.remcom) { /* no commander -- use this one */
+			if (j > state.remcom) { /* no commander -- use this one */
 				ifindit = 1;
 				iwhichb = i;
 				break;
 			}
 		}
 		if (ifindit==0) return; /* Nothing suitable -- wait until next time*/
-		ibqx = d.baseqx[iwhichb];
-		ibqy = d.baseqy[iwhichb];
+		ibqx = state.baseqx[iwhichb];
+		ibqy = state.baseqy[iwhichb];
 		/* decide how to move toward base */
-		ideltax = ibqx - d.isx;
-		ideltay = ibqy - d.isy;
+		ideltax = ibqx - state.isx;
+		ideltay = ibqy - state.isy;
 	}
 	/* Maximum movement is 1 quadrant in either or both axis */
 	if (ideltax > 1) ideltax = 1;
@@ -465,58 +465,58 @@ void scom(int *ipage) {
 	if (ideltay < -1) ideltay = -1;
 
 	/* try moving in both x and y directions */
-	iqx = d.isx + ideltax;
-	iqy = d.isy + ideltax;
+	iqx = state.isx + ideltax;
+	iqy = state.isy + ideltax;
 	if (checkdest(iqx, iqy, flag, ipage)) {
 		/* failed -- try some other maneuvers */
 		if (ideltax==0 || ideltay==0) {
 			/* attempt angle move */
 			if (ideltax != 0) {
-				iqy = d.isy + 1;
+				iqy = state.isy + 1;
 				if (checkdest(iqx, iqy, flag, ipage)) {
-					iqy = d.isy - 1;
+					iqy = state.isy - 1;
 					checkdest(iqx, iqy, flag, ipage);
 				}
 			}
 			else {
-				iqx = d.isx + 1;
+				iqx = state.isx + 1;
 				if (checkdest(iqx, iqy, flag, ipage)) {
-					iqx = d.isx - 1;
+					iqx = state.isx - 1;
 					checkdest(iqx, iqy, flag, ipage);
 				}
 			}
 		}
 		else {
 			/* try moving just in x or y */
-			iqy = d.isy;
+			iqy = state.isy;
 			if (checkdest(iqx, iqy, flag, ipage)) {
-				iqy = d.isy + ideltay;
-				iqx = d.isx;
+				iqy = state.isy + ideltay;
+				iqx = state.isx;
 				checkdest(iqx, iqy, flag, ipage);
 			}
 		}
 	}
 	/* check for a base */
-	if (d.rembase == 0) {
+	if (state.rembase == 0) {
 		future[FSCMOVE] = 1e30;
 	}
-	else for (i=1; i<=d.rembase; i++) {
-		ibqx = d.baseqx[i];
-		ibqy = d.baseqy[i];
-		if (ibqx==d.isx && ibqy == d.isy && d.isx != batx && d.isy != baty) {
+	else for (i=1; i<=state.rembase; i++) {
+		ibqx = state.baseqx[i];
+		ibqy = state.baseqy[i];
+		if (ibqx==state.isx && ibqy == state.isy && state.isx != batx && state.isy != baty) {
 			/* attack the base */
 			if (flag) return; /* no, don't attack base! */
 			iseenit = 0;
 			isatb=1;
-			future[FSCDBAS] = d.date + 1.0 +2.0*Rand();
-			if (batx != 0) future[FSCDBAS] += future[FCDBAS]-d.date;
+			future[FSCDBAS] = state.date + 1.0 +2.0*Rand();
+			if (batx != 0) future[FSCDBAS] += future[FCDBAS]-state.date;
 			if (damage[DRADIO] > 0 && condit != IHDOCKED)
 				return; /* no warning */
 			iseenit = 1;
 			if (*ipage == 0)  pause(1);
 			*ipage=1;
 			proutn("Lt. Uhura-  \"Captain, the starbase in");
-			cramlc(1, d.isx, d.isy);
+			cramlc(1, state.isx, state.isy);
 			skip(1);
 			prout("   reports that it is under attack from the Klingon Super-commander.");
 			proutn("   It can survive until stardate ");
@@ -537,13 +537,13 @@ void scom(int *ipage) {
 #endif
 		(Rand() > 0.2 ||
 		 (damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
-		 starch[d.isx][d.isy] > 0))
+		 starch[state.isx][state.isy] > 0))
 		return;
 	if (*ipage==0) pause(1);
 	*ipage = 1;
 	prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
 	proutn("   the Super-commander is in");
-	cramlc(1, d.isx, d.isy);
+	cramlc(1, state.isx, state. isy);
 	prout(".\"");
 	return;
 }

@@ -163,7 +163,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 		damage[l] += Time + extradm; /* Damage for at least time of travel! */
 	}
 	shldup = 0;
-	if (d.remkl) {
+	if (state.remkl) {
 		pause(2);
 		dreprt();
 	}
@@ -292,26 +292,26 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 			case IHB: /* Hit a base */
 				prout("***STARBASE DESTROYED..");
 				if (starch[quadx][quady] < 0) starch[quadx][quady] = 0;
-				for (ll=1; ll<=d.rembase; ll++) {
-					if (d.baseqx[ll]==quadx && d.baseqy[ll]==quady) {
-						d.baseqx[ll]=d.baseqx[d.rembase];
-						d.baseqy[ll]=d.baseqy[d.rembase];
+				for (ll=1; ll<=state.rembase; ll++) {
+					if (state.baseqx[ll]==quadx && state.baseqy[ll]==quady) {
+						state.baseqx[ll]=state.baseqx[state.rembase];
+						state.baseqy[ll]=state.baseqy[state.rembase];
 						break;
 					}
 				}
 				quad[ix][iy]=IHDOT;
-				d.rembase--;
+				state.rembase--;
 				basex=basey=0;
-				d.galaxy[quadx][quady] -= 10;
-				d.basekl++;
+				state.galaxy[quadx][quady] -= 10;
+				state.basekl++;
 				newcnd();
 				return;
 			case IHP: /* Hit a planet */
 				crmena(1, iquad, 2, ix, iy);
 				prout(" destroyed.");
-				d.nplankl++;
-				d.newstuf[quadx][quady] -= 1;
-				d.plnets[iplnet] = nulplanet;
+				state.nplankl++;
+				state.newstuf[quadx][quady] -= 1;
+				state.plnets[iplnet] = nulplanet;
 				iplnet = 0;
 				plnetx = plnety = 0;
 				quad[ix][iy] = IHDOT;
@@ -495,8 +495,8 @@ void attack(int k) {
 			r = (Rand()+Rand())*0.5 -0.5;
 			r += 0.002*kpower[l]*r;
 			torpedo(course, r, jx, jy, &hit);
-			if (d.remkl==0) finish(FWON); /* Klingons did themselves in! */
-			if (d.galaxy[quadx][quady] == 1000 ||
+			if (state.remkl==0) finish(FWON); /* Klingons did themselves in! */
+			if (state.galaxy[quadx][quady] == 1000 ||
 				alldone) return; /* Supernova or finished */
 			if (hit == 0) continue;
 		}
@@ -590,10 +590,10 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 	/* Decide what kind of enemy it is and update approriately */
 	if (type == IHR) {
 		/* chalk up a Romulan */
-		d.newstuf[quadx][quady] -= 10;
+		state.newstuf[quadx][quady] -= 10;
 		irhere--;
-		d.nromkl++;
-		d.nromrem--;
+		state.nromkl++;
+		state.nromrem--;
 	}
 	else if (type == IHT) {
 		/* Killed a Tholian */
@@ -601,41 +601,41 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 	}
 	else {
 		/* Some type of a Klingon */
-		d.galaxy[quadx][quady] -= 100;
+		state.galaxy[quadx][quady] -= 100;
 		klhere--;
-		d.remkl--;
+		state.remkl--;
 		switch (type) {
 			case IHC:
 				comhere = 0;
-				for (i=1; i<=d.remcom; i++)
-					if (d.cx[i]==quadx && d.cy[i]==quady) break;
-				d.cx[i] = d.cx[d.remcom];
-				d.cy[i] = d.cy[d.remcom];
-				d.cx[d.remcom] = 0;
-				d.cy[d.remcom] = 0;
-				d.remcom--;
+				for (i=1; i<=state.remcom; i++)
+					if (state.cx[i]==quadx && state.cy[i]==quady) break;
+				state.cx[i] = state.cx[state.remcom];
+				state.cy[i] = state.cy[state.remcom];
+				state.cx[state.remcom] = 0;
+				state.cy[state.remcom] = 0;
+				state.remcom--;
 				future[FTBEAM] = 1e30;
-				if (d.remcom != 0)
-					future[FTBEAM] = d.date + expran(1.0*incom/d.remcom);
-				d.killc++;
+				if (state.remcom != 0)
+					future[FTBEAM] = state.date + expran(1.0*incom/state.remcom);
+				state.killc++;
 				break;
 			case IHK:
-				d.killk++;
+				state.killk++;
 				break;
 			case IHS:
-				d.nscrem = ishere = d.isx = d.isy = isatb = iscate = 0;
-				d.nsckill = 1;
+				state.nscrem = ishere = state.isx = state.isy = isatb = iscate = 0;
+				state.nsckill = 1;
 				future[FSCMOVE] = future[FSCDBAS] = 1e30;
 				break;
 		}
 	}
 
 	/* For each kind of enemy, finish message to player */
-	prout(" destroyed.");
+	prout(" destroyestate.");
 	quad[ix][iy] = IHDOT;
-	if (d.remkl==0) return;
+	if (state.remkl==0) return;
 
-	d.remtime = d.remres/(d.remkl + 4*d.remcom);
+	state.remtime = state.remres/(state.remkl + 4*state.remcom);
 
 	if (type == IHT) return;
 
@@ -814,9 +814,9 @@ void photon(void) {
 			proutn("Torpedo track- ");
 		}
 		torpedo(course[i], r, sectx, secty, &dummy);
-		if (alldone || d.galaxy[quadx][quady]==1000) return;
+		if (alldone || state.galaxy[quadx][quady]==1000) return;
 	}
-	if (d.remkl==0) finish(FWON);
+	if (state.remkl==0) finish(FWON);
 }
 
 	
@@ -1195,7 +1195,7 @@ void hittem(double *hits) {
 		skip(1);
 		if (kpow == 0) {
 			deadkl(ii, jj, ienm, ii, jj);
-			if (d.remkl==0) finish(FWON);
+			if (state.remkl==0) finish(FWON);
 			if (alldone) return;
 			kk--; /* don't do the increment */
 		}

@@ -36,7 +36,7 @@ void freeze(int boss) {
 		skip(1);
 		return;
 	}
-	fwrite(&d, sizeof(d), 1, fp);
+	fwrite(&state, sizeof(state), 1, fp);
 	fwrite(&snapsht, sizeof(snapsht), 1, fp);
 	fwrite(quad, sizeof(quad), 1, fp);
 	fwrite(kx, sizeof(kx), 1, fp);
@@ -47,7 +47,7 @@ void freeze(int boss) {
 	fwrite(kavgd, sizeof(kavgd), 1, fp);
 	fwrite(damage, sizeof(damage), 1, fp);
 	fwrite(future, sizeof(future), 1, fp);
-	fwrite(&game, sizeof(game), 1, fp);
+	fwrite(&frozen, sizeof(frozen), 1, fp);
 	fwrite(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);
@@ -80,7 +80,7 @@ void thaw(void) {
 		skip(1);
 		return;
 	}
-	fread(&d, sizeof(d), 1, fp);
+	fread(&state, sizeof(state), 1, fp);
 	fread(&snapsht, sizeof(snapsht), 1, fp);
 	fread(quad, sizeof(quad), 1, fp);
 	fread(kx, sizeof(kx), 1, fp);
@@ -91,7 +91,7 @@ void thaw(void) {
 	fread(kavgd, sizeof(kavgd), 1, fp);
 	fread(damage, sizeof(damage), 1, fp);
 	fread(future, sizeof(future), 1, fp);
-	fread(&game, sizeof(game), 1, fp);
+	fread(&frozen, sizeof(frozen), 1, fp);
 	fread(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);
@@ -140,7 +140,7 @@ void abandn(void) {
 		prout("Captain and crew escape in shuttle craft.");
 		prout("Remainder of ship's complement beam down");
 		prout("to nearest habitable planet.");
-		if (d.rembase==0) {
+		if (state.rembase==0) {
 			/* Ops! no place to go... */
 			finish(FABANDN);
 			return;
@@ -151,11 +151,11 @@ void abandn(void) {
 		nprobes = 0; /* No probes */
 		prout("You are captured by Klingons and released to");
 		prout("the Federation in a prisoner-of-war exchange.");
-		nb = Rand()*d.rembase+1;
+		nb = Rand()*state.rembase+1;
 		/* Set up quadrant and position FQ adjacient to base */
-		if (quadx!=d.baseqx[nb] || quady!=d.baseqy[nb]) {
-			quadx = d.baseqx[nb];
-			quady = d.baseqy[nb];
+		if (quadx!=state.baseqx[nb] || quady!=state.baseqy[nb]) {
+			quadx = state.baseqx[nb];
+			quady = state.baseqy[nb];
 			sectx = secty = 5;
 			newqad(1);
 		}
@@ -222,22 +222,22 @@ void setup(void) {
 	for (i=0; i <= ndevice; i++) damage[i] = 0.0;
 	// Set up assorted game parameters
 	batx = baty = 0;
-	d.date = indate = 100.0*(int)(31.0*Rand()+20.0);
-	d.killk = d.killc = nkinks = nhelp = resting = casual = d.nromkl = 0;
-	isatb = iscate = imine = icrystl = icraft = d.nsckill = d.nplankl = 0;
+	state.date = indate = 100.0*(int)(31.0*Rand()+20.0);
+	state.killk = state.killc = nkinks = nhelp = resting = casual = state.nromkl = 0;
+	isatb = iscate = imine = icrystl = icraft = state.nsckill = state.nplankl = 0;
 	iscraft = 1;
 	landed = -1;
 	alive = 1;
 	docfac = 0.25;
 	for (i = 1; i <= 8; i++)
-		for (j = 1; j <= 8; j++) d.newstuf[i][j] = starch[i][j] = 0;
+		for (j = 1; j <= 8; j++) state.newstuf[i][j] = starch[i][j] = 0;
 	// Initialize times for extraneous events
-	future[FSNOVA] = d.date + expran(0.5 * intime);
-	future[FTBEAM] = d.date + expran(1.5 * (intime / d.remcom));
-	future[FSNAP] = d.date + 1.0 + Rand(); // Force an early snapshot
-	future[FBATTAK] = d.date + expran(0.3*intime);
+	future[FSNOVA] = state.date + expran(0.5 * intime);
+	future[FTBEAM] = state.date + expran(1.5 * (intime / state.remcom));
+	future[FSNAP] = state.date + 1.0 + Rand(); // Force an early snapshot
+	future[FBATTAK] = state.date + expran(0.3*intime);
 	future[FCDBAS] = 1e30;
-	future[FSCMOVE] = d.nscrem ? d.date+0.2777 : 1e30;
+	future[FSCMOVE] = state.nscrem ? state.date+0.2777 : 1e30;
 	future[FSCDBAS] = 1e30;
 	future[FDSPROB] = 1e30;
 	// Starchart is functional
@@ -248,18 +248,18 @@ void setup(void) {
 		for (j=1; j<=8; j++) {
 			int k = Rand()*9.0 + 1.0;
 			instar += k;
-			d.galaxy[i][j] = k;
+			state.galaxy[i][j] = k;
 		}
 	// Locate star bases in galaxy
 	for (i = 1; i <= inbase; i++) {
 		int contflag;
 		do {
 			do iran8(&ix, &iy);
-			while (d.galaxy[ix][iy] >= 10);
+			while (state.galaxy[ix][iy] >= 10);
 			contflag = FALSE;
 			for (j = i-1; j > 0; j--) {
 				/* Improved placement algorithm to spread out bases */
-				double distq = square(ix-d.baseqx[j]) + square(iy-d.baseqy[j]);
+				double distq = square(ix-state.baseqx[j]) + square(iy-state.baseqy[j]);
 				if (distq < 6.0*(6-inbase) && Rand() < 0.75) {
 					contflag = TRUE;
 #ifdef DEBUG
@@ -275,13 +275,13 @@ void setup(void) {
 			}
 		} while (contflag);
 			
-		d.baseqx[i] = ix;
-		d.baseqy[i] = iy;
+		state.baseqx[i] = ix;
+		state.baseqy[i] = iy;
 		starch[ix][iy] = -1;
-		d.galaxy[ix][iy] += 10;
+		state.galaxy[ix][iy] += 10;
 	}
 	// Position ordinary Klingon Battle Cruisers
-	krem = inkling - incom - d.nscrem;
+	krem = inkling - incom - state.nscrem;
 	klumper = 0.25*skill*(9.0-length)+1.0;
 	if (klumper > 9) klumper = 9; // Can't have more than 9 in quadrant
 	do {
@@ -291,8 +291,8 @@ void setup(void) {
 		krem -= klump;
 		klump *= 100;
 		do iran8(&ix, &iy);
-		while (d.galaxy[ix][iy] + klump >= 1000);
-		d.galaxy[ix][iy] += klump;
+		while (state.galaxy[ix][iy] + klump >= 1000);
+		state.galaxy[ix][iy] += klump;
 	} while (krem > 0);
 	// Position Klingon Commander Ships
 #ifdef DEBUG
@@ -303,47 +303,47 @@ void setup(void) {
 			do { /* IF debugging, put commanders by bases, always! */
 #ifdef DEBUG
 				if (idebug && klumper <= inbase) {
-					ix = d.baseqx[klumper];
-					iy = d.baseqy[klumper];
+					ix = state.baseqx[klumper];
+					iy = state.baseqy[klumper];
 					klumper++;
 				}
 				else
 #endif
 					iran8(&ix, &iy);
 			}
-			while ((d.galaxy[ix][iy] < 99 && Rand() < 0.75)||
-				   d.galaxy[ix][iy]>899);
+			while ((state.galaxy[ix][iy] < 99 && Rand() < 0.75)||
+				   state.galaxy[ix][iy]>899);
 			// check for duplicate
 			for (j = 1; j < i; j++)
-				if (d.cx[j]==ix && d.cy[j]==iy) break;
+				if (state.cx[j]==ix && state.cy[j]==iy) break;
 		} while (j < i);
-		d.galaxy[ix][iy] += 100;
-		d.cx[i] = ix;
-		d.cy[i] = iy;
+		state.galaxy[ix][iy] += 100;
+		state.cx[i] = ix;
+		state.cy[i] = iy;
 	}
 	// Locate planets in galaxy
 	for (i = 1; i <= inplan; i++) {
 		do iran8(&ix, &iy);
-		while (d.newstuf[ix][iy] > 0);
-		d.newstuf[ix][iy] = 1;
-		d.plnets[i].x = ix;
-		d.plnets[i].y = iy;
-		d.plnets[i].pclass = Rand()*3.0 + 1.0; // Planet class M N or O
-		d.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
-		d.plnets[i].known = 0;
+		while (state.newstuf[ix][iy] > 0);
+		state.newstuf[ix][iy] = 1;
+		state.plnets[i].x = ix;
+		state.plnets[i].y = iy;
+		state.plnets[i].pclass = Rand()*3.0 + 1.0; // Planet class M N or O
+		state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
+		state.plnets[i].known = 0;
 	}
 	// Locate Romulans
-	for (i = 1; i <= d.nromrem; i++) {
+	for (i = 1; i <= state.nromrem; i++) {
 		iran8(&ix, &iy);
-		d.newstuf[ix][iy] += 10;
+		state.newstuf[ix][iy] += 10;
 	}
 	// Locate the Super Commander
-	if (d.nscrem > 0) {
+	if (state.nscrem > 0) {
 		do iran8(&ix, &iy);
-		while (d.galaxy[ix][iy] >= 900);
-		d.isx = ix;
-		d.isy = iy;
-		d.galaxy[ix][iy] += 100;
+		while (state.galaxy[ix][iy] >= 900);
+		state.isx = ix;
+		state.isy = iy;
+		state.galaxy[ix][iy] += 100;
 	}
 	// Place thing (in tournament game, thingx == -1, don't want one!)
 	if (Rand() < 0.1 && thingx != -1) {
@@ -355,11 +355,11 @@ void setup(void) {
 
 //	idate = date;
 	skip(3);
-	d.snap = 0;
+	state.snap = 0;
 		
 	if (skill == 1) {
 		printf("It is stardate %d. The Federation is being attacked by\n",
-			   (int)d.date);
+			   (int)state.date);
 		printf("a deadly Klingon invasion force. As captain of the United\n"
 			   "Starship U.S.S. Enterprise, it is your mission to seek out\n"
 			   "and destroy this invasion force of %d battle cruisers.\n",
@@ -373,12 +373,12 @@ void setup(void) {
 	else {
 		printf("Stardate %d.\n\n"
 			   "%d Klingons.\nAn unknown number of Romulans\n",
-			   (int)d.date, inkling);
-		if (d.nscrem) printf("and one (GULP) Super-Commander.\n");
+			   (int)state.date, inkling);
+		if (state.nscrem) printf("and one (GULP) Super-Commander.\n");
 		printf("%d stardates\n%d starbases in  ",(int)intime, inbase);
 	}
 	for (i = 1; i <= inbase; i++) {
-		cramlc(0, d.baseqx[i], d.baseqy[i]);
+		cramlc(0, state.baseqx[i], state.baseqy[i]);
 		if (i < inbase) proutn("  ");
 	}
 	skip(2);
@@ -388,7 +388,7 @@ void setup(void) {
 	cramlc(2, sectx, secty);
 	skip(2);
 	prout("Good Luck!");
-	if (d.nscrem) proutn("  YOU'LL NEED IT.");
+	if (state.nscrem) proutn("  YOU'LL NEED IT.");
 	skip(1);
 	newqad(0);
 	if (nenhere) shldup=1.0;
@@ -476,22 +476,22 @@ int choose(void) {
 
 	// Use parameters to generate initial values of things
 	damfac = 0.5 * skill;
-	d.rembase = 3.0*Rand()+2.0;
-	inbase = d.rembase;
+	state.rembase = 3.0*Rand()+2.0;
+	inbase = state.rembase;
 	inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();
-	d.nromrem = (2.0+Rand())*skill;
-	d.nscrem = (skill > 2? 1 : 0);
-	d.remtime = 7.0 * length;
-	intime = d.remtime;
-	d.remkl = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
-	inkling = d.remkl;
+	state.nromrem = (2.0+Rand())*skill;
+	state.nscrem = (skill > 2? 1 : 0);
+	state.remtime = 7.0 * length;
+	intime = state.remtime;
+	state.remkl = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
+	inkling = state.remkl;
 	incom = skill + 0.0625*inkling*Rand();
-	d.remcom= min(10, incom);
-	incom = d.remcom;
-	d.remres = (inkling+4*incom)*intime;
-	inresor = d.remres;
+	state.remcom= min(10, incom);
+	incom = state.remcom;
+	state.remres = (inkling+4*incom)*intime;
+	inresor = state.remres;
 	if (inkling > 50) {
-		inbase = (d.rembase += 1);
+		inbase = (state.rembase += 1);
 	}
 	return FALSE;
 }
@@ -505,14 +505,14 @@ void dropin(int iquad, int *ix, int *iy) {
 void newcnd(void) {
 	condit = IHGREEN;
 	if (energy < 1000.0) condit = IHYELLOW;
-	if (d.galaxy[quadx][quady] > 99 || d.newstuf[quadx][quady] > 9)
+	if (state.galaxy[quadx][quady] > 99 || state.newstuf[quadx][quady] > 9)
 		condit = IHRED;
 }
 
 
 void newqad(int shutup) {
-	int quadnum = d.galaxy[quadx][quady];
-	int newnum = d.newstuf[quadx][quady];
+	int quadnum = state.galaxy[quadx][quady];
+	int newnum = state.newstuf[quadx][quady];
 	int i, j, ix, iy, nplan;
 
 	iattak = 1;
@@ -583,17 +583,17 @@ void newqad(int shutup) {
 			kpower[i] = Rand()*150.0 +300.0 +25.0*skill;
 		}
 		// If we need a commander, promote a Klingon
-		for (i = 1; i <= d.remcom ; i++) 
-			if (d.cx[i]==quadx && d.cy[i]==quady) break;
+		for (i = 1; i <= state.remcom ; i++) 
+			if (state.cx[i]==quadx && state.cy[i]==quady) break;
 			
-		if (i <= d.remcom) {
+		if (i <= state.remcom) {
 			quad[ix][iy] = IHC;
 			kpower[klhere] = 950.0+400.0*Rand()+50.0*skill;
 			comhere = 1;
 		}
 
 		// If we need a super-commander, promote a Klingon
-		if (quadx == d.isx && quady == d.isy) {
+		if (quadx == state.isx && quady == state.isy) {
 			quad[kx[1]][ky[1]] = IHS;
 			kpower[1] = 1175.0 + 400.0*Rand() + 125.0*skill;
 			iscate = 1;
@@ -618,7 +618,7 @@ void newqad(int shutup) {
 	if (nplan) {
 		// If quadrant needs a planet, put it in
 		for (i=1; i <= inplan; i++)
-			if (d.plnets[i].x == quadx && d.plnets[i].y == quady) break;
+			if (state.plnets[i].x == quadx && state.plnets[i].y == quady) break;
 		if (i <= inplan) {
 			iplnet = i;
 			dropin(IHP, &plnetx, &plnety);
