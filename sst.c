@@ -95,7 +95,7 @@ Eric Raymond's changes:
 
 /* the input queue */
 static char line[128], *linep = line;
-static usecurses = TRUE;
+static int usecurses = TRUE;
 
 static struct 
 {

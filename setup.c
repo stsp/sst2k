@@ -14,7 +14,7 @@ void prelim(void) {
 	skip(2);
 	prout("-SUPER- STAR TREK");
 	skip(1);
-#ifndef __HISTORICAL__
+#ifdef __HISTORICAL__
 	prout("Latest update-21 Sept 78");
 	skip(1);
 #endif /* __HISTORICAL__ */

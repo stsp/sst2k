@@ -44,26 +44,25 @@ void iostart(int usecurses)
 	(void)saveterm();
 	(void)nonl();
 	(void)cbreak();
-#ifdef FOO
+#ifdef A_COLOR
 	{
-	int background = COLOR_WHITE;
 	start_color();
-	init_pair(COLOR_BLACK, COLOR_BLACK, background);
-	init_pair(COLOR_GREEN, COLOR_GREEN, background);
-	init_pair(COLOR_RED, COLOR_RED, background);
-	init_pair(COLOR_CYAN, COLOR_CYAN, background);
-	init_pair(COLOR_WHITE, COLOR_WHITE, background);
-	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, background);
-	init_pair(COLOR_BLUE, COLOR_BLUE, background);
-	init_pair(COLOR_YELLOW, COLOR_YELLOW, background);
+	init_pair(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+	init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+	init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
+	init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
+	init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
 	}
 #endif /* A_COLOR */
 	//(void)noecho();
 	fullscreen_window = stdscr;
 	srscan_window     = newwin(12, 25, 0,       0);
-	REPORT_WINDOW     = newwin(10, 0,  1,       25);
+	report_window     = newwin(10, 0,  1,       25);
 	lrscan_window     = newwin(10, 0,  0,       64); 
-	message_window      = newwin(0,  0,  12,      0);
+	message_window    = newwin(0,  0,  12,      0);
 	prompt_window     = newwin(1,  0,  LINES-1, 0); 
 	scrollok(message_window, TRUE);
 	setwnd(fullscreen_window);
@@ -227,64 +226,63 @@ void clrscr (void)
 
 void textcolor (int color)
 {
+#ifdef A_COLOR
     if (curses) {
-	wattroff(curwnd, A_REVERSE);
-#ifdef FOO
 	switch(color) {
 	case DEFAULT: 
 	    wattrset(curwnd, 0);
 	    break;
 	case BLACK: 
-	    wattron(curwnd, COLOR_PAIR(BLACK));
+	    wattron(curwnd, COLOR_PAIR(COLOR_BLACK));
 	    break;
 	case BLUE: 
-	    wattron(curwnd, COLOR_PAIR(BLUE));
+	    wattron(curwnd, COLOR_PAIR(COLOR_BLUE));
 	    break;
 	case GREEN: 
-	    wattron(curwnd, COLOR_PAIR(GREEN));
+	    wattron(curwnd, COLOR_PAIR(COLOR_GREEN));
 	    break;
 	case CYAN: 
-	    wattron(curwnd, COLOR_PAIR(CYAN));
+	    wattron(curwnd, COLOR_PAIR(COLOR_CYAN));
 	    break;
 	case RED: 
-	    wattron(curwnd, COLOR_PAIR(RED));
+	    wattron(curwnd, COLOR_PAIR(COLOR_RED));
 	    break;
 	case MAGENTA: 
-	    wattron(curwnd, COLOR_PAIR(MAGENTA));
+	    wattron(curwnd, COLOR_PAIR(COLOR_MAGENTA));
 	    break;
 	case BROWN: 
-	    wattron(curwnd, COLOR_PAIR(YELLOW));
+	    wattron(curwnd, COLOR_PAIR(COLOR_YELLOW));
 	    break;
 	case LIGHTGRAY: 
-	    wattron(curwnd, COLOR_PAIR(WHITE));
+	    wattron(curwnd, COLOR_PAIR(COLOR_WHITE));
 	    break;
 	case DARKGRAY: 
-	    wattron(curwnd, COLOR_PAIR(BLACK) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_BLACK) | A_BOLD);
 	    break;
 	case LIGHTBLUE: 
-	    wattron(curwnd, COLOR_PAIR(BLUE) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_BLUE) | A_BOLD);
 	    break;
 	case LIGHTGREEN: 
-	    wattron(curwnd, COLOR_PAIR(GREEN) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_GREEN) | A_BOLD);
 	    break;
 	case LIGHTCYAN: 
-	    wattron(curwnd, COLOR_PAIR(CYAN) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_CYAN) | A_BOLD);
 	    break;
 	case LIGHTRED: 
-	    wattron(curwnd, COLOR_PAIR(RED) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_RED) | A_BOLD);
 	    break;
 	case LIGHTMAGENTA: 
-	    wattron(curwnd, COLOR_PAIR(MAGENTA) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_MAGENTA) | A_BOLD);
 	    break;
 	case YELLOW: 
-	    wattron(curwnd, COLOR_PAIR(YELLOW) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
 	    break;
 	case WHITE:
-	    wattron(curwnd, COLOR_PAIR(WHITE) | A_BOLD);
+	    wattron(curwnd, COLOR_PAIR(COLOR_WHITE) | A_BOLD);
 	    break;
 	}
-#endif /* FOO */
     }
+#endif /* A_COLOR */
 }
 
 void highvideo (void)
@@ -312,9 +310,9 @@ void drawmaps(short l)
 	    wmove(curwnd, 0, 0);
 	    enqueue("no");
 	    srscan(SCAN_FULL);
-	    setwnd(REPORT_WINDOW);
-	    wclear(REPORT_WINDOW);
-	    wmove(REPORT_WINDOW, 0, 0);
+	    setwnd(report_window);
+	    wclear(report_window);
+	    wmove(report_window, 0, 0);
 	    srscan(SCAN_NO_LEFTSIDE);
 	    setwnd(lrscan_window);
 	    wclear(lrscan_window);
