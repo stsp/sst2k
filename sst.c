@@ -13,27 +13,27 @@
 
 Dave Matuszek says:
 
-  SRSCAN, MOVE, PHASERS, CALL, STATUS, IMPULSE, PHOTONS, ABANDON,
-  LRSCAN, WARP, SHIELDS, DESTRUCT, CHART, REST, DOCK, QUIT, and DAMAGE
-  were in the original non-"super" version.
+   SRSCAN, MOVE, PHASERS, CALL, STATUS, IMPULSE, PHOTONS, ABANDON,
+   LRSCAN, WARP, SHIELDS, DESTRUCT, CHART, REST, DOCK, QUIT, and DAMAGE
+   were in the original non-"super" version.
 
-  Tholians weren't in the original. Dave is dubious about their merits.
-  There weren't even planets.  He says the bit about the Galileo getting
-  turned into a McDonald's is "consistant with our original vision".
+   Tholians weren't in the original. Dave is dubious about their merits.
 
-  Dilithium crystals weren't in the original.  Dave is OK with this idea.
+   Planets and dilithium crystals weren't in the original.  Dave is OK
+   with this idea. He says the bit about the Galileo getting
+   turned into a McDonald's is "consistant with our original vision".
 
-  Dave also says the Space Thingy should not be preserved across saved games,
-  so you can't prove to others that you've seen it.  He says it shouldn't
-  fire back, either.  It should so nothing except scream and disappear
-  when hit by photon torpedos.  It's OK that it moves when rammed, but it
-  didn't in the original.
+   Dave also says the Space Thingy should not be preserved across saved
+   games, so you can't prove to others that you've seen it.  He says it
+   shouldn't fire back, either.  It should do nothing except scream and
+   disappear when hit by photon torpedos.  It's OK that it may move
+   when attacked, but it didn't in the original.
 
-  The Faerie Queen was in the original.
+   The Faerie Queen, black holes, and time warping were in the original.
 
 Here are Tom Almy's changes:
 
- Compared to original version, I've changed the "help" command to
+   Compared to original version, I've changed the "help" command to
    "call" and the "terminate" command to "quit" to better match
    user expectations. The DECUS version apparently made those changes
    as well as changing "freeze" to "save". However I like "freeze".
@@ -303,7 +303,7 @@ void enqueue(char *s)
 
 static void makemoves(void) 
 {
-    int i, v, hitme;
+    int i, v = 0, hitme;
     clrscr();
     setwnd(message_window);
     while (TRUE) { /* command loop */
@@ -330,7 +330,8 @@ static void makemoves(void)
 		    v = commands[i].value;
 		    break;
 		}
-	    if (i < ABANDON) break;
+	    if (i < ABANDON && (!commands[i].option || (commands[i].option & game.options))) 
+		break;
 	    for (; i < NUMCOMMANDS; i++)
 		if (strcasecmp(commands[i].name, citem) == 0) {
 		    v = commands[i].value;
