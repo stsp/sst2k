@@ -4,8 +4,8 @@
     "docbook/docbookxx.dtd">
 
 <book>
-<title>Super Star Trek</title>
 <bookinfo>
+<title>Super Star Trek</title>
 
 <authorgroup>
 <author>
@@ -30,6 +30,19 @@
   <surname>Raymond</surname>
 </author>
 </authorgroup>
+
+<legalnotice>
+<para>Permission is hereby granted for the copying, distribution,
+modification and use of this program and associated documentation
+for recreational purposes, provided that all references to the
+authors are retained.  However, permission is not and will not be
+granted for the sale or promotional use of this program or program
+documentation, or for use in any situation in which profit may be
+considered an objective, since it is the desire of the authors to
+respect the copyrights of the originators of Star Trek.</para>
+</legalnotice>
+</bookinfo>
+
 
 <dedication>
 <literallayout format='linespecific' class='monospaced'>
@@ -84,18 +97,6 @@
 			     Eric S. Raymond
 </literallayout>
 </dedication>
-
-<legalnotice>
-<para>Permission is hereby granted for the copying, distribution,
-modification and use of this program and associated documentation
-for recreational purposes, provided that all references to the
-authors are retained.  However, permission is not and will not be
-granted for the sale or promotional use of this program or program
-documentation, or for use in any situation in which profit may be
-considered an objective, since it is the desire of the authors to
-respect the copyrights of the originators of Star Trek.</para>
-</legalnotice>
-</bookinfo>
 
 <chapter><title>Introduction</title>
 <para>The Organian Peace Treaty has collapsed, and the Federation is at war
