@@ -449,6 +449,16 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
 #endif /* SERGEEV */
 }
 
+void makechart(void) {
+#ifdef SERGEEV
+    _setcursortype(_NOCURSOR);
+    setwnd(LOWER_WINDOW);
+    clrscr();
+    chart(0);
+    _setcursortype(_NORMALCURSOR);
+#endif /* SERGEEV */
+}
+
 void setpassword(void) {
 #ifndef SERGEEV
 	while (TRUE) {
