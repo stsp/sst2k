@@ -1,3 +1,7 @@
+#ifdef SERGEEV
+#include <conio.h>
+#include "sstlinux.h"
+#endif /* SERGEEV */
 #include <unistd.h>
 #include "sst.h"
 
@@ -51,7 +55,12 @@ void imove(void) {
 									  (iy-game.ky[l])*(double)(iy-game.ky[l]));
 						game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
 					}
+#ifdef SERGEEV
+                                        if (skill > 3 && klhere > 0 && game.state.galaxy[quadx][quady] != 1000)
+					    attack(0);
+#else
 					if (game.state.galaxy[quadx][quady] != 1000) attack(0);
+#endif /* SERGEEV */
 					if (alldone) return;
 				}
 				/* compute final position -- new quadrant and sector */
@@ -89,9 +98,9 @@ void imove(void) {
 						finish(FNEG3);
 						return;
 					}
-					prout("\nYOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER\n"
-						 "AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,\n"
-						 "YOU WILL BE DESTROYED.\n");
+                                        prout("\n\rYOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER\n\r"
+                                                 "AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,\n\r"
+                                                 "YOU WILL BE DESTROYED.\n\r");
 				}
 				/* Compute final position in new quadrant */
 				if (trbeam) return; /* Don't bother if we are to be beamed */
@@ -897,7 +906,7 @@ void help(void) {
 	double ddist, xdist, probf;
 	int line = 0, l, ix, iy;
 #ifdef SERGEEV
-	int pox, posy;
+	int posx, posy;
 #endif /* SERGEEV */
 
 	chew();
@@ -946,7 +955,6 @@ void help(void) {
 	proutn("");
 	crmshp();
 	prout(" dematerializes.");
-#ifdef SERGEEV
         sectx=0;
         for (l = 1; l <= 5; l++) {
                 ix = basex+3.0*Rand()-1;
@@ -964,7 +972,6 @@ void help(void) {
            finish(FMATERIALIZE);
            return;
         }
-#endif /* SERGEEV */
 	/* Give starbase three chances to rematerialize starship */
 	probf = pow((1.0 - pow(0.98,ddist)), 0.33333333);
 	for (l = 1; l <= 3; l++) {

@@ -1,6 +1,11 @@
 #define INCLUDED	// Define externs here
 #include <ctype.h>
 #include <getopt.h>
+#ifdef SERGEEV
+#include <conio.h>
+#include <time.h>
+#include "sstlinux.h"
+#endif /* SERGEEV */
 #include "sst.h"
 
 #ifndef SSTDOC
@@ -84,10 +89,19 @@ SERGEEV, not yet completely merged):
    */
 
 static char *commands[] = {
+#ifdef SERGEEV
+        "--",
+        "---",
+#else
 	"srscan",
 	"lrscan",
+#endif /* SERGEEV */
 	"phasers",
+#ifdef SERGEEV
+        "torpedo",
+#else
 	"photons",
+#endif /* SERGEEV */
 	"move",
 	"shields",
 	"dock",
@@ -96,40 +110,63 @@ static char *commands[] = {
 	"impulse",
 	"rest",
 	"warp",
+#ifdef SERGEEV
+        "score",
+        "----",
+#else
 	"status",
 	"sensors",
+#endif /* SERGEEV */
 	"orbit",
 	"transport",
 	"mine",
 	"crystals",
 	"shuttle",
 	"planets",
+#ifdef SERGEEV
+        "-----",
+#else
 	"request",
+#endif /* SERGEEV */
 	"report",
 	"computer",
 	"commands",
-    "emexit",
-    "probe",
+	"emexit",
+	"probe",
 	"abandon",
 	"destruct",
+#ifdef SERGEEV
+        "save",
+#else
 	"freeze",
+#endif /* SERGEEV */
 	"deathray",
 	"debug",
+#ifdef SERGEEV
+        "sos",
+#else
 	"call",
+#endif /* SERGEEV */
 	"quit",
 	"help"
 };
+
+#ifdef SERGEEV
+wnd wnds[6]={{1,1,80,25},{1,1,25,12},{26,2,80,12},{65,1,80,10},{1,13,80,23},{1,24,80,25}};
+short curwnd;
+#endif /* SERGEEV */
+
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
 static void listCommands(int x) {
-	prout("   SRSCAN    MOVE      PHASERS   CALL\n"
-		  "   STATUS    IMPULSE   PHOTONS   ABANDON\n"
-		  "   LRSCAN    WARP      SHIELDS   DESTRUCT\n"
-		  "   CHART     REST      DOCK      QUIT\n"
-		  "   DAMAGES   REPORT    SENSORS   ORBIT\n"
-		  "   TRANSPORT MINE      CRYSTALS  SHUTTLE\n"
-		  "   PLANETS   REQUEST   DEATHRAY  FREEZE\n"
-		  "   COMPUTER  EMEXIT    PROBE     COMMANDS");
+        proutn   ("LEGAL COMMANDS ARE:\n\r"
+                  "   MOVE      PHASERS   SOS       PROBE\n\r"
+                  "   COMPUTER  IMPULSE   TORPEDO   ABANDON\n\r"
+                  "   EMEXIT    WARP      SHIELDS   DESTRUCT\n\r"
+                  "   CHART     REST      DOCK      QUIT\n\r"
+                  "   DAMAGES   REPORT    SCORE     ORBIT\n\r"
+                  "   TRANSPORT MINE      CRYSTALS  SHUTTLE\n\r"
+                  "   PLANETS   DEATHRAY  SAVE      COMMANDS\n\r");
 	if (x) prout("   HELP");
 }
 
@@ -244,16 +281,39 @@ void drawmaps(short l){
 
 static void makemoves(void) {
 	int i, hitme;
+#ifdef SERGEEV
+        clrscr();
+        setwnd(4);
+#endif /* SERGEEV */
 	while (TRUE) { /* command loop */
-		hitme = FALSE;
-		justin = 0;
-		Time = 0.0;
-		i = -1;
-		while (TRUE)  { /* get a command */
+#ifdef SERGEEV
+                drawmaps(1);
+#endif /* SERGEEV */
+                while (TRUE)  { /* get a command */
+			hitme = FALSE;
+			justin = 0;
+			Time = 0.0;
+			i = -1;
 			chew();
-			skip(1);
+#ifdef SERGEEV
+                        setwnd(5);
+                        clrscr();
+#endif /* SERGEEV */
 			proutn("COMMAND> ");
-			if (scan() == IHEOL) continue;
+#ifdef SERGEEV
+                        if (scan() == IHEOL) {
+                            _setcursortype(_NOCURSOR);
+                            setwnd(4);
+                            clrscr();
+                            chart(0);
+                            _setcursortype(_NORMALCURSOR);
+                            continue;
+                        }
+                        ididit=0;
+                        clrscr();
+                        setwnd(4);
+                        clrscr();
+#endif /* SERGEEV */
 			for (i=0; i < 26; i++)
 				if (isit(commands[i]))
 					break;
@@ -262,20 +322,18 @@ static void makemoves(void) {
 				if (strcmp(commands[i], citem) == 0) break;
 			if (i < NUMCOMMANDS) break;
 
-			if (skill <= 2)  {
-				prout("UNRECOGNIZED COMMAND. LEGAL COMMANDS ARE:");
-				listCommands(TRUE);
-			}
-			else prout("UNRECOGNIZED COMMAND.");
+			listCommands(TRUE);
 		}
 		commandhook(commands[i], TRUE);
 		switch (i) { /* command switch */
-			case 0:			// srscan
-				srscan(1);
-				break;
-			case 1:			// lrscan
-				lrscan();
-				break;
+#ifndef SERGEEV
+                        case 0:                 // srscan
+ 				srscan(1);
+ 				break;
+ 			case 1:			// lrscan
+ 				lrscan();
+                                break;
+#endif /* SERGEEV */
 			case 2:			// phasers
 				phasers();
 				if (ididit) hitme = TRUE;
@@ -290,12 +348,12 @@ static void makemoves(void) {
 			case 5:			// shields
 				doshield(1);
 				if (ididit) {
-					attack(2);
+					hitme=TRUE;
 					shldchg = 0;
 				}
 				break;
 			case 6:			// dock
-				dock(1);
+                                dock(1);
                                 if (ididit) attack(0);
 				break;
 			case 7:			// damages
@@ -314,12 +372,14 @@ static void makemoves(void) {
 			case 11:		// warp
 				setwrp();
 				break;
-			case 12:		// status
-				srscan(3);
+                        case 12:                // score
+                                score();
 				break;
+#ifndef SERGEEV
 			case 13:			// sensors
 				sensor();
 				break;
+#endif /* SERGEEV */
 			case 14:			// orbit
 				orbit();
 				if (ididit) hitme = TRUE;
@@ -333,6 +393,7 @@ static void makemoves(void) {
 				break;
 			case 17:			// crystals
 				usecrystals();
+                                if (ididit) hitme = TRUE;
 				break;
 			case 18:			// shuttle
 				shuttle();
@@ -383,6 +444,7 @@ static void makemoves(void) {
 				break;
 			case 31:		// Call for help
 				help();
+                                if (ididit) hitme = TRUE;
 				break;
 			case 32:
 				alldone = 1;	// quit the game
@@ -474,8 +536,8 @@ int main(int argc, char **argv) {
 #ifndef SERGEEV
 	ioend();
 #endif /* SERGEEV */
-	puts("May the Great Bird of the Galaxy roost upon your home planet.");
-	exit(0);
+	prout("May the Great Bird of the Galaxy roost upon your home planet.");
+	return 0;
 }
 
 
