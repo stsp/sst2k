@@ -10,6 +10,7 @@
 
 #include "conio.h"
 #include "sst.h"
+#include "sstlinux.h"
 
 #ifndef SERGEEV
 static int linecount;	/* for paging */
@@ -349,7 +350,7 @@ void drawmaps(short l) {
      if (l==1) sensor();
      if (l!=2) setwnd(LEFTUPPER_WINDOW);
      gotoxy(1,1);
-     enqueue("s");
+     enqueue("no");
      srscan(SCAN_FULL);
      if (l!=2){
         setwnd(SRSCAN_WINDOW);
