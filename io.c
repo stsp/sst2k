@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <termios.h>
@@ -253,8 +252,8 @@ static void vprouts(char *fmt, va_list ap) {
     }
     free(s);
 }
-
 #endif /* SERGEEV */
+
 void prouts(char *fmt, ...) {
 #ifndef SERGEEV
 	clock_t endTime;
