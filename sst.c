@@ -1,4 +1,4 @@
-#define INCLUDED	// Define externs here
+]#define INCLUDED	// Define externs here
 #include <ctype.h>
 #include <getopt.h>
 #include <time.h>
@@ -10,6 +10,26 @@
 #endif
 	
 /*
+
+Dave Matuszek says:
+
+  SRSCAN, MOVE, PHASERS, CALL, STATUS, IMPULSE, PHOTONS, ABANDON,
+  LRSCAN, WARP, SHIELDS, DESTRUCT, CHART, REST, DOCK, QUIT, and DAMAGE
+  were in the original non-"super" version.
+
+  Tholians weren't in the original. Dave is dubious about their merits.
+  There weren't even planets.  He says the bit about the Galileo getting
+  turned into a McDonald's is "consistant with our original vision".
+
+  Dilithium crystals weren't in the original.  Dave is OK with this idea.
+
+  Dave also says the Space Thingy should not be preserved across saved games,
+  so you can't prove to others that you've seen it.  He says it shouldn't
+  fire back, either.  It should so nothing except scream and disappear
+  when hit by photon torpedos.  It's OK that it moves when rammed, but it
+  didn't in the original.
+
+  The Faerie Queen was in the original.
 
 Here are Tom Almy's changes:
 

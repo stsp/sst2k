@@ -4,10 +4,6 @@
   then existed.  (This would be partly so people can try the original
   non-"super" version Matuszek and Reynolds wrote.)
 
-  Dave Matuszek tells me that SRSCAN, MOVE, PHASERS, CALL, STATUS,
-  IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT, CHART,
-  REST, DOCK, QUIT, and DAMAGE were in the original non-"super" version.
-
 * Code to hurl you out of quadrant if a supernova occurs as you warp in 
   seems to hang.
 

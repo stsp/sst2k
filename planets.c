@@ -469,7 +469,7 @@ void deathray(void)
 	skip(1);
 	prout("Lt. Uhura-  \"Graaeek!  Graaeek!\"");
 	skip(1);
-	prout("Spock-  \"Facinating!  . . . All humans aboard");
+	prout("Spock-  \"Fascinating!  . . . All humans aboard");
 	prout("  have apparently been transformed into strange mutations.");
 	prout("  Vulcans do not seem to be affected.");
 	skip(1);
