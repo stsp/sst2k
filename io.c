@@ -360,6 +360,31 @@ void drawmaps(short l) {
 #endif /* SERGEEV */
 }
 
+void boom(int ii, int jj)
+/* enemy fall down, go boom */ 
+{
+#ifdef SERGEEV
+    int crx, cry;
+    crx=wherex();
+    cry=wherey();
+    setwnd(LEFTUPPER_WINDOW);
+    drawmaps(2);
+    gotoxy(jj*2+3,ii+2);
+    highvideo();
+    proutn("%c", game.quad[ii][jj]);
+    gotoxy(wherex()-1,wherey());
+    sound(500);
+    delay(1000);
+    nosound();
+    lowvideo();
+    proutn("%c", game.quad[ii][jj]);
+    setwnd(LOWER_WINDOW);
+    gotoxy(crx,cry);
+    _setcursortype(_NORMALCURSOR);
+    delay(500);
+#endif /* SERGEEV */
+} 
+
 void warble(void)
 /* sound and visual effects for teleportation */
 {
@@ -375,6 +400,52 @@ void warble(void)
     nosound();
 #else
     prouts(" . . . . . ");
+#endif /* SERGEEV */
+}
+
+void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, int iquad)
+/* torpedo-track animation */
+{
+#ifndef SERGEEV
+    if (l == 1) {
+	if (n != 1) {
+	    skip(1);
+	    proutn("Track for torpedo number %d-  ", i);
+	}
+	else {
+	    skip(1);
+	    proutn("Torpedo track- ");
+	}
+    } else if (l==4 || l==9) 
+	skip(1);
+    proutn("%d - %d   ", (int)x, (int)y);
+#else
+    if (game.damage[DSRSENS]==0 || condit==IHDOCKED) {
+	drawmaps(2);
+	delay((wait!=1)*400);
+	gotoxy(iy*2+3,ix+2);
+	if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
+	    game.quad[ix][iy]='+';
+	    drawmaps(2);
+	    game.quad[ix][iy]=iquad;
+	    sound(l*10);
+	    delay(100);
+	    nosound();
+	}
+	else {
+	    game.quad[ix][iy]|=128;
+	    drawmaps(2);
+	    game.quad[ix][iy]=iquad;
+	    _setcursortype(_NOCURSOR);
+	    sound(500);
+	    delay(1000);
+	    nosound();
+	    lowvideo();
+	    _setcursortype(_NORMALCURSOR);
+	}
+    } else {
+	proutn("%d - %d   ", (int)x, (int)y);
+    }
 #endif /* SERGEEV */
 }
 

@@ -226,7 +226,7 @@ void gettextinfo(struct text_info *inforec)
 } 
 
 void gotoxy (int x, int y)
-/* address cusor -- OK for this to be a no-op in TTY mode */
+/* address cursor -- OK for this to be a no-op in TTY mode */
 {
 #ifdef SERGEEV
    y--;

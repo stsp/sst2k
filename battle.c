@@ -174,7 +174,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	return;
 }
 
-void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
+void torpedo(double course, double r, int inx, int iny, double *hit, int wait, int i, int n) {
         int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
 	int crx,cry;
 	
@@ -201,39 +201,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 		iy = y + 0.5;
 		if (iy < 1 || iy > 10) break;
 		iquad=game.quad[ix][iy];
-#ifndef SERGEEV
-		if (l==4 || l==9) skip(1);
-		proutn("%d - %d   ", (int)x, (int)y);
-#else
-                if (game.damage[DSRSENS]==0 || condit==IHDOCKED){
-                   drawmaps(2);
-                   delay((wait!=1)*400);
-                   wait=1;
-                   gotoxy(iy*2+3,ix+2);
-                   if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
-                      game.quad[ix][iy]='+';
-                      drawmaps(2);
-                      game.quad[ix][iy]=iquad;
-                      sound(l*10);
-                      delay(100);
-                      nosound();
-                   }
-                   else {
-                        game.quad[ix][iy]|=128;
-                        drawmaps(2);
-                        game.quad[ix][iy]=iquad;
-                        _setcursortype(_NOCURSOR);
-                        sound(500);
-                        delay(1000);
-                        nosound();
-                        lowvideo();
-                        _setcursortype(_NORMALCURSOR);
-                   }
-                }
-                else {
-		  proutn("%d - %d   ", (int)x, (int)y);
-		}
-#endif /* SERGEEV */
+		tracktorpedo(x, y, ix, iy, wait, l, i, n, iquad);
+		wait = 1;
 		if (iquad==IHDOT) continue;
 		/* hit something */
 		setwnd(LOWER_WINDOW);
@@ -401,15 +370,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 					 fabs(sin(bullseye-angle));
 				h1 = fabs(h1);
 				if (h1 >= 600) {
-#ifndef SERGEEV
-					prout(" destroyed.");
-#endif /* SERGEEV */
 					game.quad[ix][iy] = IHDOT;
 					ithere = 0;
 					ithx = ithy = 0;
-#ifdef SERGEEV
                                         deadkl(ix, iy, iquad, ix, iy);
-#endif /* SERGEEV */
 					return;
 				}
 				skip(1);
@@ -551,7 +515,7 @@ void attack(int k) {
 			prout("  ");
 			r = (Rand()+Rand())*0.5 -0.5;
 			r += 0.002*game.kpower[l]*r;
-			torpedo(course, r, jx, jy, &hit, 0);
+			torpedo(course, r, jx, jy, &hit, 0, 1, 1);
 			if (game.state.remkl==0) finish(FWON); /* Klingons did themselves in! */
 			if (game.state.galaxy[quadx][quady] == 1000 ||
 				alldone) return; /* Supernova or finished */
@@ -854,17 +818,7 @@ void photon(void) {
 			}
 		}
 		if (shldup || condit == IHDOCKED) r *= 1.0 + 0.0001*shield;
-#ifndef SERGEEV
-		if (n != 1) {
-			skip(1);
-			proutn("Track for torpedo number %d-  ", i);
-		}
-		else {
-			skip(1);
-			proutn("Torpedo track- ");
-		}
-#endif /* SERGEEV */
-		torpedo(course[i], r, sectx, secty, &dummy, i);
+		torpedo(course[i], r, sectx, secty, &dummy, 0, i, n);
 		if (alldone || game.state.galaxy[quadx][quady]==1000) return;
 	}
 	if (game.state.remkl==0) finish(FWON);
@@ -1231,28 +1185,8 @@ void hittem(double *hits) {
 		ii = game.kx[kk];
 		jj = game.ky[kk];
 		if (hit > 0.005) {
-#ifdef SERGEEV
-			int crx, cry;
-                        if (game.damage[DSRSENS]==0){
-                           crx=wherex();
-                           cry=wherey();
-                           setwnd(LEFTUPPER_WINDOW);
-                           drawmaps(2);
-                           gotoxy(jj*2+3,ii+2);
-                           highvideo();
-                           proutn("%c", game.quad[ii][jj]);
-                           gotoxy(wherex()-1,wherey());
-                           sound(500);
-                           delay(1000);
-                           nosound();
-                           lowvideo();
-                           proutn("%c", game.quad[ii][jj]);
-                           setwnd(LOWER_WINDOW);
-                           gotoxy(crx,cry);
-                           _setcursortype(_NORMALCURSOR);
-                           delay(500);
-                        }
-#endif /* SERGEEV */
+                        if (game.damage[DSRSENS]==0)
+			    boom(ii, jj);
 			proutn("%d unit hit on ", (int)hit);
 		}
 		else
