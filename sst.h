@@ -8,6 +8,9 @@
 #define EXTERN
 #endif
 
+#define min(x, y)	((x)<(y)?(x):(y))
+#define max(x, y)	((x)>(y)?(x):(y))
+
 // #define DEBUG
 
 #define NDEVICES (15)	// Number of devices

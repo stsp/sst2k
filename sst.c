@@ -428,7 +428,7 @@ char *cramlc(enum loctype key, int x, int y) {
 void crmena(int i, int enemy, int key, int x, int y) {
 	if (i == 1) proutn("***");
 	cramen(enemy);
-	proutn(" at");
+	proutn(" at ");
 	proutn(cramlc(key, x, y));
 }
 

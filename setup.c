@@ -378,6 +378,10 @@ void setup(int needprompt) {
 	if (neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
 
+void randomize(void) {
+	srand((int)time(NULL));
+}
+
 int choose(int needprompt) {
 	tourn = 0;
 	thawed = 0;

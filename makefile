@@ -7,7 +7,7 @@ CFLAGS=     -O -g -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-CFILES= sst.c finish.c reports.c setup.c linux.c moving.c battle.c events.c ai.c planets.c
+CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c
 OFILES= $(CFILES:.c=.o)
 HFILES=sst.h
 DOCS = README sst-doc.xml sst.xml TODO
