@@ -19,13 +19,12 @@ all: sst sst.doc
 
 ai.o: ai.c sst.h
 battle.o: battle.c sst.h
-conio.o: conio.c conio.h
 events.o: events.c sst.h
 finish.o: finish.c sst.h
 io.o: io.c sst.h
 moving.o: moving.c sstlinux.h sst.h
 planets.o: planets.c sst.h
-reports.o: reports.c sst.h conio.h
+reports.o: reports.c sst.h
 setup.o: setup.c sst.h
 sst.o: sst.c sstlinux.h sst.h
 sstlinux.o: sstlinux.c sstlinux.h
