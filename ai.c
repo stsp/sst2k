@@ -14,7 +14,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     if (irun == 0) {
 	/* avoid intruding on another commander's territory */
 	if (ienm == IHC) {
-	    for (l = 1; l <= game.state.remcom; l++)
+	    for_commanders(l)
 		if (game.state.cx[l]==iqx && game.state.cy[l]==iqy) return 0;
 	    /* refuse to leave if currently attacking starbase */
 	    if (batx==quadx && baty==quady) return 0;
@@ -54,7 +54,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 	game.state.isy=iqy;
     }
     else {
-	for (l=1; l<=game.state.remcom; l++) {
+	for_commanders(l) {
 	    if (game.state.cx[l]==quadx && game.state.cy[l]==quady) {
 		game.state.cx[l]=iqx;
 		game.state.cy[l]=iqy;
@@ -436,7 +436,7 @@ void scom(int *ipage)
 		continue;
 	    /* if there is a commander, an no other base is appropriate,
 	       we will take the one with the commander */
-	    for (j = 1; j <= game.state.remcom; j++) {
+	    for_commanders (j) {
 		if (ibqx==game.state.cx[j] && ibqy==game.state.cy[j] && ifindit!= 2) {
 		    ifindit = 2;
 		    iwhichb = i;

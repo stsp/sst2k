@@ -633,7 +633,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	switch (type) {
 	case IHC:
 	    comhere = 0;
-	    for (i=1; i<=game.state.remcom; i++)
+	    for_commanders (i)
 		if (game.state.cx[i]==quadx && game.state.cy[i]==quady) break;
 	    game.state.cx[i] = game.state.cx[game.state.remcom];
 	    game.state.cy[i] = game.state.cy[game.state.remcom];
