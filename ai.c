@@ -84,7 +84,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	if (ienm==IHS &&
 		(game.kpower[loccom] <= 500.0 || (condit==IHDOCKED && game.damage[DPHOTON]==0))) {
 		irun = 1;
-		motion = -10;
+		motion = -QUADSIZE;
 	}
 	else {
 		/* decide whether to advance, retreat, or hold position */
@@ -165,7 +165,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	/* calcuate preferred number of steps */
 	nsteps = motion < 0 ? -motion : motion;
 	if (motion > 0 && nsteps > mdist) nsteps = mdist; /* don't overshoot */
-	if (nsteps > 10) nsteps = 10; /* This shouldn't be necessary */
+	if (nsteps > QUADSIZE) nsteps = QUADSIZE; /* This shouldn't be necessary */
 	if (nsteps < 1) nsteps = 1; /* This shouldn't be necessary */
 #ifdef DEBUG
 	if (idebug) {
@@ -196,14 +196,14 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		success = 0;
 		attempts = 0; /* Settle mysterious hang problem */
 		while (attempts++ < 20 && !success) {
-			if (lookx < 1 || lookx > 10) {
+			if (lookx < 1 || lookx > QUADSIZE) {
 				if (motion < 0 && tryexit(lookx, looky, ienm, loccom, irun))
 					return;
 				if (krawlx == mx || my == 0) break;
 				lookx = nextx + krawlx;
 				krawlx = -krawlx;
 			}
-			else if (looky < 1 || looky > 10) {
+			else if (looky < 1 || looky > QUADSIZE) {
 				if (motion < 0 && tryexit(lookx, looky, ienm, loccom, irun))
 					return;
 				if (krawly == my || mx == 0) break;
@@ -546,15 +546,15 @@ void movetho(void) {
 	if (ithere==0 || justin == 1) return;
 
 	if (ithx == 1 && ithy == 1) {
-		idx = 1; idy = 10;
+		idx = 1; idy = QUADSIZE;
 	}
-	else if (ithx == 1 && ithy == 10) {
-		idx = 10; idy = 10;
+	else if (ithx == 1 && ithy == QUADSIZE) {
+		idx = QUADSIZE; idy = QUADSIZE;
 	}
-	else if (ithx == 10 && ithy == 10) {
-		idx = 10; idy = 1;
+	else if (ithx == QUADSIZE && ithy == QUADSIZE) {
+		idx = QUADSIZE; idy = 1;
 	}
-	else if (ithx == 10 && ithy == 1) {
+	else if (ithx == QUADSIZE && ithy == 1) {
 		idx = 1; idy = 1;
 	}
 	else {
@@ -590,9 +590,9 @@ void movetho(void) {
 	/* check to see if all holes plugged */
 	for (i = 1; i < 11; i++) {
 		if (game.quad[1][i]!=IHWEB && game.quad[1][i]!=IHT) return;
-		if (game.quad[10][i]!=IHWEB && game.quad[10][i]!=IHT) return;
+		if (game.quad[QUADSIZE][i]!=IHWEB && game.quad[QUADSIZE][i]!=IHT) return;
 		if (game.quad[i][1]!=IHWEB && game.quad[i][1]!=IHT) return;
-		if (game.quad[i][10]!=IHWEB && game.quad[i][10]!=IHT) return;
+		if (game.quad[i][QUADSIZE]!=IHWEB && game.quad[i][QUADSIZE]!=IHT) return;
 	}
 	/* All plugged up -- Tholian splits */
 	game.quad[ithx][ithy]=IHWEB;

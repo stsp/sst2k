@@ -304,8 +304,8 @@ void events(void) {
 				game.future[FDSPROB] = game.state.date + 0.01;
 				probex += probeinx;
 				probey += probeiny;
-				i = (int)(probex/10 +0.05);
-				j = (int)(probey/10 + 0.05);
+				i = (int)(probex/QUADSIZE +0.05);
+				j = (int)(probey/QUADSIZE + 0.05);
 				if (probecx != i || probecy != j) {
 					probecx = i;
 					probecy = j;
@@ -410,7 +410,7 @@ void wait(void) {
 void nova(int ix, int iy) {
 	static double course[] =
 		{0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5};
-        int bot, top, top2, hits[11][3], kount, icx, icy, mm, nn, j;
+        int bot, top, top2, hits[QUADSIZE+1][3], kount, icx, icy, mm, nn, j;
 	int iquad, iquad1, i, ll, newcx, newcy, ii, jj;
 	if (Rand() < 0.05) {
 		/* Wow! We've supernova'ed */

@@ -257,11 +257,11 @@ int srscan(int l) {
 	break;
     }
     if (condit != IHDOCKED) newcnd();
-    for (i = 1; i <= 10; i++) {
+    for (i = 1; i <= QUADSIZE; i++) {
 	jj = (k!=0 ? k : i);
 	if (leftside) {
 	    proutn("%2d  ", i);
-	    for (j = 1; j <= 10; j++) {
+	    for (j = 1; j <= QUADSIZE; j++) {
 		if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1)){
 		    if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
 			switch (condit) {
