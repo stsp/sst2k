@@ -48,7 +48,7 @@ void imove(void)
 		/* Don't do it if being pushed by Nova */
 		if (nenhere != 0 && iattak != 2) {
 		    newcnd();
-		    for (l = 1; l <= nenhere; l++) {
+		    for_local_enemies(l) {
 			finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
 				      (iy-game.ky[l])*(double)(iy-game.ky[l]));
 			game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
@@ -193,7 +193,7 @@ no_quad_change:
     /* No quadrant change -- compute new avg enemy distances */
     game.quad[sectx][secty] = ship;
     if (nenhere) {
-	for (l = 1; l <= nenhere; l++) {
+	for_local_enemies(l) {
 	    finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
 			  (iy-game.ky[l])*(double)(iy-game.ky[l]));
 	    game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
@@ -202,7 +202,7 @@ no_quad_change:
 	sortkl();
 	if (!game.state.galaxy[quadx][quady].supernova && iattak == 0)
 	    attack(0);
-	for (l = 1 ; l <= nenhere; l++) game.kavgd[l] = game.kdist[l];
+	for_local_enemies(l) game.kavgd[l] = game.kdist[l];
     }
     newcnd();
     iattak = 0;
@@ -929,7 +929,7 @@ void help(void)
     }
     else {
 	ddist = 1e30;
-	for (l = 1; l <= game.state.rembase; l++) {
+	for_starbases(l) {
 	    xdist=10.0*sqrt(square(game.state.baseqx[l]-quadx)+square(game.state.baseqy[l]-quady));
 	    if (xdist < ddist) {
 		ddist = xdist;

@@ -273,26 +273,28 @@ void movcom(void)
 
     /* Figure out which Klingon is the commander (or Supercommander)
        and do move */
-    if (comhere) for (i = 1; i <= nenhere; i++) {
-	ix = game.kx[i];
-	iy = game.ky[i];
-	if (game.quad[ix][iy] == IHC) {
-	    movebaddy(ix, iy, i, IHC);
-	    break;
+    if (comhere) 
+	for_local_enemies(i) {
+	    ix = game.kx[i];
+	    iy = game.ky[i];
+	    if (game.quad[ix][iy] == IHC) {
+		movebaddy(ix, iy, i, IHC);
+		break;
+	    }
 	}
-    }
-    if (ishere) for (i = 1; i <= nenhere; i++) {
-	ix = game.kx[i];
-	iy = game.ky[i];
-	if (game.quad[ix][iy] == IHS) {
-	    movebaddy(ix, iy, i, IHS);
-	    break;
+    if (ishere) 
+	for_local_enemies(i) {
+	    ix = game.kx[i];
+	    iy = game.ky[i];
+	    if (game.quad[ix][iy] == IHS) {
+		movebaddy(ix, iy, i, IHS);
+		break;
+	    }
 	}
-    }
     /* if skill level is high, move other Klingons and Romulans too!
        Move these last so they can base their actions on what the
        commander(s) do. */
-    if (skill >= SKILL_EXPERT) for (i = 1; i <= nenhere; i++) {
+    if (skill >= SKILL_EXPERT) for_local_enemies(i) {
 	ix = game.kx[i];
 	iy = game.ky[i];
 	if (game.quad[ix][iy] == IHK || game.quad[ix][iy] == IHR)
@@ -313,7 +315,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	return 1;
     if (flag) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
-	for (i = 1; i <= game.state.rembase; i++)
+	for_starbases(i)
 	    if (game.state.baseqx[i]==iqx && game.state.baseqy[i]==iqy) return 1;
     }
     if (justin && !iscate) return 1;
@@ -329,7 +331,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	ishere=0;
 	ientesc=0;
 	game.future[FSCDBAS]=1e30;
-	for (i = 1; i <= nenhere; i++) 
+	for_local_enemies(i) 
 	    if (game.quad[game.kx[i]][game.ky[i]] == IHS) break;
 	game.quad[game.kx[i]][game.ky[i]] = IHDOT;
 	game.kx[i] = game.kx[nenhere];
@@ -397,7 +399,7 @@ void scom(int *ipage)
 	}
 	sx = game.state.isx;
 	sy = game.state.isy;
-	for (i = 1; i <= game.state.rembase; i++) {
+	for_starbases(i) {
 	    basetbl[i] = i;
 	    ibqx = game.state.baseqx[i];
 	    ibqy = game.state.baseqy[i];
@@ -425,7 +427,7 @@ void scom(int *ipage)
 	   without too many Klingons, and not already under attack. */
 	ifindit = iwhichb = 0;
 
-	for (i2 = 1; i2 <= game.state.rembase; i2++) {
+	for_starbases(i2) {
 	    i = basetbl[i2];	/* bug in original had it not finding nearest*/
 	    ibqx = game.state.baseqx[i];
 	    ibqy = game.state.baseqy[i];
@@ -498,7 +500,7 @@ void scom(int *ipage)
     if (game.state.rembase == 0) {
 	game.future[FSCMOVE] = 1e30;
     }
-    else for (i=1; i<=game.state.rembase; i++) {
+    else for_starbases(i) {
 	ibqx = game.state.baseqx[i];
 	ibqy = game.state.baseqy[i];
 	if (ibqx==game.state.isx && ibqy == game.state.isy && game.state.isx != batx && game.state.isy != baty) {

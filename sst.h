@@ -27,8 +27,11 @@
  */
 #define VALID_QUADRANT(x, y)	((x)>=1 && (x)<=GALSIZE && (y)>=1 && (y)<=GALSIZE)
 #define VALID_SECTOR(x, y)	((x)>=1 && (x)<=QUADSIZE && (y)>=1 && (y)<=QUADSIZE)
-#define for_quadrants(i)	for (i = 1; i < GALSIZE+1; i++)
-#define for_sectors(i)		for (i = 1; i < QUADSIZE+1; i++)
+#define for_quadrants(i)	for (i = 1; i <= GALSIZE; i++)
+#define for_sectors(i)		for (i = 1; i <= QUADSIZE; i++)
+#define for_commanders(i)	for (i = 1; i <= game.state.remcom; i++)
+#define for_local_enemies(i)	for (i = 1; i <= nenhere; i++)
+#define for_starbases(i)	for (i = 1; i <= game.state.rembase; i++)
 
 typedef struct {
     int x;	/* Quadrant location of planet */

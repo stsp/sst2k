@@ -255,7 +255,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	case IHR: /* Hit a regular enemy */
 	case IHK:
 	    /* find the enemy */
-	    for (ll=1; ll <= nenhere; ll++)
+	    for_local_enemies(ll)
 		if (ix==game.kx[ll] && iy==game.ky[ll]) break;
 	    kp = fabs(game.kpower[ll]);
 	    h1 = 700.0 + 100.0*Rand() -
@@ -410,7 +410,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	game.quad[jx][jy]=iquad;
 	game.quad[ix][iy]=IHDOT;
 	prout(" displaced by blast to %s ", cramlc(sector, jx, jy));
-	for (ll=1; ll<=nenhere; ll++)
+	for_local_enemies(ll)
 	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(sectx-game.kx[ll])+square(secty-game.ky[ll]));
 	sortkl();
 	return;
@@ -482,7 +482,7 @@ void attack(int torps_ok)
     if (shldchg == 1) chgfac = 0.25+0.5*Rand();
     skip(1);
     if (skill <= SKILL_FAIR) i = 2;
-    for (l=1; l <= nenhere; l++) {
+    for_local_enemies(l) {
 	if (game.kpower[l] < 0) continue;	/* too weak to attack */
 	/* compute hit strength and diminsh shield power */
 	r = Rand();
@@ -595,7 +595,7 @@ void attack(int torps_ok)
 	}
     }
     /* After attack, reset average distance to enemies */
-    for (l = 1; l <= nenhere; l++)
+    for_local_enemies(l)
 	game.kavgd[l] = game.kdist[l];
     sortkl();
     return;
@@ -666,7 +666,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     /* Remove enemy ship from arrays describing local conditions */
     if (game.future[FCDBAS] < 1e30 && batx==quadx && baty==quady && type==IHC)
 	game.future[FCDBAS] = 1e30;
-    for (i=1; i<=nenhere; i++)
+    for_local_enemies(i)
 	if (game.kx[i]==ix && game.ky[i]==iy) break;
     nenhere--;
     if (i <= nenhere)  {
@@ -997,7 +997,7 @@ void phasers(void)
 	irec=0;
 	do {
 	    chew();
-	    if (!kz) for (i = 1; i <= nenhere; i++)
+	    if (!kz) for_local_enemies(i)
 		irec+=fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
 		    (1.01+0.05*Rand()) + 1.0;
 	    kz=1;
@@ -1032,7 +1032,7 @@ void phasers(void)
 	if (nenhere) {
 	    extra = 0.0;
 	    powrem = rpow;
-	    for (i = 1; i <= nenhere; i++) {
+	    for_local_enemies(i) {
 		hits[i] = 0.0;
 		if (powrem <= 0) continue;
 		hits[i] = fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]));

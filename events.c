@@ -177,8 +177,8 @@ void events(void)
 		break;
 	    }
 	    i = 0;
-	    for (j=1; j<=game.state.rembase; j++) {
-		for (k=1; k<=game.state.remcom; k++)
+	    for_commanders (j) {
+		for_commanders(k)
 		    if (game.state.baseqx[j]==game.state.cx[k] && game.state.baseqy[j]==game.state.cy[k] &&
 			(game.state.baseqx[j]!=quadx || game.state.baseqy[j]!=quady) &&
 			(game.state.baseqx[j]!=game.state.isx || game.state.baseqy[j]!=game.state.isy)) {
@@ -236,7 +236,7 @@ void events(void)
 	    if (line==FCDBAS) {
 		game.future[FCDBAS] = 1e30;
 		/* find the lucky pair */
-		for (i = 1; i <= game.state.remcom; i++)
+		for_commanders(i)
 		    if (game.state.cx[i]==batx && game.state.cy[i]==baty) 
 			break;
 		if (i > game.state.remcom || game.state.rembase == 0 ||
@@ -273,7 +273,7 @@ void events(void)
 	    }
 	    /* Remove Starbase from galaxy */
 	    game.state.galaxy[batx][baty].starbase = FALSE;
-	    for (i=1; i <= game.state.rembase; i++)
+	    for_starbases(i)
 		if (game.state.baseqx[i]==batx && game.state.baseqy[i]==baty) {
 		    game.state.baseqx[i]=game.state.baseqx[game.state.rembase];
 		    game.state.baseqy[i]=game.state.baseqy[game.state.rembase];
@@ -481,7 +481,7 @@ void nova(int ix, int iy)
 			break;
 		    case IHB: /* Destroy base */
 			game.state.galaxy[quadx][quady].starbase = FALSE;
-			for (i = 1; i <= game.state.rembase; i++)
+			for_starbases(i)
 			    if (game.state.baseqx[i]==quadx && game.state.baseqy[i]==quady) 
 				break;
 			game.state.baseqx[i] = game.state.baseqx[game.state.rembase];
@@ -524,7 +524,7 @@ void nova(int ix, int iy)
 		    case IHC: /* Damage/destroy big enemies */
 		    case IHS:
 		    case IHR:
-			for (ll = 1; ll <= nenhere; ll++)
+			for_local_enemies(ll)
 			    if (game.kx[ll]==ii && game.ky[ll]==jj) break;
 			game.kpower[ll] -= 800.0; /* If firepower is lost, die */
 			if (game.kpower[ll] <= 0.0) {

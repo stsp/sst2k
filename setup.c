@@ -559,7 +559,7 @@ void newqad(int shutup)
 	    game.kpower[i] = Rand()*150.0 +300.0 +25.0*skill;
 	}
 	// If we need a commander, promote a Klingon
-	for (i = 1; i <= game.state.remcom ; i++) 
+	for_commanders(i)
 	    if (game.state.cx[i]==quadx && game.state.cy[i]==quady) break;
 			
 	if (i <= game.state.remcom) {
