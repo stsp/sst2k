@@ -300,15 +300,17 @@ static void makemoves(void) {
                         clrscr();
 #endif /* SERGEEV */
 			proutn("COMMAND> ");
-#ifdef SERGEEV
                         if (scan() == IHEOL) {
+#ifdef SERGEEV
                             _setcursortype(_NOCURSOR);
                             setwnd(4);
                             clrscr();
                             chart(0);
                             _setcursortype(_NORMALCURSOR);
+#endif /* SERGEEV */
                             continue;
                         }
+#ifdef SERGEEV
                         ididit=0;
                         clrscr();
                         setwnd(4);
