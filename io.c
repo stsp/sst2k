@@ -9,7 +9,7 @@
 #include "sst.h"
 #include "sstlinux.h"
 
-static int linecount;	/* for paging */
+static int rows, linecount;	/* for paging */
 
 WINDOW *curwnd;
 
@@ -29,8 +29,9 @@ static void outro(void)
 
 void iostart(void) 
 {
-    if (game.options & OPTION_CURSES) {
-
+    if (!(game.options & OPTION_CURSES)) {
+	rows = atoi(getenv("LINES"));
+    } else {
 	if (atexit(outro)){
 	    fprintf(stderr,"Unable to register outro(), exiting...\n");
 	    exit(1);
@@ -44,15 +45,15 @@ void iostart(void)
 	(void)cbreak();
 #ifdef A_COLOR
 	{
-	start_color();
-	init_pair(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
-	init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
-	init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
-	init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
-	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
-	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-	init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
-	init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
+	    start_color();
+	    init_pair(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+	    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+	    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
+	    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+	    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+	    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+	    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
+	    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
 	}
 #endif /* A_COLOR */
 	//(void)noecho();
@@ -108,7 +109,7 @@ void pause_game(int i)
 	fgets(buf, sizeof(buf), stdin);
 	if (i != 0) {
 	    int j;
-	    for (j = 0; j < 24; j++)
+	    for (j = 0; j < rows; j++)
 		putchar('\n');
 	}
 	linecount = 0;
@@ -123,7 +124,7 @@ void skip(int i)
 	    proutn("\n\r");
 	} else {
 	    linecount++;
-	    if (linecount >= 24)
+	    if (linecount >= rows)
 		pause_game(0);
 	    else
 		putchar('\n');

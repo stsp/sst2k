@@ -143,7 +143,7 @@ void lrscan(void)
 		if (game.state.galaxy[x][y].supernova) 
 		    proutn("***");
 		else
-		    proutn(" %-3d", game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars);
+		    proutn(" %3d", game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars);
 	    }
 	}
 	prout(" ");
