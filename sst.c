@@ -478,7 +478,7 @@ int scan(void) {
 			chew();
 			return IHEOL;
 		}
-		fgets(line, sizeof(line), stdin);
+		getline(line, sizeof(line));
 		line[strlen(line)-1] = '\0';
 		linep = line;
 	}

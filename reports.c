@@ -118,7 +118,7 @@ void lrscan(void) {
 	}
 	else {
 		skip(1);
-		proutn("Long-range scan for");
+		proutn("Long-range scan for ");
 	}
 	prout(cramlc(quadrant, quadx, quady));
 	for (x = quadx-1; x <= quadx+1; x++) {

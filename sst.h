@@ -422,4 +422,4 @@ void movetho(void);
 void probe(void);
 void clearscreen(void);
 void iostart(void);
-
+void getline(char *, int);
