@@ -185,10 +185,10 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
     nextx = comx;
     nexty = comy;
     /* main move loop */
-    for (ll = 1; ll <= nsteps; ll++) {
+    for (ll = 0; ll < nsteps; ll++) {
 #ifdef DEBUG
 	if (idebug) {
-	    prout("%d", ll);
+	    prout("%d", ll+1);
 	}
 #endif
 	/* Check if preferred position available */

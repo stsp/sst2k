@@ -299,7 +299,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	case IHB: /* Hit a base */
 	    skip(1);
 	    prout("***STARBASE DESTROYED..");
-	    for (ll=1; ll<=game.state.rembase; ll++) {
+	    for_starbases(ll) {
 		if (game.state.baseqx[ll]==quadx && game.state.baseqy[ll]==quady) {
 		    game.state.baseqx[ll]=game.state.baseqx[game.state.rembase];
 		    game.state.baseqy[ll]=game.state.baseqy[game.state.rembase];
