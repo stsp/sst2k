@@ -1,4 +1,4 @@
-CFLAGS=     -O -g
+CFLAGS=     -O -g -DSSTDOC='"sst.doc"'
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

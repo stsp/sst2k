@@ -6,6 +6,10 @@
 #include <dos.h>
 #endif
 #include <time.h>
+
+#ifndef SSTDOC
+#define SSTDOC	"sst.doc"
+#endif
 	
 int getch(void);
 
@@ -135,7 +139,7 @@ static void helpme(void) {
 		cmdbuf[j] = toupper(commands[i][j]);
 	    cmdbuf[j] = '\0';
 	}
-	fp = fopen("sst.doc", "r");
+	fp = fopen(SSTDOC, "r");
 	if (fp == NULL) {
 		prout("Spock-  \"Captain, that information is missing from the");
 		prout("   computer. You need to find SST.DOC and put it in the");
