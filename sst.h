@@ -451,7 +451,7 @@ void prouts(char *, ...);
 int isit(char *);
 void preport(void);
 void orbit(void);
-void sensor(void);
+void sensor(int);
 void drawmaps(short);
 void beam(void);
 void mine(void);

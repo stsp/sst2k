@@ -300,8 +300,8 @@ void drawmaps(short l)
 /* hook to be called after moving to redraw maps */
 {
     if (curses) {
-	if (l == 1) 
-	    sensor();
+	if (l == 1)
+	    sensor(FALSE);
 	if (l != 2) {
 	    setwnd(srscan_window);
 	    wmove(curwnd, 0, 0);

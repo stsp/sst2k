@@ -372,7 +372,7 @@ static void makemoves(void) {
                                 score();
 				break;
 			case SENSORS:			// sensors
-				sensor();
+				sensor(TRUE);
 				break;
 			case ORBIT:			// orbit
 				orbit();

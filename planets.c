@@ -84,7 +84,7 @@ void orbit(void)
     ididit=1;
 }
 
-void sensor(void) 
+void sensor(int force) 
 {
     skip(1);
     chew();
@@ -92,11 +92,11 @@ void sensor(void)
 	prout("Short range sensors damaged.");
 	return;
     }
-    if (plnetx == 0) {
+    if (!plnetx && ((game.state.plnets[iplnet].known == unknown || force))) {
 	prout("Spock- \"No planet in this quadrant, Captain.\"");
 	return;
     }
-    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
+    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == unknown)) {
 	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
 	skip(1);
 	prout("         Planet at %s is of class %s.", 
