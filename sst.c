@@ -10,8 +10,6 @@
 #define SSTDOC	"sst.doc"
 #endif
 	
-static char line[128], *linep = line;
-
 /*
 
 Here are Tom Almy's changes:
@@ -93,6 +91,9 @@ Eric Raymond's changes:
    1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
 
    */
+
+/* the input queue */
+static char line[128], *linep = line;
 
 static struct 
 {
@@ -261,6 +262,10 @@ static void helpme(void) {
 	fclose(fp);
 }
 
+void enqueue(char *s) {
+    strcpy(line, s);
+}
+
 static void makemoves(void) {
 	int i, hitme;
         clrscr();
@@ -302,7 +307,7 @@ static void makemoves(void) {
 		commandhook(commands[i].name, TRUE);
 		switch (i) { /* command switch */
                         case SRSCAN:                 // srscan
- 				srscan(1);
+ 				srscan(SRSCAN);
  				break;
  			case LRSCAN:			// lrscan
  				lrscan();

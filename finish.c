@@ -393,7 +393,7 @@ void plaque(void) {
 	
 	while (fp == NULL) {
                 proutn("File or device name for your plaque: ");
-                getline(winner, sizeof(winner));
+                cgetline(winner, sizeof(winner));
 		fp = fopen(winner, "w");
 		if (fp==NULL) {
                         prout("Invalid name.");
@@ -401,7 +401,7 @@ void plaque(void) {
 	}
 
         proutn("Enter name to go on plaque (up to 30 characters): ");
-        getline(winner, sizeof(winner));
+        cgetline(winner, sizeof(winner));
 	/* The 38 below must be 64 for 132-column paper */
 	nskip = 38 - strlen(winner)/2;
 

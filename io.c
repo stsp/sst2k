@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <termios.h>
@@ -13,8 +14,8 @@
 
 #ifndef SERGEEV
 static int linecount;	/* for paging */
-#endif /* SERGEEV */
 static int screenheight = 24, screenwidth = 80;
+#endif /* SERGEEV */
 #ifndef SERGEEV
 static int curses = FALSE;
 #else /* SERGEEV */
@@ -32,6 +33,7 @@ wnd wnds[6]={{1,1,80,25},	/* FULLSCREEN_WINDOW */
 short curwnd;
 #endif /* SERGEEV */
 
+#ifndef SERGEEV
 static void outro(int sig) {
 /* wrap up, either normally or due to signal */
     if (curses) {
@@ -48,6 +50,7 @@ static void fastexit(int sig) {
     putchar('\n');
     exit(0);
 }
+#endif /* SERGEEV */
 
 void iostart(int usecurses) {
 #ifdef SERGEEV
@@ -346,7 +349,7 @@ void drawmaps(short l) {
      if (l==1) sensor();
      if (l!=2) setwnd(LEFTUPPER_WINDOW);
      gotoxy(1,1);
-     strcpy(line,"s");
+     enqueue("s");
      srscan(1);
      if (l!=2){
         setwnd(SRSCAN_WINDOW);
@@ -354,7 +357,7 @@ void drawmaps(short l) {
         srscan(2);
         setwnd(LRSCAN_WINDOW);
         clrscr();
-        strcpy(line,"l");
+        enqueue("l");
         lrscan();
         _setcursortype(_NORMALCURSOR);
      }
