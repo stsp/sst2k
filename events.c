@@ -580,7 +580,7 @@ void nova(int ix, int iy) {
 	skip(1);
 	prout("Force of nova displaces starship.");
 	iattak=2;	/* Eliminates recursion problem */
-	move();
+	imove();
 	Time = 10.0*dist/16.0;
 	return;
 }
@@ -635,7 +635,7 @@ void snova(int insx, int insy) {
 			if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				skip(1);
 				prout("Message from Starfleet Command       Stardate %.2f", game.state.date);
-				proutn("     Supernova in %s; caution advised.",
+				prout("     Supernova in %s; caution advised.",
 				       cramlc(quadrant, nqx, nqy));
 			}
 		}

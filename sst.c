@@ -348,8 +348,8 @@ int main(int argc, char **argv) {
 	int hitme;
 	char ch;
 
-	prelim(); 
 	iostart();
+	prelim(); 
 	line[0] = '\0';
 	if (argc > 1) {
 		while (--argc > 0) {
@@ -380,7 +380,8 @@ int main(int argc, char **argv) {
 		if (!ja()) break;
 	}
 	skip(1);
-	prout("May the Great Bird of the Galaxy roost upon your home planet.");
+	ioend();
+	puts("May the Great Bird of the Galaxy roost upon your home planet.");
 }
 
 

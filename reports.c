@@ -130,7 +130,7 @@ void lrscan(void) {
 				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+1000 :1;
 			}
 		}
-		putchar('\n');
+		skip(1);
 	}
 
 }

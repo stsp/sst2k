@@ -2,7 +2,7 @@
 
 static void getcd(int, int);
 
-void move(void) {
+void imove(void) {
 	double angle, deltax, deltay, bigger, x, y,
 	finald, finalx, finaly, stopegy;
 	int trbeam = 0, n, l, ix, iy, kink, kinks, iquad;
@@ -447,7 +447,7 @@ void impuls(void) {
 		if (ja() == 0) return;
 	}
 	/* Activate impulse engines and pay the cost */
-	move();
+	imove();
 	ididit = 1;
 	if (alldone) return;
 	power = 20.0 + 100.0*dist;
@@ -575,7 +575,7 @@ void warp(int i) {
 				
 
 	/* Activate Warp Engines and pay the cost */
-	move();
+	imove();
 	if (alldone) return;
 	energy -= dist*warpfac*warpfac*warpfac*(shldup+1);
 	if (energy <= 0) finish(FNRG);

@@ -316,8 +316,10 @@ char *device[NDEVICES+1] = {
     "D. S. Probe"};									
 #endif
 
+#ifndef TRUE
 #define TRUE (1)
 #define FALSE (0)
+#endif
 
 #define IHR 'R'
 #define IHK 'K'
@@ -392,7 +394,7 @@ double square(double);
 void dropin(int, int*, int*);
 void newcnd(void);
 void sortkl(void);
-void move(void);
+void imove(void);
 void ram(int, int, int, int);
 void crmena(int, int, int, int, int);
 void deadkl(int, int, int, int, int);
@@ -422,4 +424,5 @@ void movetho(void);
 void probe(void);
 void clearscreen(void);
 void iostart(void);
+void ioend(void);
 void getline(char *, int);

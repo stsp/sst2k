@@ -18,7 +18,7 @@ SOURCES= $(CFILES) $(HFILES) $(DOCS) sst.doc sst.6 makehelp.py makefile sst.spec
 all: sst sst.doc
 
 sst:  $(OFILES)
-	gcc  -o sst $(OFILES) -lm
+	gcc  -o sst $(OFILES) -lm -lcurses
 
 $(OFILES):  $(HFILES)
 
