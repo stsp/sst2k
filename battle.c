@@ -176,10 +176,8 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 
 void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
         int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
-#ifdef SERGEEV
 	int crx,cry;
 	
-#endif /* SERGEEV */
 	double ac=course + 0.25*r;
 	double angle = (15.0-ac)*0.5235988;
 	double bullseye = (15.0 - course)*0.5235988;
@@ -190,12 +188,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 	if (fabs(deltay) > bigger) bigger = fabs(deltay);
 	deltax /= bigger;
 	deltay /= bigger;
-#ifdef SERGEEV
         crx=wherex();
         cry=wherey();
         if (game.damage[DSRSENS]==0 || condit==IHDOCKED) setwnd(LEFTUPPER_WINDOW);
 	else setwnd(LOWER_WINDOW);
-#endif /* SERGEEV */
 	/* Loop to move a single torpedo */
 	for (l=1; l <= 15; l++) {
 		x += deltax;
@@ -204,12 +200,11 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 		y += deltay;
 		iy = y + 0.5;
 		if (iy < 1 || iy > 10) break;
+		iquad=game.quad[ix][iy];
 #ifndef SERGEEV
 		if (l==4 || l==9) skip(1);
 		proutn("%d - %d   ", (int)x, (int)y);
-		iquad=game.quad[ix][iy];
 #else
-                iquad=game.quad[ix][iy];
                 if (game.damage[DSRSENS]==0 || condit==IHDOCKED){
                    drawmaps(2);
                    delay((wait!=1)*400);
@@ -241,12 +236,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 #endif /* SERGEEV */
 		if (iquad==IHDOT) continue;
 		/* hit something */
-#ifndef SERGEEV
-		skip(1);
-#else
 		setwnd(LOWER_WINDOW);
 	        gotoxy(crx,cry);
-#endif
 		switch(iquad) {
 			case IHE: /* Hit our ship */
 			case IHF:
@@ -446,12 +437,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 		}
 		break;
 	}
-#ifdef SERGEEV
         if(curwnd!=LOWER_WINDOW) {
 	    setwnd(LOWER_WINDOW);
 	    gotoxy(crx,cry);
 	}
-#endif /* SERGEEV */
 	if (shoved) {
 		game.quad[jx][jy]=iquad;
 		game.quad[ix][iy]=IHDOT;
@@ -461,9 +450,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 		sortkl();
 		return;
 	}
-#ifndef SERGEEV
 	skip(1);
-#endif /* SERGEEV */
 	prout("Torpedo missed.");
 	return;
 }
@@ -1228,9 +1215,6 @@ void phasers(void) {
 
 void hittem(double *hits) {
 	double kp, kpow, wham, hit, dustfac, kpini;
-#ifdef SERGEEV
-	int crx, cry;
-#endif /* SERGEEV */
 	int nenhr2=nenhere, k=1, kk=1, ii, jj, ienm;
 
 	skip(1);
@@ -1248,6 +1232,7 @@ void hittem(double *hits) {
 		jj = game.ky[kk];
 		if (hit > 0.005) {
 #ifdef SERGEEV
+			int crx, cry;
                         if (game.damage[DSRSENS]==0){
                            crx=wherex();
                            cry=wherey();
