@@ -4,7 +4,7 @@ CFLAGS=-f87 -2 -m$(MODEL)
 .c.obj:; bcc $(CFLAGS) -c $*.c
 
 OBJS= sst.obj setup.obj reports.obj finish.obj moving.obj\
- battle.obj events.obj ai.obj planets.obj
+ battle.obj events.obj ai.obj planets.obj io.o
 
 sst.exe:	$(OBJS) sst.lnk
 	bcc @sst.lnk

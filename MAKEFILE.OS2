@@ -5,7 +5,7 @@ CFLAGS=     -O
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-OFILES=     sst.o finish.o reports.o setup.o moving.o battle.o events.o ai.o planets.o
+OFILES=     sst.o finish.o reports.o setup.o moving.o battle.o events.o ai.o planets.o io.o
 
 HFILES=     sst.h
 

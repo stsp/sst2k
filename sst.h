@@ -420,3 +420,6 @@ void debugme(void);
 void attakreport(void);
 void movetho(void);
 void probe(void);
+void clearscreen(void);
+void iostart(void);
+

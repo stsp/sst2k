@@ -1,21 +1,12 @@
 #define INCLUDED	// Define externs here
 #include "sst.h"
 #include <ctype.h>
-#include <stdarg.h>
-#ifdef MSDOS
-#include <dos.h>
-#endif
-#include <time.h>
 
 #ifndef SSTDOC
 #define SSTDOC	"sst.doc"
 #endif
 	
 static char line[128], *linep = line;
-static int linecount;	/* for paging */
-static int screenheight = 24;
-
-static void clearscreen(void);
 
 /* Compared to original version, I've changed the "help" command to
    "call" and the "terminate" command to "quit" to better match
@@ -356,12 +347,9 @@ int main(int argc, char **argv) {
 	int i;
 	int hitme;
 	char ch;
-	prelim();
-	char *LINES = getenv("LINES");
- 
-	if (LINES)
-	    screenheight = atoi(LINES);
 
+	prelim(); 
+	iostart();
 	line[0] = '\0';
 	if (argc > 1) {
 		while (--argc > 0) {
@@ -466,14 +454,12 @@ void iran10(int *i, int *j) {
 }
 
 void chew(void) {
-	linecount = 0;
 	linep = line;
 	*linep = 0;
 }
 
 void chew2(void) {
 	/* return IHEOL next time */
-	linecount = 0;
 	linep = line+1;
 	*linep = 0;
 }
@@ -481,8 +467,6 @@ void chew2(void) {
 int scan(void) {
 	int i;
 	char *cp;
-
-	linecount = 0;
 
 	// Init result
 	aaitem = 0.0;
@@ -541,95 +525,6 @@ int ja(void) {
 
 double square(double i) { return i*i; }
 									
-static void clearscreen(void) {
-	/* Somehow we need to clear the screen */
-#ifdef __BORLANDC__
-	extern void clrscr(void);
-	clrscr();
-#else
-	// proutn("\033[2J");	/* Hope for an ANSI display */
-	/* much more in that old-time TTY spirit to just throw linefeeds */
-	int i;
-	for (i = 0; i < screenheight; i++)
-	    putchar('\n');
-#endif
-}
-
-/* We will pull these out in case we want to do something special later */
-
-void pause(int i) {
-	char buf[BUFSIZ];
-	putchar('\n');
-	if (i==1) {
-		if (skill > 2)
-			prout("[ANOUNCEMENT ARRIVING...]");
-		else
-			prout("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
-	}
-	else {
-	    	if (skill > 2)
-	    		proutn("[CONTINUE?]");
-	    	else
-			proutn("[PRESS ENTER TO CONTINUE]");
-
-	}
-	fgets(buf, sizeof(buf), stdin);
-	if (i != 0) {
-		clearscreen();
-	}
-	linecount = 0;
-}
-
-
-void skip(int i) {
-	while (i-- > 0) {
-		linecount++;
-		if (linecount >= screenheight)
-			pause(0);
-		else
-			putchar('\n');
-	}
-}
-
-
-void proutn(char *fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    vprintf(fmt, ap);
-    va_end(ap);
-}
-
-void prout(char *fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    vprintf(fmt, ap);
-    va_end(ap);
-    skip(1);
-}
-
-void proutc(char *line) {
-    line[strlen(line)-1] = '\0';
-    fputs(line, stdout);
-    skip(1);
-}
-
-void prouts(char *fmt, ...) {
-	clock_t endTime;
-	char *s, buf[BUFSIZ];
-	/* print slowly! */
-	va_list ap;
-	va_start(ap, fmt);
-	vsprintf(buf, fmt, ap);
-	va_end(ap);
-	skip(1);
-	for (s = buf; *s; s++) {
-		endTime = clock() + CLOCKS_PER_SEC*0.05;
-		while (clock() < endTime) ;
-		putchar(*s);
-		fflush(stdout);
-	}
-}
-
 void huh(void) {
 	chew();
 	skip(1);
