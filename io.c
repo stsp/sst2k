@@ -169,7 +169,7 @@ void prouts(char *fmt, ...)
     va_end(ap);
     skip(1);
     for (s = buf; *s; s++) {
-	delay(200);
+	delay(30);
 	if (game.options & OPTION_CURSES) {
 	    waddch(curwnd, *s);
 	    wrefresh(curwnd);
@@ -301,7 +301,7 @@ void drawmaps(short l)
 {
     if (game.options & OPTION_CURSES) {
 	if (l == 1)
-	    sensor(FALSE);
+	    sensor();
 	if (l != 2) {
 	    setwnd(srscan_window);
 	    wmove(curwnd, 0, 0);

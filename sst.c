@@ -195,7 +195,7 @@ commands[] = {
 	{"DEBUG",	DEBUGCMD,	0},
 #define MAYDAY	32
 	{"MAYDAY",	MAYDAY,		0},
-	{"SOS",		MAYDAY,		0},
+	//{"SOS",		MAYDAY,		0},
 	{"CALL",	MAYDAY,		0},
 #define QUIT	33
 	{"QUIT",	QUIT,		0},
@@ -204,12 +204,13 @@ commands[] = {
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
+#define ACCEPT(i)	(!commands[i].option || (commands[i].option & game.options))
 
 static void listCommands(void) {
     int i, k = 0;
     proutn("LEGAL COMMANDS ARE:");
     for (i = 0; i < NUMCOMMANDS; i++) {
-	if (commands[i].option && !(commands[i].option & game.options))
+	if (!ACCEPT(i))
 	    continue;
 	if (k % 5 == 0)
 	    skip(1);
@@ -237,7 +238,7 @@ static void helpme(void)
 	setwnd(message_window);
 	if (key == IHEOL) return;
 	for (i = 0; i < NUMCOMMANDS; i++) {
-	    if (strcasecmp(commands[i].name, citem)==0) {
+	    if (ACCEPT(i) && strcasecmp(commands[i].name, citem)==0) {
 		i = commands[i].value;
 		break;
 	    }
@@ -325,14 +326,14 @@ static void makemoves(void)
 	    setwnd(message_window);
 	    clrscr();
 	    for (i=0; i < ABANDON; i++)
-		if (isit(commands[i].name)) {
+		if (ACCEPT(i) && isit(commands[i].name)) {
 		    v = commands[i].value;
 		    break;
 		}
 	    if (i < ABANDON && (!commands[i].option || (commands[i].option & game.options))) 
 		break;
 	    for (; i < NUMCOMMANDS; i++)
-		if (strcasecmp(commands[i].name, citem) == 0) {
+		if (ACCEPT(i) && strcasecmp(commands[i].name, citem) == 0) {
 		    v = commands[i].value;
 		    break;
 		}
@@ -396,7 +397,7 @@ static void makemoves(void)
 	    score();
 	    break;
 	case SENSORS:			// sensors
-	    sensor(TRUE);
+	    sensor();
 	    break;
 	case ORBIT:			// orbit
 	    orbit();
