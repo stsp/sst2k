@@ -10,10 +10,10 @@ CFLAGS=     -O -g -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
 CFILES= sst.c finish.c reports.c setup.c linux.c moving.c battle.c events.c ai.c planets.c
 OFILES= $(CFILES:.c=.o)
 HFILES=sst.h
-DOC = sst-doc.xml sst.xml TODO
+DOCS = README sst-doc.xml sst.xml TODO
 
 # sst.doc and sst.6 are included so target system won't need xmlto
-SOURCES= $(CFILES) $(HFILES) $(DOC) sst.doc sst.6 makehelp.py makefile sst.spec
+SOURCES= $(CFILES) $(HFILES) $(DOCS) sst.doc sst.6 makehelp.py makefile sst.spec
 
 all: sst sst.doc
 
