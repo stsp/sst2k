@@ -17,6 +17,19 @@ SOURCES= $(CFILES) $(HFILES) $(DOCS) sst.doc sst.6 makehelp.py makefile sst.spec
 
 all: sst sst.doc
 
+ai.o: ai.c sst.h
+battle.o: battle.c conio.h sst.h
+conio.o: conio.c conio.h
+events.o: events.c sst.h
+finish.o: finish.c sst.h
+io.o: io.c conio.h sst.h
+moving.o: moving.c sstlinux.h conio.h sst.h
+planets.o: planets.c sst.h
+reports.o: reports.c sst.h conio.h
+setup.o: setup.c conio.h sst.h
+sst.o: sst.c conio.h sstlinux.h sst.h
+sstlinux.o: sstlinux.c sstlinux.h
+
 sst:  $(OFILES)
 	gcc  -o sst $(OFILES) -lm -lcurses
 

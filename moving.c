@@ -1,6 +1,6 @@
-#include "conio.h"
-#include "sstlinux.h"
 #include <unistd.h>
+#include "sstlinux.h"
+#include "conio.h"
 #include "sst.h"
 
 static void getcd(int, int);

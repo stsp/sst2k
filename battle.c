@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include "conio.h"
-#include "sstlinux.h"
 #include "sst.h"
 
 void doshield(int i) {

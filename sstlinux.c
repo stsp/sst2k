@@ -2,7 +2,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/kd.h>
-
 #include "sstlinux.h"
 
 static int fd = 0;

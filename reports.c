@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "conio.h"
-#include "sstlinux.h"
 
 void attakreport(int l) {
      if (!l) {

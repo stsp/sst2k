@@ -9,7 +9,6 @@
 #include <time.h>
 
 #include "conio.h"
-#include "sstlinux.h"
 #include "sst.h"
 
 #ifndef SERGEEV
