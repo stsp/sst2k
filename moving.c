@@ -233,7 +233,7 @@ void dock(int l)
     shield = inshld;
     torps = intorps;
     lsupres = inlsr;
-    if (stdamtim != FOREVER &&
+    if (game.damage[DRADIO] == 0.0 &&
 	(game.future[FCDBAS] < FOREVER || isatb == 1) && iseenit == 0) {
 	/* get attack report from base */
 	prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");

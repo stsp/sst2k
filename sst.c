@@ -751,7 +751,6 @@ void debugme(void)
 	for (i=0; i < NDEVICES; i++) 
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
-	stdamtim = FOREVER;
     }
     proutn("Toggle idebug? ");
     if (ja() != 0) {
@@ -770,8 +769,6 @@ void debugme(void)
 	    key = scan();
 	    if (key == IHALPHA &&  isit("y")) {
 		game.damage[i] = 10.0;
-		if (i == DRADIO) 
-		    stdamtim = game.state.date;
 	    }
 	}
     }

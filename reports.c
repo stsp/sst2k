@@ -175,7 +175,7 @@ void rechart(void)
 /* update the chart in the Enterprise's computer from galaxy data */
 {
     int i, j;
-    stdamtim = game.state.date;
+    lastchart = game.state.date;
     for_quadrants(i)
 	for_quadrants(j) 
 	    if (game.state.galaxy[i][j].charted) {
@@ -190,23 +190,19 @@ void chart(int nn)
     int i,j;
     char *cp;
     chew();
-    if (stdamtim != FOREVER && stdamtim != game.state.date && condit == IHDOCKED) {
-	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
-    }
-    if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n\r");
-    if (stdamtim != FOREVER) {
-	if (condit == IHDOCKED) {
-	    /* We are docked, so restore chart from base information */
-	    rechart();
-	}
-	else if (game.state.date-stdamtim) {
-	    prout("(Last surveillance update %d stardates ago).",
-		   (int)(game.state.date-stdamtim));
-	}
-    }
-    else if (game.damage[DRADIO] == 0.0)
+
+    if (game.damage[DRADIO] == 0.0)
 	rechart();
 
+    if (lastchart < game.state.date && condit == IHDOCKED) {
+	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
+	rechart();
+    }
+
+    if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n\r");
+    if (game.state.date > lastchart)
+	prout("(Last surveillance update %d stardates ago).",
+	      (int)(game.state.date-lastchart));
     prout("      1    2    3    4    5    6    7    8");
     for_quadrants(i) {
 	proutn("%d |", i);

@@ -233,7 +233,7 @@ EXTERN struct {
 	docfac,
 	resting,
 	damfac,
-	stdamtim,
+	lastchart,
 	cryprob,
 	probex,
 	probey,
@@ -243,88 +243,88 @@ EXTERN struct {
 } game;
 
 #define inkling game.inkling		// Initial number of klingons
-#define inbase game.inbase			// Initial number of bases
-#define incom game.incom			// Initian number of commanders
-#define instar game.instar			// Initial stars
+#define inbase game.inbase		// Initial number of bases
+#define incom game.incom		// Initian number of commanders
+#define instar game.instar		// Initial stars
 #define intorps game.intorps		// Initial/Max torpedoes
-#define condit game.condit			// Condition (red, yellow, green docked)
-#define torps game.torps			// number of torpedoes
-#define ship game.ship				// Ship type -- 'E' is Enterprise
-#define quadx game.quadx			// where we are
-#define quady game.quady			//
-#define sectx game.sectx			// where we are
-#define secty game.secty			//
-#define length game.length			// length of game
-#define skill game.skill			// skill level
-#define basex game.basex			// position of base in current quad
-#define basey game.basey			//
-#define klhere game.klhere			// klingons here
+#define condit game.condit		// Condition (red/yellow/green/docked)
+#define torps game.torps		// number of torpedoes
+#define ship game.ship			// Ship type -- 'E' is Enterprise
+#define quadx game.quadx		// where we are
+#define quady game.quady		//
+#define sectx game.sectx		// where we are
+#define secty game.secty		//
+#define length game.length		// length of game
+#define skill game.skill		// skill level
+#define basex game.basex		// position of base in current quad
+#define basey game.basey		//
+#define klhere game.klhere		// klingons here
 #define comhere game.comhere		// commanders here
-#define casual game.casual			// causalties
-#define nhelp game.nhelp			// calls for help
-#define nkinks game.nkinks			//
-#define ididit game.ididit			// Action taken -- allows enemy to attack
+#define casual game.casual		// causalties
+#define nhelp game.nhelp		// calls for help
+#define nkinks game.nkinks		//
+#define ididit game.ididit		// Action taken -- allows enemy to attack
 #define gamewon game.gamewon		// Finished!
-#define alive game.alive			// We are alive (not killed)
-#define justin game.justin			// just entered quadrant
+#define alive game.alive		// We are alive (not killed)
+#define justin game.justin		// just entered quadrant
 #define alldone game.alldone		// game is now finished
 #define shldchg game.shldchg		// shield is changing (affects efficiency)
-#define plnetx game.plnetx			// location of planet in quadrant
-#define plnety game.plnety			//
+#define plnetx game.plnetx		// location of planet in quadrant
+#define plnety game.plnety		//
 #define inorbit game.inorbit		// orbiting
-#define landed game.landed			// party on planet (1), on ship (-1)
-#define iplnet game.iplnet			// planet # in quadrant
-#define imine game.imine			// mining
-#define inplan game.inplan			// initial planets
+#define landed game.landed		// party on planet (1), on ship (-1)
+#define iplnet game.iplnet		// planet # in quadrant
+#define imine game.imine		// mining
+#define inplan game.inplan		// initial planets
 #define nenhere game.nenhere		// Number of enemies in quadrant
-#define ishere game.ishere			// Super-commander in quandrant
-#define neutz game.neutz			// Romulan Neutral Zone
-#define irhere game.irhere			// Romulans in quadrant
-#define icraft game.icraft			// Kirk in Galileo
+#define ishere game.ishere		// Super-commander in quandrant
+#define neutz game.neutz		// Romulan Neutral Zone
+#define irhere game.irhere		// Romulans in quadrant
+#define icraft game.icraft		// Kirk in Galileo
 #define ientesc game.ientesc		// Attempted escape from supercommander
 #define iscraft game.iscraft		// =1 if craft on ship, -1 if removed from game
-#define isatb game.isatb			// =1 if SuperCommander is attacking base
-#define iscate game.iscate			// Super Commander is here
+#define isatb game.isatb		// =1 if SuperCommander is attacking base
+#define iscate game.iscate		// Super Commander is here
 #ifdef DEBUG
-#define idebug game.idebug			// Debug mode
+#define idebug game.idebug		// Debug mode
 #endif
-#define iattak game.iattak			// attack recursion elimination (was cracks[4])
+#define iattak game.iattak		// attack recursion elimination (was cracks[4])
 #define icrystl game.icrystl		// dilithium crystals aboard
-#define tourn game.tourn			// Tournament number
-#define thawed game.thawed			// Thawed game
-#define batx game.batx				// Base coordinates being attacked
-#define baty game.baty				//
-#define ithere game.ithere			// Tholean is here 
-#define ithx game.ithx				// coordinates of tholean
+#define tourn game.tourn		// Tournament number
+#define thawed game.thawed		// Thawed game
+#define batx game.batx			// Base coordinates being attacked
+#define baty game.baty			//
+#define ithere game.ithere		// Tholean is here 
+#define ithx game.ithx			// coordinates of tholean
 #define ithy game.ithy
 #define iseenit game.iseenit		// Seen base attack report
 #define inresor game.inresor		// initial resources
-#define intime game.intime			// initial time
-#define inenrg game.inenrg			// Initial/Max Energy
-#define inshld game.inshld			// Initial/Max Shield
-#define inlsr game.inlsr			// initial life support resources
-#define indate game.indate			// Initial date
-#define energy game.energy			// Energy level
-#define shield game.shield			// Shield level
-#define shldup game.shldup			// Shields are up
+#define intime game.intime		// initial time
+#define inenrg game.inenrg		// Initial/Max Energy
+#define inshld game.inshld		// Initial/Max Shield
+#define inlsr game.inlsr		// initial life support resources
+#define indate game.indate		// Initial date
+#define energy game.energy		// Energy level
+#define shield game.shield		// Shield level
+#define shldup game.shldup		// Shields are up
 #define warpfac game.warpfac		// Warp speed
-#define wfacsq game.wfacsq			// squared warp factor
+#define wfacsq game.wfacsq		// squared warp factor
 #define lsupres game.lsupres		// life support reserves
-#define dist game.dist				// movement distance
-#define direc game.direc			// movement direction
-#define Time game.Time				// time taken by current operation
-#define docfac game.docfac			// repair factor when docking (constant?)
+#define dist game.dist			// movement distance
+#define direc game.direc		// movement direction
+#define Time game.Time			// time taken by current operation
+#define docfac game.docfac		// repair factor when docking (constant?)
 #define resting game.resting		// rest time
-#define damfac game.damfac			// damage factor
-#define stdamtim game.stdamtim		// time that star chart was damaged
+#define damfac game.damfac		// damage factor
+#define lastchart game.lastchart	// time star chart was last updated
 #define cryprob game.cryprob		// probability that crystal will work
-#define probex game.probex			// location of probe
+#define probex game.probex		// location of probe
 #define probey game.probey
 #define probecx game.probecx		// current probe quadrant
 #define probecy game.probecy	
 #define probeinx game.probeinx		// Probe x,y increment
 #define probeiny game.probeiny		
-#define proben game.proben			// number of moves for probe
+#define proben game.proben		// number of moves for probe
 #define isarmed game.isarmed		// Probe is armed
 #define nprobes game.nprobes		// number of probes available
 

@@ -242,7 +242,7 @@ void setup(int needprompt)
     game.future[FSCDBAS] = FOREVER;
     game.future[FDSPROB] = FOREVER;
     // Starchart is functional but we've never seen it
-    stdamtim = FOREVER;
+    lastchart = FOREVER;
     // Put stars in the galaxy
     instar = 0;
     for_quadrants(i)

@@ -50,8 +50,7 @@ void events(void)
 		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 	/* If radio repaired, update star chart and attack reports */
 	if (radio_was_broken && game.damage[DRADIO] == 0.0) {
-	    stdamtim = FOREVER;
-	    prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
+1	    prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
 	    prout("   surveillance reports are coming in.");
 	    skip(1);
 	    if (iseenit==0) {
