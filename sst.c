@@ -180,11 +180,6 @@ commands[] = {
 	{"HELP",	HELP},
 };
 
-#ifdef SERGEEV
-wnd wnds[6]={{1,1,80,25},{1,1,25,12},{26,2,80,12},{65,1,80,10},{1,13,80,23},{1,24,80,25}};
-short curwnd;
-#endif /* SERGEEV */
-
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
 static void listCommands(int x) {
@@ -209,13 +204,13 @@ static void helpme(void) {
 	while (TRUE) {
 		if (key == IHEOL) {
 #ifdef SERGEEV
-                        setwnd(5);
+                        setwnd(BOTTOM_WINDOW);
 #endif /* SERGEEV */
                         proutn("Help on what command? ");
 			key = scan();
 		}
 #ifdef SERGEEV
-                setwnd(4);
+                setwnd(LOWER_WINDOW);
 #endif /* SERGEEV */
 		if (key == IHEOL) return;
 		for (i = 0; i < NUMCOMMANDS; i++) {
@@ -282,15 +277,15 @@ void drawmaps(short l) {
 #ifdef SERGEEV
      _setcursortype(_NOCURSOR);
      if (l==1) sensor();
-     if (l!=2) setwnd(1);
+     if (l!=2) setwnd(LEFTUPPER_WINDOW);
      gotoxy(1,1);
      strcpy(line,"s");
      srscan(1);
      if (l!=2){
-        setwnd(2);
+        setwnd(SRSCAN_WINDOW);
         clrscr();
         srscan(2);
-        setwnd(3);
+        setwnd(LRSCAN_WINDOW);
         clrscr();
         strcpy(line,"l");
         lrscan();
@@ -303,7 +298,7 @@ static void makemoves(void) {
 	int i, hitme;
 #ifdef SERGEEV
         clrscr();
-        setwnd(4);
+        setwnd(LOWER_WINDOW);
 #endif /* SERGEEV */
 	while (TRUE) { /* command loop */
                 drawmaps(1);
@@ -314,14 +309,14 @@ static void makemoves(void) {
 			i = -1;
 			chew();
 #ifdef SERGEEV
-                        setwnd(5);
+                        setwnd(BOTTOM_WINDOW);
                         clrscr();
 #endif /* SERGEEV */
 			proutn("COMMAND> ");
                         if (scan() == IHEOL) {
 #ifdef SERGEEV
                             _setcursortype(_NOCURSOR);
-                            setwnd(4);
+                            setwnd(LOWER_WINDOW);
                             clrscr();
                             chart(0);
                             _setcursortype(_NORMALCURSOR);
@@ -331,7 +326,7 @@ static void makemoves(void) {
 #ifdef SERGEEV
                         ididit=0;
                         clrscr();
-                        setwnd(4);
+                        setwnd(LOWER_WINDOW);
                         clrscr();
 #endif /* SERGEEV */
 			for (i=0; i < ABANDON; i++)
@@ -532,7 +527,7 @@ int main(int argc, char **argv) {
 	randomize();
         textattr(7);
         clrscr();
-        setwnd(0);
+        setwnd(FULLSCREEN_WINDOW);
 #endif /* SERGEEV */
 	line[0] = '\0';
 	for (i = optind; i < argc;  i++) {
@@ -561,7 +556,7 @@ int main(int argc, char **argv) {
 		proutn("Do you want to play again? ");
 		if (!ja()) break;
 #ifdef SERGEEV
-		setwnd(0);
+		setwnd(FULLSCREEN_WINDOW);
 		clrscr();
 #endif /* SERGEEV */
 	}
@@ -672,9 +667,9 @@ int scan(void) {
 		getline(line, sizeof(line));
 #ifdef SERGEEV
                 fflush(stdin);
-                if (curwnd==5){
+                if (curwnd==BOTTOM_WINDOW){
                    clrscr();
-                   setwnd(4);
+                   setwnd(LOWER_WINDOW);
                    clrscr();
                 }
 #endif /* SERGEEV */

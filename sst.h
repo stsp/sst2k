@@ -446,3 +446,10 @@ typedef struct {
         int wndleft,wndtop,wndright,wndbottom;
 } wnd;
 extern wnd wnds[6];
+/* these need to track io.c:wnd */
+#define FULLSCREEN_WINDOW	0
+#define LEFTUPPER_WINDOW	1
+#define SRSCAN_WINDOW		2
+#define LRSCAN_WINDOW		3
+#define LOWER_WINDOW		4
+#define BOTTOM_WINDOW		5

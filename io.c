@@ -33,6 +33,17 @@ static int curses = FALSE;
 static int curses = TRUE;
 #endif /* SERGEEV */
 
+#ifdef SERGEEV
+wnd wnds[6]={{1,1,80,25},	/* FULLSCREEN_WINDOW */
+	     {1,1,25,12},	/* LEFTUPPER_WINDOW */
+	     {26,2,80,12},	/* SRSCAN_WINDOW */
+	     {65,1,80,10},	/* LRSCAN_WINDOW */
+	     {1,13,80,23},	/* LOWER_WINDOW */
+	     {1,24,80,25},	/* BOTTOM_WINDOW */
+};
+short curwnd;
+#endif /* SERGEEV */
+
 static void outro(int sig) {
 /* wrap up, either normally or due to signal */
     if (curses) {
@@ -94,7 +105,7 @@ void pause_game(int i) {
         char buf[BUFSIZ];
 #else /* SERGEEV */
         drawmaps(0);
-        setwnd(5);
+        setwnd(BOTTOM_WINDOW);
 #endif /* SERGEEV */
 	if (i==1) {
 		if (skill > 2)
@@ -132,7 +143,7 @@ void pause_game(int i) {
 	proutn(prompt);
 	getche();
         clrscr();
-        setwnd(4);
+        setwnd(LOWER_WINDOW);
         clrscr();
 #endif /* SERGEEV */
 }
@@ -163,7 +174,7 @@ static void vproutn(char *fmt, va_list ap) {
     char *s, *p;
     vasprintf(&s, fmt, ap);
     p=s;
-    if ((curwnd==4)&&(wherey()==wnds[curwnd].wndbottom-wnds[curwnd].wndtop)){
+    if ((curwnd==LOWER_WINDOW)&&(wherey()==wnds[curwnd].wndbottom-wnds[curwnd].wndtop)){
        if (strchr(s,'\n')) {
           p=strchr(s,'\n');
           p[0]=0;
@@ -174,7 +185,7 @@ static void vproutn(char *fmt, va_list ap) {
 #endif /* SERGEEV */
     }
 #ifdef SERGEEV
-    if ((curwnd==4)&&(wherey()>wnds[curwnd].wndbottom-wnds[curwnd].wndtop+1))
+    if ((curwnd==LOWER_WINDOW)&&(wherey()>wnds[curwnd].wndbottom-wnds[curwnd].wndtop+1))
        cprintf("\r");
 //        setwnd(curwnd);
     if (strchr(s,'\n') || strchr(s,'\r')) clreol();
@@ -299,7 +310,7 @@ void warble(void)
     posx=wherex();
     posy=wherey();
     drawmaps(1);
-    setwnd(4);
+    setwnd(LOWER_WINDOW);
     gotoxy(posx,posy);
     sound(50);
     delay(1000);
@@ -346,7 +357,7 @@ void setwnd(short wndnum){
 #ifdef SERGEEV
      int cury;
      cury=wherey()+wnds[curwnd].wndtop-wnds[wndnum].wndtop;
-     if ((curwnd==0)&&(wndnum!=0)) clrscr();
+     if ((curwnd==FULLSCREEN_WINDOW)&&(wndnum!=FULLSCREEN_WINDOW)) clrscr();
      window(wnds[wndnum].wndleft, wnds[wndnum].wndtop, wnds[wndnum].wndright, wnds[wndnum].wndbottom);
      if ((curwnd==wndnum)&&(cury>wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1)){
         gotoxy(wnds[wndnum].wndright-wnds[wndnum].wndleft+1,wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1);

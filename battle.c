@@ -195,8 +195,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 #ifdef SERGEEV
         crx=wherex();
         cry=wherey();
-        if (game.damage[DSRSENS]==0 || condit==IHDOCKED) setwnd(1);
-	else setwnd(4);
+        if (game.damage[DSRSENS]==0 || condit==IHDOCKED) setwnd(LEFTUPPER_WINDOW);
+	else setwnd(LOWER_WINDOW);
 #endif /* SERGEEV */
 	/* Loop to move a single torpedo */
 	for (l=1; l <= 15; l++) {
@@ -246,7 +246,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 #ifndef SERGEEV
 		skip(1);
 #else
-		setwnd(4);
+		setwnd(LOWER_WINDOW);
 	        gotoxy(crx,cry);
 #endif
 		switch(iquad) {
@@ -449,8 +449,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 		break;
 	}
 #ifdef SERGEEV
-        if(curwnd!=4) {
-	    setwnd(4);
+        if(curwnd!=LOWER_WINDOW) {
+	    setwnd(LOWER_WINDOW);
 	    gotoxy(crx,cry);
 	}
 #endif /* SERGEEV */
@@ -1253,7 +1253,7 @@ void hittem(double *hits) {
                         if (game.damage[DSRSENS]==0){
                            crx=wherex();
                            cry=wherey();
-                           setwnd(1);
+                           setwnd(LEFTUPPER_WINDOW);
                            drawmaps(2);
                            gotoxy(jj*2+3,ii+2);
                            highvideo();
@@ -1264,7 +1264,7 @@ void hittem(double *hits) {
                            nosound();
                            lowvideo();
                            proutn("%c", game.quad[ii][jj]);
-                           setwnd(4);
+                           setwnd(LOWER_WINDOW);
                            gotoxy(crx,cry);
                            _setcursortype(_NORMALCURSOR);
                            delay(500);
