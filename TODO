@@ -2,8 +2,6 @@
 
 * Remove the assumption that sst.doc lives in the current directory.
 
-* Do a manual page.
-
 * Improve the internal pager.
 
 * Yes-no confirmations and "press-to-continue" situations should print
@@ -21,6 +19,8 @@
 
 * Write a curses-based interface.  Shouldn't be hard, all output goes through
   prout/proutn/prouts so we can split the screen into two panes with the upper
-  one for the charts.
+  one for the charts.  (Note, there's one fputs() used in the help reader to
+  avoid % expansion.)
+
 
 

@@ -1,0 +1,47 @@
+<!DOCTYPE refentry PUBLIC 
+   "-//OASIS//DTD DocBook XML V4.1.2//EN"
+   "docbook/docbookx.dtd">
+<refentry id='sst.6'>
+<refmeta>
+<refentrytitle>sst</refentrytitle>
+<manvolnum>6</manvolnum>
+<refmiscinfo class='date'>Nov 1 2004</refmiscinfo>
+</refmeta>
+<refnamediv id='name'>
+<refname>sst</refname>
+<refpurpose>the classic Super Star Trek game</refpurpose>
+</refnamediv>
+<refsynopsisdiv id='synopsis'>
+
+<cmdsynopsis>
+  <command>sst</command>
+</cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>DESCRIPTION</title>
+
+<para>The Organian Peace Treaty has collapsed, and the Federation is
+at war with the Klingon Empire. Joining the Klingons against the
+Federation are the members of the Romulan Star Empire. As commander
+of the Starship U.S.S. Enterprise, your job is to wipe out the Klingon
+invasion fleet and make the galaxy safe for democracy.</para>
+
+<para>This is one of the great early classic computer games from the
+1970s and still has a remarkable amount of play value. Run
+<command>sst</command> in a terminal window to start it.  Typing
+'comands' at the prompt will list all commands; help is available for
+each one individually as well.  Full documentation is <ulink
+url='http://sst.berlios.de/sst-doc.html'>browseable</ulink>.</para>
+</refsect1>
+
+<refsect1 id='authors'><title>AUTHORS</title> <para>Super Star Trek
+was designed and written by David Matuszek, Paul Reynolds, and Don
+Smith in the 1970s.  It was resurrected by Tom Almy.  This version has
+been cleaned up and documented by Eric S. Raymond
+&lt;esr@snark.thyrsus.com&gt;.  There is a <ulink
+url='https://developer.berlios.de/projects/sst/'>project
+page</ulink>.</para>
+</refsect1>
+</refentry>
+
