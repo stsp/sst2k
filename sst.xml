@@ -35,6 +35,17 @@ each one individually as well.  Full documentation is <ulink
 url='http://sst.berlios.de/sst-doc.html'>browseable</ulink>.  On
 systems where <filename>/usr/share/doc/sst/</filename> is a legal
 filename, it will probably be installed there as well.</para>
+
+<para>Input tokens for the setup prompts will be read from the command
+line before standard input.  Thus, for example, you can invoke the
+program as</para>
+
+<programlisting>
+sst regular medium good foobar
+</programlisting>
+
+<para>to start a regular medium game as a good player 
+with password "foobar".</para>
 </refsect1>
 
 <refsect1 id='authors'><title>AUTHORS</title> <para>Super Star Trek

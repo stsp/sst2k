@@ -251,7 +251,6 @@ EXTERN struct {
 #define nprobes game.nprobes		// number of probes available
 
 /* the following global state doesn't need to be saved */
-EXTERN int fromcommandline; // Game start from command line options
 EXTERN char	*device[NDEVICES+1];
 EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
@@ -340,8 +339,8 @@ char *device[NDEVICES+1] = {
 /* Function prototypes */
 void prelim(void);
 void attack(int);
-int choose(void);
-void setup(void);
+int choose(int);
+void setup(int);
 void score(void);
 void atover(int);
 void srscan(int);
@@ -404,6 +403,7 @@ void snova(int, int);
 void scom(int *);
 void hittem(double *);
 void prouts(char *, ...);
+void proutc(char *);
 int isit(char *);
 void preport(void);
 void orbit(void);

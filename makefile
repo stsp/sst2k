@@ -31,9 +31,9 @@ sst.doc: sst-doc.txt
 	makehelp.py >sst.doc
 
 sst-doc.html: sst-doc.xml
-	xmlto --skip-validation xhhtml-nochunks sst-doc.xml
+	xmlto --skip-validation xhtml-nochunks sst-doc.xml
 
-install: sst.6 uninstall
+install: uninstall sst.6 sst.doc sst-doc.html 
 	install -m 755 -o 0 -g 0 -d $(ROOT)/usr/bin/
 	install -m 755 -o 0 -g 0 sst $(ROOT)/usr/bin/sst
 	install -m 755 -o 0 -g 0 -d $(ROOT)/usr/share/man/man6/

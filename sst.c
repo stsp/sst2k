@@ -11,8 +11,6 @@
 #define SSTDOC	"sst.doc"
 #endif
 	
-int getch(void);
-
 static char line[128], *linep = line;
 static int linecount;	/* for paging */
 static int screenheight = 24;
@@ -44,7 +42,7 @@ static void clearscreen(void);
    2. deathray improvement (but keeping original failure alternatives)
 
    3. Tholian Web
-
+s
    4. Enemies can ram the Enterprise. Regular Klingons and Romulans can
       move in Expert and Emeritus games. This code could use improvement.
 
@@ -168,8 +166,7 @@ static void helpme(void) {
 	while (fgets(linebuf, sizeof(linebuf),fp)) {
 		if (strstr(linebuf, "******"))
 			break;
-		/* use fputs here to avoid % expansion */
-		fputs(linebuf, stdout);
+		proutc(linebuf);
 	}
 	fclose(fp);
 }
@@ -365,19 +362,16 @@ int main(int argc, char **argv) {
 	if (LINES)
 	    screenheight = atoi(LINES);
 
+	line[0] = '\0';
 	if (argc > 1) {
-		fromcommandline = 1;
-		line[0] = '\0';
 		while (--argc > 0) {
 			strcat(line, *(++argv));
 			strcat(line, " ");
 		}
 	}
-	else fromcommandline = 0;
-
 
 	while (TRUE) { /* Play a game */
-		setup();
+		setup(line[0] == '\0');
 		if (alldone) {
 			score();
 			alldone = 0;
@@ -553,29 +547,33 @@ static void clearscreen(void) {
 	extern void clrscr(void);
 	clrscr();
 #else
-	proutn("\033[2J");	/* Hope for an ANSI display */
+	// proutn("\033[2J");	/* Hope for an ANSI display */
+	/* much more in that old-time TTY spirit to just throw linefeeds */
+	int i;
+	for (i = 0; i < screenheight; i++)
+	    putchar('\n');
 #endif
 }
 
 /* We will pull these out in case we want to do something special later */
 
 void pause(int i) {
+	char buf[BUFSIZ];
 	putchar('\n');
 	if (i==1) {
 		if (skill > 2)
 			prout("[ANOUNCEMENT ARRIVING...]");
 		else
-			prout("[IMPORTANT ANNOUNCEMENT ARRIVING -- HIT SPACE BAR TO CONTINUE]");
-		getch();
+			prout("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
 	}
 	else {
-		if (skill > 2)
-			proutn("[CONTINUE?]");
-		else
-			proutn("[HIT SPACE BAR TO CONTINUE]");
-		getch();
-		proutn("\r                           \r");
+	    	if (skill > 2)
+	    		proutn("[CONTINUE?]");
+	    	else
+			proutn("[PRESS ENTER TO CONTINUE]");
+
 	}
+	fgets(buf, sizeof(buf), stdin);
 	if (i != 0) {
 		clearscreen();
 	}
@@ -606,6 +604,12 @@ void prout(char *fmt, ...) {
     va_start(ap, fmt);
     vprintf(fmt, ap);
     va_end(ap);
+    skip(1);
+}
+
+void proutc(char *line) {
+    line[strlen(line)-1] = '\0';
+    fputs(line, stdout);
     skip(1);
 }
 

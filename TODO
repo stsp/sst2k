@@ -1,8 +1,5 @@
 		Super Star Trek TO-DO list
 
-* Yes-no confirmations and "press-to-continue" situations should print
-  a recognizable standard prompt.
-
 * The time machine switch.  Specify a year, get only the features that
   then existed.  (This would be partly so people can try the original
   non-"super" version Matuszek and Reynolds wrote.)
@@ -13,8 +10,5 @@
 
 * Write a curses-based interface.  Shouldn't be hard, all output goes through
   prout/proutn/prouts so we can split the screen into two panes with the upper
-  one for the charts.  (Note, there's one fputs() used in the help reader to
-  avoid % expansion.)
-
-
+  one for the charts.
 

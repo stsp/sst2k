@@ -179,7 +179,7 @@ void abandn(void) {
 	return;
 }
 	
-void setup(void) {
+void setup(int needprompt) {
 	int i,j, krem, klumper;
 	int ix, iy;
 	alldone = gamewon = 0;
@@ -187,7 +187,7 @@ void setup(void) {
 	idebug = 0;
 #endif
 	//  Decide how many of everything
-	if (choose()) return; // frozen game
+	if (choose(needprompt)) return; // frozen game
 	// Prepare the Enterprise
 	ship = IHE;
 	energy = inenrg = 5000.0;
@@ -372,23 +372,20 @@ void setup(void) {
         proutn(cramlc(sector, sectx, secty));
 	skip(2);
 	prout("Good Luck!");
-	if (game.state.nscrem) proutn("  YOU'LL NEED IT.");
-	skip(1);
+	if (game.state.nscrem) prout("  YOU'LL NEED IT.");
 	newqad(0);
 	if (nenhere) shldup=1.0;
 	if (neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
 
-int choose(void) {
+int choose(int needprompt) {
 	tourn = 0;
 	thawed = 0;
 	skill = 0;
 	length = 0;
 	while (TRUE) {
-		if (fromcommandline) /* Can start with command line options */
-			fromcommandline = 0;
-		else
-			proutn("Would you like a regular, tournament, or frozen game?");
+		if (needprompt) /* Can start with command line options */
+		    proutn("Would you like a regular, tournament, or frozen game?");
 		scan();
 		if (strlen(citem)==0) continue; // Try again
 		if (isit("tournament")) {
