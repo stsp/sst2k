@@ -469,7 +469,7 @@ int choose(int needprompt)
 
     // Use parameters to generate initial values of things
     damfac = 0.5 * skill;
-    game.state.rembase = 3.0*Rand()+2.0;
+    game.state.rembase = 2.0 + Rand()*(MAXBASES-2.0);
     inbase = game.state.rembase;
     if (game.options & OPTION_PLANETS)
 	inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();

@@ -18,7 +18,7 @@
 #define PLNETMAX (10)
 #define GALSIZE	(8)
 #define QUADSIZE (10)
-#define BASEMAX	(6)
+#define BASEMAX	(5)
 
 /*
  * These macros hide the difference between 0-origin and 1-origin addressing.
@@ -52,8 +52,8 @@ typedef struct {
 	killk,			// Klingons killed
 	killc,			// commanders killed
 	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
-	baseqx[BASEMAX],		// Base quadrant X
-	baseqy[BASEMAX],		// Base quadrant Y
+	baseqx[BASEMAX+1],		// Base quadrant X
+	baseqy[BASEMAX+1],		// Base quadrant Y
 	isx, isy,		// Coordinate of Super Commander
 	nscrem,			// remaining super commanders
 	nromkl,			// Romulans killed
