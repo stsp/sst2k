@@ -203,7 +203,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 		if (iquad==IHDOT) continue;
 		/* hit something */
 		setwnd(message_window);
-		prout("");	/* start new line after text track */
+		skip(1);	/* start new line after text track */
 		switch(iquad) {
 			case IHE: /* Hit our ship */
 			case IHF:

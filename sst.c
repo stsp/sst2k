@@ -89,10 +89,13 @@ Eric Raymond's changes:
 
    1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
 
+   2. Status report now indicates when dilithium crystals are on board.
+
    */
 
 /* the input queue */
 static char line[128], *linep = line;
+static usecurses = TRUE;
 
 static struct 
 {
@@ -100,91 +103,94 @@ static struct
     int value;
 }
 commands[] = {
-#define SRSCAN	1
+#define SRSCAN	0
 	{"SRSCAN",	SRSCAN},
-#define STATUS	2
+#define STATUS	1
 	{"STATUS",	STATUS},
-#define REQUEST	3
+#define REQUEST	2
 	{"REQUEST",	REQUEST},
-#define LRSCAN	4
+#define LRSCAN	3
 	{"LRSCAN",	LRSCAN},
-#define PHASERS	5
+#define PHASERS	4
 	{"PHASERS",	PHASERS},
-#define TORPEDO	6
+#define TORPEDO	5
         {"TORPEDO",	TORPEDO},
 	{"PHOTONS",	TORPEDO},
-#define MOVE	7
+#define MOVE	6
 	{"MOVE",	MOVE},
-#define SHIELDS	8
+#define SHIELDS	7
 	{"SHIELDS",	SHIELDS},
-#define DOCK	9
+#define DOCK	8
 	{"DOCK",	DOCK},
-#define DAMAGES	10
+#define DAMAGES	9
 	{"DAMAGES",	DAMAGES},
-#define CHART	11
+#define CHART	10
 	{"CHART",	CHART},
-#define IMPULSE	12
+#define IMPULSE	11
 	{"IMPULSE",	IMPULSE},
-#define REST	13
+#define REST	12
 	{"REST",	REST},
-#define WARP	14
+#define WARP	13
 	{"WARP",	WARP},
-#define SCORE	15
+#define SCORE	14
 	{"SCORE",	SCORE},
-#define SENSORS	16
+#define SENSORS	15
 	{"SENSORS",	SENSORS},
-#define ORBIT	17
+#define ORBIT	16
 	{"ORBIT",	ORBIT},
-#define TRANSPORT	18
+#define TRANSPORT	17
 	{"TRANSPORT",	TRANSPORT},
-#define MINE	19
+#define MINE	18
 	{"MINE",	MINE},
-#define CRYSTALS	20
+#define CRYSTALS	19
 	{"CRYSTALS",	CRYSTALS},
-#define SHUTTLE	21
+#define SHUTTLE	20
 	{"SHUTTLE",	SHUTTLE},
-#define PLANETS	22
+#define PLANETS	21
 	{"PLANETS",	PLANETS},
-#define REPORT	23
+#define REPORT	22
 	{"REPORT",	REPORT},
-#define COMPUTER	24
+#define COMPUTER	23
 	{"COMPUTER",	COMPUTER},
-#define COMMANDS	25
+#define COMMANDS	24
 	{"COMMANDS",	COMMANDS},
-#define EMEXIT	26
+#define EMEXIT	25
 	{"EMEXIT",	EMEXIT},
-#define PROBE	27
+#define PROBE	26
 	{"PROBE",	PROBE},
-#define SAVE	28
+#define SAVE	27
 	{"SAVE",	SAVE},
 	{"FREEZE",	SAVE},
-#define ABANDON	29
+#define ABANDON	28
 	{"ABANDON",	ABANDON},
-#define DESTRUCT	30
+#define DESTRUCT	29
 	{"DESTRUCT",	DESTRUCT},
-#define DEATHRAY	31
+#define DEATHRAY	30
 	{"DEATHRAY",	DEATHRAY},
-#define DEBUGCMD	32
+#define DEBUGCMD	31
 	{"DEBUG",	DEBUGCMD},
-#define MAYDAY	33
+#define MAYDAY	32
 	{"MAYDAY",	MAYDAY},
 	{"SOS",		MAYDAY},
 	{"CALL",	MAYDAY},
-#define QUIT	34
+#define QUIT	33
 	{"QUIT",	QUIT},
-#define HELP	35
+#define HELP	34
 	{"HELP",	HELP},
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
-static void listCommands(int x) {
-    int i;
-    prout("LEGAL COMMANDS ARE:");
-    for (i = 0; i < NUMCOMMANDS; i++) {
-	proutn("%-12s ", commands[i].name);
-	if (i % 5 == 4)
+#define MIN_CURSES_COMMAND	PHASERS		/* might change someday */
+
+static void listCommands(int usecurses) {
+    int i, k = 0;
+    proutn("LEGAL COMMANDS ARE:");
+    for (i = usecurses ? MIN_CURSES_COMMAND : 0; i < NUMCOMMANDS; i++) {
+	if (k % 5 == 0)
 	    skip(1);
+	proutn("%-12s ", commands[i].name); 
+	k++;
     }
     skip(1);
 }
@@ -214,7 +220,7 @@ static void helpme(void) {
 		if (i != NUMCOMMANDS) break;
 		skip(1);
 		prout("Valid commands:");
-		listCommands(FALSE);
+		listCommands(usecurses);
 		key = IHEOL;
 		chew();
 		skip(1);
@@ -303,8 +309,7 @@ static void makemoves(void) {
 				    break;
 			    }
 			if (i < NUMCOMMANDS) break;
-
-			listCommands(TRUE);
+			listCommands(usecurses);
 		}
 		commandhook(commands[i].name, TRUE);
 		switch (i) { /* command switch */
@@ -393,7 +398,7 @@ static void makemoves(void) {
 				eta();
 				break;
 			case COMMANDS:
-				listCommands(TRUE);
+				listCommands(usecurses);
 				break;
 			case EMEXIT:		// Emergency exit
 				clrscr();	// Hide screen
@@ -470,7 +475,7 @@ static void makemoves(void) {
 
 
 int main(int argc, char **argv) {
-	int i, option, usecurses = TRUE;
+    int i, option;
 
 	while ((option = getopt(argc, argv, "t")) != -1) {
 	    switch (option) {

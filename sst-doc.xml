@@ -326,9 +326,9 @@ Full commands:  SRSCAN
 </literallayout>
 
 <!-- This is new in SST 2K -->
-<para>If you are using the screen-oriented interface, it should never
-be necessary to call this command explicitly; a short-range scan will
-always be present on the screen.</para>
+<para>If you are using the screen-oriented interface, this command is
+suppressed; instead, a short-range scan will always be present on the
+screen.</para>
 
 <para>The short-range scan gives you a considerable amount of information
 about the quadrant your starship is in.  A short-range scan is best
@@ -380,6 +380,11 @@ the contents of adjacent sectors.</para>
 Mnemonic:  STATUS
 Shortest abbreviation: ST
 </literallayout>
+
+<!-- This is new in SST 2K --> 
+<para>If you are using the screen-oriented interface, this command is
+suppressed; instead, a full status report will always be present on the
+screen.</para>
 
 <para>This command gives you information about the current state of your
 starship as follows:</para>
@@ -491,10 +496,10 @@ Mnemonic:  LRSCAN
 Shortest abbreviation:  L
 </literallayout>
 
-<!-- This is new in SST 2K -->
-<para>If you are using the screen-oriented interface, it should never
-be necessary to call this command explicitly; a long-range scan will
-always be present on the screen.</para>
+<!-- This is new in SST 2K --> 
+<para>If you are using the screen-oriented interface, this command is
+suppressed; instead, a long-range scan will always be present on the
+screen.</para>
 
 <para>A long-range scan gives you general information about where you are
 and what is around you.  Here is an example output.</para>
@@ -1256,6 +1261,11 @@ Mnemonic:  REQUEST
 Shortest abbreviation:  REQ
 Full command:  REQUEST &lt;ITEM&gt;
 </literallayout>
+
+<!-- This is new in SST 2K --> 
+<para>If you are using the screen-oriented interface, this command is
+suppressed; instead, a full status report will always be present on the
+screen.</para>
 
 <para>This command allows you to get any single piece of information
 from the &lt;STATUS&gt; command.  &lt;ITEM&gt; specifies which

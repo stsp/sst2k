@@ -322,7 +322,7 @@ int srscan(int l) {
 				case 6:
 					proutn("Energy        %.2f", energy);
 					if (icrystl)
-					    proutn(" (crystals on board)");
+					    proutn(" (have crystals)");
 					break;
 				case 7:
 					proutn("Torpedoes     %d", torps);
