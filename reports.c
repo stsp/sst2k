@@ -249,9 +249,7 @@ static void sectscan(int goodScan, int i, int j)
 	    if (game.quad[i][j] != ship) 
 		highvideo();
 	}
-	if (game.quad[i][j] & DAMAGED) 
-	    highvideo();
-	proutn("%c ",game.quad[i][j] & ~DAMAGED);
+	proutn("%c ",game.quad[i][j]);
 	textcolor(DEFAULT);
     }
     else
@@ -343,7 +341,7 @@ int srscan(int l)
 	    else
 		prout("  [Using Base's sensors]");
 	}
-	else proutn("     Short-range scan\n");
+	else proutn("     Short-range scan");
 	if (goodScan && !game.damage[DRADIO]) { 
 	    game.state.chart[quadx][quady].klingons = game.state.galaxy[quadx][quady].klingons;
 	    game.state.chart[quadx][quady].starbase = game.state.galaxy[quadx][quady].starbase;

@@ -49,7 +49,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 	ientesc=0;
 	isatb=0;
 	game.future[FSCMOVE]=0.2777+game.state.date;
-	game.future[FSCDBAS]=1e30;
+	game.future[FSCDBAS]=FOREVER;
 	game.state.isx=iqx;
 	game.state.isy=iqy;
     }
@@ -330,7 +330,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	isatb=0;
 	ishere=0;
 	ientesc=0;
-	game.future[FSCDBAS]=1e30;
+	game.future[FSCDBAS]=FOREVER;
 	for_local_enemies(i) 
 	    if (game.quad[game.kx[i]][game.ky[i]] == IHS) break;
 	game.quad[game.kx[i]][game.ky[i]] = IHDOT;
@@ -394,7 +394,7 @@ void scom(int *ipage)
 	/* compute distances to starbases */
 	if (game.state.rembase <= 0) {
 	    /* nothing left to do */
-	    game.future[FSCMOVE] = 1e30;
+	    game.future[FSCMOVE] = FOREVER;
 	    return;
 	}
 	sx = game.state.isx;
@@ -498,7 +498,7 @@ void scom(int *ipage)
     }
     /* check for a base */
     if (game.state.rembase == 0) {
-	game.future[FSCMOVE] = 1e30;
+	game.future[FSCMOVE] = FOREVER;
     }
     else for_starbases(i) {
 	ibqx = game.state.baseqx[i];
@@ -509,7 +509,7 @@ void scom(int *ipage)
 	    iseenit = 0;
 	    isatb=1;
 	    game.future[FSCDBAS] = game.state.date + 1.0 +2.0*Rand();
-	    if (game.future[FCDBAS] < 1e30) game.future[FSCDBAS] +=
+	    if (game.future[FCDBAS] < FOREVER) game.future[FSCDBAS] +=
 		game.future[FCDBAS]-game.state.date;
 	    if (game.damage[DRADIO] > 0 && condit != IHDOCKED)
 		return; /* no warning */

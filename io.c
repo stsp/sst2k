@@ -302,11 +302,11 @@ void drawmaps(short l)
     if (game.options & OPTION_CURSES) {
 	if (l == 1)
 	    sensor();
+        setwnd(srscan_window);
+        wmove(curwnd, 0, 0);
+        enqueue("no");
+        srscan(SCAN_FULL);
 	if (l != 2) {
-	    setwnd(srscan_window);
-	    wmove(curwnd, 0, 0);
-	    enqueue("no");
-	    srscan(SCAN_FULL);
 	    setwnd(report_window);
 	    wclear(report_window);
 	    wmove(report_window, 0, 0);
@@ -320,25 +320,28 @@ void drawmaps(short l)
     }
 }
 
+static void put_srscan_sym(int x, int y, char sym)
+{
+    wmove(srscan_window, x+1, y*2+2);
+    waddch(srscan_window, sym);
+    wrefresh(srscan_window);
+}
+
 void boom(int ii, int jj)
 /* enemy fall down, go boom */ 
 {
     if (game.options & OPTION_CURSES) {
-	setwnd(srscan_window);
 	drawmaps(2);
-	wmove(srscan_window, ii*2+3, jj+2);
+	setwnd(srscan_window);
 	wattron(srscan_window, A_REVERSE);
-	waddch(srscan_window, game.quad[ii][jj]);
-	wrefresh(srscan_window);
+	put_srscan_sym(ii, jj, game.quad[ii][jj]);
 	sound(500);
 	delay(1000);
 	nosound();
-	wmove(srscan_window, ii*2+3, jj+2);
 	wattroff(srscan_window, A_REVERSE);
-	waddch(srscan_window, game.quad[ii][jj]);
-	wrefresh(srscan_window);
-	setwnd(message_window);
+	put_srscan_sym(ii, jj, game.quad[ii][jj]);
 	delay(500);
+	setwnd(message_window);
     }
 } 
 
@@ -355,7 +358,7 @@ void warble(void)
 	prouts(" . . . . . ");
 }
 
-void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, int iquad)
+void tracktorpedo(int ix, int iy, int l, int i, int n)
 /* torpedo-track animation */
 {
     if (!game.options & OPTION_CURSES) {
@@ -370,30 +373,31 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
 	    }
 	} else if (l==4 || l==9) 
 	    skip(1);
-	proutn("%d - %d   ", (int)x, (int)y);
+	proutn("%d - %d   ", ix, iy);
     } else {
 	if (game.damage[DSRSENS]==0 || condit==IHDOCKED) {
-	    drawmaps(2);
-	    delay((wait!=1)*400);
-	    if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
-		game.quad[ix][iy]='+';
+	    if (i != 1 && l == 1) {
 		drawmaps(2);
-		game.quad[ix][iy]=iquad;
+		delay(400);
+	    }
+	    if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
+		put_srscan_sym(ix, iy, '+');
 		sound(l*10);
 		delay(100);
 		nosound();
+		put_srscan_sym(ix, iy, game.quad[ix][iy]);
 	    }
 	    else {
-		game.quad[ix][iy] |= DAMAGED;
-		drawmaps(2);
-		game.quad[ix][iy]=iquad;
+		wattron(curwnd, A_REVERSE);
+		put_srscan_sym(ix, iy, game.quad[ix][iy]);
 		sound(500);
 		delay(1000);
 		nosound();
 		wattroff(curwnd, A_REVERSE);
+		put_srscan_sym(ix, iy, game.quad[ix][iy]);
 	    }
 	} else {
-	    proutn("%d - %d   ", (int)x, (int)y);
+	    proutn("%d - %d   ", ix, iy);
 	}
     }
 }

@@ -17,7 +17,7 @@ static int consumeTime(void)
     }
 #endif
 //	asave = future[FSNOVA];
-//	future[FSNOVA] = 1e30; /* defer supernovas */
+//	future[FSNOVA] = FOREVER; /* defer supernovas */
     events();	/* Used to avoid if future[FSCMOVE] within time */
 //	future[FSNOVA] = asave;
     /*fails if game over, quadrant super-novas or we've moved to new quadrant*/

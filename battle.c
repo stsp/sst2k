@@ -176,7 +176,7 @@ void ram(int ibumpd, int ienm, int ix, int iy)
     return;
 }
 
-void torpedo(double course, double r, int inx, int iny, double *hit, int wait, int i, int n) 
+void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
 {
     int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
 	
@@ -202,8 +202,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	iy = y + 0.5;
 	if (!VALID_SECTOR(ix, iy)) break;
 	iquad=game.quad[ix][iy];
-	tracktorpedo(x, y, ix, iy, wait, l, i, n, iquad);
-	wait = 1;
+	tracktorpedo(ix, iy, l, i, n);
 	if (iquad==IHDOT) continue;
 	/* hit something */
 	setwnd(message_window);
@@ -518,7 +517,7 @@ void attack(int torps_ok)
 	    prout("  ");
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[l]*r;
-	    torpedo(course, r, jx, jy, &hit, 0, 1, 1);
+	    torpedo(course, r, jx, jy, &hit, 1, 1);
 	    if (game.state.remkl==0) 
 		finish(FWON); /* Klingons did themselves in! */
 	    if (game.state.galaxy[quadx][quady].supernova || alldone) 
@@ -640,7 +639,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	    game.state.cx[game.state.remcom] = 0;
 	    game.state.cy[game.state.remcom] = 0;
 	    game.state.remcom--;
-	    game.future[FTBEAM] = 1e30;
+	    game.future[FTBEAM] = FOREVER;
 	    if (game.state.remcom != 0)
 		game.future[FTBEAM] = game.state.date + expran(1.0*incom/game.state.remcom);
 	    game.state.killc++;
@@ -651,7 +650,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	case IHS:
 	    game.state.nscrem = ishere = game.state.isx = game.state.isy = isatb = iscate = 0;
 	    game.state.nsckill = 1;
-	    game.future[FSCMOVE] = game.future[FSCDBAS] = 1e30;
+	    game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
 	    break;
 	}
     }
@@ -664,8 +663,8 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
     /* Remove enemy ship from arrays describing local conditions */
-    if (game.future[FCDBAS] < 1e30 && batx==quadx && baty==quady && type==IHC)
-	game.future[FCDBAS] = 1e30;
+    if (game.future[FCDBAS] < FOREVER && batx==quadx && baty==quady && type==IHC)
+	game.future[FCDBAS] = FOREVER;
     for_local_enemies(i)
 	if (game.kx[i]==ix && game.ky[i]==iy) break;
     nenhere--;
@@ -827,7 +826,7 @@ void photon(void)
 	}
 	if (shldup || condit == IHDOCKED) 
 	    r *= 1.0 + 0.0001*shield;
-	torpedo(course[i], r, sectx, secty, &dummy, 0, i, n);
+	torpedo(course[i], r, sectx, secty, &dummy, i, n);
 	if (alldone || game.state.galaxy[quadx][quady].supernova)
 	    return;
     }
