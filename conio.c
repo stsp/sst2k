@@ -31,7 +31,6 @@ char color_warning=1;
 int directvideo;
 WINDOW *conio_scr;
 
-#ifdef SERGEEV 
 /* Some internals... */
 static int colortab(int a) /* convert LINUX Color code to DOS-standard */
 {
@@ -47,7 +46,6 @@ static int colortab(int a) /* convert LINUX Color code to DOS-standard */
    }
    return COLOR_BLACK;
 } 
-#endif /* SERGEEV */
 
 static void docolor (int color) /* Set DOS-like text mode colors */
 {
@@ -61,9 +59,8 @@ static void docolor (int color) /* Set DOS-like text mode colors */
    wattron(conio_scr,COLOR_PAIR(1+(color&7)+((color&112)>>1))); 
 }
 
-#ifdef SERGEEV
 /* Call this before any call to linux conio - except the port functions ! */
-void __attribute__((constructor)) initconio (void) /* This is needed, because ncurses needs to be initialized */
+void initconio (void)
 {
    int x,y;
    short pair;
@@ -93,7 +90,6 @@ void __attribute__((constructor)) initconio (void) /* This is needed, because nc
    textcolor(7);
    textbackground(0);
 }
-#endif /* SERGEEV */
 
 /* Call this on exiting your program */
 void doneconio (void)

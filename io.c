@@ -53,6 +53,7 @@ static void fastexit(int sig) {
 
 void iostart(int usecurses) {
 #ifdef SERGEEV
+    	initconio();
         textattr(7);
         clrscr();
         setwnd(FULLSCREEN_WINDOW);
