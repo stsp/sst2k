@@ -2,8 +2,6 @@
 
 * Remove the assumption that sst.doc lives in the current directory.
 
-* Have it read the value of LINES rather than assumong a 24-line terminal.
-
 * Do a manual page.
 
 * Improve the internal pager.

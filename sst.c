@@ -11,6 +11,7 @@ int getch(void);
 
 static char line[128], *linep = line;
 static int linecount;	/* for paging */
+static int screenheight = 24;
 
 static void clearscreen(void);
 
@@ -163,8 +164,8 @@ static void helpme(void) {
 	while (fgets(linebuf, sizeof(linebuf),fp)) {
 		if (strstr(linebuf, "******"))
 			break;
-		linebuf[strlen(linebuf)-1] = '\0'; // No \n at end
-		prout(linebuf);
+		/* use fputs here to avoid % expansion */
+		fputs(linebuf, stdout);
 	}
 	fclose(fp);
 }
@@ -355,6 +356,10 @@ int main(int argc, char **argv) {
 	int hitme;
 	char ch;
 	prelim();
+	char *LINES = getenv("LINES");
+ 
+	if (LINES)
+	    screenheight = atoi(LINES);
 
 	if (argc > 1) {
 		fromcommandline = 1;
@@ -577,7 +582,7 @@ void pause(int i) {
 void skip(int i) {
 	while (i-- > 0) {
 		linecount++;
-		if (linecount >= 23)
+		if (linecount >= screenheight)
 			pause(0);
 		else
 			putchar('\n');
