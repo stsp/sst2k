@@ -147,8 +147,6 @@ EXTERN struct {
 	justin,
 	alldone,
 	shldchg,
-	thingx,
-	thingy,
 	plnetx,
 	plnety,
 	inorbit,
@@ -175,8 +173,6 @@ EXTERN struct {
 	batx,
 	baty,
 	ithere,
-        iqhere,
-        iqengry,
 	ithx,
 	ithy,
 	iseenit,
@@ -238,8 +234,6 @@ EXTERN struct {
 #define justin game.justin			// just entered quadrant
 #define alldone game.alldone		// game is now finished
 #define shldchg game.shldchg		// shield is changing (affects efficiency)
-#define thingx game.thingx			// location of strange object in galaxy
-#define thingy game.thingy			//
 #define plnetx game.plnetx			// location of planet in quadrant
 #define plnety game.plnety			//
 #define inorbit game.inorbit		// orbiting
@@ -251,8 +245,6 @@ EXTERN struct {
 #define ishere game.ishere			// Super-commander in quandrant
 #define neutz game.neutz			// Romulan Neutral Zone
 #define irhere game.irhere			// Romulans in quadrant
-#define iqhere game.iqhere			// Thing in quadrant
-#define iqengry game.iqengry			// Thing attacking
 #define icraft game.icraft			// Kirk in Galileo
 #define ientesc game.ientesc		// Attempted escape from supercommander
 #define iscraft game.iscraft		// =1 if craft on ship, -1 if removed from game
@@ -307,6 +299,9 @@ EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
 EXTERN double aaitem;
 EXTERN char citem[10];
+
+/* the Space Thingy's global state should *not* be saved! */
+EXTERN int thingx, thingy, iqhere, iqengry;
 
 typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,

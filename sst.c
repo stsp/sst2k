@@ -116,6 +116,7 @@ Eric Raymond's changes:
 
    3. Can now report starbases left in scrscan.
 
+   4. Per Dave Matuszek's remarks, Thingy state is not saved across games.
    */
 
 /* the input queue */
