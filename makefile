@@ -23,7 +23,7 @@ sst:  $(OFILES)
 $(OFILES):  $(HFILES)
 
 sst.6: sst.xml
-	xmlto man sst.xml
+	xmlto --skip-validation man sst.xml
 
 sst-doc.txt: sst-doc.xml
 	xmlto -m sst-layer.xsl --skip-validation txt sst-doc.xml

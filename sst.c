@@ -1,6 +1,7 @@
 #define INCLUDED	// Define externs here
-#include "sst.h"
 #include <ctype.h>
+#include <getopt.h>
+#include "sst.h"
 
 #ifndef SSTDOC
 #define SSTDOC	"sst.doc"
@@ -344,20 +345,28 @@ static void makemoves(void) {
 
 
 int main(int argc, char **argv) {
-	int i;
+    int i, option, usecurses = TRUE;
 	int hitme;
 	char ch;
 
-	iostart();
-	prelim(); 
-	line[0] = '\0';
-	if (argc > 1) {
-		while (--argc > 0) {
-			strcat(line, *(++argv));
-			strcat(line, " ");
-		}
+	while ((option = getopt(argc, argv, "t")) != -1) {
+	    switch (option) {
+	    case 't':
+		usecurses = FALSE;
+		break;
+	    default:
+		fprintf(stderr, "usage: sst [-t] [startcommand...].\n");
+		exit(0);
+	    }
 	}
 
+	iostart(usecurses);
+	prelim(); 
+	line[0] = '\0';
+	for (i = optind; i < argc;  i++) {
+		strcat(line, argv[i]);
+		strcat(line, " ");
+	}
 	while (TRUE) { /* Play a game */
 		setup(line[0] == '\0');
 		if (alldone) {

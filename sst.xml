@@ -14,7 +14,10 @@
 <refsynopsisdiv id='synopsis'>
 
 <cmdsynopsis>
-  <command>sst</command>
+  <command>sst 
+       <arg choice='opt'>-t </arg> 
+       <arg rep='repeat' ><replaceable>command</replaceable></arg>
+  </command>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -36,9 +39,13 @@ url='http://sst.berlios.de/sst-doc.html'>browseable</ulink>.  On
 systems where <filename>/usr/share/doc/sst/</filename> is a legal
 filename, it will probably be installed there as well.</para>
 
-<para>Input tokens for the setup prompts will be read from the command
-line before standard input.  Thus, for example, you can invoke the
-program as</para>
+<para>There is one option -t, which forces the original pure-tty mode.
+Normally sst tries to come up in full-screen mode that assumes it is
+running on a cursor-addressable terminal or terminal emulator.</para>
+
+<para>Input tokens for the setup prompts will be read from the
+remainder of the command line before standard input.  Thus, for
+example, you can invoke the program as</para>
 
 <programlisting>
 sst regular medium good foobar

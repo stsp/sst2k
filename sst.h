@@ -423,6 +423,6 @@ void attakreport(void);
 void movetho(void);
 void probe(void);
 void clearscreen(void);
-void iostart(void);
+void iostart(int);
 void ioend(void);
 void getline(char *, int);
