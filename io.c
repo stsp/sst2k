@@ -98,7 +98,7 @@ void pause(int i) {
 
 	}
 	if (curses) {
-		waddch('\n');
+	    waddch(stdscr, '\n');
 		waddstr(stdscr, prompt);
 		wgetnstr(stdscr, buf, sizeof(buf));
 		wclear(stdscr);
@@ -189,8 +189,7 @@ void prouts(char *fmt, ...) {
 	}
 }
 
-void getline(char *line, int max)
-{
+void getline(char *line, int max) {
     if (curses) {
 	wgetnstr(stdscr, line, max);
 	wrefresh(stdscr);
@@ -198,4 +197,7 @@ void getline(char *line, int max)
 	fgets(line, max, stdin);
         line[strlen(line)-1] = '\0';
     }
+}
+
+void commandhook(char *cmd, int before) {
 }

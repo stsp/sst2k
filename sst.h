@@ -426,3 +426,4 @@ void clearscreen(void);
 void iostart(int);
 void ioend(void);
 void getline(char *, int);
+void commandhook(char *, int);

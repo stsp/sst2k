@@ -190,6 +190,7 @@ static void makemoves(void) {
 			}
 			else prout("UNRECOGNIZED COMMAND.");
 		}
+		commandhook(commands[i], TRUE);
 		switch (i) { /* command switch */
 			case 0:			// srscan
 				srscan(1);
@@ -314,6 +315,7 @@ static void makemoves(void) {
 				helpme();	// get help
 				break;
 		}
+		commandhook(commands[i], FALSE);
 		for (;;) {
 			if (alldone) break;		// Game has ended
 #ifdef DEBUG
