@@ -51,6 +51,11 @@ static void fastexit(int sig) {
 }
 
 void iostart(int usecurses) {
+#ifdef SERGEEV
+        textattr(7);
+        clrscr();
+        setwnd(FULLSCREEN_WINDOW);
+#else
 	(void) signal(SIGINT, fastexit);
 	(void) signal(SIGINT, fastexit);
 #ifdef SIGIOT
@@ -75,10 +80,13 @@ void iostart(int usecurses) {
 		if (LINES)
 		    screenheight = atoi(LINES);
 	}
+#endif /* SERGEEV */
 }
 
 void ioend(void) {
+#ifndef SERGEEV
     outro(0);
+#endif /* SERGEEV */
 }
 
 void waitfor(void) {
@@ -291,40 +299,6 @@ void c_printf (char *format, ... )
 #endif /* SERGEEV */
 }
 
-void warble(void)
-/* sound and visual effects for teleportation */
-{
-#ifdef SERGEEV
-    int posx, posy;
-    posx=wherex();
-    posy=wherey();
-    drawmaps(1);
-    setwnd(LOWER_WINDOW);
-    gotoxy(posx,posy);
-    sound(50);
-    delay(1000);
-    nosound();
-#else
-    prouts(" . . . . . ");
-#endif /* SERGEEV */
-}
-
-void setpassword(void) {
-#ifndef SERGEEV
-	while (TRUE) {
-		scan();
-		strcpy(game.passwd, citem);
-		chew();
-		if (*game.passwd != 0) break;
-		proutn("Please type in a secret password-");
-	}
-#else
-	int i;
-        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
-        game.passwd[3]=0;
-#endif /* SERGEEV */
-}
-
 void cgetline(char *line, int max) {
     if (curses) {
 #ifndef SERGEEV
@@ -359,3 +333,64 @@ void setwnd(short wndnum){
 
 void commandhook(char *cmd, int before) {
 }
+
+/*
+ * Things past this point have policy implications.
+ */
+
+void drawmaps(short l) {
+/* hook to be called after moving to redraw maps */
+#ifdef SERGEEV
+     _setcursortype(_NOCURSOR);
+     if (l==1) sensor();
+     if (l!=2) setwnd(LEFTUPPER_WINDOW);
+     gotoxy(1,1);
+     strcpy(line,"s");
+     srscan(1);
+     if (l!=2){
+        setwnd(SRSCAN_WINDOW);
+        clrscr();
+        srscan(2);
+        setwnd(LRSCAN_WINDOW);
+        clrscr();
+        strcpy(line,"l");
+        lrscan();
+        _setcursortype(_NORMALCURSOR);
+     }
+#endif /* SERGEEV */
+}
+
+void warble(void)
+/* sound and visual effects for teleportation */
+{
+#ifdef SERGEEV
+    int posx, posy;
+    posx=wherex();
+    posy=wherey();
+    drawmaps(1);
+    setwnd(LOWER_WINDOW);
+    gotoxy(posx,posy);
+    sound(50);
+    delay(1000);
+    nosound();
+#else
+    prouts(" . . . . . ");
+#endif /* SERGEEV */
+}
+
+void setpassword(void) {
+#ifndef SERGEEV
+	while (TRUE) {
+		scan();
+		strcpy(game.passwd, citem);
+		chew();
+		if (*game.passwd != 0) break;
+		proutn("Please type in a secret password-");
+	}
+#else
+	int i;
+        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
+        game.passwd[3]=0;
+#endif /* SERGEEV */
+}
+

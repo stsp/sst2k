@@ -264,28 +264,6 @@ static void helpme(void) {
 	fclose(fp);
 }
 
-void drawmaps(short l) {
-/* hook to be called after moving to redraw maps */
-#ifdef SERGEEV
-     _setcursortype(_NOCURSOR);
-     if (l==1) sensor();
-     if (l!=2) setwnd(LEFTUPPER_WINDOW);
-     gotoxy(1,1);
-     strcpy(line,"s");
-     srscan(1);
-     if (l!=2){
-        setwnd(SRSCAN_WINDOW);
-        clrscr();
-        srscan(2);
-        setwnd(LRSCAN_WINDOW);
-        clrscr();
-        strcpy(line,"l");
-        lrscan();
-        _setcursortype(_NORMALCURSOR);
-     }
-#endif /* SERGEEV */
-}
-
 static void makemoves(void) {
 	int i, hitme;
         clrscr();
@@ -505,14 +483,9 @@ int main(int argc, char **argv) {
 	    }
 	}
 
-#ifndef SERGEEV
-	iostart(usecurses);
-#else
 	randomize();
-        textattr(7);
-        clrscr();
-        setwnd(FULLSCREEN_WINDOW);
-#endif /* SERGEEV */
+	iostart(usecurses);
+
 	line[0] = '\0';
 	for (i = optind; i < argc;  i++) {
 		strcat(line, argv[i]);
@@ -543,9 +516,7 @@ int main(int argc, char **argv) {
 		clrscr();
 	}
 	skip(1);
-#ifndef SERGEEV
 	ioend();
-#endif /* SERGEEV */
 	prout("May the Great Bird of the Galaxy roost upon your home planet.");
 	return 0;
 }
@@ -647,14 +618,12 @@ int scan(void) {
 			return IHEOL;
 		}
 		cgetline(line, sizeof(line));
-#ifdef SERGEEV
                 fflush(stdin);
                 if (curwnd==BOTTOM_WINDOW){
                    clrscr();
                    setwnd(LOWER_WINDOW);
                    clrscr();
                 }
-#endif /* SERGEEV */
 		linep = line;
 	}
 	// Skip leading white space
