@@ -16,7 +16,6 @@
 
 #define PHASEFAC (2.0)
 #define PLNETMAX (10)
-#define NEVENTS (8)
 #define GALSIZE	(8)
 #define QUADSIZE (10)
 #define BASEMAX	(6)
@@ -116,6 +115,19 @@ typedef struct {
 #define DDSP    14  // Added deep space probe
 #define NDEVICES (15)	// Number of devices
 
+/* Define future events */
+#define FSPY	0	// Spy event happens always (no future[] entry)
+					// can cause SC to tractor beam Enterprise
+#define FSNOVA  1   // Supernova
+#define FTBEAM  2   // Commander tractor beams Enterprise
+#define FSNAP   3   // Snapshot for time warp
+#define FBATTAK 4   // Commander attacks base
+#define FCDBAS  5   // Commander destroys base
+#define FSCMOVE 6   // Supercommander moves (might attack base)
+#define FSCDBAS 7   // Supercommander destroys base
+#define FDSPROB 8   // Move deep space probe
+#define NEVENTS (9)
+
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,
@@ -135,7 +147,7 @@ EXTERN struct {
     double kdist[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy distances
     double kavgd[(QUADSIZE+1)*(QUADSIZE+1)];		// average distances
     double damage[NDEVICES];	// damage encountered
-    double future[NEVENTS+1];	// future events
+    double future[NEVENTS];	// future events
     char passwd[10];		// Self Destruct password
     int kx[(QUADSIZE+1)*(QUADSIZE+1)];			// enemy sector locations
     int ky[(QUADSIZE+1)*(QUADSIZE+1)];
@@ -330,18 +342,6 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
 			  FHOLE} FINTYPE ;
 enum loctype {neither, quadrant, sector};
-
-/* Define future events */
-#define FSPY	0	// Spy event happens always (no future[] entry)
-					// can cause SC to tractor beam Enterprise
-#define FSNOVA  1   // Supernova
-#define FTBEAM  2   // Commander tractor beams Enterprise
-#define FSNAP   3   // Snapshot for time warp
-#define FBATTAK 4   // Commander attacks base
-#define FCDBAS  5   // Commander destroys base
-#define FSCMOVE 6   // Supercommander moves (might attack base)
-#define FSCDBAS 7   // Supercommander destroys base
-#define FDSPROB 8   // Move deep space probe
 
 #ifdef INCLUDED
 char *device[NDEVICES] = {

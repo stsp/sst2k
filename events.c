@@ -18,7 +18,7 @@ void events(void)
 	line = FSPY;
 	if (alldone) return;
 	datemin = fintim;
-	for (l = 1; l <= NEVENTS; l++)
+	for (l = 1; l < NEVENTS; l++)
 	    if (game.future[l] < datemin) {
 		line = l;
 		datemin = game.future[l];
