@@ -59,19 +59,31 @@ typedef struct {
 } snapshot;				// Data that is snapshot
 
 /*
- * This is how the integers in galaxy are encoded.
+ * This is how the integers in the galaxy array are encoded.
  * Someday these should turn into structure fields.
  */
 #define SUPERNOVA_PLACE	1000
-#define ENEMY_PLACE	100
+#define KLINGON_PLACE	100
 #define BASE_PLACE	10
 #define STAR_PLACE	1
+#define KLINGONS(n)	((n)/KLINGON_PLACE)
+#define BASES(n)	(((n)%KLINGON_PLACE)/BASE_PLACE)
+#define STARS(n)	((n)%BASE_PLACE)
+#define NOEXIT(s)	((s) > 899)	/* supernova or >8 Klingons */
 
 /* for newstuff */
 #define ROMULAN_PLACE	10
+#define ROMULANS(n)	((n)/ROMULAN_PLACE)
 
 /* for starch */
 #define CHART_UNKNOWN	-1
+
+#define SKILL_NONE	0
+#define SKILL_NOVICE	1
+#define SKILL_FAIR	2
+#define SKILL_GOOD	3
+#define SKILL_EXPERT	4
+#define SKILL_EMERITUS	5
 
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
@@ -417,8 +429,7 @@ void crmshp(void);
 char *cramlc(enum loctype, int, int);
 double expran(double);
 double Rand(void);
-void iran8(int *, int *);
-void iran10(int *, int *);
+void iran(int, int *, int *);
 #define square(i) ((i)*(i))
 void dropin(int, int*, int*);
 void newcnd(void);

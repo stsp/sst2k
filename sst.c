@@ -87,11 +87,14 @@ Here are Stas Sergeev's changes:
 
 Eric Raymond's changes:
 
+ Mainly, I translated this C code out of FORTRAN into C -- created #defines
+   for a lot of magic numbers.
+
    1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
 
    2. Status report now indicates when dilithium crystals are on board.
 
-   3. Can now report vbases left in scrscan.
+   3. Can now report starbases left in scrscan.
 
    */
 
@@ -420,7 +423,7 @@ static void makemoves(void) {
 			case SAVE:			// Save Game
 				freeze(FALSE);
                                 clrscr();
-				if (skill > 3)
+				if (skill > SKILL_GOOD)
                                         prout("WARNING--Saved games produce no plaques!");
 				break;
 			case DEATHRAY:		// Try a desparation measure
@@ -588,14 +591,9 @@ double Rand(void) {
 	return rand()/(1.0 + (double)RAND_MAX);
 }
 
-void iran8(int *i, int *j) {
-	*i = Rand()*8.0 + 1.0;
-	*j = Rand()*8.0 + 1.0;
-}
-
-void iran10(int *i, int *j) {
-	*i = Rand()*10.0 + 1.0;
-	*j = Rand()*10.0 + 1.0;
+void iran(int size, int *i, int *j) {
+    *i = Rand()*(size*1.0) + 1.0;
+    *j = Rand()*(size*1.0) + 1.0;
 }
 
 void chew(void) {

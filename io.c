@@ -82,13 +82,13 @@ void pause_game(int i)
     char *prompt;
     char buf[BUFSIZ];
     if (i==1) {
-	if (skill > 2)
+	if (skill > SKILL_FAIR)
 	    prompt = "[ANOUNCEMENT ARRIVING...]";
 	else
 	    prompt = "[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]";
     }
     else {
-	if (skill > 2)
+	if (skill > SKILL_FAIR)
 	    prompt = "[CONTINUE?]";
 	else
 	    prompt = "[PRESS ENTER TO CONTINUE]";
