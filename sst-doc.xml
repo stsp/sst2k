@@ -1679,6 +1679,10 @@ All the game state now lives in one big structure that can be
 written to and read from disk as one blob.  The write gives it an
 an identifiable magic number and the thaw logic checks for same. 
 </para></listitem>
+<listitem><para>
+I made the internal pager work, nd in the process got rid of a number
+of platform dependencies in the code.
+</para></listitem>
 </itemizedlist>
 
 </sect1>
