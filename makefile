@@ -7,9 +7,11 @@ OFILES=     sst.o finish.o reports.o setup.o linux.o moving.o battle.o events.o 
 
 HFILES=     sst.h
 
-sstos2.exe:  $(OFILES)
+sst:  $(OFILES)
 	gcc  -o sst $(OFILES) -lm
 
-        
 $(OFILES):  $(HFILES)
+
+clean:
+	rm -f *.o sst
 

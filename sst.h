@@ -145,95 +145,95 @@ EXTERN struct foo2 {
 	probey,
 	probeinx,
 	probeiny;
-} a;
+} game;
 
-#define inkling a.inkling		// Initial number of klingons
-#define inbase a.inbase			// Initial number of bases
-#define incom a.incom			// Initian number of commanders
-#define instar a.instar			// Initial stars
-#define intorps a.intorps		// Initial/Max torpedoes
-#define condit a.condit			// Condition (red, yellow, green docked)
-#define torps a.torps			// number of torpedoes
-#define ship a.ship				// Ship type -- 'E' is Enterprise
-#define quadx a.quadx			// where we are
-#define quady a.quady			//
-#define sectx a.sectx			// where we are
-#define secty a.secty			//
-#define length a.length			// length of game
-#define skill a.skill			// skill level
-#define basex a.basex			// position of base in current quad
-#define basey a.basey			//
-#define klhere a.klhere			// klingons here
-#define comhere a.comhere		// commanders here
-#define casual a.casual			// causalties
-#define nhelp a.nhelp			// calls for help
-#define nkinks a.nkinks			//
-#define ididit a.ididit			// Action taken -- allows enemy to attack
-#define gamewon a.gamewon		// Finished!
-#define alive a.alive			// We are alive (not killed)
-#define justin a.justin			// just entered quadrant
-#define alldone a.alldone		// game is now finished
-#define shldchg a.shldchg		// shield is changing (affects efficiency)
-#define thingx a.thingx			// location of strange object in galaxy
-#define thingy a.thingy			//
-#define plnetx a.plnetx			// location of planet in quadrant
-#define plnety a.plnety			//
-#define inorbit a.inorbit		// orbiting
-#define landed a.landed			// party on planet (1), on ship (-1)
-#define iplnet a.iplnet			// planet # in quadrant
-#define imine a.imine			// mining
-#define inplan a.inplan			// initial planets
-#define nenhere a.nenhere		// Number of enemies in quadrant
-#define ishere a.ishere			// Super-commander in quandrant
-#define neutz a.neutz			// Romulan Neutral Zone
-#define irhere a.irhere			// Romulans in quadrant
-#define icraft a.icraft			// Kirk in Galileo
-#define ientesc a.ientesc		// Attempted escape from supercommander
-#define iscraft a.iscraft		// =1 if craft on ship, -1 if removed from game
-#define isatb a.isatb			// =1 if SuperCommander is attacking base
-#define iscate a.iscate			// Super Commander is here
+#define inkling game.inkling		// Initial number of klingons
+#define inbase game.inbase			// Initial number of bases
+#define incom game.incom			// Initian number of commanders
+#define instar game.instar			// Initial stars
+#define intorps game.intorps		// Initial/Max torpedoes
+#define condit game.condit			// Condition (red, yellow, green docked)
+#define torps game.torps			// number of torpedoes
+#define ship game.ship				// Ship type -- 'E' is Enterprise
+#define quadx game.quadx			// where we are
+#define quady game.quady			//
+#define sectx game.sectx			// where we are
+#define secty game.secty			//
+#define length game.length			// length of game
+#define skill game.skill			// skill level
+#define basex game.basex			// position of base in current quad
+#define basey game.basey			//
+#define klhere game.klhere			// klingons here
+#define comhere game.comhere		// commanders here
+#define casual game.casual			// causalties
+#define nhelp game.nhelp			// calls for help
+#define nkinks game.nkinks			//
+#define ididit game.ididit			// Action taken -- allows enemy to attack
+#define gamewon game.gamewon		// Finished!
+#define alive game.alive			// We are alive (not killed)
+#define justin game.justin			// just entered quadrant
+#define alldone game.alldone		// game is now finished
+#define shldchg game.shldchg		// shield is changing (affects efficiency)
+#define thingx game.thingx			// location of strange object in galaxy
+#define thingy game.thingy			//
+#define plnetx game.plnetx			// location of planet in quadrant
+#define plnety game.plnety			//
+#define inorbit game.inorbit		// orbiting
+#define landed game.landed			// party on planet (1), on ship (-1)
+#define iplnet game.iplnet			// planet # in quadrant
+#define imine game.imine			// mining
+#define inplan game.inplan			// initial planets
+#define nenhere game.nenhere		// Number of enemies in quadrant
+#define ishere game.ishere			// Super-commander in quandrant
+#define neutz game.neutz			// Romulan Neutral Zone
+#define irhere game.irhere			// Romulans in quadrant
+#define icraft game.icraft			// Kirk in Galileo
+#define ientesc game.ientesc		// Attempted escape from supercommander
+#define iscraft game.iscraft		// =1 if craft on ship, -1 if removed from game
+#define isatb game.isatb			// =1 if SuperCommander is attacking base
+#define iscate game.iscate			// Super Commander is here
 #ifdef DEBUG
-#define idebug a.idebug			// Debug mode
+#define idebug game.idebug			// Debug mode
 #endif
-#define iattak a.iattak			// attack recursion elimination (was cracks[4])
-#define icrystl a.icrystl		// dilithium crystals aboard
-#define tourn a.tourn			// Tournament number
-#define thawed a.thawed			// Thawed game
-#define batx a.batx				// Base coordinates being attacked
-#define baty a.baty				//
-#define ithere a.ithere			// Tholean is here 
-#define ithx a.ithx				// coordinates of tholean
-#define ithy a.ithy
-#define iseenit a.iseenit		// Seen base attack report
-#define inresor a.inresor		// initial resources
-#define intime a.intime			// initial time
-#define inenrg a.inenrg			// Initial/Max Energy
-#define inshld a.inshld			// Initial/Max Shield
-#define inlsr a.inlsr			// initial life support resources
-#define indate a.indate			// Initial date
-#define energy a.energy			// Energy level
-#define shield a.shield			// Shield level
-#define shldup a.shldup			// Shields are up
-#define warpfac a.warpfac		// Warp speed
-#define wfacsq a.wfacsq			// squared warp factor
-#define lsupres a.lsupres		// life support reserves
-#define dist a.dist				// movement distance
-#define direc a.direc			// movement direction
-#define Time a.Time				// time taken by current operation
-#define docfac a.docfac			// repair factor when docking (constant?)
-#define resting a.resting		// rest time
-#define damfac a.damfac			// damage factor
-#define stdamtim a.stdamtim		// time that star chart was damaged
-#define cryprob a.cryprob		// probability that crystal will work
-#define probex a.probex			// location of probe
-#define probey a.probey
-#define probecx a.probecx		// current probe quadrant
-#define probecy a.probecy	
-#define probeinx a.probeinx		// Probe x,y increment
-#define probeiny a.probeiny		
-#define proben a.proben			// number of moves for probe
-#define isarmed a.isarmed		// Probe is armed
-#define nprobes a.nprobes		// number of probes available
+#define iattak game.iattak			// attack recursion elimination (was cracks[4])
+#define icrystl game.icrystl		// dilithium crystals aboard
+#define tourn game.tourn			// Tournament number
+#define thawed game.thawed			// Thawed game
+#define batx game.batx				// Base coordinates being attacked
+#define baty game.baty				//
+#define ithere game.ithere			// Tholean is here 
+#define ithx game.ithx				// coordinates of tholean
+#define ithy game.ithy
+#define iseenit game.iseenit		// Seen base attack report
+#define inresor game.inresor		// initial resources
+#define intime game.intime			// initial time
+#define inenrg game.inenrg			// Initial/Max Energy
+#define inshld game.inshld			// Initial/Max Shield
+#define inlsr game.inlsr			// initial life support resources
+#define indate game.indate			// Initial date
+#define energy game.energy			// Energy level
+#define shield game.shield			// Shield level
+#define shldup game.shldup			// Shields are up
+#define warpfac game.warpfac		// Warp speed
+#define wfacsq game.wfacsq			// squared warp factor
+#define lsupres game.lsupres		// life support reserves
+#define dist game.dist				// movement distance
+#define direc game.direc			// movement direction
+#define Time game.Time				// time taken by current operation
+#define docfac game.docfac			// repair factor when docking (constant?)
+#define resting game.resting		// rest time
+#define damfac game.damfac			// damage factor
+#define stdamtim game.stdamtim		// time that star chart was damaged
+#define cryprob game.cryprob		// probability that crystal will work
+#define probex game.probex			// location of probe
+#define probey game.probey
+#define probecx game.probecx		// current probe quadrant
+#define probecy game.probecy	
+#define probeinx game.probeinx		// Probe x,y increment
+#define probeiny game.probeiny		
+#define proben game.proben			// number of moves for probe
+#define isarmed game.isarmed		// Probe is armed
+#define nprobes game.nprobes		// number of probes available
 
 EXTERN int
 		kx[21],			// enemy sector locations

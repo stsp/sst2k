@@ -47,7 +47,7 @@ void freeze(int boss) {
 	fwrite(kavgd, sizeof(kavgd), 1, fp);
 	fwrite(damage, sizeof(damage), 1, fp);
 	fwrite(future, sizeof(future), 1, fp);
-	fwrite(&a, sizeof(a), 1, fp);
+	fwrite(&game, sizeof(game), 1, fp);
 	fwrite(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);
@@ -91,7 +91,7 @@ void thaw(void) {
 	fread(kavgd, sizeof(kavgd), 1, fp);
 	fread(damage, sizeof(damage), 1, fp);
 	fread(future, sizeof(future), 1, fp);
-	fread(&a, sizeof(a), 1, fp);
+	fread(&game, sizeof(game), 1, fp);
 	fread(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);

@@ -13,8 +13,6 @@ static int linecount;	/* for paging */
 
 static void clearscreen(void);
 
-#define NUMCOMMANDS 34
-
 /* Compared to original version, I've changed the "help" command to
    "call" and the "terminate" command to "quit" to better match
    user expectations. The DECUS version apparently made those changes
@@ -52,7 +50,7 @@ static void clearscreen(void);
    */
 
 
-static char *commands[NUMCOMMANDS] = {
+static char *commands[] = {
 	"srscan",
 	"lrscan",
 	"phasers",
@@ -88,6 +86,7 @@ static char *commands[NUMCOMMANDS] = {
 	"quit",
 	"help"
 };
+#define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
 static void listCommands(int x) {
 	prout("   SRSCAN    MOVE      PHASERS   CALL\n"
@@ -345,7 +344,7 @@ static void makemoves(void) {
 }
 
 
-void main(int argc, char **argv) {
+int main(int argc, char **argv) {
 	int i;
 	int hitme;
 	char ch;
@@ -486,7 +485,8 @@ int scan(void) {
 			chew();
 			return IHEOL;
 		}
-		gets(line);
+		fgets(line, sizeof(line), stdin);
+		line[strlen(line)-1] = '\0';
 		linep = line;
 	}
 	// Skip leading white space
