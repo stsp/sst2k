@@ -122,20 +122,20 @@ char *cgets (char *str) /* ugly function :-( */
 void clreol (void)
 /* clear to end of line -- can be a no-op in tty mode */
 {
-#ifdef SERGEEV
-   wclrtoeol(conio_scr);
-   wrefresh(conio_scr);
-#endif /* SERGEEV */
+   if (conio_scr) {
+       wclrtoeol(conio_scr);
+       wrefresh(conio_scr);
+   }
 }
 
 void clrscr (void)
 /* clear screen -- can be a no-op in tty mode */
 {
-#ifdef SERGEEV
-   wclear(conio_scr);
-   wmove(conio_scr,0,0);
-   wrefresh(conio_scr);
-#endif /* SERGEEV */
+   if (conio_scr) {
+       wclear(conio_scr);
+       wmove(conio_scr,0,0);
+       wrefresh(conio_scr);
+   }
 }
 
 int cprintf (char *format, ... )
@@ -147,12 +147,11 @@ int cprintf (char *format, ... )
    vsprintf(buffer,format,argp);
    va_end(argp);
 
-#ifdef SERGEEV
-   i=waddstr(conio_scr,buffer);
-   wrefresh(conio_scr);
-#else
-   i=printf(buffer);
-#endif /* SERGEEV */
+   if (conio_scr) {
+       i=waddstr(conio_scr,buffer);
+       wrefresh(conio_scr);
+   } else 
+       i=printf(buffer);
    return(i);
 }
 
@@ -224,20 +223,20 @@ void gettextinfo(struct text_info *inforec)
 void gotoxy (int x, int y)
 /* address cursor -- OK for this to be a no-op in TTY mode */
 {
-#ifdef SERGEEV
-   y--;
-   x--;
-   wmove(conio_scr,y,x);
-   wrefresh(conio_scr);
-#endif /* SERGEEV */
+    if (conio_scr) {
+	y--;
+	x--;
+	wmove(conio_scr,y,x);
+	wrefresh(conio_scr);
+   }
 }
 
 void highvideo (void)
 {
-#ifdef SERGEEV
-   textcolor(15); /* White */
-   textbackground(0); /* Black */
-#endif /* SERGEEV */
+    if (conio_scr) {
+	textcolor(15); /* White */
+	textbackground(0); /* Black */
+    }
 }
 
 void insline (void)
@@ -291,11 +290,11 @@ void textbackground (int color)
 
 void textcolor (int color)
 {
-#ifdef SERGEEV
-   fgc=color;
-   color=(bgc*16)+fgc;
-   docolor(color);
-#endif /* SERGEEV */
+    if (conio_scr) {
+	fgc=color;
+	color=(bgc*16)+fgc;
+	docolor(color);
+   }
 }
  
 void textmode (int mode)
@@ -305,24 +304,26 @@ void textmode (int mode)
 
 int wherex (void)
 {
-#ifdef SERGEEV
-   int y;
-   int x;
-   getyx(conio_scr,y,x);
-   x++;
-   return(x);
-#endif /* SERGEEV */
+    if (conio_scr) {
+	int y;
+	int x;
+	getyx(conio_scr,y,x);
+	x++;
+	return(x);
+    }
+    return (0);
 }
 
 int wherey (void)
 {
-#ifdef SERGEEV
-   int y;
-   int x;
-   getyx(conio_scr,y,x);
-   y++;
-   return(y);
-#endif /* SERGEEV */
+    if (conio_scr) {
+	int y;
+	int x;
+	getyx(conio_scr,y,x);
+	y++;
+	return(y);
+    }
+    return (0);
 }
 
 void window (int left,int top,int right,int bottom)
