@@ -5,7 +5,7 @@
 void dstrct() {
 	/* Finish with a BANG! */
 	chew();
-	if (damage[DCOMPTR] != 0.0) {
+	if (frozen.damage[DCOMPTR] != 0.0) {
 		prout("Computer damaged; cannot execute destruct sequence.");
 		return;
 	}
@@ -22,7 +22,7 @@ void dstrct() {
 	prout("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED");
 	scan();
 	chew();
-	if (strcmp(passwd, citem) != 0) {
+	if (strcmp(frozen.passwd, citem) != 0) {
 		prouts("PASSWORD-REJECTED;"); skip(1);
 		prout("CONTINUITY-EFFECTED");
 		skip(1);
@@ -55,8 +55,8 @@ void kaboom(void) {
 		double whammo = 25.0 * energy;
 		int l=1;
 		while (l <= nenhere) {
-			if (kpower[l]*kdist[l] <= whammo) 
-				deadkl(kx[l],ky[l], frozen.quad[kx[l]][ky[l]], kx[l], ky[l]);
+			if (frozen.kpower[l]*frozen.kdist[l] <= whammo) 
+				deadkl(frozen.kx[l],frozen.ky[l], frozen.quad[frozen.kx[l]][frozen.ky[l]], frozen.kx[l], frozen.ky[l]);
 			l++;
 		}
 	}

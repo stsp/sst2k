@@ -18,11 +18,11 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 			if (batx==quadx && baty==quady) return 0;
 		}
 		/* don't leave if over 1000 units of energy */
-		if (kpower[loccom] > 1000.) return 0;
+		if (frozen.kpower[loccom] > 1000.) return 0;
 	}
 	/* print escape message and move out of quadrant.
 	   We know this if either short or long range sensors are working */
-	if (damage[DSRSENS] == 0.0 || damage[DLRSENS] == 0.0 ||
+	if (frozen.damage[DSRSENS] == 0.0 || frozen.damage[DLRSENS] == 0.0 ||
 		condit == IHDOCKED) {
 		proutn("***");
 		cramen(ienm);
@@ -31,11 +31,11 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 		prout(" (and regains strength).");
 	}
 	/* handle local matters related to escape */
-	kx[loccom] = kx[nenhere];
-	ky[loccom] = ky[nenhere];
-	kavgd[loccom] = kavgd[nenhere];
-	kpower[loccom] = kpower[nenhere];
-	kdist[loccom] = kdist[nenhere];
+	frozen.kx[loccom] = frozen.kx[nenhere];
+	frozen.ky[loccom] = frozen.ky[nenhere];
+	frozen.kavgd[loccom] = frozen.kavgd[nenhere];
+	frozen.kpower[loccom] = frozen.kpower[nenhere];
+	frozen.kdist[loccom] = frozen.kdist[nenhere];
 	klhere--;
 	nenhere--;
 	if (condit != IHDOCKED) newcnd();
@@ -47,8 +47,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 		iscate=0;
 		ientesc=0;
 		isatb=0;
-		future[FSCMOVE]=0.2777+state.date;
-		future[FSCDBAS]=1e30;
+		frozen.future[FSCMOVE]=0.2777+state.date;
+		frozen.future[FSCDBAS]=1e30;
 		state.isx=iqx;
 		state.isy=iqy;
 	}
@@ -78,12 +78,12 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 				  (comhere + ishere);
 	double dist1, forces;
 
-	dist1 = kdist[loccom];
+	dist1 = frozen.kdist[loccom];
 	mdist = dist1 + 0.5; /* Nearest integer distance */
 
 	/* If SC, check with spy to see if should hi-tail it */
 	if (ienm==IHS &&
-		(kpower[loccom] <= 500.0 || (condit==IHDOCKED && damage[DPHOTON]==0))) {
+		(frozen.kpower[loccom] <= 500.0 || (condit==IHDOCKED && frozen.damage[DPHOTON]==0))) {
 		irun = 1;
 		motion = -10;
 	}
@@ -127,14 +127,14 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
   *  Motion is limited to skill level, except for SC hi-tailing it out.
   */
 
-		forces = kpower[loccom]+100.0*nenhere+400*(nbaddys-1);
+		forces = frozen.kpower[loccom]+100.0*nenhere+400*(nbaddys-1);
 		if (shldup==0) forces += 1000; /* Good for enemy if shield is down! */
-		if (damage[DPHASER] == 0.0 || damage[DPHOTON] == 0.0) {
-			if (damage[DPHASER] != 0) /* phasers damaged */
+		if (frozen.damage[DPHASER] == 0.0 || frozen.damage[DPHOTON] == 0.0) {
+			if (frozen.damage[DPHASER] != 0) /* phasers damaged */
 				forces += 300.0;
 			else
 				forces -= 0.2*(energy - 2500.0);
-			if (damage[DPHOTON] != 0) /* photon torpedoes damaged */
+			if (frozen.damage[DPHOTON] != 0) /* photon torpedoes damaged */
 				forces += 300.0;
 			else
 				forces -= 50.0*torps;
@@ -253,14 +253,14 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	frozen.quad[nextx][nexty] = ienm;
 	if (nextx != comx || nexty != comy) {
 		/* it moved */
-		kx[loccom] = nextx;
-		ky[loccom] = nexty;
-		kdist[loccom] = kavgd[loccom] =
+		frozen.kx[loccom] = nextx;
+		frozen.ky[loccom] = nexty;
+		frozen.kdist[loccom] = frozen.kavgd[loccom] =
 					sqrt(square(sectx-nextx)+square(secty-nexty));
-		if (damage[DSRSENS] == 0 || condit == IHDOCKED) {
+		if (frozen.damage[DSRSENS] == 0 || condit == IHDOCKED) {
 			proutn("***");
 			cramen(ienm);
-			if (kdist[loccom] < dist1) proutn(" advances to");
+			if (frozen.kdist[loccom] < dist1) proutn(" advances to");
 			else proutn(" retreats to");
 			cramlc(2, nextx, nexty);
 			skip(1);
@@ -278,16 +278,16 @@ void movcom(void) {
 	/* Figure out which Klingon is the commander (or Supercommander)
 	   and do move */
 	if (comhere) for (i = 1; i <= nenhere; i++) {
-		ix = kx[i];
-		iy = ky[i];
+		ix = frozen.kx[i];
+		iy = frozen.ky[i];
 		if (frozen.quad[ix][iy] == IHC) {
 			movebaddy(ix, iy, i, IHC);
 			break;
 		}
 	}
 	if (ishere) for (i = 1; i <= nenhere; i++) {
-		ix = kx[i];
-		iy = ky[i];
+		ix = frozen.kx[i];
+		iy = frozen.ky[i];
 		if (frozen.quad[ix][iy] == IHS) {
 			movebaddy(ix, iy, i, IHS);
 			break;
@@ -297,8 +297,8 @@ void movcom(void) {
 	   Move these last so they can base their actions on what the
        commander(s) do. */
 	if (skill > 3) for (i = 1; i <= nenhere; i++) {
-		ix = kx[i];
-		iy = ky[i];
+		ix = frozen.kx[i];
+		iy = frozen.ky[i];
 		if (frozen.quad[ix][iy] == IHK || frozen.quad[ix][iy] == IHR)
 			movebaddy(ix, iy, i, frozen.quad[ix][iy]);
 	}
@@ -329,15 +329,15 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 		isatb=0;
 		ishere=0;
 		ientesc=0;
-		future[FSCDBAS]=1e30;
+		frozen.future[FSCDBAS]=1e30;
 		for (i = 1; i <= nenhere; i++) 
-			if (frozen.quad[kx[i]][ky[i]] == IHS) break;
-		frozen.quad[kx[i]][ky[i]] = IHDOT;
-		kx[i] = kx[nenhere];
-		ky[i] = ky[nenhere];
-		kdist[i] = kdist[nenhere];
-		kavgd[i] = kavgd[nenhere];
-		kpower[i] = kpower[nenhere];
+			if (frozen.quad[frozen.kx[i]][frozen.ky[i]] == IHS) break;
+		frozen.quad[frozen.kx[i]][frozen.ky[i]] = IHDOT;
+		frozen.kx[i] = frozen.kx[nenhere];
+		frozen.ky[i] = frozen.ky[nenhere];
+		frozen.kdist[i] = frozen.kdist[nenhere];
+		frozen.kavgd[i] = frozen.kavgd[nenhere];
+		frozen.kpower[i] = frozen.kpower[nenhere];
 		klhere--;
 		nenhere--;
 		if (condit!=IHDOCKED) newcnd();
@@ -350,7 +350,7 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 			/* destroy the planet */
 			state.plnets[i] = nulplanet;
 			state.newstuf[state.isx][state.isy] -= 1;
-			if (damage[DRADIO] == 0.0 || condit == IHDOCKED) {
+			if (frozen.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				if (*ipage==0) pause(1);
 				*ipage = 1;
 				prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
@@ -396,7 +396,7 @@ void scom(int *ipage) {
 		/* compute distances to starbases */
 		if (state.rembase <= 0) {
 			/* nothing left to do */
-			future[FSCMOVE] = 1e30;
+			frozen.future[FSCMOVE] = 1e30;
 			return;
 		}
 		sx = state.isx;
@@ -498,7 +498,7 @@ void scom(int *ipage) {
 	}
 	/* check for a base */
 	if (state.rembase == 0) {
-		future[FSCMOVE] = 1e30;
+		frozen.future[FSCMOVE] = 1e30;
 	}
 	else for (i=1; i<=state.rembase; i++) {
 		ibqx = state.baseqx[i];
@@ -508,9 +508,9 @@ void scom(int *ipage) {
 			if (flag) return; /* no, don't attack base! */
 			iseenit = 0;
 			isatb=1;
-			future[FSCDBAS] = state.date + 1.0 +2.0*Rand();
-			if (batx != 0) future[FSCDBAS] += future[FCDBAS]-state.date;
-			if (damage[DRADIO] > 0 && condit != IHDOCKED)
+			frozen.future[FSCDBAS] = state.date + 1.0 +2.0*Rand();
+			if (batx != 0) frozen.future[FSCDBAS] += frozen.future[FCDBAS]-state.date;
+			if (frozen.damage[DRADIO] > 0 && condit != IHDOCKED)
 				return; /* no warning */
 			iseenit = 1;
 			if (*ipage == 0)  pause(1);
@@ -520,7 +520,7 @@ void scom(int *ipage) {
 			skip(1);
 			prout("   reports that it is under attack from the Klingon Super-commander.");
 			proutn("   It can survive until stardate ");
-			cramf(future[FSCDBAS], 0, 1);
+			cramf(frozen.future[FSCDBAS], 0, 1);
 			prout(" .\"");
 			if (resting==0) return;
 			prout("Mr. Spock-  \"Captain, shall we cancel the rest period?\"");
@@ -536,8 +536,8 @@ void scom(int *ipage) {
 		idebug==0 &&
 #endif
 		(Rand() > 0.2 ||
-		 (damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
-		 starch[state.isx][state.isy] > 0))
+		 (frozen.damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
+		 frozen.starch[state.isx][state.isy] > 0))
 		return;
 	if (*ipage==0) pause(1);
 	*ipage = 1;

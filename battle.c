@@ -14,7 +14,7 @@ void doshield(int i) {
 				action = NRG;
 			else {
 				chew();
-				if (damage[DSHIELD]) {
+				if (frozen.damage[DSHIELD]) {
 					prout("Shields damaged and down.");
 					return;
 				}
@@ -30,7 +30,7 @@ void doshield(int i) {
 				proutn("Energy to transfer to shields- ");
 				action = NRG;
 			}
-			else if (damage[DSHIELD]) {
+			else if (frozen.damage[DSHIELD]) {
 				prout("Shields damaged and down.");
 				return;
 			}
@@ -158,9 +158,9 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	casual += icas;
 	for (l=1; l <= ndevice; l++) {
 		if (l == DDRAY) continue; // Don't damage deathray 
-		if (damage[l] < 0) continue;
+		if (frozen.damage[l] < 0) continue;
 		extradm = (10.0*type*Rand()+1.0)*damfac;
-		damage[l] += Time + extradm; /* Damage for at least time of travel! */
+		frozen.damage[l] += Time + extradm; /* Damage for at least time of travel! */
 	}
 	shldup = 0;
 	if (state.remkl) {
@@ -249,15 +249,15 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 			case IHK:
 				/* find the enemy */
 				for (ll=1; ll <= nenhere; ll++)
-					if (ix==kx[ll] && iy==ky[ll]) break;
-				kp = fabs(kpower[ll]);
+					if (ix==frozen.kx[ll] && iy==frozen.ky[ll]) break;
+				kp = fabs(frozen.kpower[ll]);
 				h1 = 700.0 + 100.0*Rand() -
 					 1000.0*sqrt(square(ix-inx)+square(iy-iny))*
 					 fabs(sin(bullseye-angle));
 				h1 = fabs(h1);
 				if (kp < h1) h1 = kp;
-				kpower[ll] -= (kpower[ll]<0 ? -h1 : h1);
-				if (kpower[ll] == 0) {
+				frozen.kpower[ll] -= (frozen.kpower[ll]<0 ? -h1 : h1);
+				if (frozen.kpower[ll] == 0) {
 					deadkl(ix, iy, iquad, ix, iy);
 					return;
 				}
@@ -285,13 +285,13 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					return;
 				}
 				prout(" damaged--");
-				kx[ll] = jx;
-				ky[ll] = jy;
+				frozen.kx[ll] = jx;
+				frozen.ky[ll] = jy;
 				shoved = 1;
 				break;
 			case IHB: /* Hit a base */
 				prout("***STARBASE DESTROYED..");
-				if (starch[quadx][quady] < 0) starch[quadx][quady] = 0;
+				if (frozen.starch[quadx][quady] < 0) frozen.starch[quadx][quady] = 0;
 				for (ll=1; ll<=state.rembase; ll++) {
 					if (state.baseqx[ll]==quadx && state.baseqy[ll]==quady) {
 						state.baseqx[ll]=state.baseqx[state.rembase];
@@ -391,7 +391,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		cramlc(2, jx, jy);
 		skip(1);
 		for (ll=1; ll<=nenhere; ll++)
-			kdist[ll] = kavgd[ll] = sqrt(square(sectx-kx[ll])+square(secty-ky[ll]));
+			frozen.kdist[ll] = frozen.kavgd[ll] = sqrt(square(sectx-frozen.kx[ll])+square(secty-frozen.ky[ll]));
 		sortkl();
 		return;
 	}
@@ -414,11 +414,11 @@ static void fry(double hit) {
 		do {
 			j = ndevice*Rand()+1.0;
 			/* Cheat to prevent shuttle damage unless on ship */
-		} while (damage[j] < 0.0 || (j == DSHUTTL && iscraft != 1) ||
+		} while (frozen.damage[j] < 0.0 || (j == DSHUTTL && iscraft != 1) ||
 				 j == DDRAY);
 		cdam[l] = j;
 		extradm = (hit*damfac)/(ncrit*(75.0+25.0*Rand()));
-		damage[j] += extradm;
+		frozen.damage[j] += extradm;
 		if (l > 1) {
 			for (ll=2; ll<=l && j != cdam[ll-1]; ll++) ;
 			if (ll<=l) continue;
@@ -429,7 +429,7 @@ static void fry(double hit) {
 		proutn(device[j]);
 	}
 	prout(" damaged.");
-	if (damage[DSHIELD] && shldup) {
+	if (frozen.damage[DSHIELD] && shldup) {
 		prout("***Shields knocked down.");
 		shldup=0;
 	}
@@ -461,14 +461,14 @@ void attack(int k) {
 	skip(1);
 	if (skill <= 2) i = 2;
 	for (l=1; l <= nenhere; l++) {
-		if (kpower[l] < 0) continue;	/* too weak to attack */
+		if (frozen.kpower[l] < 0) continue;	/* too weak to attack */
 		/* compute hit strength and diminsh shield power */
 		r = Rand();
 		/* Increase chance of photon torpedos if docked or enemy energy low */
 		if (condit == IHDOCKED) r *= 0.25;
-		if (kpower[l] < 500) r *= 0.25; 
-		jx = kx[l];
-		jy = ky[l];
+		if (frozen.kpower[l] < 500) r *= 0.25; 
+		jx = frozen.kx[l];
+		jy = frozen.ky[l];
 		iquad = frozen.quad[jx][jy];
 		itflag = (iquad == IHK && r > 0.0005) || k == 0 ||
 			(iquad==IHC && r > 0.015) ||
@@ -479,21 +479,21 @@ void attack(int k) {
 			if (condit == IHDOCKED) continue; /* Don't waste the effort! */
 			attempt = 1; /* Attempt to attack */
 			dustfac = 0.8+0.05*Rand();
-			hit = kpower[l]*pow(dustfac,kavgd[l]);
-			kpower[l] *= 0.75;
+			hit = frozen.kpower[l]*pow(dustfac,frozen.kavgd[l]);
+			frozen.kpower[l] *= 0.75;
 		}
 		else { /* Enemy used photon torpedo */
 			double course = 1.90985*atan2((double)secty-jy, (double)jx-sectx);
 			hit = 0;
 			proutn("***TORPEDO INCOMING");
-			if (damage[DSRSENS] <= 0.0) {
+			if (frozen.damage[DSRSENS] <= 0.0) {
 				proutn(" From ");
 				crmena(0, iquad, i, jx, jy);
 			}
 			attempt = 1;
 			prout("--");
 			r = (Rand()+Rand())*0.5 -0.5;
-			r += 0.002*kpower[l]*r;
+			r += 0.002*frozen.kpower[l]*r;
 			torpedo(course, r, jx, jy, &hit);
 			if (state.remkl==0) finish(FWON); /* Klingons did themselves in! */
 			if (state.galaxy[quadx][quady] == 1000 ||
@@ -519,11 +519,11 @@ void attack(int k) {
 		ihurt = 1;
 		cramf(hit, 0, 2);
 		proutn(" unit hit");
-		if ((damage[DSRSENS] > 0 && itflag) || skill <= 2) {
+		if ((frozen.damage[DSRSENS] > 0 && itflag) || skill <= 2) {
 			proutn(" on the ");
 			crmshp();
 		}
-		if (damage[DSRSENS] <= 0.0 && itflag) {
+		if (frozen.damage[DSRSENS] <= 0.0 && itflag) {
 			proutn(" from ");
 			crmena(0, iquad, i, jx, jy);
 		}
@@ -555,7 +555,7 @@ void attack(int k) {
 		cramf(energy, 0, 2);
 		proutn("    shields ");
 		if (shldup) proutn("up, ");
-		else if (damage[DSHIELD] == 0) proutn("down, ");
+		else if (frozen.damage[DSHIELD] == 0) proutn("down, ");
 		else proutn("damaged, ");
 	}
 	crami(percent, 1);
@@ -576,7 +576,7 @@ void attack(int k) {
 	}
 	/* After attack, reset average distance to enemies */
 	for (l = 1; l <= nenhere; l++)
-		kavgd[l] = kdist[l];
+		frozen.kavgd[l] = frozen.kdist[l];
 	sortkl();
 	return;
 }
@@ -614,9 +614,9 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 				state.cx[state.remcom] = 0;
 				state.cy[state.remcom] = 0;
 				state.remcom--;
-				future[FTBEAM] = 1e30;
+				frozen.future[FTBEAM] = 1e30;
 				if (state.remcom != 0)
-					future[FTBEAM] = state.date + expran(1.0*incom/state.remcom);
+					frozen.future[FTBEAM] = state.date + expran(1.0*incom/state.remcom);
 				state.killc++;
 				break;
 			case IHK:
@@ -625,13 +625,13 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 			case IHS:
 				state.nscrem = ishere = state.isx = state.isy = isatb = iscate = 0;
 				state.nsckill = 1;
-				future[FSCMOVE] = future[FSCDBAS] = 1e30;
+				frozen.future[FSCMOVE] = frozen.future[FSCDBAS] = 1e30;
 				break;
 		}
 	}
 
 	/* For each kind of enemy, finish message to player */
-	prout(" destroyestate.");
+	prout(" destroyed.");
 	frozen.quad[ix][iy] = IHDOT;
 	if (state.remkl==0) return;
 
@@ -642,21 +642,21 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 	/* Remove enemy ship from arrays describing local conditions */
 
 	for (i=1; i<=nenhere; i++)
-		if (kx[i]==ix && ky[i]==iy) break;
+		if (frozen.kx[i]==ix && frozen.ky[i]==iy) break;
 	nenhere--;
 	if (i <= nenhere)  {
 		for (j=i; j<=nenhere; j++) {
-			kx[j] = kx[j+1];
-			ky[j] = ky[j+1];
-			kpower[j] = kpower[j+1];
-			kavgd[j] = kdist[j] = kdist[j+1];
+			frozen.kx[j] = frozen.kx[j+1];
+			frozen.ky[j] = frozen.ky[j+1];
+			frozen.kpower[j] = frozen.kpower[j+1];
+			frozen.kavgd[j] = frozen.kdist[j] = frozen.kdist[j+1];
 		}
 	}
-	kx[nenhere+1] = 0;
-	ky[nenhere+1] = 0;
-	kdist[nenhere+1] = 0;
-	kavgd[nenhere+1] = 0;
-	kpower[nenhere+1] = 0;
+	frozen.kx[nenhere+1] = 0;
+	frozen.ky[nenhere+1] = 0;
+	frozen.kdist[nenhere+1] = 0;
+	frozen.kavgd[nenhere+1] = 0;
+	frozen.kpower[nenhere+1] = 0;
 	return;
 }
 
@@ -688,7 +688,7 @@ void photon(void) {
 
 	ididit = 0;
 
-	if (damage[DPHOTON]) {
+	if (frozen.damage[DPHOTON]) {
 		prout("Photon tubes damaged.");
 		chew();
 		return;
@@ -798,7 +798,7 @@ void photon(void) {
 			osuabor=1;
 			if (Rand() <= 0.2) {
 				prout("***Photon tubes damaged by misfire.");
-				damage[DPHOTON] = damfac*(1.0+2.0*Rand());
+				frozen.damage[DPHOTON] = damfac*(1.0+2.0*Rand());
 				break;
 			}
 		}
@@ -826,7 +826,7 @@ static void overheat(double rpow) {
 		double chekbrn = (rpow-1500.)*0.00038;
 		if (Rand() <= chekbrn) {
 			prout("Weapons officer Sulu-  \"Phasers overheated, sir.\"");
-			damage[DPHASER] = damfac*(1.0 + Rand()) * (1.0+chekbrn);
+			frozen.damage[DPHASER] = damfac*(1.0 + Rand()) * (1.0+chekbrn);
 		}
 	}
 }
@@ -884,19 +884,19 @@ void phasers(void) {
 
 	skip(1);
 	/* SR sensors and Computer */
-	if (damage[DSRSENS]+damage[DCOMPTR] > 0) ipoop = 0;
+	if (frozen.damage[DSRSENS]+frozen.damage[DCOMPTR] > 0) ipoop = 0;
 	if (condit == IHDOCKED) {
 		prout("Phasers can't be fired through base shields.");
 		chew();
 		return;
 	}
-	if (damage[DPHASER] != 0) {
+	if (frozen.damage[DPHASER] != 0) {
 		prout("Phaser control damaged.");
 		chew();
 		return;
 	}
 	if (shldup) {
-		if (damage[DSHCTRL]) {
+		if (frozen.damage[DSHCTRL]) {
 			prout("High speed shield control damaged.");
 			chew();
 			return;
@@ -1017,7 +1017,7 @@ void phasers(void) {
 				for (i = 1; i <= nenhere; i++) {
 					hits[i] = 0.0;
 					if (powrem <= 0) continue;
-					hits[i] = fabs(kpower[i])/(phasefac*pow(0.90,kdist[i]));
+					hits[i] = fabs(frozen.kpower[i])/(phasefac*pow(0.90,frozen.kdist[i]));
 					over = (0.01 + 0.05*Rand())*hits[i];
 					temp = powrem;
 					powrem -= hits[i] + over;
@@ -1044,7 +1044,7 @@ void phasers(void) {
 		case FORCEMAN:
 			chew();
 			key = IHEOL;
-			if (damage[DCOMPTR]!=0)
+			if (frozen.damage[DCOMPTR]!=0)
 				prout("Battle comuter damaged, manual file only.");
 			else {
 				skip(1);
@@ -1058,7 +1058,7 @@ void phasers(void) {
 		case MANUAL:
 			rpow = 0.0;
 			for (k = 1; k <= nenhere;) {
-				int ii = kx[k], jj = ky[k];
+				int ii = frozen.kx[k], jj = frozen.ky[k];
 				int ienm = frozen.quad[ii][jj];
 				if (msgflag) {
 					proutn("Energy available= ");
@@ -1067,7 +1067,7 @@ void phasers(void) {
 					msgflag = 0;
 					rpow = 0.0;
 				}
-				if (damage[DSRSENS] && !(abs(sectx-ii) < 2 && abs(secty-jj) < 2) &&
+				if (frozen.damage[DSRSENS] && !(abs(sectx-ii) < 2 && abs(secty-jj) < 2) &&
 					(ienm == IHC || ienm == IHS)) {
 					cramen(ienm);
 					prout(" can't be located without short range scan.");
@@ -1080,7 +1080,7 @@ void phasers(void) {
 				if (key == IHEOL) {
 					chew();
 					if (ipoop && k > kz) {
-						int irec=(fabs(kpower[k])/(phasefac*pow(0.9,kdist[k])))*
+						int irec=(fabs(frozen.kpower[k])/(phasefac*pow(0.9,frozen.kdist[k])))*
 								 (1.01+0.05*Rand()) + 1.0;
 						kz = k;
 						proutn("(");
@@ -1176,14 +1176,14 @@ void hittem(double *hits) {
 	for (; k <= nenhr2; k++, kk++) {
 		if ((wham = hits[k])==0) continue;
 		dustfac = 0.9 + 0.01*Rand();
-		hit = wham*pow(dustfac,kdist[kk]);
-		kpini = kpower[kk];
+		hit = wham*pow(dustfac,frozen.kdist[kk]);
+		kpini = frozen.kpower[kk];
 		kp = fabs(kpini);
 		if (phasefac*hit < kp) kp = phasefac*hit;
-		kpower[kk] -= (kpower[kk] < 0 ? -kp: kp);
-		kpow = kpower[kk];
-		ii = kx[kk];
-		jj = ky[kk];
+		frozen.kpower[kk] -= (frozen.kpower[kk] < 0 ? -kp: kp);
+		kpow = frozen.kpower[kk];
+		ii = frozen.kx[kk];
+		jj = frozen.ky[kk];
 		if (hit > 0.005) {
 			cramf(hit, 0, 2);
 			proutn(" unit hit on ");
@@ -1206,7 +1206,7 @@ void hittem(double *hits) {
 				cramlc(2,ii,jj);
 				skip(1);
 				prout("   has just lost its firepower.\"");
-				kpower[kk] = -kpow;
+				frozen.kpower[kk] = -kpow;
 			}
 	}
 	return;

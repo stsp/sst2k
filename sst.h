@@ -55,8 +55,18 @@ EXTERN struct foo {
 // but I just didn't think of it back when I started.
 
 EXTERN struct foo2 {
-        char quad[11][11];	// contents of our quadrant
-	int inkling,
+    char quad[11][11];		// contents of our quadrant
+    double kpower[21];		// enemy energy levels
+    double kdist[21];		// enemy distances
+    double kavgd[21];		// average distances
+    double damage[ndevice+1];	// damage encountered
+    double future[NEVENTS+1];	// future events
+    char passwd[10];		// Self Destruct password
+    int kx[21];			// enemy sector locations
+    int ky[21];
+    int starch[9][9];		// star chart
+    /* members with macro definitions start here */
+    int inkling,
 	inbase,
 	incom,
 	instar,
@@ -233,26 +243,10 @@ EXTERN struct foo2 {
 #define isarmed frozen.isarmed		// Probe is armed
 #define nprobes frozen.nprobes		// number of probes available
 
-EXTERN int
-		kx[21],			// enemy sector locations
-		ky[21],
-		starch[9][9];	// star chart
-
+/* the following global state doesn't need to be saved */
 EXTERN int fromcommandline; // Game start from command line options
-
-
-EXTERN char	passwd[10],		// Self Destruct password
-		*device[ndevice+1];
-
+EXTERN char	*device[ndevice+1];
 EXTERN PLANETS nulplanet;	// zeroed planet structure
-
-EXTERN double
-		kpower[21],		// enemy energy levels
-		kdist[21],		// enemy distances
-		kavgd[21],		// average distances
-		damage[ndevice+1],		// damage encountered
-		future[NEVENTS+1];		// future events
-
 EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
 

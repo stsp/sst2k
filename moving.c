@@ -24,11 +24,11 @@ void move(void) {
 	deltax /= bigger;
 
 	/* If tractor beam is to occur, don't move full distance */
-	if (state.date+Time >= future[FTBEAM]) {
+	if (state.date+Time >= frozen.future[FTBEAM]) {
 		trbeam = 1;
 		condit = IHRED;
-		dist = dist*(future[FTBEAM]-state.date)/Time + 0.1;
-		Time = future[FTBEAM] - state.date + 1e-5;
+		dist = dist*(frozen.future[FTBEAM]-state.date)/Time + 0.1;
+		Time = frozen.future[FTBEAM] - state.date + 1e-5;
 	}
 	/* Move within the quadrant */
 	frozen.quad[sectx][secty] = IHDOT;
@@ -46,9 +46,9 @@ void move(void) {
 				if (nenhere != 0 && iattak != 2) {
 					newcnd();
 					for (l = 1; l <= nenhere; l++) {
-						finald = sqrt((ix-kx[l])*(double)(ix-kx[l]) +
-									  (iy-ky[l])*(double)(iy-ky[l]));
-						kavgd[l] = 0.5 * (finald+kdist[l]);
+						finald = sqrt((ix-frozen.kx[l])*(double)(ix-frozen.kx[l]) +
+									  (iy-frozen.ky[l])*(double)(iy-frozen.ky[l]));
+						frozen.kavgd[l] = 0.5 * (finald+frozen.kdist[l]);
 					}
 					if (state.galaxy[quadx][quady] != 1000) attack(0);
 					if (alldone) return;
@@ -173,15 +173,15 @@ label100:
 	frozen.quad[sectx][secty] = ship;
 	if (nenhere) {
 		for (l = 1; l <= nenhere; l++) {
-			finald = sqrt((ix-kx[l])*(double)(ix-kx[l]) +
-						  (iy-ky[l])*(double)(iy-ky[l]));
-			kavgd[l] = 0.5 * (finald+kdist[l]);
-			kdist[l] = finald;
+			finald = sqrt((ix-frozen.kx[l])*(double)(ix-frozen.kx[l]) +
+						  (iy-frozen.ky[l])*(double)(iy-frozen.ky[l]));
+			frozen.kavgd[l] = 0.5 * (finald+frozen.kdist[l]);
+			frozen.kdist[l] = finald;
 		}
 		sortkl();
 		if (state.galaxy[quadx][quady] != 1000 && iattak == 0)
 			attack(0);
-		for (l = 1 ; l <= nenhere; l++) kavgd[l] = kdist[l];
+		for (l = 1 ; l <= nenhere; l++) frozen.kavgd[l] = frozen.kdist[l];
 	}
 	newcnd();
 	iattak = 0;
@@ -210,7 +210,7 @@ void dock(void) {
 	torps = intorps;
 	lsupres = inlsr;
 	if (stdamtim != 1e30 &&
-		(future[FCDBAS] < 1e30 || isatb == 1) && iseenit == 0) {
+		(frozen.future[FCDBAS] < 1e30 || isatb == 1) && iseenit == 0) {
 		/* get attack report from base */
 		prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
 		attakreport();
@@ -247,7 +247,7 @@ static void getcd(int isprobe, int akey) {
 		return;
 	}
 	while (automatic == -1) {
-		if (damage[DCOMPTR]) {
+		if (frozen.damage[DCOMPTR]) {
 			if (isprobe)
 				prout("Computer damaged; manual navigation only");
 			else
@@ -410,7 +410,7 @@ void impuls(void) {
 	double power;
 
 	ididit = 0;
-	if (damage[DIMPULS]) {
+	if (frozen.damage[DIMPULS]) {
 		chew();
 		skip(1);
 		prout("Engineer Scott- \"The impulse engines are damaged, Sir.\"");
@@ -467,13 +467,13 @@ void warp(int i) {
 
 	if (i!=2) { /* Not WARPX entry */
 		ididit = 0;
-		if (damage[DWARPEN] > 10.0) {
+		if (frozen.damage[DWARPEN] > 10.0) {
 			chew();
 			skip(1);
 			prout("Engineer Scott- \"The impulse engines are damaged, Sir.\"");
 			return;
 		}
-		if (damage[DWARPEN] > 0.0 && warpfac > 4.0) {
+		if (frozen.damage[DWARPEN] > 0.0 && warpfac > 4.0) {
 			chew();
 			skip(1);
 			prout("Engineer Scott- \"Sorry, Captain. Until this damage");
@@ -584,7 +584,7 @@ void warp(int i) {
 	Time = 10.0*dist/wfacsq;
 	if (twarp) timwrp();
 	if (blooey) {
-		damage[DWARPEN] = damfac*(3.0*Rand()+1.0);
+		frozen.damage[DWARPEN] = damfac*(3.0*Rand()+1.0);
 		skip(1);
 		prout("Engineering to bridge--");
 		prout("  Scott here.  The warp engines are damaged.");
@@ -609,11 +609,11 @@ void setwrp(void) {
 		huh();
 		return;
 	}
-	if (damage[DWARPEN] > 10.0) {
+	if (frozen.damage[DWARPEN] > 10.0) {
 		prout("Warp engines inoperative.");
 		return;
 	}
-	if (damage[DWARPEN] > 0.0 && aaitem > 4.0) {
+	if (frozen.damage[DWARPEN] > 0.0 && aaitem > 4.0) {
 		prout("Engineer Scott- \"I'm doing my best, Captain,\n"
 			  "  but right now we can only go warp 4.\"");
 		return;
@@ -653,7 +653,7 @@ void atover(int igrab) {
 	chew();
 	/* is captain on planet? */
 	if (landed==1) {
-		if (damage[DTRANSP]) {
+		if (frozen.damage[DTRANSP]) {
 			finish(FPNOVA);
 			return;
 		}
@@ -703,10 +703,10 @@ void atover(int igrab) {
 		crmshp();
 		skip(1);
 		prout("safely out of quadrant.");
-		starch[quadx][quady] = damage[DRADIO] > 0.0 ? state.galaxy[quadx][quady]+1000:1;
+		frozen.starch[quadx][quady] = frozen.damage[DRADIO] > 0.0 ? state.galaxy[quadx][quady]+1000:1;
 
 		/* Try to use warp engines */
-		if (damage[DWARPEN]) {
+		if (frozen.damage[DWARPEN]) {
 			skip(1);
 			prout("Warp engines damaged.");
 			finish(FSNOVAED);
@@ -750,15 +750,15 @@ void timwrp() {
 		state = snapsht;
 		state.snap = 0;
 		if (state.remcom) {
-			future[FTBEAM] = state.date + expran(intime/state.remcom);
-			future[FBATTAK] = state.date + expran(0.3*intime);
+			frozen.future[FTBEAM] = state.date + expran(intime/state.remcom);
+			frozen.future[FBATTAK] = state.date + expran(0.3*intime);
 		}
-		future[FSNOVA] = state.date + expran(0.5*intime);
-		future[FSNAP] = state.date +expran(0.25*state.remtime); /* next snapshot will
+		frozen.future[FSNOVA] = state.date + expran(0.5*intime);
+		frozen.future[FSNAP] = state.date +expran(0.25*state.remtime); /* next snapshot will
 													   be sooner */
-		if (state.nscrem) future[FSCMOVE] = 0.2777;
+		if (state.nscrem) frozen.future[FSCMOVE] = 0.2777;
 		isatb = 0;
-		future[FCDBAS] = future[FSCDBAS] = 1e30;
+		frozen.future[FCDBAS] = frozen.future[FSCDBAS] = 1e30;
 		batx = baty = 0;
 
 		/* Make sure Galileo is consistant -- Snapshot may have been taken
@@ -775,19 +775,19 @@ void timwrp() {
 		}
 		/* Likewise, if in the original time the Galileo was abandoned, but
 		   was on ship earlier, it would have vanished -- lets restore it */
-		if (iscraft==0 && gotit==0 && damage[DSHUTTL] >= 0.0) {
+		if (iscraft==0 && gotit==0 && frozen.damage[DSHUTTL] >= 0.0) {
 			prout("Checkov-  \"Security reports the Galileo has reappeared in the dock!\"");
 			iscraft = 1;
 		}
 
 		/* Revert star chart to earlier era, if it was known then*/
-		if (damage[DRADIO]==0.0 || stdamtim > state.date) {
+		if (frozen.damage[DRADIO]==0.0 || stdamtim > state.date) {
 			for (l = 1; l <= 8; l++)
 				for (ll = 1; ll <= 8; ll++)
-					if (starch[l][ll] > 1)
-						starch[l][ll]=damage[DRADIO]>0.0 ? state.galaxy[l][ll]+1000 :1;
+					if (frozen.starch[l][ll] > 1)
+						frozen.starch[l][ll]=frozen.damage[DRADIO]>0.0 ? state.galaxy[l][ll]+1000 :1;
 			prout("Spock has reconstructed a correct star chart from memory");
-			if (damage[DRADIO] > 0.0) stdamtim = state.date;
+			if (frozen.damage[DRADIO] > 0.0) stdamtim = state.date;
 		}
 	}
 	else {
@@ -797,8 +797,8 @@ void timwrp() {
 		cramf(Time, 1, 2);
 		prout(" stardates.");
 		/* cheat to make sure no tractor beams occur during time warp */
-		future[FTBEAM] += Time;
-		damage[DRADIO] += Time;
+		frozen.future[FTBEAM] += Time;
+		frozen.damage[DRADIO] += Time;
 	}
 	newqad(0);
 }
@@ -816,16 +816,16 @@ void probe(void) {
 			prout("Ye Faerie Queene has no deep space probes.");
 		return;
 	}
-	if (damage[DDSP] != 0.0) {
+	if (frozen.damage[DDSP] != 0.0) {
 		chew();
 		skip(1);
 		prout("Engineer Scott- \"The probe launcher is damaged, Sir.\"");
 		return;
 	}
-	if (future[FDSPROB] != 1e30) {
+	if (frozen.future[FDSPROB] != 1e30) {
 		chew();
 		skip(1);
-		if (damage[DRADIO] != 0 && condit != IHDOCKED) {
+		if (frozen.damage[DRADIO] != 0 && condit != IHDOCKED) {
 			prout("Spock-  \"Records show the previous probe has not yet");
 			prout("   reached its destination.\"");
 		}
@@ -870,7 +870,7 @@ void probe(void) {
 	probey = quady*10 + secty - 1;
 	probecx = quadx;
 	probecy = quady;
-	future[FDSPROB] = state.date + 0.01; // Time to move one sector
+	frozen.future[FDSPROB] = state.date + 0.01; // Time to move one sector
 	prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
 	return;
 }
@@ -886,7 +886,7 @@ void help(void) {
 		prout("Lt. Uhura-  \"But Captain, we're already docked.\"");
 		return;
 	}
-	if (damage[DRADIO] != 0) {
+	if (frozen.damage[DRADIO] != 0) {
 		prout("Subspace radio damaged.");
 		return;
 	}

@@ -38,16 +38,7 @@ void freeze(int boss) {
 	}
 	fwrite(&state, sizeof(state), 1, fp);
 	fwrite(&snapsht, sizeof(snapsht), 1, fp);
-	fwrite(kx, sizeof(kx), 1, fp);
-	fwrite(ky, sizeof(ky), 1, fp);
-	fwrite(starch, sizeof(starch), 1, fp);
-	fwrite(kpower, sizeof(kpower), 1, fp);
-	fwrite(kdist, sizeof(kdist), 1, fp);
-	fwrite(kavgd, sizeof(kavgd), 1, fp);
-	fwrite(damage, sizeof(damage), 1, fp);
-	fwrite(future, sizeof(future), 1, fp);
 	fwrite(&frozen, sizeof(frozen), 1, fp);
-	fwrite(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);
 
@@ -60,7 +51,7 @@ void thaw(void) {
 	FILE *fp;
 	int key;
 
-	passwd[0] = '\0';
+	frozen.passwd[0] = '\0';
 	if ((key = scan()) == IHEOL) {
 		proutn("File name: ");
 		key = scan();
@@ -81,16 +72,7 @@ void thaw(void) {
 	}
 	fread(&state, sizeof(state), 1, fp);
 	fread(&snapsht, sizeof(snapsht), 1, fp);
-	fread(kx, sizeof(kx), 1, fp);
-	fread(ky, sizeof(ky), 1, fp);
-	fread(starch, sizeof(starch), 1, fp);
-	fread(kpower, sizeof(kpower), 1, fp);
-	fread(kdist, sizeof(kdist), 1, fp);
-	fread(kavgd, sizeof(kavgd), 1, fp);
-	fread(damage, sizeof(damage), 1, fp);
-	fread(future, sizeof(future), 1, fp);
 	fread(&frozen, sizeof(frozen), 1, fp);
-	fread(passwd, sizeof(passwd), 1, fp);
 
 	fclose(fp);
 
@@ -109,15 +91,15 @@ void abandn(void) {
 	}
 	else {
 		/* Must take shuttle craft to exit */
-		if (damage[DSHUTTL]==-1) {
+		if (frozen.damage[DSHUTTL]==-1) {
 			prout("Ye Faerie Queene has no shuttle craft.");
 			return;
 		}
-		if (damage[DSHUTTL]<0) {
+		if (frozen.damage[DSHUTTL]<0) {
 			prout("Shuttle craft now serving Big Mac's.");
 			return;
 		}
-		if (damage[DSHUTTL]>0) {
+		if (frozen.damage[DSHUTTL]>0) {
 			prout("Shuttle craft damaged.");
 			return;
 		}
@@ -183,8 +165,8 @@ void abandn(void) {
 	iscraft=0; /* Gallileo disappears */
 	/* Resupply ship */
 	condit=IHDOCKED;
-	for (l = 1; l <= ndevice; l++) damage[l] = 0.0;
-	damage[DSHUTTL] = -1;
+	for (l = 1; l <= ndevice; l++) frozen.damage[l] = 0.0;
+	frozen.damage[DSHUTTL] = -1;
 	energy = inenrg = 3000.0;
 	shield = inshld = 1250.0;
 	torps = intorps = 6;
@@ -217,7 +199,7 @@ void setup(void) {
 	nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
 	warpfac = 5.0;
 	wfacsq = warpfac * warpfac;
-	for (i=0; i <= ndevice; i++) damage[i] = 0.0;
+	for (i=0; i <= ndevice; i++) frozen.damage[i] = 0.0;
 	// Set up assorted game parameters
 	batx = baty = 0;
 	state.date = indate = 100.0*(int)(31.0*Rand()+20.0);
@@ -228,16 +210,16 @@ void setup(void) {
 	alive = 1;
 	docfac = 0.25;
 	for (i = 1; i <= 8; i++)
-		for (j = 1; j <= 8; j++) state.newstuf[i][j] = starch[i][j] = 0;
+		for (j = 1; j <= 8; j++) state.newstuf[i][j] = frozen.starch[i][j] = 0;
 	// Initialize times for extraneous events
-	future[FSNOVA] = state.date + expran(0.5 * intime);
-	future[FTBEAM] = state.date + expran(1.5 * (intime / state.remcom));
-	future[FSNAP] = state.date + 1.0 + Rand(); // Force an early snapshot
-	future[FBATTAK] = state.date + expran(0.3*intime);
-	future[FCDBAS] = 1e30;
-	future[FSCMOVE] = state.nscrem ? state.date+0.2777 : 1e30;
-	future[FSCDBAS] = 1e30;
-	future[FDSPROB] = 1e30;
+	frozen.future[FSNOVA] = state.date + expran(0.5 * intime);
+	frozen.future[FTBEAM] = state.date + expran(1.5 * (intime / state.remcom));
+	frozen.future[FSNAP] = state.date + 1.0 + Rand(); // Force an early snapshot
+	frozen.future[FBATTAK] = state.date + expran(0.3*intime);
+	frozen.future[FCDBAS] = 1e30;
+	frozen.future[FSCMOVE] = state.nscrem ? state.date+0.2777 : 1e30;
+	frozen.future[FSCDBAS] = 1e30;
+	frozen.future[FDSPROB] = 1e30;
 	// Starchart is functional
 	stdamtim = 1e30;
 	// Put stars in the galaxy
@@ -275,7 +257,7 @@ void setup(void) {
 			
 		state.baseqx[i] = ix;
 		state.baseqy[i] = iy;
-		starch[ix][iy] = -1;
+		frozen.starch[ix][iy] = -1;
 		state.galaxy[ix][iy] += 10;
 	}
 	// Position ordinary Klingon Battle Cruisers
@@ -421,7 +403,7 @@ int choose(void) {
 		if (isit("frozen")) {
 			thaw();
 			chew();
-			if (*passwd==0) continue;
+			if (*frozen.passwd==0) continue;
 			randomize();
 			Rand(); Rand(); Rand(); Rand();
 			if (!alldone) thawed = 1; // No plaque if not finished
@@ -463,13 +445,13 @@ int choose(void) {
 	}
 	while (TRUE) {
 		scan();
-		strcpy(passwd, citem);
+		strcpy(frozen.passwd, citem);
 		chew();
-		if (*passwd != 0) break;
+		if (*frozen.passwd != 0) break;
 		proutn("Please type in a secret password-");
 	}
 #ifdef DEBUG
-	if (strcmp(passwd, "debug")==0) idebug = 1;
+	if (strcmp(frozen.passwd, "debug")==0) idebug = 1;
 #endif
 
 	// Use parameters to generate initial values of things
@@ -554,7 +536,7 @@ void newqad(int shutup) {
 		(skill == 3 && Rand() <= 0.05) ||
 		(skill > 3 && Rand() <= 0.08)
 #ifdef DEBUG
-		|| strcmp(passwd, "tholianx")==0
+		|| strcmp(frozen.passwd, "tholianx")==0
 #endif
 		) {
 		do {
@@ -575,10 +557,10 @@ void newqad(int shutup) {
 		quadnum -= 100*klhere;
 		for (i = 1; i <= klhere; i++) {
 			dropin(IHK, &ix, &iy);
-			kx[i] = ix;
-			ky[i] = iy;
-			kdist[i] = kavgd[i] = sqrt(square(sectx-ix) + square(secty-iy));
-			kpower[i] = Rand()*150.0 +300.0 +25.0*skill;
+			frozen.kx[i] = ix;
+			frozen.ky[i] = iy;
+			frozen.kdist[i] = frozen.kavgd[i] = sqrt(square(sectx-ix) + square(secty-iy));
+			frozen.kpower[i] = Rand()*150.0 +300.0 +25.0*skill;
 		}
 		// If we need a commander, promote a Klingon
 		for (i = 1; i <= state.remcom ; i++) 
@@ -586,14 +568,14 @@ void newqad(int shutup) {
 			
 		if (i <= state.remcom) {
 			frozen.quad[ix][iy] = IHC;
-			kpower[klhere] = 950.0+400.0*Rand()+50.0*skill;
+			frozen.kpower[klhere] = 950.0+400.0*Rand()+50.0*skill;
 			comhere = 1;
 		}
 
 		// If we need a super-commander, promote a Klingon
 		if (quadx == state.isx && quady == state.isy) {
-			frozen.quad[kx[1]][ky[1]] = IHS;
-			kpower[1] = 1175.0 + 400.0*Rand() + 125.0*skill;
+			frozen.quad[frozen.kx[1]][frozen.ky[1]] = IHS;
+			frozen.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*skill;
 			iscate = 1;
 			ishere = 1;
 		}
@@ -601,10 +583,10 @@ void newqad(int shutup) {
 	// Put in Romulans if needed
 	for (i = klhere+1; i <= nenhere; i++) {
 		dropin(IHR, &ix, &iy);
-		kx[i] = ix;
-		ky[i] = iy;
-		kdist[i] = kavgd[i] = sqrt(square(sectx-ix) + square(secty-iy));
-		kpower[i] = Rand()*400.0 + 450.0 + 50.0*skill;
+		frozen.kx[i] = ix;
+		frozen.ky[i] = iy;
+		frozen.kdist[i] = frozen.kavgd[i] = sqrt(square(sectx-ix) + square(secty-iy));
+		frozen.kpower[i] = Rand()*400.0 + 450.0 + 50.0*skill;
 	}
 	sortkl();
 	// If quadrant needs a starbase, put it in
@@ -630,7 +612,7 @@ void newqad(int shutup) {
 	// Check for RNZ
 	if (irhere > 0 && klhere == 0 && basex == 0) {
 		neutz = 1;
-		if (damage[DRADIO] <= 0.0) {
+		if (frozen.damage[DRADIO] <= 0.0) {
 			skip(1);
 			prout("LT. Uhura- \"Captain, an urgent message.");
 			prout("  I'll put it on audio.\"  CLICK");
@@ -645,7 +627,7 @@ void newqad(int shutup) {
 		if (thingx == quadx && thingy == quady) {
 			dropin(IHQUEST, &ix, &iy);
 			thingx = thingy = 0; // Transient
-			if (damage[DSRSENS] == 0.0) {
+			if (frozen.damage[DSRSENS] == 0.0) {
 				skip(1);
 				prout("MR. SPOCK- \"Captain, this is most unusual.");
 				prout("    Please examine your short-range scan.\"");
@@ -677,23 +659,23 @@ void sortkl(void) {
 	do {
 		sw = FALSE;
 		for (j = 1; j < nenhere; j++)
-			if (kdist[j] > kdist[j+1]) {
+			if (frozen.kdist[j] > frozen.kdist[j+1]) {
 				sw = TRUE;
-				t = kdist[j];
-				kdist[j] = kdist[j+1];
-				kdist[j+1] = t;
-				t = kavgd[j];
-				kavgd[j] = kavgd[j+1];
-				kavgd[j+1] = t;
-				k = kx[j];
-				kx[j] = kx[j+1];
-				kx[j+1] = k;
-				k = ky[j];
-				ky[j] = ky[j+1];
-				ky[j+1] = k;
-				t = kpower[j];
-				kpower[j] = kpower[j+1];
-				kpower[j+1] = t;
+				t = frozen.kdist[j];
+				frozen.kdist[j] = frozen.kdist[j+1];
+				frozen.kdist[j+1] = t;
+				t = frozen.kavgd[j];
+				frozen.kavgd[j] = frozen.kavgd[j+1];
+				frozen.kavgd[j+1] = t;
+				k = frozen.kx[j];
+				frozen.kx[j] = frozen.kx[j+1];
+				frozen.kx[j+1] = k;
+				k = frozen.ky[j];
+				frozen.ky[j] = frozen.ky[j+1];
+				frozen.ky[j+1] = k;
+				t = frozen.kpower[j];
+				frozen.kpower[j] = frozen.kpower[j+1];
+				frozen.kpower[j+1] = t;
 			}
 	} while (sw);
 }

@@ -64,7 +64,7 @@ void orbit(void) {
 		prout("Already in standard orbit.");
 		return;
 	}
-	if (damage[DWARPEN] != 0 && damage[DIMPULS] != 0) {
+	if (frozen.damage[DWARPEN] != 0 && frozen.damage[DIMPULS] != 0) {
 		prout("Both warp and impulse engines damaged.");
 		return;
 	}
@@ -87,7 +87,7 @@ void orbit(void) {
 void sensor(void) {
 	skip(1);
 	chew();
-	if (damage[DSRSENS] != 0.0) {
+	if (frozen.damage[DSRSENS] != 0.0) {
 		prout("Short range sensors damaged.");
 		return;
 	}
@@ -116,9 +116,9 @@ void sensor(void) {
 void beam(void) {
 	chew();
 	skip(1);
-	if (damage[DTRANSP] != 0) {
+	if (frozen.damage[DTRANSP] != 0) {
 		prout("Transporter damaged.");
-		if (damage[DSHUTTL]==0 && (state.plnets[iplnet].known==2 || iscraft == 1)) {
+		if (frozen.damage[DSHUTTL]==0 && (state.plnets[iplnet].known==2 || iscraft == 1)) {
 			skip(1);
 			prout("Spock-  \"May I suggest the shuttle craft, Sir?\" ");
 			if (ja() != 0) shuttle();
@@ -285,14 +285,14 @@ void shuttle(void) {
 	chew();
 	skip(1);
 	ididit = 0;
-	if(damage[DSHUTTL] != 0.0) {
-		if (damage[DSHUTTL] == -1.0) {
+	if(frozen.damage[DSHUTTL] != 0.0) {
+		if (frozen.damage[DSHUTTL] == -1.0) {
 			if (inorbit && state.plnets[iplnet].known == 2)
 				prout("Ye Faerie Queene has no shuttle craft bay to dock it at.");
 			else
 				prout("Ye Faerie Queene had no shuttle craft.");
 		}
-		else if (damage[DSHUTTL] > 0)
+		else if (frozen.damage[DSHUTTL] > 0)
 			prout("The Galileo is damaged.");
 		else prout("Shuttle craft is now serving Big Macs.");
 		return;
@@ -337,7 +337,7 @@ void shuttle(void) {
 		/* Kirk on planet */
 		if (iscraft==1) {
 			/* Galileo on ship! */
-			if (damage[DTRANSP]==0) {
+			if (frozen.damage[DTRANSP]==0) {
 				proutn("Spock-  \"Would you rather use the transporter?\" ");
 				if (ja() != 0) {
 					beam();
@@ -411,7 +411,7 @@ void deathray(void) {
 		prout("Sulu-  \"But Sir, there are no enemies in this quadrant.\"");
 		return;
 	}
-	if (damage[DDRAY] > 0.0) {
+	if (frozen.damage[DDRAY] > 0.0) {
 		prout("Death Ray is damaged.");
 		return;
 	}
@@ -437,7 +437,7 @@ void deathray(void) {
 		prouts("Sulu- \"Captain!  It's working!\"");
 		skip(2);
 		while (nenhere > 0)
-			deadkl(kx[1],ky[1],frozen.quad[kx[1]][ky[1]],kx[1],ky[1]);
+			deadkl(frozen.kx[1],frozen.ky[1],frozen.quad[frozen.kx[1]][frozen.ky[1]],frozen.kx[1],frozen.ky[1]);
 		prout("Ensign Chekov-  \"Congratulations, Captain!\"");
 		if (state.remkl == 0) finish(FWON);
 		prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
@@ -446,7 +446,7 @@ void deathray(void) {
 		}
 		else {
 			prout("   has been rendered disfunctional.\"");
-			damage[DDRAY] = 39.95;
+			frozen.damage[DDRAY] = 39.95;
 		}
 		return;
 	}
