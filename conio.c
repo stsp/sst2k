@@ -133,10 +133,13 @@ void clreol (void)
 }
 
 void clrscr (void)
+/* clear screen -- can be a no-op in tty mode */
 {
+#ifdef SERGEEV
    wclear(conio_scr);
    wmove(conio_scr,0,0);
    wrefresh(conio_scr);
+#endif /* SERGEEV */
 }
 
 int cprintf (char *format, ... )
@@ -147,8 +150,13 @@ int cprintf (char *format, ... )
    va_start(argp,format);
    vsprintf(buffer,format,argp);
    va_end(argp);
+
+#ifdef SERGEEV
    i=waddstr(conio_scr,buffer);
    wrefresh(conio_scr);
+#else
+   i=printf(buffer);
+#endif /* SERGEEV */
    return(i);
 }
 

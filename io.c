@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <time.h>
 
 #include "conio.h"
 #include "sstlinux.h"

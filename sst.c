@@ -199,15 +199,11 @@ static void helpme(void) {
 	key = scan();
 	while (TRUE) {
 		if (key == IHEOL) {
-#ifdef SERGEEV
                         setwnd(BOTTOM_WINDOW);
-#endif /* SERGEEV */
                         proutn("Help on what command? ");
 			key = scan();
 		}
-#ifdef SERGEEV
                 setwnd(LOWER_WINDOW);
-#endif /* SERGEEV */
 		if (key == IHEOL) return;
 		for (i = 0; i < NUMCOMMANDS; i++) {
 		    if (strcasecmp(commands[i].name, citem)==0) {
@@ -292,10 +288,8 @@ void drawmaps(short l) {
 
 static void makemoves(void) {
 	int i, hitme;
-#ifdef SERGEEV
         clrscr();
         setwnd(LOWER_WINDOW);
-#endif /* SERGEEV */
 	while (TRUE) { /* command loop */
                 drawmaps(1);
                 while (TRUE)  { /* get a command */
@@ -304,10 +298,8 @@ static void makemoves(void) {
 			Time = 0.0;
 			i = -1;
 			chew();
-#ifdef SERGEEV
                         setwnd(BOTTOM_WINDOW);
                         clrscr();
-#endif /* SERGEEV */
 			proutn("COMMAND> ");
                         if (scan() == IHEOL) {
 #ifdef SERGEEV
@@ -319,12 +311,10 @@ static void makemoves(void) {
 #endif /* SERGEEV */
                             continue;
                         }
-#ifdef SERGEEV
                         ididit=0;
                         clrscr();
                         setwnd(LOWER_WINDOW);
                         clrscr();
-#endif /* SERGEEV */
 			for (i=0; i < ABANDON; i++)
 			    if (isit(commands[i].name)) {
 				i = commands[i].value;
@@ -444,9 +434,7 @@ static void makemoves(void) {
 				break;
 			case SAVE:			// Save Game
 				freeze(FALSE);
-#ifdef SERGEEV
                                 clrscr();
-#endif /* SERGEEV */
 				if (skill > 3)
                                         prout("WARNING--Saved games produce no plaques!");
 				break;
@@ -551,10 +539,8 @@ int main(int argc, char **argv) {
 		}
 		proutn("Do you want to play again? ");
 		if (!ja()) break;
-#ifdef SERGEEV
 		setwnd(FULLSCREEN_WINDOW);
 		clrscr();
-#endif /* SERGEEV */
 	}
 	skip(1);
 #ifndef SERGEEV
