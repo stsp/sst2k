@@ -35,9 +35,9 @@ Here are Tom Almy's changes:
 
    1. Better base positioning at startup
 
-   2. deathray improvement (but keeping original failure alternatives)
+   2. Deathray improvement (but keeping original failure alternatives)
 
-   3. Tholian Web
+   3. Tholian Web.
 
    4. Enemies can ram the Enterprise. Regular Klingons and Romulans can
       move in Expert and Emeritus games. This code could use improvement.
@@ -47,7 +47,7 @@ Here are Tom Almy's changes:
    6. Perhaps cloaking to be added later? BSD version
 
 Here are Stas Sergeev's changes (controlled by the proprocessor symbol
-SERGEEV, not yet merged):
+SERGEEV, not yet completely merged):
 
    1. The Space Thingy can be shoved, if you it ram, and can fire back if 
       fired upon.
@@ -133,6 +133,21 @@ static void listCommands(int x) {
 	if (x) prout("   HELP");
 }
 
+#ifdef SERGEEV
+void setwnd(short wndnum){
+     int cury;
+     cury=wherey()+wnds[curwnd].wndtop-wnds[wndnum].wndtop;
+     if ((curwnd==0)&&(wndnum!=0)) clrscr();
+     window(wnds[wndnum].wndleft, wnds[wndnum].wndtop, wnds[wndnum].wndright, wnds[wndnum].wndbottom);
+     if ((curwnd==wndnum)&&(cury>wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1)){
+        gotoxy(wnds[wndnum].wndright-wnds[wndnum].wndleft+1,wnds[wndnum].wndbottom-wnds[wndnum].wndtop+1);
+	skip(1);
+     }
+     curwnd=wndnum;
+     gotoxy(1,cury);
+}
+#endif /* SERGEEV */
+
 static void helpme(void) {
 	int i, j;
 	char cmdbuf[32], *cp;
@@ -143,9 +158,15 @@ static void helpme(void) {
 	key = scan();
 	while (TRUE) {
 		if (key == IHEOL) {
-			proutn("Help on what command?");
+#ifdef SERGEEV
+                        setwnd(5);
+#endif /* SERGEEV */
+                        proutn("Help on what command? ");
 			key = scan();
 		}
+#ifdef SERGEEV
+                setwnd(4);
+#endif /* SERGEEV */
 		if (key == IHEOL) return;
 		for (i = 0; i < NUMCOMMANDS; i++) {
 			if (strcmp(commands[i], citem)==0) break;
@@ -442,11 +463,17 @@ int main(int argc, char **argv) {
 				freeze(FALSE);
 			}
 		}
-		proutn("Do you want to play again?");
+		proutn("Do you want to play again? ");
 		if (!ja()) break;
+#ifdef SERGEEV
+		setwnd(0);
+		clrscr();
+#endif /* SERGEEV */
 	}
 	skip(1);
+#ifndef SERGEEV
 	ioend();
+#endif /* SERGEEV */
 	puts("May the Great Bird of the Galaxy roost upon your home planet.");
 	exit(0);
 }
@@ -588,7 +615,7 @@ int ja(void) {
 		chew();
 		if (*citem == 'y') return TRUE;
 		if (*citem == 'n') return FALSE;
-		proutn("Please answer with \"Y\" or \"N\":");
+		proutn("Please answer with \"Y\" or \"N\": ");
 	}
 }
 

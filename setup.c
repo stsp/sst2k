@@ -1,12 +1,24 @@
 #include <time.h>
 #include "sst.h"
 
+#ifdef SERGEEV
+#ifdef __linux__
+static long filelength(int fd) {
+struct stat buf;
+    fstat(fd, &buf);
+    return buf.st_size;
+}
+#endif
+#endif /* SERGEEV */
+
 void prelim(void) {
 	skip(2);
 	prout("-SUPER- STAR TREK");
 	skip(1);
+#ifndef SERGEEV
 	prout("Latest update-21 Sept 78");
 	skip(1);
+#endif /* SERGEEV */
 }
 
 void freeze(int boss) {

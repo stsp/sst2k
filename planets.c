@@ -58,7 +58,6 @@ void preport(void) {
 void orbit(void) {
 	skip(1);
 	chew();
-	ididit=0;
 	if (inorbit!=0) {
 		prout("Already in standard orbit.");
 		return;
@@ -114,7 +113,7 @@ void beam(void) {
 		prout("Transporter damaged.");
 		if (game.damage[DSHUTTL]==0 && (game.state.plnets[iplnet].known==shuttle_down || iscraft == 1)) {
 			skip(1);
-			prout("Spock-  \"May I suggest the shuttle craft, Sir?\" ");
+			proutn("Spock-  \"May I suggest the shuttle craft, Sir?\" ");
 			if (ja() != 0) shuttle();
 		}
 		return;

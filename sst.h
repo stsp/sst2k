@@ -438,3 +438,10 @@ void iostart(int);
 void ioend(void);
 void getline(char *, int);
 void commandhook(char *, int);
+
+#ifdef SERGEEV
+typedef struct {
+        int wndleft,wndtop,wndright,wndbottom;
+} wnd;
+extern wnd wnds[6];
+#endif /* SERGEEV */
