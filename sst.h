@@ -443,7 +443,6 @@ void cgetline(char *, int);
 void waitfor(void);
 void setpassword(void);
 void commandhook(char *, int);
-void c_printf (char *format, ... );
 void makechart(void);
 void enqueue(char *s);
 

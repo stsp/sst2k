@@ -290,20 +290,6 @@ void prouts(char *fmt, ...) {
 #endif /* SERGEEV */
 }
 
-void c_printf (char *format, ... )
-{
-    char buffer[BUFSIZ]; /* Well, BUFSIZ is from ncurses...  */
-    va_list argp;
-    va_start(argp,format);
-    vsprintf(buffer,format,argp);
-    va_end(argp);
-#ifdef SERGEEV
-    waddstr(conio_scr,buffer);
-#else
-    proutn(buffer);
-#endif /* SERGEEV */
-}
-
 void cgetline(char *line, int max) {
     if (curses) {
 #ifndef SERGEEV

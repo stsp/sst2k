@@ -167,9 +167,9 @@ void chart(int nn) {
 	char *cp;
 	chew();
 	if (stdamtim != 1e30 && stdamtim != game.state.date && condit == IHDOCKED) {
-                c_printf("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
+                proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
 	}
-        if (nn == 0) c_printf("       STAR CHART FOR THE KNOWN GALAXY\n\r");
+        if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n\r");
 	if (stdamtim != 1e30) {
 		if (condit == IHDOCKED) {
 			/* We are docked, so restore chart from base information */
@@ -186,10 +186,10 @@ void chart(int nn) {
 
 	prout("      1    2    3    4    5    6    7    8");
 	for (i = 1; i <= 8; i++) {
-                c_printf("%d |", i);
+                proutn("%d |", i);
 		for (j = 1; j <= 8; j++) {
 		    char buf[4];
-                        c_printf("  ");
+                        proutn("  ");
 			if (game.starch[i][j] < 0)
                                 strcpy(buf, ".1.");
 			else if (game.starch[i][j] == 0)
@@ -218,10 +218,10 @@ void chart(int nn) {
 			for (cp = buf; cp < buf + sizeof(buf); cp++)
 			    if (*cp == '0')
 				*cp = '.';
-			c_printf(buf);
+			proutn(buf);
 		}
-                c_printf("  |");
-                if (i<8) c_printf("\n\r");
+                proutn("  |");
+                if (i<8) proutn("\n\r");
 	}
 	prout("");	/* flush output */
 }
@@ -244,13 +244,13 @@ int srscan(int l) {
 				else
                                         prout("  [Using Base's sensors]");
 			}
-                        else c_printf("     Short-range scan\n\r");
+                        else proutn("     Short-range scan\n\r");
                         if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+1000:1;
 			scan();
 			if (isit("chart")) nn = TRUE;
 			if (isit("no")) rightside = FALSE;
 			chew();
-                        c_printf("    1 2 3 4 5 6 7 8 9 10\n\r");
+                        proutn("    1 2 3 4 5 6 7 8 9 10\n\r");
 			break;
 		case SCAN_REQUEST:
 			while (scan() == IHEOL)
@@ -292,7 +292,7 @@ int srscan(int l) {
                                         if (game.quad[i][j]!=ship) highvideo();
                                    }
                                    if (game.quad[i][j] & 128) highvideo();
-                                   c_printf("%c ",game.quad[i][j] & 127);
+                                   proutn("%c ",game.quad[i][j] & 127);
                                    textcolor(LIGHTGRAY);
                                 }
 				else
@@ -360,7 +360,7 @@ int srscan(int l) {
 					break;
 			}
 		}
-    		if (i<10) c_printf("\n\r");
+    		if (i<10) proutn("\n\r");
 	        if (k!=0) return(goodScan);
 	}
 	prout("");
