@@ -141,7 +141,7 @@ void lrscan(void)
 		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
 		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
 		if (game.state.galaxy[x][y].supernova) 
-		    proutn("***");
+		    proutn(" ***");
 		else
 		    proutn(" %3d", game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars);
 	    }
