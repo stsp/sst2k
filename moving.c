@@ -765,7 +765,7 @@ void timwrp() {
 		   when on planet, which would give us two Galileos! */
 		gotit = 0;
 		for (l = 1; l <= inplan; l++) {
-			if (game.state.plnets[l].known == 2) {
+			if (game.state.plnets[l].known == shuttle_down) {
 				gotit = 1;
 				if (iscraft==1 && ship==IHE) {
 					prout("Checkov-  \"Security reports the Galileo has disappeared, Sir!");

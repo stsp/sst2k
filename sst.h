@@ -16,11 +16,11 @@
 #define NEVENTS (8)
 
 typedef struct {
-	int x;	/* Quadrant location of planet */
-	int y;
-	int pclass; /* class M, N, or O (1, 2, or 3) */
-	int crystals; /* has crystals */
-	int known;   /* =1 contents known, =2 shuttle on this planet */
+    int x;	/* Quadrant location of planet */
+    int y;
+    int pclass; /* class M, N, or O (1, 2, or 3) */
+    int crystals; /* has crystals */
+    enum {unknown, known, shuttle_down} known;
 } planet;
 
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct {
 // original names. Gee, I could have done this with the d structure,
 // but I just didn't think of it back when I started.
 
-EXTERN struct foo2 {
+EXTERN struct {
     snapshot state;
     snapshot snapsht;
     char quad[11][11];		// contents of our quadrant

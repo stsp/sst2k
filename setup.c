@@ -306,7 +306,7 @@ void setup(void) {
 		game.state.plnets[i].y = iy;
 		game.state.plnets[i].pclass = Rand()*3.0 + 1.0; // Planet class M N or O
 		game.state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
-		game.state.plnets[i].known = 0;
+		game.state.plnets[i].known = unknown;
 	}
 	// Locate Romulans
 	for (i = 1; i <= game.state.nromrem; i++) {
