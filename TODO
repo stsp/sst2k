@@ -8,7 +8,3 @@
   IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT CHART,
   REST, DOCK, QUIT, and DAMAGE were in the original non-"super" version.
 
-* Write a curses-based interface.  Shouldn't be hard, all output goes through
-  prout/proutn/prouts so we can split the screen into two panes with the upper
-  one for the charts.
-
