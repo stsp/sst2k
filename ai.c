@@ -550,7 +550,7 @@ void scom(int *ipage) {
 
 void movetho(void) {
 	int idx, idy, im, i, dum, my;
-	/* Move the Tholean */
+	/* Move the Tholian */
 	if (ithere==0 || justin == 1) return;
 
 	if (ithx == 1 && ithy == 1) {

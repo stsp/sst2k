@@ -294,7 +294,7 @@ void shuttle(void) {
 		}
 		else if (damage[DSHUTTL] > 0)
 			prout("The Galileo is damaged.");
-		else prout("Shuttle craft is now serving Big Mac's.");
+		else prout("Shuttle craft is now serving Big Macs.");
 		return;
 	}
 	if (inorbit==0) {
@@ -323,7 +323,7 @@ void shuttle(void) {
 	Time = 3.0e-5*height;
 	if (Time >= 0.8*d.remtime) {
 		prout("First Officer Spock-  \"Captain, I compute that such");
-		prout("  a maneuver would require aproximately ");
+		prout("  a maneuver would require approximately ");
 		cramf(100*Time/d.remtime,0,4);
 		prout("% of our");
 		prout("remaining time.");

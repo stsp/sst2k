@@ -8,7 +8,7 @@ void move(void) {
 	int trbeam = 0, n, l, ix, iy, kink, kinks, iquad;
 
 	if (inorbit) {
-		prout("SULU- \"Leaving standard orbit.\"");
+		prout("Helmsman Sulu- \"Leaving standard orbit.\"");
 		inorbit = 0;
 	}
 
@@ -112,7 +112,7 @@ void move(void) {
 				dist=0.1*sqrt((sectx-ix)*(double)(sectx-ix) +
 							  (secty-iy)*(double)(secty-iy));
 				switch (iquad) {
-					case IHT: /* Ram a Tholean */
+					case IHT: /* Ram a Tholian */
 					case IHK: /* Ram enemy ship */
 					case IHC:
 					case IHS:
@@ -521,7 +521,7 @@ void warp(int i) {
 			proutn("  a trip would require approximately ");
 			cramf(100.0*Time/d.remtime, 0, 2);
 			prout(" percent of our");
-			prout("  remaining time.  Are you sure this is wise?\"");
+			prout(" remaining time.  Are you sure this is wise?\"");
 			if (ja() == 0) { ididit = 0; return;}
 		}
 	}
@@ -827,7 +827,7 @@ void probe(void) {
 		skip(1);
 		if (damage[DRADIO] != 0 && condit != IHDOCKED) {
 			prout("Spock-  \"Records show the previous probe has not yet");
-			prout("   reached it's destination.\"");
+			prout("   reached its destination.\"");
 		}
 		else
 			prout("Uhura- \"The previous probe is still reporting data, Sir.\"");

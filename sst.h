@@ -354,7 +354,7 @@ void lrscan(void);
 void phasers(void);
 void photon(void);
 void warp(int);
-void sheild(int);
+void doshield(int);
 void dock(void);
 void dreprt(void);
 void chart(int);

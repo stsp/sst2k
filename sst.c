@@ -210,7 +210,7 @@ static void makemoves(void) {
 				warp(1);
 				break;
 			case 5:			// shields
-				sheild(1);
+				doshield(1);
 				if (ididit) {
 					attack(2);
 					shldchg = 0;
@@ -401,8 +401,8 @@ void cramen(int i) {
 		case IHP: s = "Planet"; break;
 		case IHB: s = "Starbase"; break;
 		case IHBLANK: s = "Black hole"; break;
-		case IHT: s = "Tholean"; break;
-		case IHWEB: s = "Tholean web"; break;
+		case IHT: s = "Tholian"; break;
+		case IHWEB: s = "Tholian web"; break;
 		default: s = "Unknown??"; break;
 	}
 	proutn(s);

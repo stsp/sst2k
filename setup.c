@@ -634,7 +634,7 @@ void newqad(int shutup) {
 		neutz = 1;
 		if (damage[DRADIO] <= 0.0) {
 			skip(1);
-			prout("LT. UHURA- \"Captain, an urgent message.");
+			prout("LT. Uhura- \"Captain, an urgent message.");
 			prout("  I'll put it on audio.\"  CLICK");
 			skip(1);
 			prout("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE.");

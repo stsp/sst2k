@@ -1,6 +1,6 @@
 #include "sst.h"
 
-void sheild(int i) {
+void doshield(int i) {
 	int key;
 	enum {NONE, SHUP, SHDN, NRG} action = NONE;
 
@@ -596,7 +596,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 		d.nromrem--;
 	}
 	else if (type == IHT) {
-		/* Killed a Tholean */
+		/* Killed a Tholian */
 		ithere = 0;
 	}
 	else {

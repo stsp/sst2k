@@ -163,7 +163,7 @@ void events(void) {
 				}
 				if (shldup==0) {
 					if (damage[DSHIELD]==0 && shield > 0) {
-						sheild(2); /* Shldsup */
+						doshield(2); /* Shldsup */
 						shldchg=0;
 					}
 					else prout("(Shields not currently useable.)");
