@@ -103,7 +103,7 @@ static void listCommands(int x) {
 
 static void helpme(void) {
 	int i, j;
-	char cmdbuf[32];
+	char cmdbuf[32], *cp;
 	char linebuf[132];
 	FILE *fp;
 	/* Give help on commands */
@@ -130,9 +130,9 @@ static void helpme(void) {
 		strcpy(cmdbuf, " ABBREV");
 	}
 	else {
-		strcpy(cmdbuf, "  Mnemonic:  ");
-		j = 0;
-		while ((cmdbuf[j+13] = toupper(commands[i][j])) != 0) j++;
+	    for (j = 0; commands[i][j]; j++)
+		cmdbuf[j] = toupper(commands[i][j]);
+	    cmdbuf[j] = '\0';
 	}
 	fp = fopen("sst.doc", "r");
 	if (fp == NULL) {
@@ -141,26 +141,31 @@ static void helpme(void) {
 		prout("   current directory.\"");
 		return;
 	}
-	i = strlen(cmdbuf);
-	do {
-		if (fgets(linebuf, 132, fp) == NULL) {
+	for (;;) {
+	    if (fgets(linebuf, sizeof(linebuf), fp) == NULL) {
 			prout("Spock- \"Captain, there is no information on that command.\"");
 			fclose(fp);
 			return;
 		}
-	} while (strncmp(linebuf, cmdbuf, i) != 0);
+	    if (linebuf[0] == '%' && linebuf[1] == '%'&& linebuf[2] == ' ') {
+		for (cp = linebuf+3; isspace(*cp); cp++)
+			continue;
+		linebuf[strlen(linebuf)-1] = '\0';
+		if (strcmp(cp, cmdbuf) == 0)
+		    break;
+	    }
+	}
 
 	skip(1);
 	prout("Spock- \"Captain, I've found the following information:\"");
 	skip(1);
 
-	do {
-		if (linebuf[0]!=12) { // ignore page break lines 
-			linebuf[strlen(linebuf)-1] = '\0'; // No \n at end
-			prout(linebuf);
-		}
-		fgets(linebuf,132,fp);
-	} while (strstr(linebuf, "******")==NULL);
+	while (fgets(linebuf, sizeof(linebuf),fp)) {
+		if (strstr(linebuf, "******"))
+			break;
+		linebuf[strlen(linebuf)-1] = '\0'; // No \n at end
+		prout(linebuf);
+	}
 	fclose(fp);
 }
 
