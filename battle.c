@@ -175,7 +175,6 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 
 void torpedo(double course, double r, int inx, int iny, double *hit, int wait, int i, int n) {
         int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
-	int crx,cry;
 	
 	double ac=course + 0.25*r;
 	double angle = (15.0-ac)*0.5235988;
@@ -187,10 +186,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	if (fabs(deltay) > bigger) bigger = fabs(deltay);
 	deltax /= bigger;
 	deltay /= bigger;
-        crx=wherex();
-        cry=wherey();
-        if (game.damage[DSRSENS]==0 || condit==IHDOCKED) setwnd(LEFTUPPER_WINDOW);
-	else setwnd(LOWER_WINDOW);
+        if (game.damage[DSRSENS]==0 || condit==IHDOCKED) 
+	    setwnd(LEFTUPPER_WINDOW);
+	else 
+	    setwnd(LOWER_WINDOW);
 	/* Loop to move a single torpedo */
 	for (l=1; l <= 15; l++) {
 		x += deltax;
@@ -205,7 +204,6 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 		if (iquad==IHDOT) continue;
 		/* hit something */
 		setwnd(LOWER_WINDOW);
-	        gotoxy(crx,cry);
 		switch(iquad) {
 			case IHE: /* Hit our ship */
 			case IHF:
@@ -402,7 +400,6 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	}
         if(curwnd!=LOWER_WINDOW) {
 	    setwnd(LOWER_WINDOW);
-	    gotoxy(crx,cry);
 	}
 	if (shoved) {
 		game.quad[jx][jy]=iquad;

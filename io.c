@@ -415,6 +415,9 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
     proutn("%d - %d   ", (int)x, (int)y);
 #else
     if (game.damage[DSRSENS]==0 || condit==IHDOCKED) {
+	int crx, cry;
+	crx = wherex();
+	cry = wherey();
 	drawmaps(2);
 	delay((wait!=1)*400);
 	gotoxy(iy*2+3,ix+2);
@@ -437,6 +440,7 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
 	    lowvideo();
 	    _setcursortype(_NORMALCURSOR);
 	}
+	gotoxy(crx, cry);
     } else {
 	proutn("%d - %d   ", (int)x, (int)y);
     }
