@@ -261,7 +261,7 @@ void setup(int needprompt)
 	    for (j = i-1; j > 0; j--) {
 		/* Improved placement algorithm to spread out bases */
 		double distq = square(ix-game.state.baseqx[j]) + square(iy-game.state.baseqy[j]);
-		if (distq < 6.0*(BASEMAX-inbase) && Rand() < 0.75) {
+		if (distq < 6.0*(BASEMAX+1-inbase) && Rand() < 0.75) {
 		    contflag = TRUE;
 #ifdef DEBUG
 		    proutn("DEBUG: Abandoning base #%d at %d-%d\n", i, ix, iy);
@@ -269,7 +269,7 @@ void setup(int needprompt)
 		    break;
 		}
 #ifdef DEBUG
-		else if (distq < 6.0 * (BASEMAX-inbase)) {
+		else if (distq < 6.0 * (BASEMAX+1-inbase)) {
 		    proutn("DEBUG: saving base #%d, close to #%d\n", i, j);
 		}
 #endif
@@ -469,7 +469,7 @@ int choose(int needprompt)
 
     // Use parameters to generate initial values of things
     damfac = 0.5 * skill;
-    game.state.rembase = 2.0 + Rand()*(MAXBASES-2.0);
+    game.state.rembase = 2.0 + Rand()*(BASEMAX-2.0);
     inbase = game.state.rembase;
     if (game.options & OPTION_PLANETS)
 	inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();

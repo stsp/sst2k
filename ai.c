@@ -370,8 +370,8 @@ void scom(int *ipage)
 {
     int i, i2, j, ideltax, ideltay, ibqx, ibqy, sx, sy, ifindit, iwhichb;
     int iqx, iqy;
-    int basetbl[BASEMAX];
-    double bdist[BASEMAX];
+    int basetbl[BASEMAX+1];
+    double bdist[BASEMAX+1];
     int flag;
 #ifdef DEBUG
     if (idebug) prout("SCOM");
