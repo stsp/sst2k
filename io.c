@@ -59,11 +59,7 @@ void iostart(int usecurses) {
 	if(signal(SIGQUIT,SIG_IGN) != SIG_IGN)
 	    (void)signal(SIGQUIT,fastexit);
 
-#ifndef SERGEEV
-	if (curses = usecurses) {
-#else /* SERGEEV */
 	if ((curses = usecurses)) {
-#endif /* SERGEEV */
 		(void)initscr();
 #ifdef KEY_MIN
 		keypad(stdscr, TRUE);

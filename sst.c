@@ -38,7 +38,7 @@ Here are Tom Almy's changes:
    2. deathray improvement (but keeping original failure alternatives)
 
    3. Tholian Web
-s
+
    4. Enemies can ram the Enterprise. Regular Klingons and Romulans can
       move in Expert and Emeritus games. This code could use improvement.
 

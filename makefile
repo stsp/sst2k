@@ -2,11 +2,7 @@
 
 VERS=$(shell sed <sst.spec -n -e '/Version: \(.*\)/s//\1/p')
 
-#ifndef SERGEEV
 CFLAGS=     -O -g -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
-#else /* SERGEEV */
-CFLAGS= -O1 -g -Wall -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
-#endif /* SERGEEV */
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

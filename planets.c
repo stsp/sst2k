@@ -56,8 +56,6 @@ void preport(void) {
 }
 
 void orbit(void) {
-	double asave;
-
 	skip(1);
 	chew();
 	ididit=0;
