@@ -82,7 +82,6 @@ void orbit(void) {
 }
 
 void sensor(void) {
-#ifndef SERGEEV
 	skip(1);
 	chew();
 	if (game.damage[DSRSENS] != 0.0) {
@@ -90,25 +89,22 @@ void sensor(void) {
 		return;
 	}
 	if (plnetx == 0) {
-		prout("No planet in this quadrant.");
+		prout("Spock- \"No planet in this quadrant, Captain.\"");
 		return;
 	}
-#else
-    if (game.damage[DSRSENS] != 0.0) return;
-    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
-	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
-	skip(1);
-	prout("         Planet at %s is of class %s.", 
-	       cramlc(sector, plnetx, plnety),
-	       classes[game.state.plnets[iplnet].pclass]);
-	if (game.state.plnets[iplnet].known==shuttle_down) 
-		prout("         Sensors show Galileo still on surface.");
-	proutn("         Readings indicate");
-	if (game.state.plnets[iplnet].crystals == 0) proutn(" no");
-	prout(" dilithium crystals present.\"");
-	if (game.state.plnets[iplnet].known == unknown) game.state.plnets[iplnet].known = known;
-    }
-#endif /* SERGEEV */
+	if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
+	    prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
+	    skip(1);
+	    prout("         Planet at %s is of class %s.", 
+		   cramlc(sector, plnetx, plnety),
+		   classes[game.state.plnets[iplnet].pclass]);
+	    if (game.state.plnets[iplnet].known==shuttle_down) 
+		    prout("         Sensors show Galileo still on surface.");
+	    proutn("         Readings indicate");
+	    if (game.state.plnets[iplnet].crystals == 0) proutn(" no");
+	    prout(" dilithium crystals present.\"");
+	    if (game.state.plnets[iplnet].known == unknown) game.state.plnets[iplnet].known = known;
+	}
 }
 
 void beam(void) {
