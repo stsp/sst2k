@@ -253,7 +253,7 @@ void setup(int needprompt) {
 			for (j = i-1; j > 0; j--) {
 				/* Improved placement algorithm to spread out bases */
 				double distq = square(ix-game.state.baseqx[j]) + square(iy-game.state.baseqy[j]);
-				if (distq < 6.0*(6-inbase) && Rand() < 0.75) {
+				if (distq < 6.0*(BASEMAX-inbase) && Rand() < 0.75) {
 					contflag = TRUE;
 #ifdef DEBUG
 					proutn("DEBUG: Abandoning base #%d at %d-%d\n", i, ix, iy);
@@ -261,7 +261,7 @@ void setup(int needprompt) {
 					break;
 				}
 #ifdef DEBUG
-				else if (distq < 6.0 * (6-inbase)) {
+				else if (distq < 6.0 * (BASEMAX-inbase)) {
 					proutn("DEBUG: saving base #%d, close to #%d\n", i, j);
 				}
 #endif

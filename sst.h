@@ -20,6 +20,7 @@
 #define NEVENTS (8)
 #define GALSIZE	(8)
 #define QUADSIZE (10)
+#define BASEMAX	(6)
 
 typedef struct {
     int x;	/* Quadrant location of planet */
@@ -42,8 +43,8 @@ typedef struct {
 	killc,			// commanders killed
 	galaxy[GALSIZE+1][GALSIZE+1], 	// The Galaxy (subscript 0 not used)
 	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
-	baseqx[6],		// Base quadrant X
-	baseqy[6],		// Base quadrant Y
+	baseqx[BASEMAX],		// Base quadrant X
+	baseqy[BASEMAX],		// Base quadrant Y
 	newstuf[GALSIZE+1][GALSIZE+1],	// Extended galaxy goodies
 	isx, isy,		// Coordinate of Super Commander
 	nscrem,			// remaining super commanders

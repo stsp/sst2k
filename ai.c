@@ -364,8 +364,8 @@ static int movescom(int iqx, int iqy, int flag, int *ipage) {
 void scom(int *ipage) {
 	int i, i2, j, ideltax, ideltay, ibqx, ibqy, sx, sy, ifindit, iwhichb;
 	int iqx, iqy;
-	int basetbl[6];
-	double bdist[6];
+	int basetbl[BASEMAX];
+	double bdist[BASEMAX];
 	int flag;
 #ifdef DEBUG
 	if (idebug) prout("SCOM");
