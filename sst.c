@@ -408,17 +408,20 @@ void cramen(int i) {
 	proutn(s);
 }
 
-void cramlc(int key, int x, int y) {
-	if (key == 1) proutn(" Quadrant");
-	else if (key == 2) proutn(" Sector");
-	proutn(" %d - %d", x, y);
+char *cramlc(enum loctype key, int x, int y) {
+	static char buf[32];
+	buf[0] = '\0';
+	if (key == quadrant) strcpy(buf, "Quadrant ");
+	else if (key == sector) strcpy(buf, "Sector ");
+	sprintf(buf+strlen(buf), "%d-%d", x, y);
+	return buf;
 }
 
 void crmena(int i, int enemy, int key, int x, int y) {
 	if (i == 1) proutn("***");
 	cramen(enemy);
 	proutn(" at");
-	cramlc(key, x, y);
+	proutn(cramlc(key, x, y));
 }
 
 void crmshp(void) {
@@ -526,12 +529,6 @@ int ja(void) {
 		if (*citem == 'n') return FALSE;
 		proutn("Please answer with \"Y\" or \"N\":");
 	}
-}
-
-void cramf(double x, int w, int d) {
-	char buf[64];
-	sprintf(buf, "%*.*f", w, d, x);
-	proutn(buf);
 }
 
 double square(double i) { return i*i; }
@@ -680,7 +677,7 @@ void debugme(void) {
 				case FSCMOVE: proutn("SC Move         "); break;
 				case FSCDBAS: proutn("SC Base Destroy "); break;
 			}
-			cramf(future[i]-game.state.date, 8, 2);
+			proutn("%82.2f", future[i]-game.state.date);
 			chew();
 			proutn("  ?");
 			key = scan();

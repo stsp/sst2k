@@ -263,6 +263,7 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 			  FMATERIALIZE, FPHASER, FLOST, FMINING, FDPLANET,
 			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
 			  FHOLE} FINTYPE ;
+enum loctype {neither, quadrant, sector};
 
 /* Define devices */
 #define DSRSENS 1
@@ -380,7 +381,7 @@ void newqad(int);
 int ja(void);
 void cramen(int);
 void crmshp(void);
-void cramlc(int, int, int);
+char *cramlc(enum loctype, int, int);
 double expran(double);
 double Rand(void);
 void iran8(int *, int *);
@@ -396,7 +397,6 @@ void deadkl(int, int, int, int, int);
 void timwrp(void);
 void movcom(void);
 void torpedo(double, double, int, int, double *);
-void cramf(double, int, int);
 void huh(void);
 void pause(int);
 void nova(int, int);

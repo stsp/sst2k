@@ -98,9 +98,9 @@ void move(void) {
 				quady = (iy+9)/10;
 				sectx = ix - 10*(quadx-1);
 				secty = iy - 10*(quady-1);
-				proutn("\nEntering");
-				cramlc(1, quadx, quady);
-				skip(1);
+				prout("");
+				prout("Entering %s.",
+				      cramlc(quadrant, quadx, quady));
 				game.quad[sectx][secty] = ship;
 				newqad(0);
 				return;
@@ -129,9 +129,8 @@ void move(void) {
 						skip(1);
 						proutn("***");
 						crmshp();
-						proutn(" pulled into black hole at");
-						cramlc(2, ix, iy);
-						skip(1);
+						proutn(" pulled into black hole at ");
+						prout(cramlc(sector, ix, iy));
 						finish(FHOLE);
 						return;
 					default:
@@ -139,14 +138,13 @@ void move(void) {
 						skip(1);
 						crmshp();
 						if (iquad == IHWEB)
-							proutn(" encounters Tholian web at");
+							proutn(" encounters Tholian web at ");
 						else
-							proutn(" blocked by object at");
-						cramlc(2, ix,iy);
+							proutn(" blocked by object at ");
+						proutn(cramlc(sector, ix,iy));
 						prout(";");
 						proutn("Emergency stop required ");
-						cramf(stopegy, 0, 2);
-						prout(" units of energy.");
+						prout("%2d units of energy.", (int)stopegy);
 						energy -= stopegy;
 						finalx = x-deltax+0.5;
 						sectx = finalx;
@@ -357,9 +355,8 @@ static void getcd(int isprobe, int akey) {
 		if (!isprobe) {
 			if (itemp) {
 				if (iprompt) {
-					proutn("Helmsman Sulu- \"Course locked in for");
-					cramlc(2, irows, icols);
-					prout(".\"");
+					proutn("Helmsman Sulu- \"Course locked in for %s.\"",
+						cramlc(sector, irows, icols));
 				}
 			}
 			else prout("Ensign Chekov- \"Course laid in, Captain.\"");
@@ -431,8 +428,8 @@ void impuls(void) {
 		prout("First Officer Spock- \"Captain, the impulse engines");
 		prout("require 20.0 units to engage, plus 100.0 units per");
 		if (energy > 30) {
-			proutn("quadrant.  We can go, therefore, a maximum of ");
-			cramf(0.01 * (energy-20.0)-0.05, 0, 1);
+			proutn("quadrant.  We can go, therefore, a maximum of %d", 
+			       (int)(0.01 * (energy-20.0)-0.05));
 			prout(" quadrants.\"");
 		}
 		else {
@@ -519,8 +516,8 @@ void warp(int i) {
 		if (Time >= 0.8*game.state.remtime) {
 			skip(1);
 			prout("First Officer Spock- \"Captain, I compute that such");
-			proutn("  a trip would require approximately ");
-			cramf(100.0*Time/game.state.remtime, 0, 2);
+			proutn("  a trip would require approximately %2.0f",
+				100.0*Time/game.state.remtime);
 			prout(" percent of our");
 			prout(" remaining time.  Are you sure this is wise?\"");
 			if (ja() == 0) { ididit = 0; return;}
@@ -631,9 +628,8 @@ void setwrp(void) {
 	warpfac = aaitem;
 	wfacsq=warpfac*warpfac;
 	if (warpfac <= oldfac || warpfac <= 6.0) {
-		proutn("Helmsman Sulu- \"Warp factor ");
-		cramf(warpfac, 0, 1);
-		prout(", Captain.\"");
+		proutn("Helmsman Sulu- \"Warp factor %do, Captain.\"", 
+			(int)warpfac);
 		return;
 	}
 	if (warpfac < 8.00) {
@@ -715,9 +711,7 @@ void atover(int igrab) {
 		}
 		warpfac = 6.0+2.0*Rand();
 		wfacsq = warpfac * warpfac;
-		proutn("Warp factor set to ");
-		cramf(warpfac, 1, 1);
-		skip(1);
+		prout("Warp factor set to %d", (int)warpfac);
 		power = 0.75*energy;
 		dist = power/(warpfac*warpfac*warpfac*(shldup+1));
 		distreq = 1.4142+Rand();
@@ -745,9 +739,8 @@ void timwrp() {
 	prout("***TIME WARP ENTERED.");
 	if (game.state.snap && Rand() < 0.5) {
 		/* Go back in time */
-		proutn("You are traveling backwards in time ");
-		cramf(game.state.date-game.snapsht.date, 0, 2);
-		prout(" stardates.");
+		prout("You are traveling backwards in time %d stardates.",
+		      (int)(game.state.date-game.snapsht.date));
 		game.state = game.snapsht;
 		game.state.snap = 0;
 		if (game.state.remcom) {
@@ -794,9 +787,7 @@ void timwrp() {
 	else {
 		/* Go forward in time */
 		Time = -0.5*intime*log(Rand());
-		proutn("You are traveling forward in time ");
-		cramf(Time, 1, 2);
-		prout(" stardates.");
+		prout("You are traveling forward in time %d stardates.", (int)Time);
 		/* cheat to make sure no tractor beams occur during time warp */
 		game.future[FTBEAM] += Time;
 		game.damage[DRADIO] += Time;
@@ -922,9 +913,8 @@ void help(void) {
 	}
 	/* dematerialize starship */
 	game.quad[sectx][secty]=IHDOT;
-	proutn("Starbase in");
-	cramlc(1, quadx, quady);
-	proutn(" responds--");
+	proutn("Starbase in %s responds--", cramlc(quadrant, quadx, quady));
+	proutn("");
 	crmshp();
 	prout(" dematerializes.");
 	/* Give starbase three chances to rematerialize starship */

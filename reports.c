@@ -5,20 +5,16 @@
 
 void attakreport(void) {
 	if (game.future[FCDBAS] < 1e30) {
-		proutn("Starbase in ");
-		cramlc(1, batx, baty);
-		prout(" is currently under attack.");
-		proutn("It can hold out until Stardate ");
-		cramf(game.future[FCDBAS], 0,1);
-		prout(".");
+		prout("Starbase in %s is currently under attack.",
+		      cramlc(quadrant, batx, baty));
+		prout("It can hold out until Stardate %d.", 
+		      (int)game.future[FCDBAS]);
 	}
 	if (isatb == 1) {
-		proutn("Starbase in ");
-		cramlc(1, game.state.isx, game.state.isy);
-		prout(" is under Super-commander attack.");
-		proutn("It can hold out until Stardate ");
-		cramf(game.future[FSCDBAS], 0, 1);
-		prout(".");
+		prout("Starbase in %s is under Super-commander attack.",
+		      cramlc(quadrant, game.state.isx, game.state.isy));
+		prout("It can hold out until Stardate %d.", 
+		      (int)game.future[FSCDBAS]);
 	}
 }
 	
@@ -88,7 +84,7 @@ void report(int f) {
 			proutn("An armed deep space probe is in");
 		else
 			proutn("A deep space probe is in");
-		cramlc(1, probecx, probecy);
+		proutn(cramlc(quadrant, probecx, probecy));
 		prout(".");
 	}
 	if (icrystl) {
@@ -124,8 +120,7 @@ void lrscan(void) {
 		skip(1);
 		proutn("Long-range scan for");
 	}
-	cramlc(1, quadx, quady);
-	skip(1);
+	prout(cramlc(quadrant, quadx, quady));
 	for (x = quadx-1; x <= quadx+1; x++) {
 		for (y = quady-1; y <= quady+1; y++) {
 			if (x == 0 || x > 8 || y == 0 || y > 8)
@@ -152,11 +147,10 @@ void dreprt(void) {
 				prout("                IN FLIGHT   DOCKED");
 				jdam = TRUE;
 			}
-			proutn("  %16s ", device[i]);
-			cramf(game.damage[i]+0.05, 8, 2);
-			proutn("  ");
-			cramf(docfac*game.damage[i]+0.005, 8, 2);
-			skip(1);
+			prout("  %16s %8.2f  %8.2f", 
+				device[i],
+			        game.damage[i]+0.05,
+				docfac*game.damage[i]+0.005);
 		}
 	}
 	if (!jdam) prout("All devices functional.");
@@ -182,9 +176,8 @@ void chart(int nn) {
 					if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+1000;
 		}
 		else {
-			proutn("(Last surveillance update ");
-			cramf(game.state.date-stdamtim, 0, 1);
-			prout(" stardates ago.)");
+		    proutn("(Last surveillance update %d stardates ago.",
+			   (int)(game.state.date-stdamtim));
 		}
 	}
 	if (nn ==0) skip(1);
@@ -209,10 +202,8 @@ void chart(int nn) {
 	if (nn == 0) {
 		skip(1);
 		crmshp();
-		proutn(" is currently in");
-		cramlc(1, quadx, quady);
-		skip(1);
-	}
+		prout(" is currently in %s", cramlc(quadrant, quadx, quady));
+}
 }
 		
 		
@@ -288,10 +279,10 @@ void srscan(int l) {
 					proutn(" Condition     %s", cp);
 					break;
 				case 3:
-					proutn(" Position     ");
-					cramlc(0, quadx, quady);
-					proutn(",");
-					cramlc(0, sectx, secty);
+					proutn(" Position      ");
+					proutn(cramlc(neither, quadx, quady));
+					proutn(" , ");
+					proutn(cramlc(neither, sectx, secty));
 					break;
 				case 4:
 					proutn(" Life Support  ");
@@ -447,23 +438,17 @@ void eta(void) {
 		}
 		else
 			proutn("Remaining");
-		proutn(" energy will be ");
-		cramf(energy-tpower, 1, 1);
-		prout(".");
+		prout(" energy will be %5.2f.", energy-tpower);
 		if (wfl) {
-			proutn("And we will arrive at stardate ");
-			cramf(game.state.date+ttime, 1, 1);
-			prout(".");
+			prout("And we will arrive at stardate %5.2f.",
+				game.state.date+ttime);
 		}
 		else if (twarp==1.0)
 			prout("Any warp speed is adequate.");
 		else {
-			proutn("Minimum warp needed is ");
-			cramf(twarp, 1, 2);
-			skip(1);
-			proutn("and we will arrive at stardate ");
-			cramf(game.state.date+ttime, 1, 2);
-			prout(".");
+			prout("Minimum warp needed is %5.2f,", twarp);
+			prout("and we will arrive at stardate %5.2f.",
+				game.state.date+ttime);
 		}
 		if (game.state.remtime < ttime)
 			prout("Unfortunately, the Federation will be destroyed by then.");

@@ -191,10 +191,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		iy = y + 0.5;
 		if (iy < 1 || iy > 10) break;
 		if (l==4 || l==9) skip(1);
-		cramf(x, 0, 1);
-		proutn(" - ");
-		cramf(y, 0, 1);
-		proutn("   ");
+		proutn("%d - %d   ", (int)x, (int)y);
 		iquad=game.quad[ix][iy];
 		if (iquad==IHDOT) continue;
 		/* hit something */
@@ -385,9 +382,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 	if (shoved) {
 		game.quad[jx][jy]=iquad;
 		game.quad[ix][iy]=IHDOT;
-		proutn(" displaced by blast to");
-		cramlc(2, jx, jy);
-		skip(1);
+		prout(" displaced by blast to %s ", cramlc(sector, jx, jy));
 		for (ll=1; ll<=nenhere; ll++)
 			game.kdist[ll] = game.kavgd[ll] = sqrt(square(sectx-game.kx[ll])+square(secty-game.ky[ll]));
 		sortkl();
@@ -515,8 +510,7 @@ void attack(int k) {
 		               shields were down for some strange reason. This
 					   doesn't make any sense, so I've fixed it */
 		ihurt = 1;
-		cramf(hit, 0, 2);
-		proutn(" unit hit");
+		proutn("%d unit hit", (int)hit);
 		if ((game.damage[DSRSENS] > 0 && itflag) || skill <= 2) {
 			proutn(" on the ");
 			crmshp();
@@ -959,9 +953,7 @@ void phasers(void) {
 				key = scan();
 			}
 			if (key != IHREAL && nenhere != 0) {
-				proutn("Phasers locked on target. Energy available =");
-				cramf(ifast?energy-200.0:energy,1,2);
-				skip(1);
+				prout("Phasers locked on target. Energy available = %3.2f", ifast?energy-200.0:energy);
 			}
 			do {
 				while (key != IHREAL) {
@@ -971,8 +963,8 @@ void phasers(void) {
 				}
 				rpow = aaitem;
 				if (rpow >= (ifast?energy-200:energy)) {
-					proutn("Energy available= ");
-					cramf(ifast?energy-200:energy, 1,2);
+				    proutn("Energy available= %3.2f",
+					ifast?energy-200:energy);
 					skip(1);
 					key = IHEOL;
 				}
@@ -1017,8 +1009,7 @@ void phasers(void) {
 					prout("phaser energy.");
 				}
 				else {
-					cramf(extra, 0, 2);
-					prout(" expended on empty space.");
+					prout("%d expended on empty space.", (int)extra);
 				}
 			}
 			break;
@@ -1043,8 +1034,8 @@ void phasers(void) {
 				int ii = game.kx[k], jj = game.ky[k];
 				int ienm = game.quad[ii][jj];
 				if (msgflag) {
-					proutn("Energy available= ");
-					cramf(energy-.006-(ifast?200:0), 0, 2);
+					proutn("Energy available= %5.2f",
+					       energy-.006-(ifast?200:0));
 					skip(1);
 					msgflag = 0;
 					rpow = 0.0;
@@ -1165,8 +1156,7 @@ void hittem(double *hits) {
 		ii = game.kx[kk];
 		jj = game.ky[kk];
 		if (hit > 0.005) {
-			cramf(hit, 0, 2);
-			proutn(" unit hit on ");
+			proutn("%d unit hit on ", (int)hit);
 		}
 		else
 			proutn("Very small hit on ");
@@ -1182,9 +1172,8 @@ void hittem(double *hits) {
 		else /* decide whether or not to emasculate klingon */
 			if (kpow > 0 && Rand() >= 0.9 &&
 				kpow <= ((0.4 + 0.4*Rand())*kpini)) {
-				proutn("***Mr. Spock-  \"Captain, the vessel at");
-				cramlc(2,ii,jj);
-				skip(1);
+				prout("***Mr. Spock-  \"Captain, the vessel at ",
+					cramlc(sector,ii,jj));
 				prout("   has just lost its firepower.\"");
 				game.kpower[kk] = -kpow;
 			}

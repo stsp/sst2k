@@ -152,11 +152,10 @@ void events(void) {
 				}
 				iran10(&sectx, &secty);
 				crmshp();
-				proutn(" is pulled to");
-				cramlc(1, quadx, quady);
+				proutn(" is pulled to ");
+				proutn(cramlc(quadrant, quadx, quady));
 				proutn(", ");
-				cramlc(2, sectx, secty);
-				skip(1);
+				prout(cramlc(sector, sectx, secty));
 				if (resting) {
 					prout("(Remainder of rest/repair period cancellegame.state.)");
 					resting = 0;
@@ -216,12 +215,11 @@ void events(void) {
 				if (ipage==0) pause(1);
 				ipage = 1;
 				skip(1);
-				proutn("Lt. Uhura-  \"Captain, the starbase in");
-				cramlc(1, batx, baty);
-				skip(1);
+				proutn("Lt. Uhura-  \"Captain, the starbase in ");
+				prout(cramlc(quadrant, batx, baty));
 				prout("   reports that it is under atttack and that it can");
-				proutn("   hold out only until stardate ");
-				cramf(game.future[FCDBAS],1,1);
+				proutn("   hold out only until stardate %d",
+		       			(int)game.future[FCDBAS]);
 				prout(".\"");
 				if (resting) {
 					skip(1);
@@ -273,8 +271,8 @@ void events(void) {
 					ipage = 1;
 					skip(1);
 					prout("Lt. Uhura-  \"Captain, Starfleet Command reports that");
-					proutn("   the starbase in");
-					cramlc(1, batx, baty);
+					proutn("   the starbase in ");
+					proutn(cramlc(quadrant, batx, baty));
 					prout(" has been destroyed by");
 					if (isatb==2) prout("the Klingon Super-Commander");
 					else prout("a Klingon Commander");
@@ -334,7 +332,7 @@ void events(void) {
 						ipage = 1;
 						skip(1);
 						proutn("Lt. Uhura-  \"The deep space probe is now in ");
-						cramlc(1, probecx, probecy);
+						proutn(cramlc(quadrant, probecx, probecy));
 						prout(".\"");
 					}
 				}
@@ -385,8 +383,7 @@ void wait(void) {
 	do {
 		if (delay <= 0) resting = 0;
 		if (resting == 0) {
-			cramf(game.state.remtime, 0, 2);
-			prout(" stardates left.");
+			prout("%d stardates left.", (int)game.state.remtime);
 			return;
 		}
 		temp = Time = delay;
@@ -554,8 +551,8 @@ void nova(int ix, int iy) {
 							skip(1);
 							break;
 						}
-						proutn(", buffeted to");
-						cramlc(2, newcx, newcy);
+						proutn(", buffeted to ");
+						proutn(cramlc(sector, newcx, newcy));
 						game.quad[ii][jj] = IHDOT;
 						game.quad[newcx][newcy] = iquad;
 						game.kx[ll] = newcx;
@@ -637,12 +634,9 @@ void snova(int insx, int insy) {
 			/* it isn't here, or we just entered (treat as inroute) */
 			if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 				skip(1);
-				proutn("Message from Starfleet Command       Stardate ");
-				cramf(game.state.date, 0, 1);
-				skip(1);
-				proutn("     Supernova in");
-				cramlc(1, nqx, nqy);
-				prout("; caution advised.");
+				prout("Message from Starfleet Command       Stardate %5.2f", game.state.date);
+				proutn("     Supernova in %s; caution advised.",
+				       cramlc(quadrant, nqx, nqy));
 			}
 		}
 		else {
@@ -668,9 +662,7 @@ void snova(int insx, int insy) {
 		skip(1);
 		prouts("***RED ALERT!  RED ALERT!");
 		skip(1);
-		proutn("***Incipient supernova detected at");
-		cramlc(2, nsx, nsy);
-		skip(1);
+		prout("***Incipient supernova detected at ", cramlc(sector, nsx, nsy));
 		nqx = quadx;
 		nqy = quady;
 		if (square(nsx-sectx) + square(nsy-secty) <= 2.1) {
@@ -753,9 +745,8 @@ void snova(int insx, int insy) {
 	if (game.state.remkl==0 && (nqx != quadx || nqy != quady)) {
 		skip(2);
 		if (insx == 0) prout("Lucky you!");
-		proutn("A supernova in");
-		cramlc(1, nqx, nqy);
-		prout(" has just destroyed the last Klingons.");
+		proutn("A supernova in %s has just destroyed the last Klingons.",
+		       cramlc(quadrant, nqx, nqy));
 		finish(FWON);
 		return;
 	}

@@ -359,17 +359,17 @@ void setup(void) {
 		prout("An unknown number of Romulans.");
 		if (game.state.nscrem) prout("and one (GULP) Super-Commander.");
 			prout("%d stardates.",(int)intime);
-			proutn("%d starbases in  ", inbase);
+			proutn("%d starbases in ", inbase);
 	}
 	for (i = 1; i <= inbase; i++) {
-		cramlc(0, game.state.baseqx[i], game.state.baseqy[i]);
-		if (i < inbase) proutn("  ");
+	    	proutn(cramlc(0, game.state.baseqx[i], game.state.baseqy[i]));
+		proutn("  ");
 	}
 	skip(2);
-	proutn("The Enterprise is currently in");
-	cramlc(1, quadx, quady);
+	proutn("The Enterprise is currently in ");
+	proutn(cramlc(quadrant, quadx, quady));
 	proutn(" ");
-	cramlc(2, sectx, secty);
+        proutn(cramlc(sector, sectx, secty));
 	skip(2);
 	prout("Good Luck!");
 	if (game.state.nscrem) proutn("  YOU'LL NEED IT.");

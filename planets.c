@@ -42,7 +42,7 @@ void preport(void) {
 #ifdef DEBUG
 			if (idebug && game.state.plnets[i].known==unknown) proutn("(Unknown) ");
 #endif
-			cramlc(1, game.state.plnets[i].x, game.state.plnets[i].y);
+			proutn(cramlc(quadrant, game.state.plnets[i].x, game.state.plnets[i].y));
 			proutn("   class ");
 			proutn(classes[game.state.plnets[i].pclass]);
 			proutn("   ");
@@ -78,9 +78,8 @@ void orbit(void) {
 	prout("Helmsman Sulu-  \"Entering standard orbit, Sir.\"");
 	newcnd();
 	if (consumeTime()) return;
-	proutn("Sulu-  \"Entered orbit at altitude ");
-	cramf(height = (1400.+7200.*Rand()), 0, 2);
-	prout(" kilometers.\"");
+	height = (1400.+7200.*Rand());
+	prout("Sulu-  \"Entered orbit at altitude %4.2f kilometers.\"", height);
 	inorbit = 1;
 	return;
 }
@@ -96,15 +95,11 @@ void sensor(void) {
 		prout("No planet in this quadrant.");
 		return;
 	}
-	proutn("Spock-  \"Sensor scan for");
-	cramlc(1, quadx, quady);
-	prout("-");
+	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
 	skip(1);
-	proutn("         Planet at");
-	cramlc(2, plnetx, plnety);
-	proutn(" is of class ");
-	proutn(classes[game.state.plnets[iplnet].pclass]);
-	prout(".");
+	prout("         Planet at %s is of class %s.", 
+	       cramlc(sector, plnetx, plnety),
+	       classes[game.state.plnets[iplnet].pclass]);
 	if (game.state.plnets[iplnet].known==shuttle_down) 
 		prout("         Sensors show Galileo still on surface.");
 	proutn("         Readings indicate");
@@ -324,9 +319,8 @@ void shuttle(void) {
 	Time = 3.0e-5*height;
 	if (Time >= 0.8*game.state.remtime) {
 		prout("First Officer Spock-  \"Captain, I compute that such");
-		prout("  a maneuver would require approximately ");
-		cramf(100*Time/game.state.remtime,0,4);
-		prout("% of our");
+		proutn("  a maneuver would require approximately 2d%% of our",
+		      (int)(100*Time/game.state.remtime));
 		prout("remaining time.");
 		prout("Are you sure this is wise?\" ");
 		if (ja()==0) {

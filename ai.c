@@ -26,9 +26,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 		condit == IHDOCKED) {
 		proutn("***");
 		cramen(ienm);
-		proutn(" escapes to");
-		cramlc(1, iqx, iqy);
-		prout(" (and regains strength).");
+		proutn(" escapes to %s (and regains strength).",
+		       cramlc(quadrant, iqx, iqy));
 	}
 	/* handle local matters related to escape */
 	game.kx[loccom] = game.kx[nenhere];
@@ -154,11 +153,8 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		}
 #ifdef DEBUG
 		if (idebug) {
-			proutn("MOTION = ");
-			cramf(motion, 1, 2);
-            proutn("  FORCES = ");
-			cramf(forces, 1, 2);
-			skip(1);
+			proutn("MOTION = %1.2f", motion);
+			proutn("  FORCES = %1,2f", forces);
 		}
 #endif
 		/* don't move if no motion */
@@ -239,8 +235,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 			nexty = looky;
 #ifdef DEBUG
 			if (idebug) {
-				cramlc(0, nextx, nexty);
-				skip(1);
+				prout(cramlc(neither, nextx, nexty));
 			}
 #endif
 		}
@@ -258,9 +253,8 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 			proutn("***");
 			cramen(ienm);
 			if (game.kdist[loccom] < dist1) proutn(" advances to");
-			else proutn(" retreats to");
-			cramlc(2, nextx, nexty);
-			skip(1);
+			else proutn(" retreats to ");
+			prout(cramlc(sector, nextx, nexty));
 		}
 	}
 }
@@ -351,8 +345,8 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 				if (*ipage==0) pause(1);
 				*ipage = 1;
 				prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
-				proutn("   a planet in");
-				cramlc(1, game.state.isx, game.state.isy);
+				proutn("   a planet in ");
+				proutn(cramlc(quadrant, game.state.isx, game.state.isy));
 				prout(" has been destroyed");
 				prout("   by the Super-commander.\"");
 			}
@@ -512,13 +506,12 @@ void scom(int *ipage) {
 			iseenit = 1;
 			if (*ipage == 0)  pause(1);
 			*ipage=1;
-			proutn("Lt. Uhura-  \"Captain, the starbase in");
-			cramlc(1, game.state.isx, game.state.isy);
+			proutn("Lt. Uhura-  \"Captain, the starbase in ");
+			proutn(cramlc(quadrant, game.state.isx, game.state.isy));
 			skip(1);
 			prout("   reports that it is under attack from the Klingon Super-commander.");
-			proutn("   It can survive until stardate ");
-			cramf(game.future[FSCDBAS], 0, 1);
-			prout(" .\"");
+			proutn("   It can survive until stardate %d.\"",
+			       (int)game.future[FSCDBAS]);
 			if (resting==0) return;
 			prout("Mr. Spock-  \"Captain, shall we cancel the rest period?\"");
 			if (ja()==0) return;
@@ -539,8 +532,8 @@ void scom(int *ipage) {
 	if (*ipage==0) pause(1);
 	*ipage = 1;
 	prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
-	proutn("   the Super-commander is in");
-	cramlc(1, game.state.isx, game.state. isy);
+	proutn("   the Super-commander is in ");
+	proutn(cramlc(quadrant, game.state.isx, game.state. isy));
 	prout(".\"");
 	return;
 }
