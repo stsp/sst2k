@@ -10,7 +10,6 @@ void prelim(void) {
 }
 
 void freeze(int boss) {
-	char *x, *y;
 	FILE *fp;
 	int key;
 	if (boss) {

@@ -217,8 +217,8 @@ void chart(int nn) {
 void srscan(int l) {
 	static char requests[][3] =
 		{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
-	char *cp;
-	int leftside=TRUE, rightside=TRUE, i, j, jj, k=0, nn=FALSE;
+	char *cp = NULL;
+	int leftside=TRUE, rightside=TRUE, i, j, k=0, nn=FALSE;
 	int goodScan=TRUE;
 	switch (l) {
 		case 1: // SRSCAN
@@ -339,7 +339,7 @@ void srscan(int l) {
 			
 			
 void eta(void) {
-	int key, ix1, ix2, iy1, iy2, prompt=FALSE;
+	int ix1, ix2, iy1, iy2, prompt=FALSE;
 	int wfl;
 	double ttime, twarp, tpower;
 	if (game.damage[DCOMPTR] != 0.0) {

@@ -585,7 +585,7 @@ void nova(int ix, int iy) {
 	
 	
 void snova(int insx, int insy) {
-	int comdead, nqx, nqy, nsx, nsy, num, kldead, iscdead;
+        int comdead, nqx=0, nqy=0, nsx, nsy, num, kldead, iscdead;
 	int nrmdead, npdead;
 	int insipient=0;
 

@@ -1,3 +1,8 @@
+#ifdef SERGEEV
+#include <conio.h>
+#include <unistd.h>
+#include "sstlinux.h"
+#endif /* SERGEEV */
 #include "sst.h"
 
 void doshield(int i) {
@@ -171,8 +176,12 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	return;
 }
 
-void torpedo(double course, double r, int inx, int iny, double *hit) {
-	int l, iquad, ix, iy,  jx, jy, shoved=0, ll;
+void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
+        int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
+#ifdef SERGEEV
+	int crx,cry;
+	
+#endif /* SERGEEV */
 	double ac=course + 0.25*r;
 	double angle = (15.0-ac)*0.5235988;
 	double bullseye = (15.0 - course)*0.5235988;
@@ -183,7 +192,12 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 	if (fabs(deltay) > bigger) bigger = fabs(deltay);
 	deltax /= bigger;
 	deltay /= bigger;
-
+#ifdef SERGEEV
+        crx=wherex();
+        cry=wherey();
+        if (game.damage[DSRSENS]==0 || condit==IHDOCKED) setwnd(1);
+	else setwnd(4);
+#endif /* SERGEEV */
 	/* Loop to move a single torpedo */
 	for (l=1; l <= 15; l++) {
 		x += deltax;
@@ -192,12 +206,49 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		y += deltay;
 		iy = y + 0.5;
 		if (iy < 1 || iy > 10) break;
+#ifndef SERGEEV
 		if (l==4 || l==9) skip(1);
 		proutn("%d - %d   ", (int)x, (int)y);
 		iquad=game.quad[ix][iy];
+#else
+                iquad=game.quad[ix][iy];
+                if (game.damage[DSRSENS]==0 || condit==IHDOCKED){
+                   drawmaps(2);
+                   delay((wait!=1)*400);
+                   wait=1;
+                   gotoxy(iy*2+3,ix+2);
+                   if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
+                      game.quad[ix][iy]='+';
+                      drawmaps(2);
+                      game.quad[ix][iy]=iquad;
+                      sound(l*10);
+                      delay(100);
+                      nosound();
+                   }
+                   else {
+                        game.quad[ix][iy]|=128;
+                        drawmaps(2);
+                        game.quad[ix][iy]=iquad;
+                        _setcursortype(_NOCURSOR);
+                        sound(500);
+                        delay(1000);
+                        nosound();
+                        lowvideo();
+                        _setcursortype(_NORMALCURSOR);
+                   }
+                }
+                else {
+		  proutn("%d - %d   ", (int)x, (int)y);
+		}
+#endif /* SERGEEV */
 		if (iquad==IHDOT) continue;
 		/* hit something */
+#ifndef SERGEEV
 		skip(1);
+#else
+		setwnd(4);
+	        gotoxy(crx,cry);
+#endif
 		switch(iquad) {
 			case IHE: /* Hit our ship */
 			case IHF:
@@ -209,7 +260,9 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					   1000.0*sqrt(square(ix-inx)+square(iy-iny))*
 					   fabs(sin(bullseye-angle));
 				*hit = fabs(*hit);
+#ifndef SERGEEV
 				newcnd(); /* undock */
+#endif /* SERGEEV */
 				/* We may be displaced. */
 				if (landed==1 || condit==IHDOCKED) return; /* Cheat if on a planet */
 				ang = angle + 2.5*(Rand()-0.5);
@@ -361,10 +414,15 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					 fabs(sin(bullseye-angle));
 				h1 = fabs(h1);
 				if (h1 >= 600) {
+#ifndef SERGEEV
 					prout(" destroyed.");
+#endif /* SERGEEV */
 					game.quad[ix][iy] = IHDOT;
 					ithere = 0;
 					ithx = ithy = 0;
+#ifdef SERGEEV
+                                        deadkl(ix, iy, iquad, ix, iy);
+#endif /* SERGEEV */
 					return;
 				}
 				skip(1);
@@ -392,6 +450,12 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		}
 		break;
 	}
+#ifdef SERGEEV
+        if(curwnd!=4) {
+	    setwnd(4);
+	    gotoxy(crx,cry);
+	}
+#endif /* SERGEEV */
 	if (shoved) {
 		game.quad[jx][jy]=iquad;
 		game.quad[ix][iy]=IHDOT;
@@ -401,14 +465,16 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		sortkl();
 		return;
 	}
+#ifndef SERGEEV
 	skip(1);
+#endif /* SERGEEV */
 	prout("Torpedo missed.");
 	return;
 }
 
 static void fry(double hit) {
 	double ncrit, extradm;
-	int ktr=1, l, ll, j, cdam[NDEVICES+1], crptr;
+	int ktr=1, l, ll, j, cdam[NDEVICES+1];
 
 	/* a critical hit occured */
 	if (hit < (275.0-25.0*skill)*(1.0+0.5*Rand())) return;
@@ -502,7 +568,7 @@ void attack(int k) {
 			prout("  ");
 			r = (Rand()+Rand())*0.5 -0.5;
 			r += 0.002*game.kpower[l]*r;
-			torpedo(course, r, jx, jy, &hit);
+			torpedo(course, r, jx, jy, &hit, 0);
 			if (game.state.remkl==0) finish(FWON); /* Klingons did themselves in! */
 			if (game.state.galaxy[quadx][quady] == 1000 ||
 				alldone) return; /* Supernova or finished */
@@ -518,6 +584,7 @@ void attack(int k) {
 			if (absorb > shield) absorb = shield;
 			shield -= absorb;
 			hit -= hitsh;
+                        if (condit==IHDOCKED) dock(0);
 			if (propor > 0.1 && hit < 0.005*energy) continue;
 		}
 		/* It's a hit -- print out hit size */
@@ -541,6 +608,7 @@ void attack(int k) {
 		fry(hit);
 		prout("Hit %g energy %g", hit, energy);
 		energy -= hit;
+                if (condit==IHDOCKED) dock(0);
 	}
 	if (energy <= 0) {
 		/* Returning home upon your shield, not with it... */
@@ -585,7 +653,10 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 	/* Added ixx and iyy allow enemy to "move" before dying */
 
 	int i,j;
-	
+
+#ifdef SERGEEV	
+        skip(1);
+#endif /* SERGEEV */
 	crmena(1, type, 2, ixx, iyy);
 	/* Decide what kind of enemy it is and update approriately */
 	if (type == IHR) {
@@ -801,7 +872,8 @@ void photon(void) {
 				break;
 			}
 		}
-		if (shldup != 0 || condit == IHDOCKED) r *= 1.0 + 0.0001*shield;
+		if (shldup || condit == IHDOCKED) r *= 1.0 + 0.0001*shield;
+#ifndef SERGEEV
 		if (n != 1) {
 			skip(1);
 			proutn("Track for torpedo number %d-  ", i);
@@ -810,7 +882,8 @@ void photon(void) {
 			skip(1);
 			proutn("Torpedo track- ");
 		}
-		torpedo(course[i], r, sectx, secty, &dummy);
+#endif /* SERGEEV */
+		torpedo(course[i], r, sectx, secty, &dummy, i);
 		if (alldone || game.state.galaxy[quadx][quady]==1000) return;
 	}
 	if (game.state.remkl==0) finish(FWON);
@@ -871,8 +944,8 @@ static int checkshctrl(double rpow) {
 	
 
 void phasers(void) {
-	double hits[21], rpow, extra, powrem, over, temp;
-	int kz = 0, k=1, i; /* Cheating inhibitor */
+	double hits[21], rpow=0, extra, powrem, over, temp;
+	int kz = 0, k=1, i, irec=0; /* Cheating inhibitor */
 	int ifast=0, no=0, ipoop=1, msgflag = 1;
 	enum {NOTSET, MANUAL, FORCEMAN, AUTOMATIC} automode = NOTSET;
 	int key=0;
@@ -905,7 +978,6 @@ void phasers(void) {
 		ifast = 1;
 		
 	}
-	ididit = 1;
 	/* Original code so convoluted, I re-did it all */
 	while (automode==NOTSET) {
 		key=scan();
@@ -938,7 +1010,6 @@ void phasers(void) {
 			}
 			else {
 				huh();
-				ididit = 0;
 				return;
 			}
 		}
@@ -972,25 +1043,31 @@ void phasers(void) {
 				key = scan();
 			}
 			if (key != IHREAL && nenhere != 0) {
-				prout("Phasers locked on target. Energy available: %.2f", ifast?energy-200.0:energy);
+                                prout("Phasers locked on target. Energy available: %.2f",
+                            	    ifast?energy-200.0:energy,1,2);
 			}
+                        irec=0;
 			do {
-				while (key != IHREAL) {
+                                        chew();
+                                        if (!kz) for (i = 1; i <= nenhere; i++)
+                                                     irec+=fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
+                                                     (1.01+0.05*Rand()) + 1.0;
+                                        kz=1;
+                                        proutn("(%d) units required. ", irec);
 					chew();
-					proutn("Units to fire=");
+					proutn("Units to fire= ");
 					key = scan();
-				}
-				rpow = aaitem;
-				if (rpow >= (ifast?energy-200:energy)) {
-				    proutn("Energy available= %.2f",
-					ifast?energy-200:energy);
+                                        if (key!=IHREAL) return;
+					rpow = aaitem;
+                            		if (rpow > (ifast?energy-200:energy)) {
+                                    	    proutn("Energy available= %.2f",
+					    ifast?energy-200:energy);
 					skip(1);
 					key = IHEOL;
 				}
-			} while (rpow >= (ifast?energy-200:energy));
+			} while (rpow > (ifast?energy-200:energy));
 			if (rpow<=0) {
 				/* chicken out */
-				ididit = 0;
 				chew();
 				return;
 			}
@@ -1020,6 +1097,7 @@ void phasers(void) {
 				}
 				if (powrem > 0.0) extra += powrem;
 				hittem(hits);
+                                ididit=1;
 			}
 			if (extra > 0 && alldone == 0) {
 				if (ithere) {
@@ -1071,12 +1149,14 @@ void phasers(void) {
 				}
 				if (key == IHEOL) {
 					chew();
-					if (ipoop && k > kz) {
-						int irec=(fabs(game.kpower[k])/(PHASEFAC*pow(0.9,game.kdist[k])))*
+                                        if (ipoop && k > kz)
+                                                irec=(fabs(game.kpower[k])/(PHASEFAC*pow(0.9,game.kdist[k])))*
 								 (1.01+0.05*Rand()) + 1.0;
-						kz = k;
-						proutn("(%d)", irec);
-					}
+					kz = k;
+					proutn("(");
+                                        if (game.damage[DCOMPTR]==0) proutn("%d", irec);
+                                        else proutn("??");
+ 					proutn(")  ");
 					proutn("units to fire at ");
 					crmena(0, ienm, 2, ii, jj);
 					proutn("-  ");
@@ -1089,7 +1169,6 @@ void phasers(void) {
 					}
 				if (key == IHALPHA) {
 					huh();
-					ididit = 0;
 					return;
 				}
 				if (key == IHEOL) {
@@ -1107,20 +1186,16 @@ void phasers(void) {
 				rpow += aaitem;
 				/* If total requested is too much, inform and start over */
 				
-				if (rpow >= (ifast?energy-200:energy)) {
+				if (rpow > (ifast?energy-200:energy)) {
 					prout("Available energy exceeded -- try again.");
 					chew();
-					key = IHEOL;
-					k = 1;
-					msgflag = 1;
-					continue;
+                                        return;
 				}
 				key = scan(); /* scan for next value */
 				k++;
 			}
 			if (rpow == 0.0) {
 				/* zero energy -- abort */
-				ididit = 0;
 				chew();
 				return;
 			}
@@ -1135,6 +1210,7 @@ void phasers(void) {
 			}
 			hittem(hits);
 			ididit=1;
+		case NOTSET:;	/* avoid gcc warning */
 	}
 	/* Say shield raised or malfunction, if necessary */
 	if (alldone) return;
@@ -1158,6 +1234,9 @@ void phasers(void) {
 
 void hittem(double *hits) {
 	double kp, kpow, wham, hit, dustfac, kpini;
+#ifdef SERGEEV
+	int cx, cy;
+#endif /* SERGEEV */
 	int nenhr2=nenhere, k=1, kk=1, ii, jj, ienm;
 
 	skip(1);
@@ -1174,6 +1253,27 @@ void hittem(double *hits) {
 		ii = game.kx[kk];
 		jj = game.ky[kk];
 		if (hit > 0.005) {
+#ifdef SERGEEV
+                        if (game.damage[DSRSENS]==0){
+                           crx=wherex();
+                           cry=wherey();
+                           setwnd(1);
+                           drawmaps(2);
+                           gotoxy(jj*2+3,ii+2);
+                           highvideo();
+                           proutn("%c", game.quad[ii][jj]);
+                           gotoxy(wherex()-1,wherey());
+                           sound(500);
+                           delay(1000);
+                           nosound();
+                           lowvideo();
+                           proutn("%c", game.quad[ii][jj]);
+                           setwnd(4);
+                           gotoxy(crx,cry);
+                           _setcursortype(_NORMALCURSOR);
+                           delay(500);
+                        }
+#endif /* SERGEEV */
 			proutn("%d unit hit on ", (int)hit);
 		}
 		else

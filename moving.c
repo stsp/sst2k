@@ -887,7 +887,7 @@ void probe(void) {
 void help(void) {
 	/* There's more than one way to move in this game! */
 	double ddist, xdist, probf;
-	int line, l, ix, iy;
+	int line = 0, l, ix, iy;
 
 	chew();
 	/* Test for conditions which prevent calling for help */

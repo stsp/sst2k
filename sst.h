@@ -408,7 +408,7 @@ void crmena(int, int, int, int, int);
 void deadkl(int, int, int, int, int);
 void timwrp(void);
 void movcom(void);
-void torpedo(double, double, int, int, double *);
+void torpedo(double, double, int, int, double *, int);
 void huh(void);
 void pause_game(int);
 void nova(int, int);

@@ -2,12 +2,16 @@
 
 VERS=$(shell sed <sst.spec -n -e '/Version: \(.*\)/s//\1/p')
 
+#ifndef SERGEEV
 CFLAGS=     -O -g -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
+#else /* SERGEEV */
+CFLAGS= -O1 -g -Wall -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
+#endif /* SERGEEV */
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c io.c
+CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c io.c sstlinux.c conio.c
 OFILES= $(CFILES:.c=.o)
 HFILES=sst.h
 DOCS = README sst-doc.xml sst.xml sst-layer.xsl TODO

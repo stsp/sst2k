@@ -201,7 +201,6 @@ static void helpme(void) {
 
 static void makemoves(void) {
 	int i, hitme;
-	char ch;
 	while (TRUE) { /* command loop */
 		hitme = FALSE;
 		justin = 0;
@@ -385,9 +384,6 @@ static void makemoves(void) {
 
 int main(int argc, char **argv) {
     int i, option, usecurses = TRUE;
-	int hitme;
-	char ch;
-
 	while ((option = getopt(argc, argv, "t")) != -1) {
 	    switch (option) {
 	    case 't':
@@ -430,6 +426,7 @@ int main(int argc, char **argv) {
 	skip(1);
 	ioend();
 	puts("May the Great Bird of the Galaxy roost upon your home planet.");
+	exit(0);
 }
 
 
