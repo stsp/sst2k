@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <getopt.h>
 #include <time.h>
-#include "conio.h"
 #include "sstlinux.h"
 #include "sst.h"
 
@@ -260,7 +259,7 @@ static void helpme(void) {
 	while (fgets(linebuf, sizeof(linebuf),fp)) {
 		if (strstr(linebuf, "******"))
 			break;
-		proutc(linebuf);
+		proutn(linebuf);
 	}
 	fclose(fp);
 }
@@ -493,6 +492,8 @@ int main(int argc, char **argv) {
 		strcat(line, " ");
 	}
 	while (TRUE) { /* Play a game */
+		setwnd(FULLSCREEN_WINDOW);
+		clrscr();
 	        prelim();
 		setup(line[0] == '\0');
 		if (alldone) {
@@ -513,11 +514,8 @@ int main(int argc, char **argv) {
 		}
 		proutn("Do you want to play again? ");
 		if (!ja()) break;
-		setwnd(FULLSCREEN_WINDOW);
-		clrscr();
 	}
 	skip(1);
-	ioend();
 	prout("May the Great Bird of the Galaxy roost upon your home planet.");
 	return 0;
 }

@@ -7,7 +7,7 @@ CFLAGS= -O1 -g -Wall -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c io.c sstlinux.c conio.c
+CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c io.c sstlinux.c
 OFILES= $(CFILES:.c=.o)
 HFILES=sst.h
 DOCS = README sst-doc.xml sst.xml sst-layer.xsl TODO
@@ -18,16 +18,16 @@ SOURCES= $(CFILES) $(HFILES) $(DOCS) sst.doc sst.6 makehelp.py makefile sst.spec
 all: sst sst.doc
 
 ai.o: ai.c sst.h
-battle.o: battle.c conio.h sst.h
+battle.o: battle.c sst.h
 conio.o: conio.c conio.h
 events.o: events.c sst.h
 finish.o: finish.c sst.h
-io.o: io.c conio.h sst.h
-moving.o: moving.c sstlinux.h conio.h sst.h
+io.o: io.c sst.h
+moving.o: moving.c sstlinux.h sst.h
 planets.o: planets.c sst.h
 reports.o: reports.c sst.h conio.h
-setup.o: setup.c conio.h sst.h
-sst.o: sst.c conio.h sstlinux.h sst.h
+setup.o: setup.c sst.h
+sst.o: sst.c sstlinux.h sst.h
 sstlinux.o: sstlinux.c sstlinux.h
 
 sst:  $(OFILES)

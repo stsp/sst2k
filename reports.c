@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "conio.h"
 
 void attakreport(int l) {
      if (!l) {
@@ -272,10 +271,12 @@ int srscan(int l) {
                                                 case IHDOCKED: textcolor(LIGHTGRAY); break;
                                                 case IHDEAD: textcolor(WHITE);
                                         }
-                                        if (game.quad[i][j]!=ship) highvideo();
+                                        if (game.quad[i][j] != ship) 
+					    highvideo();
                                    }
-                                   if (game.quad[i][j] & 128) highvideo();
-                                   proutn("%c ",game.quad[i][j] & 127);
+                                   if (game.quad[i][j] & DAMAGED) 
+				       highvideo();
+                                   proutn("%c ",game.quad[i][j] & ~DAMAGED);
                                    textcolor(LIGHTGRAY);
                                 }
 				else

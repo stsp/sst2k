@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <curses.h>
 #ifndef INCLUDED
 #define EXTERN extern
 #else
@@ -61,7 +62,7 @@ typedef struct {
 
 #define SSTMAGIC	"SST2.0\n"
 
-EXTERN short curwnd;
+EXTERN WINDOW *curwnd;
 
 EXTERN struct {
     char magic[sizeof(SSTMAGIC)];
@@ -418,7 +419,6 @@ void snova(int, int);
 void scom(int *);
 void hittem(double *);
 void prouts(char *, ...);
-void proutc(char *);
 int isit(char *);
 void preport(void);
 void orbit(void);
@@ -434,8 +434,7 @@ void attakreport(int);
 void movetho(void);
 void probe(void);
 void iostart(int);
-void ioend(void);
-void setwnd(short);
+void setwnd(WINDOW *);
 void warble(void);
 void boom(int ii, int jj);
 void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, int iquad);
@@ -452,10 +451,21 @@ void enqueue(char *s);
 #define SCAN_STATUS		3
 #define SCAN_NO_LEFTSIDE	4
 
-/* these need to track io.c:wnd */
-#define FULLSCREEN_WINDOW	0
-#define LEFTUPPER_WINDOW	1
-#define SRSCAN_WINDOW		2
-#define LRSCAN_WINDOW		3
-#define LOWER_WINDOW		4
-#define BOTTOM_WINDOW		5
+WINDOW *FULLSCREEN_WINDOW;
+WINDOW *SRSCAN_WINDOW;
+WINDOW *REPORT_WINDOW;
+WINDOW *LRSCAN_WINDOW;
+WINDOW *LOWER_WINDOW;
+WINDOW *BOTTOM_WINDOW;
+
+extern void clreol(void);
+extern void clrscr(void);
+extern void textcolor(int color);
+extern void highvideo(void);
+
+enum COLORS {
+   BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY,
+   DARKGRAY, LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE
+};
+
+#define DAMAGED	128	/* marker for damaged ship in starmap */

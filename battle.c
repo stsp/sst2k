@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include "conio.h"
 #include "sst.h"
 
 void doshield(int i) {
@@ -187,7 +186,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	deltax /= bigger;
 	deltay /= bigger;
         if (game.damage[DSRSENS]==0 || condit==IHDOCKED) 
-	    setwnd(LEFTUPPER_WINDOW);
+	    setwnd(SRSCAN_WINDOW);
 	else 
 	    setwnd(LOWER_WINDOW);
 	/* Loop to move a single torpedo */

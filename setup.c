@@ -1,6 +1,5 @@
 #include <time.h>
 #include <sys/stat.h>
-#include "conio.h"
 #include "sst.h"
 
 #ifdef __linux__
