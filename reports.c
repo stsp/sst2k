@@ -195,11 +195,11 @@ void chart(int nn)
 	rechart();
 
     if (lastchart < game.state.date && condit == IHDOCKED) {
-	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n\r");
+	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n");
 	rechart();
     }
 
-    if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n\r");
+    if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n");
     if (game.state.date > lastchart)
 	prout("(Last surveillance update %d stardates ago).",
 	      (int)(game.state.date-lastchart));
@@ -230,7 +230,7 @@ void chart(int nn)
 		proutn(" ");
 	}
 	proutn("  |");
-	if (i<GALSIZE) proutn("\n\r");
+	if (i<GALSIZE) proutn("\n");
     }
     prout("");	/* flush output */
 }
@@ -343,7 +343,7 @@ int srscan(int l)
 	    else
 		prout("  [Using Base's sensors]");
 	}
-	else proutn("     Short-range scan\n\r");
+	else proutn("     Short-range scan\n");
 	if (goodScan && !game.damage[DRADIO]) { 
 	    game.state.chart[quadx][quady].klingons = game.state.galaxy[quadx][quady].klingons;
 	    game.state.chart[quadx][quady].starbase = game.state.galaxy[quadx][quady].starbase;
@@ -354,7 +354,7 @@ int srscan(int l)
 	if (isit("chart")) nn = TRUE;
 	if (isit("no")) rightside = FALSE;
 	chew();
-	proutn("    1 2 3 4 5 6 7 8 9 10\n\r");
+	proutn("    1 2 3 4 5 6 7 8 9 10\n");
 	break;
     case SCAN_REQUEST:
 	while (scan() == IHEOL)
@@ -390,7 +390,7 @@ int srscan(int l)
 	}
 	if (rightside)
 	    status(jj);
-	if (i<sizeof(requests)/sizeof(requests[0])) proutn("\n\r");
+	if (i<sizeof(requests)/sizeof(requests[0])) proutn("\n");
 	if (req!=0) return(goodScan);
     }
     prout("");
