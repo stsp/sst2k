@@ -304,7 +304,7 @@ void events(void)
 	    if (probecx != i || probecy != j) {
 		probecx = i;
 		probecy = j;
-		if (i < 1 || i > GALSIZE || j < 1 || j > GALSIZE ||
+		if (!VALID_QUADRANT(i, j) ||
 		    game.state.galaxy[probecx][probecy].supernova) {
 		    // Left galaxy or ran into supernova
 		    if (game.damage[DRADIO]==0.0 || condit == IHDOCKED) {
@@ -312,7 +312,7 @@ void events(void)
 			ipage = 1;
 			skip(1);
 			proutn("Lt. Uhura-  \"The deep space probe ");
-			if (i < 1 ||i > GALSIZE || j < 1 || j > GALSIZE)
+			if (!VALID_QUADRANT(j, i))
 			    proutn("has left the galaxy");
 			else
 			    proutn("is no longer transmitting");
@@ -441,7 +441,7 @@ void nova(int ix, int iy)
 		    if (j==2 && nn== 2) continue;
 		    ii = hits[mm][1]+nn-2;
 		    jj = hits[mm][2]+j-2;
-		    if (ii < 1 || ii > QUADSIZE || jj < 1 || jj > QUADSIZE) continue;
+		    if (!VALID_SECTOR(jj, ii)) continue;
 		    iquad = game.quad[ii][jj];
 		    switch (iquad) {
 		    // case IHDOT:	/* Empty space ends reaction
@@ -535,7 +535,7 @@ void nova(int ix, int iy)
 			newcy = jj + jj - hits[mm][2];
 			crmena(1, iquad, 2, ii, jj);
 			proutn(" damaged");
-			if (newcx<1 || newcx>QUADSIZE || newcy<1 || newcy>QUADSIZE) {
+			if (!VALID_SECTOR(newcx, newcy)) {
 			    /* can't leave quadrant */
 			    skip(1);
 			    break;
@@ -610,15 +610,15 @@ void snova(int insx, int insy)
 	    /* Scheduled supernova -- select star */
 	    /* logic changed here so that we won't favor quadrants in top
 	       left of universe */
-	    for (nqx = 1; nqx<=GALSIZE; nqx++) {
-		for (nqy = 1; nqy<=GALSIZE; nqy++) {
+	    for_quadrants(nqx) {
+		for_quadrants(nqy) {
 		    stars += game.state.galaxy[nqx][nqy].stars;
 		}
 	    }
 	    if (stars == 0) return; /* nothing to supernova exists */
 	    num = Rand()*stars + 1;
-	    for (nqx = 1; nqx<=GALSIZE; nqx++) {
-		for (nqy = 1; nqy<=GALSIZE; nqy++) {
+	    for_quadrants(nqx) {
+		for_quadrants(nqy) {
 		    num -= game.state.galaxy[nqx][nqy].stars;
 		    if (num <= 0) break;
 		}
@@ -648,8 +648,8 @@ void snova(int insx, int insy)
 	    /* we are in the quadrant! */
 	    incipient = 1;
 	    num = Rand()* game.state.galaxy[nqx][nqy].stars + 1;
-	    for (nsx=1; nsx < QUADSIZE; nsx++) {
-		for (nsy=1; nsy < QUADSIZE; nsy++) {
+	    for_sectors(nsx) {
+		for_sectors(nsy) {
 		    if (game.quad[nsx][nsy]==IHSTAR) {
 			num--;
 			if (num==0) break;

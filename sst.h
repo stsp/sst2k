@@ -21,6 +21,15 @@
 #define QUADSIZE (10)
 #define BASEMAX	(6)
 
+/*
+ * These macros hide the difference between 0-origin and 1-origin addressing.
+ * They're a step towards de-FORTRANizing the code.
+ */
+#define VALID_QUADRANT(x, y)	((x)>=1 && (x)<=GALSIZE && (y)>=1 && (y)<=GALSIZE)
+#define VALID_SECTOR(x, y)	((x)>=1 && (x)<=QUADSIZE && (y)>=1 && (y)<=QUADSIZE)
+#define for_quadrants(i)	for (i = 1; i < GALSIZE+1; i++)
+#define for_sectors(i)		for (i = 1; i < QUADSIZE+1; i++)
+
 typedef struct {
     int x;	/* Quadrant location of planet */
     int y;

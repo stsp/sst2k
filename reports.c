@@ -132,7 +132,7 @@ void lrscan(void)
     for (x = quadx-1; x <= quadx+1; x++) {
 	proutn(" ");
 	for (y = quady-1; y <= quady+1; y++) {
-	    if (x == 0 || x > GALSIZE || y == 0 || y > GALSIZE)
+	    if (!VALID_QUADRANT(x, y))
 		proutn("  -1");
 	    else {
 		if (!game.damage[DRADIO])
@@ -176,8 +176,8 @@ void rechart(void)
 {
     int i, j;
     stdamtim = game.state.date;
-    for (i=1; i <= GALSIZE ; i++)
-	for (j=1; j <= GALSIZE; j++) 
+    for_quadrants(i)
+	for_quadrants(j) 
 	    if (game.state.galaxy[i][j].charted) {
 		game.state.chart[i][j].klingons = game.state.galaxy[i][j].klingons;
 		game.state.chart[i][j].starbase = game.state.galaxy[i][j].starbase;
@@ -208,9 +208,9 @@ void chart(int nn)
 	rechart();
 
     prout("      1    2    3    4    5    6    7    8");
-    for (i = 1; i <= GALSIZE; i++) {
+    for_quadrants(i) {
 	proutn("%d |", i);
-	for (j = 1; j <= GALSIZE; j++) {
+	for_quadrants(j) {
 	    char buf[4];
 	    proutn("  ");
 	    if (game.state.galaxy[i][j].supernova)
@@ -381,7 +381,7 @@ int srscan(int l)
 	jj = (req!=0 ? req : i);
 	if (leftside && i <= QUADSIZE) {
 	    proutn("%2d  ", i);
-	    for (j = 1; j <= QUADSIZE; j++) {
+	    for_sectors(j) {
 		sectscan(goodScan, i, j);
 	    }
 	}
@@ -436,8 +436,7 @@ void eta(void)
 	else iy2=QUADSIZE;
     }
 
-    if (ix1 > GALSIZE || ix1 < 1 || iy1 > GALSIZE || iy1 < 1 ||
-	ix2 > QUADSIZE || ix2 < 1 || iy2 > QUADSIZE || iy2 < 1) {
+    if (!VALID_QUADRANT(ix1, iy1) || !VALID_SECTOR(ix2, iy2)) {
 	huh();
 	return;
     }

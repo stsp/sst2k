@@ -6,7 +6,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 
     iqx = quadx+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
     iqy = quady+(looky+(QUADSIZE-1))/QUADSIZE - 1;
-    if (iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
+    if (!VALID_QUADRANT(iqx,iqy) ||
 	game.state.galaxy[iqx][iqy].supernova ||
 	game.state.galaxy[iqx][iqy].klingons > 8)
 	return 0; /* no can do -- neg energy, supernovae, or >8 Klingons */
@@ -307,7 +307,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
     int i;
 
     if ((iqx==quadx && iqy==quady) ||
-	iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
+	!VALID_QUADRANT(iqx, iqy) ||
 	game.state.galaxy[iqx][iqy].supernova ||
 	game.state.galaxy[iqx][iqy].klingons > 8) 
 	return 1;
@@ -595,7 +595,7 @@ void movetho(void)
     game.ky[nenhere]=ithy;
 
     /* check to see if all holes plugged */
-    for (i = 1; i < QUADSIZE+1; i++) {
+    for_sectors(i) {
 	if (game.quad[1][i]!=IHWEB && game.quad[1][i]!=IHT) return;
 	if (game.quad[QUADSIZE][i]!=IHWEB && game.quad[QUADSIZE][i]!=IHT) return;
 	if (game.quad[i][1]!=IHWEB && game.quad[i][1]!=IHT) return;

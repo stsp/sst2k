@@ -156,11 +156,10 @@ void abandn(void)
 	for (;;) {
 	    /* position next to base by trial and error */
 	    game.quad[sectx][secty] = IHDOT;
-	    for (l = 1; l <= QUADSIZE; l++) {
+	    for_sectors(l) {
 		sectx = 3.0*Rand() - 1.0 + basex;
 		secty = 3.0*Rand() - 1.0 + basey;
-		if (sectx >= 1 && sectx <= QUADSIZE &&
-		    secty >= 1 && secty <= QUADSIZE &&
+		if (VALID_SECTOR(sectx, secty) &&
 		    game.quad[sectx][secty] == IHDOT) break;
 	    }
 	    if (l < QUADSIZE+1) break; /* found a spot */
@@ -227,8 +226,8 @@ void setup(int needprompt)
     landed = -1;
     alive = 1;
     docfac = 0.25;
-    for (i = 1; i <= GALSIZE; i++)
-	for (j = 1; j <= GALSIZE; j++) {
+    for_quadrants(i)
+	for_quadrants(j) {
 	    game.state.galaxy[i][j].charted = 0;
 	    game.state.galaxy[i][j].planets = 0;
 	    game.state.galaxy[i][j].romulans = 0;
@@ -246,8 +245,8 @@ void setup(int needprompt)
     stdamtim = 1e30;
     // Put stars in the galaxy
     instar = 0;
-    for (i=1; i<=GALSIZE; i++)
-	for (j=1; j<=GALSIZE; j++) {
+    for_quadrants(i)
+	for_quadrants(j) {
 	    int k = Rand()*9.0 + 1.0;
 	    instar += k;
 	    game.state.galaxy[i][j].stars = k;
@@ -536,8 +535,8 @@ void newqad(int shutup)
 	ientesc = 1;
     }
     // Clear quadrant
-    for (i=1; i <= QUADSIZE; i++)
-	for (j=1; j <= QUADSIZE; j++) 
+    for_sectors(i)
+	for_sectors(j) 
 	    game.quad[i][j] = IHDOT;
     // cope with supernova
     if (game.state.galaxy[quadx][quady].supernova)

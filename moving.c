@@ -43,7 +43,7 @@ void imove(void)
 	for (l = 1; l <= n; l++) {
 	    ix = (x += deltax) + 0.5;
 	    iy = (y += deltay) + 0.5;
-	    if (ix < 1 || ix > QUADSIZE || iy < 1 || iy > QUADSIZE) {
+	    if (!VALID_SECTOR(ix, iy)) {
 		/* Leaving quadrant -- allow final enemy attack */
 		/* Don't do it if being pushed by Nova */
 		if (nenhere != 0 && iattak != 2) {
@@ -372,11 +372,10 @@ static void getcd(int isprobe, int akey) {
 			}
 			itemp = 1;
 		}
-		if (irowq<1 || irowq > GALSIZE || icolq<1 || icolq > GALSIZE ||
-			irows<1 || irows > QUADSIZE || icols<1 || icols > QUADSIZE) {
-				huh();
-				return;
-			}
+		if (!VALID_QUADRANT(icolq,irowq)||!VALID_SECTOR(icols,irows)) {
+		    huh();
+		    return;
+		}
 		skip(1);
 		if (!isprobe) {
 			if (itemp) {
@@ -589,10 +588,9 @@ void warp(int i)
 	    for (l = 1; l <= n; l++) {
 		x += deltax;
 		ix = x + 0.5;
-		if (ix < 1 || ix > QUADSIZE) break;
 		y += deltay;
 		iy = y +0.5;
-		if (iy < 1 || iy > QUADSIZE) break;
+		if (!VALID_SECTOR(ix, iy)) break;
 		if (game.quad[ix][iy] != IHDOT) {
 		    blooey = 0;
 		    twarp = 0;
@@ -953,7 +951,7 @@ void help(void)
     for (l = 1; l <= 5; l++) {
 	ix = basex+3.0*Rand()-1;
 	iy = basey+3.0*Rand()-1;
-	if (ix>=1 && ix<=QUADSIZE && iy>=1 && iy<=QUADSIZE && game.quad[ix][iy]==IHDOT) {
+	if (VALID_SECTOR(ix,iy) && game.quad[ix][iy]==IHDOT) {
 	    /* found one -- finish up */
 	    sectx=ix;
 	    secty=iy;
