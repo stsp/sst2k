@@ -179,7 +179,8 @@ void abandn(void)
     iscraft=0; /* Gallileo disappears */
     /* Resupply ship */
     condit=IHDOCKED;
-    for (l = 1; l <= NDEVICES; l++) game.damage[l] = 0.0;
+    for (l = 0; l < NDEVICES; l++) 
+	game.damage[l] = 0.0;
     game.damage[DSHUTTL] = -1;
     energy = inenrg = 3000.0;
     shield = inshld = 1250.0;
@@ -214,7 +215,8 @@ void setup(int needprompt)
     nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
     warpfac = 5.0;
     wfacsq = warpfac * warpfac;
-    for (i=0; i <= NDEVICES; i++) game.damage[i] = 0.0;
+    for (i=0; i < NDEVICES; i++) 
+	game.damage[i] = 0.0;
     // Set up assorted game parameters
     batx = baty = 0;
     game.state.date = indate = 100.0*(int)(31.0*Rand()+20.0);

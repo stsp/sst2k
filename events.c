@@ -51,7 +51,7 @@ void events(void)
 	repair = xtime;
 	if (condit == IHDOCKED) repair /= docfac;
 	/* Don't fix Deathray here */
-	for (l=1; l<=NDEVICES; l++)
+	for (l=0; l<NDEVICES; l++)
 	    if (game.damage[l] > 0.0 && l != DDRAY)
 		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 	/* If radio repaired, update star chart and attack reports */

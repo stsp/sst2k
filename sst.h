@@ -14,7 +14,6 @@
 
 // #define DEBUG
 
-#define NDEVICES (15)	// Number of devices
 #define PHASEFAC (2.0)
 #define PLNETMAX (10)
 #define NEVENTS (8)
@@ -95,6 +94,24 @@ typedef struct {
 #define OPTION_THINGY	0x00000010	/* Space Thingy can shoot back */
 #define OPTION_PROBE	0x00000020	/* deep-space probes */
 
+/* Define devices */
+#define DSRSENS 0
+#define DLRSENS 1
+#define DPHASER 2
+#define DPHOTON 3
+#define DLIFSUP 4
+#define DWARPEN 5
+#define DIMPULS 6
+#define DSHIELD 7
+#define DRADIO  8
+#define DSHUTTL 9
+#define DCOMPTR 10
+#define DTRANSP 11
+#define DSHCTRL 12
+#define DDRAY   13  // Added deathray
+#define DDSP    14  // Added deep space probe
+#define NDEVICES (15)	// Number of devices
+
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,
@@ -113,7 +130,7 @@ EXTERN struct {
     double kpower[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy energy levels
     double kdist[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy distances
     double kavgd[(QUADSIZE+1)*(QUADSIZE+1)];		// average distances
-    double damage[NDEVICES+1];	// damage encountered
+    double damage[NDEVICES];	// damage encountered
     double future[NEVENTS+1];	// future events
     char passwd[10];		// Self Destruct password
     int kx[(QUADSIZE+1)*(QUADSIZE+1)];			// enemy sector locations
@@ -294,7 +311,7 @@ EXTERN struct {
 #define nprobes game.nprobes		// number of probes available
 
 /* the following global state doesn't need to be saved */
-EXTERN char	*device[NDEVICES+1];
+EXTERN char	*device[NDEVICES];
 EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
 EXTERN double aaitem;
@@ -310,23 +327,6 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 			  FHOLE} FINTYPE ;
 enum loctype {neither, quadrant, sector};
 
-/* Define devices */
-#define DSRSENS 1
-#define DLRSENS 2
-#define DPHASER 3
-#define DPHOTON 4
-#define DLIFSUP 5
-#define DWARPEN 6
-#define DIMPULS 7
-#define DSHIELD 8
-#define DRADIO  9
-#define DSHUTTL 10
-#define DCOMPTR 11
-#define DTRANSP 12
-#define DSHCTRL 13
-#define DDRAY   14  // Added deathray
-#define DDSP    15  // Added deep space probe
-
 /* Define future events */
 #define FSPY	0	// Spy event happens always (no future[] entry)
 					// can cause SC to tractor beam Enterprise
@@ -340,8 +340,7 @@ enum loctype {neither, quadrant, sector};
 #define FDSPROB 8   // Move deep space probe
 
 #ifdef INCLUDED
-char *device[NDEVICES+1] = {
-	"",
+char *device[NDEVICES] = {
 	"S. R. Sensors",
 	"L. R. Sensors",
 	"Phasers",
@@ -355,8 +354,8 @@ char *device[NDEVICES+1] = {
 	"Computer",
 	"Transporter",
 	"Shield Control",
-    "Death Ray",
-    "D. S. Probe"};									
+	"Death Ray",
+	"D. S. Probe"};									
 #endif
 
 #ifndef TRUE

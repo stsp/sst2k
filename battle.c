@@ -159,9 +159,11 @@ void ram(int ibumpd, int ienm, int ix, int iy)
     icas = 10.0+20.0*Rand();
     prout("***Sickbay reports %d casualties", icas);
     casual += icas;
-    for (l=1; l <= NDEVICES; l++) {
-	if (l == DDRAY) continue; // Don't damage deathray 
-	if (game.damage[l] < 0) continue;
+    for (l=0; l < NDEVICES; l++) {
+	if (l == DDRAY) 
+	    continue; // Don't damage deathray 
+	if (game.damage[l] < 0) 
+	    continue;
 	extradm = (10.0*type*Rand()+1.0)*damfac;
 	game.damage[l] += Time + extradm; /* Damage for at least time of travel! */
     }
@@ -422,7 +424,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 static void fry(double hit) 
 {
     double ncrit, extradm;
-    int ktr=1, l, ll, j, cdam[NDEVICES+1];
+    int ktr=1, l, ll, j, cdam[NDEVICES];
 
     /* a critical hit occured */
     if (hit < (275.0-25.0*skill)*(1.0+0.5*Rand())) return;
@@ -430,16 +432,16 @@ static void fry(double hit)
     ncrit = 1.0 + hit/(500.0+100.0*Rand());
     proutn("***CRITICAL HIT--");
     /* Select devices and cause damage */
-    for (l = 1; l <= ncrit && l <= NDEVICES; l++) {
+    for (l = 0; l < ncrit && 0 < NDEVICES; l++) {
 	do {
-	    j = NDEVICES*Rand()+1.0;
+	    j = NDEVICES*Rand();
 	    /* Cheat to prevent shuttle damage unless on ship */
-	} while (game.damage[j] < 0.0 || (j == DSHUTTL && iscraft != 1) ||
-		 j == DDRAY);
+	} while 
+	      (game.damage[j]<0.0 || (j==DSHUTTL && iscraft!=1) || j==DDRAY);
 	cdam[l] = j;
 	extradm = (hit*damfac)/(ncrit*(75.0+25.0*Rand()));
 	game.damage[j] += extradm;
-	if (l > 1) {
+	if (l > 0) {
 	    for (ll=2; ll<=l && j != cdam[ll-1]; ll++) ;
 	    if (ll<=l) continue;
 	    ktr += 1;

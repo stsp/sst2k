@@ -749,7 +749,7 @@ void debugme(void)
     proutn("Reset damage? ");
     if (ja() != 0) {
 	int i;
-	for (i=0; i <= NDEVICES; i++) 
+	for (i=0; i < NDEVICES; i++) 
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
 	stdamtim = 1e30;
@@ -763,7 +763,7 @@ void debugme(void)
     proutn("Cause selective damage? ");
     if (ja() != 0) {
 	int i, key;
-	for (i=1; i <= NDEVICES; i++) {
+	for (i=0; i < NDEVICES; i++) {
 	    proutn("Kill ");
 	    proutn(device[i]);
 	    proutn("? ");

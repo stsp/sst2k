@@ -149,7 +149,7 @@ void dreprt(void)
     int jdam = FALSE, i;
     chew();
 
-    for (i = 1; i <= NDEVICES; i++) {
+    for (i = 0; i < NDEVICES; i++) {
 	if (game.damage[i] > 0.0) {
 	    if (!jdam) {
 		prout("DEVICE            -REPAIR TIMES-");
@@ -253,8 +253,9 @@ static void status(int req)
 	case IHDOCKED: cp = "DOCKED"; break;
 	case IHDEAD: cp="DEAD"; break;
 	}
-	for (t=0;t<=NDEVICES;t++)
-	    if (game.damage[t]>0) dam++;
+	for (t=0;t<NDEVICES;t++)
+	    if (game.damage[t]>0) 
+		dam++;
 	proutn("Condition     %s, %i DAMAGES", cp, dam);
 	break;
     case 3:

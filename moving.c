@@ -147,10 +147,10 @@ void imove(void)
 		     * possibility that you'll get timewarped instead.
 		     */
 		    n=0;
-		    for (l=1;l<=NDEVICES+1;l++)
-			if (game.damage[l]>0) n++;
-		    probf=pow(1.4,(energy+shield)/5000.0-1.0)*
-			pow(1.3,1.0/(n+1)-1.0);
+		    for (l=0;l<NDEVICES;l++)
+			if (game.damage[l]>0) 
+			    n++;
+		    probf=pow(1.4,(energy+shield)/5000.0-1.0)*pow(1.3,1.0/(n+1)-1.0);
 		    if (Rand()>probf) 
 			timwrp();
 		    else 
