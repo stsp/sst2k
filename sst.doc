@@ -581,7 +581,7 @@ you move, but higher warp factors require more energy.  You may move
 with your shields up, but this doubles the energy required.
 
 You can move within a quadrant without being attacked if you just
-entered the quadrant or have bee attacked since your last move
+entered the quadrant or have been attacked since your last move
 command.  This enables you to move and hit them before they
 retaliate. 
 
@@ -1407,6 +1407,8 @@ Impulse engines require 20 units to warm up, plus 100 units per
      quadrant.  Speed is just under one sector per stardate.
                   ********MODIFICATIONS********                       25
 
+Tom Almy's story:
+
 Back in (about) 1977 I got a copy of this Super Star Trek game for
 the CDC 6600 mainframe computer. Someone had converted it to PDP-11
 Fortran but couldn't get it to run because of its size. I modified
@@ -1466,10 +1468,57 @@ Modifications I made:
   the algorithm.
 
   The DECUS version had a Deep Space Probe. Looked like a good idea
-  so I implimented it based on its description.
+  so I implemented it based on its description.
 
 
-               ----------ACKNOWLEDGMENTS----------                    26
+                                                                      26
+
+Eric Raymond's story:
+
+I played the FORTRAN version of this game in the mid-1970s on
+a DEC minicomputer.  In the late 1980s Dave Matuszek and I became
+friends; I was vaguely aware that he had had something to do with the
+original Star Trek game.  In October 2004, sitting in Dave's living
+room, we got to talking about the game and I realized it would make a
+great exhibit for the Retrocomputing Museum <http://www.catb.org/retro/>.
+
+A few quick web searches later we found Tom Almy's page.  We
+downloaded his code and Dave verified that that it was a direct
+descendent of UT Super Star Trek -- even though it had been translated
+to C, he was able to recognize some of his FORTRAN code.
+
+Thus, this game is a cousin of Eric Allman's BSD Trek game, which is also
+derived from UT Super Star Trek.  However, this one has had a lot more
+stuff folded into it over the years -- deep space probes, dilithium mining,
+the Tholian Web, and so forth.
+
+This lineage differs from most of the BASIC versions out there in that you
+set courses and firing directions with rectangular rather than polar 
+coordinates.  It also preserves the original numbered rather than named
+quadrants.
+
+This game is now an open-source project; see the project site at 
+
+     <http://developer.berlios.de/projects/sst/>
+
+Here are some good pages on the history of Star Trek games:
+
+http://www.dunnington.u-net.com/public/startrek/
+http://www3.sympatico.ca/maury/games/space/star_trek.html
+http://www.cactus.org/%7Enystrom/startrek.html
+
+Modifications I made:
+
+* I cleaned up a lot of grubby FORTRANisms in the code internals.
+
+* I fixed a surprising number of typos in the code and documentation.
+
+* I changed the freeze logic to emit an identifiable magic number and
+  the thaw logic to check for it.
+
+               ----------ACKNOWLEDGMENTS----------                    27
+
+These are the original acknowledgments by Dave Matuszek and Paul Reynolds:
 
 The authors would like to thank Professor Michael Duggan for his
 encouragement and administrative assistance with the development of
@@ -1487,10 +1536,7 @@ game, programmed in the BASIC language, by Jim Korp and Grady Hicks.
 It is the authors' understanding that the BASIC game was in turn
 derived from a still earlier version in use at Penn State University.
 
-
-
-
-                 ----------REFERENCES----------
+               ----------REFERENCES----------                         28
 
 
  1.  "Star Trek" (the original television series), produced and
