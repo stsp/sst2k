@@ -85,6 +85,16 @@ typedef struct {
 #define SKILL_EXPERT	4
 #define SKILL_EMERITUS	5
 
+/* game options */
+#define OPTION_ALL	0xffffffff
+#define OPTION_TTY	0x00000001	/* old interface */
+#define OPTION_CURSES	0x00000002	/* new interface */
+#define OPTION_IOMODES	0x00000003	/* cover both interfaces */
+#define OPTION_PLANETS	0x00000004	/* planets and mining */
+#define OPTION_THOLIAN	0x00000008	/* Tholians and their webs */
+#define OPTION_THINGY	0x00000010	/* Space Thingy can shoot back */
+#define OPTION_PROBE	0x00000020	/* deep-space probes */
+
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,
@@ -96,6 +106,7 @@ EXTERN WINDOW *curwnd;
 
 EXTERN struct {
     char magic[sizeof(SSTMAGIC)];
+    unsigned long options;
     snapshot state;
     snapshot snapsht;
     char quad[QUADSIZE+1][QUADSIZE+1];		// contents of our quadrant
@@ -462,7 +473,7 @@ void debugme(void);
 void attakreport(int);
 void movetho(void);
 void probe(void);
-void iostart(int);
+void iostart(void);
 void setwnd(WINDOW *);
 void warble(void);
 void boom(int ii, int jj);

@@ -164,7 +164,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	/* Limit motion according to skill */
 	if (abs(motion) > skill) motion = (motion < 0) ? -skill : skill;
     }
-    /* calcuate preferred number of steps */
+    /* calculate preferred number of steps */
     nsteps = motion < 0 ? -motion : motion;
     if (motion > 0 && nsteps > mdist) nsteps = mdist; /* don't overshoot */
     if (nsteps > QUADSIZE) nsteps = QUADSIZE; /* This shouldn't be necessary */

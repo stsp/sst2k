@@ -1,4 +1,4 @@
-]#define INCLUDED	// Define externs here
+#define INCLUDED	// Define externs here
 #include <ctype.h>
 #include <getopt.h>
 #include <time.h>
@@ -68,7 +68,7 @@ Here are Tom Almy's changes:
 
 Here are Stas Sergeev's changes:
 
-   1. The Space Thingy can be shoved, if you it ram, and can fire back if 
+   1. The Space Thingy can be shoved, if you ram it, and can fire back if 
       fired upon.
 
    2. The Tholian can be hit with phasers
@@ -108,7 +108,7 @@ Here are Stas Sergeev's changes:
 Eric Raymond's changes:
 
  Mainly, I translated this C code out of FORTRAN into C -- created #defines
-   for a lot of magic numbers.
+   for a lot of magic numbers and refactored the heck out of it.
 
    1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
 
@@ -120,98 +120,98 @@ Eric Raymond's changes:
 
 /* the input queue */
 static char line[128], *linep = line;
-static int usecurses = TRUE;
 
 static struct 
 {
     char *name;
     int value;
+    unsigned long option;
 }
 commands[] = {
 #define SRSCAN	0
-	{"SRSCAN",	SRSCAN},
+	{"SRSCAN",	SRSCAN,		OPTION_TTY},
 #define STATUS	1
-	{"STATUS",	STATUS},
+	{"STATUS",	STATUS,		OPTION_TTY},
 #define REQUEST	2
-	{"REQUEST",	REQUEST},
+	{"REQUEST",	REQUEST,	OPTION_TTY},
 #define LRSCAN	3
-	{"LRSCAN",	LRSCAN},
+	{"LRSCAN",	LRSCAN,		OPTION_TTY},
 #define PHASERS	4
-	{"PHASERS",	PHASERS},
+	{"PHASERS",	PHASERS,	0},
 #define TORPEDO	5
-        {"TORPEDO",	TORPEDO},
-	{"PHOTONS",	TORPEDO},
+        {"TORPEDO",	TORPEDO,	0},
+	{"PHOTONS",	TORPEDO,	0},
 #define MOVE	6
-	{"MOVE",	MOVE},
+	{"MOVE",	MOVE,		0},
 #define SHIELDS	7
-	{"SHIELDS",	SHIELDS},
+	{"SHIELDS",	SHIELDS,	0},
 #define DOCK	8
-	{"DOCK",	DOCK},
+	{"DOCK",	DOCK,		0},
 #define DAMAGES	9
-	{"DAMAGES",	DAMAGES},
+	{"DAMAGES",	DAMAGES,	0},
 #define CHART	10
-	{"CHART",	CHART},
+	{"CHART",	CHART,		0},
 #define IMPULSE	11
-	{"IMPULSE",	IMPULSE},
+	{"IMPULSE",	IMPULSE,	0},
 #define REST	12
-	{"REST",	REST},
+	{"REST",	REST,		0},
 #define WARP	13
-	{"WARP",	WARP},
+	{"WARP",	WARP,		0},
 #define SCORE	14
-	{"SCORE",	SCORE},
+	{"SCORE",	SCORE,		0},
 #define SENSORS	15
-	{"SENSORS",	SENSORS},
+	{"SENSORS",	SENSORS,	OPTION_PLANETS},
 #define ORBIT	16
-	{"ORBIT",	ORBIT},
+	{"ORBIT",	ORBIT,		OPTION_PLANETS},
 #define TRANSPORT	17
-	{"TRANSPORT",	TRANSPORT},
+	{"TRANSPORT",	TRANSPORT,	OPTION_PLANETS},
 #define MINE	18
-	{"MINE",	MINE},
+	{"MINE",	MINE,		OPTION_PLANETS},
 #define CRYSTALS	19
-	{"CRYSTALS",	CRYSTALS},
+	{"CRYSTALS",	CRYSTALS,	OPTION_PLANETS},
 #define SHUTTLE	20
-	{"SHUTTLE",	SHUTTLE},
+	{"SHUTTLE",	SHUTTLE,	OPTION_PLANETS},
 #define PLANETS	21
-	{"PLANETS",	PLANETS},
+	{"PLANETS",	PLANETS,	OPTION_PLANETS},
 #define REPORT	22
-	{"REPORT",	REPORT},
+	{"REPORT",	REPORT,		0},
 #define COMPUTER	23
-	{"COMPUTER",	COMPUTER},
+	{"COMPUTER",	COMPUTER,      	0},
 #define COMMANDS	24
-	{"COMMANDS",	COMMANDS},
+	{"COMMANDS",	COMMANDS,      	0},
 #define EMEXIT	25
-	{"EMEXIT",	EMEXIT},
+	{"EMEXIT",	EMEXIT,		0},
 #define PROBE	26
-	{"PROBE",	PROBE},
+	{"PROBE",	PROBE,		OPTION_PROBE},
 #define SAVE	27
-	{"SAVE",	SAVE},
-	{"FREEZE",	SAVE},
+	{"SAVE",	SAVE,		0},
+	{"FREEZE",	SAVE,		0},
 #define ABANDON	28
-	{"ABANDON",	ABANDON},
+	{"ABANDON",	ABANDON,	0},
 #define DESTRUCT	29
-	{"DESTRUCT",	DESTRUCT},
+	{"DESTRUCT",	DESTRUCT,	0},
 #define DEATHRAY	30
-	{"DEATHRAY",	DEATHRAY},
+	{"DEATHRAY",	DEATHRAY,	0},
 #define DEBUGCMD	31
-	{"DEBUG",	DEBUGCMD},
+	{"DEBUG",	DEBUGCMD,	0},
 #define MAYDAY	32
-	{"MAYDAY",	MAYDAY},
-	{"SOS",		MAYDAY},
-	{"CALL",	MAYDAY},
+	{"MAYDAY",	MAYDAY,		0},
+	{"SOS",		MAYDAY,		0},
+	{"CALL",	MAYDAY,		0},
 #define QUIT	33
-	{"QUIT",	QUIT},
+	{"QUIT",	QUIT,		0},
 #define HELP	34
-	{"HELP",	HELP},
+	{"HELP",	HELP,		0},
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
-#define MIN_CURSES_COMMAND	PHASERS		/* might change someday */
-
-static void listCommands(int usecurses) {
+static void listCommands(void) {
     int i, k = 0;
     proutn("LEGAL COMMANDS ARE:");
-    for (i = usecurses ? MIN_CURSES_COMMAND : 0; i < NUMCOMMANDS; i++) {
+    for (i = 0; i < NUMCOMMANDS; i++) {
+	if (commands[i].option && !(commands[i].option & game.options))
+	    continue;
 	if (k % 5 == 0)
 	    skip(1);
 	proutn("%-12s ", commands[i].name); 
@@ -220,554 +220,583 @@ static void listCommands(int usecurses) {
     skip(1);
 }
 
-static void helpme(void) {
-	int i, j;
-	char cmdbuf[32], *cp;
-	char linebuf[132];
-	FILE *fp;
-	/* Give help on commands */
-	int key;
-	key = scan();
-	while (TRUE) {
-		if (key == IHEOL) {
-                        setwnd(prompt_window);
-                        proutn("Help on what command? ");
-			key = scan();
-		}
-                setwnd(message_window);
-		if (key == IHEOL) return;
-		for (i = 0; i < NUMCOMMANDS; i++) {
-		    if (strcasecmp(commands[i].name, citem)==0) {
-			i = commands[i].value;
-			break;
-		    }
-		}
-		if (i != NUMCOMMANDS) break;
-		skip(1);
-		prout("Valid commands:");
-		listCommands(usecurses);
-		key = IHEOL;
-		chew();
-		skip(1);
+static void helpme(void) 
+{
+    int i, j;
+    char cmdbuf[32], *cp;
+    char linebuf[132];
+    FILE *fp;
+    /* Give help on commands */
+    int key;
+    key = scan();
+    while (TRUE) {
+	if (key == IHEOL) {
+	    setwnd(prompt_window);
+	    proutn("Help on what command? ");
+	    key = scan();
 	}
-	if (i == COMMANDS) {
-		strcpy(cmdbuf, " ABBREV");
-	}
-	else {
-	    for (j = 0; commands[i].name[j]; j++)
-		cmdbuf[j] = toupper(commands[i].name[j]);
-	    cmdbuf[j] = '\0';
-	}
-	fp = fopen(SSTDOC, "r");
-	if (fp == NULL) {
-		prout("Spock-  \"Captain, that information is missing from the");
-		prout("   computer.\"");
-		/*
-		 * This used to continue: "You need to find SST.DOC and put 
-		 * it in the current directory."
-		 */
-		return;
-	}
-	for (;;) {
-	    if (fgets(linebuf, sizeof(linebuf), fp) == NULL) {
-			prout("Spock- \"Captain, there is no information on that command.\"");
-			fclose(fp);
-			return;
-		}
-	    if (linebuf[0] == '%' && linebuf[1] == '%'&& linebuf[2] == ' ') {
-		for (cp = linebuf+3; isspace(*cp); cp++)
-			continue;
-		linebuf[strlen(linebuf)-1] = '\0';
-		if (strcasecmp(cp, cmdbuf) == 0)
-		    break;
+	setwnd(message_window);
+	if (key == IHEOL) return;
+	for (i = 0; i < NUMCOMMANDS; i++) {
+	    if (strcasecmp(commands[i].name, citem)==0) {
+		i = commands[i].value;
+		break;
 	    }
 	}
-
+	if (i != NUMCOMMANDS) break;
 	skip(1);
-	prout("Spock- \"Captain, I've found the following information:\"");
+	prout("Valid commands:");
+	listCommands();
+	key = IHEOL;
+	chew();
 	skip(1);
-
-	while (fgets(linebuf, sizeof(linebuf),fp)) {
-		if (strstr(linebuf, "******"))
-			break;
-		proutn(linebuf);
+    }
+    if (i == COMMANDS) {
+	strcpy(cmdbuf, " ABBREV");
+    }
+    else {
+	for (j = 0; commands[i].name[j]; j++)
+	    cmdbuf[j] = toupper(commands[i].name[j]);
+	cmdbuf[j] = '\0';
+    }
+    fp = fopen(SSTDOC, "r");
+    if (fp == NULL) {
+	prout("Spock-  \"Captain, that information is missing from the");
+	prout("   computer.\"");
+	/*
+	 * This used to continue: "You need to find SST.DOC and put 
+	 * it in the current directory."
+	 */
+	return;
+    }
+    for (;;) {
+	if (fgets(linebuf, sizeof(linebuf), fp) == NULL) {
+	    prout("Spock- \"Captain, there is no information on that command.\"");
+	    fclose(fp);
+	    return;
 	}
-	fclose(fp);
+	if (linebuf[0] == '%' && linebuf[1] == '%'&& linebuf[2] == ' ') {
+	    for (cp = linebuf+3; isspace(*cp); cp++)
+		continue;
+	    linebuf[strlen(linebuf)-1] = '\0';
+	    if (strcasecmp(cp, cmdbuf) == 0)
+		break;
+	}
+    }
+
+    skip(1);
+    prout("Spock- \"Captain, I've found the following information:\"");
+    skip(1);
+
+    while (fgets(linebuf, sizeof(linebuf),fp)) {
+	if (strstr(linebuf, "******"))
+	    break;
+	proutn(linebuf);
+    }
+    fclose(fp);
 }
 
-void enqueue(char *s) {
+void enqueue(char *s) 
+{
     strcpy(line, s);
 }
 
-static void makemoves(void) {
-	int i, hitme;
-        clrscr();
-        setwnd(message_window);
-	while (TRUE) { /* command loop */
-                drawmaps(1);
-                while (TRUE)  { /* get a command */
-			hitme = FALSE;
-			justin = 0;
-			Time = 0.0;
-			i = -1;
-			chew();
-                        setwnd(prompt_window);
-                        clrscr();
-			proutn("COMMAND> ");
-                        if (scan() == IHEOL) {
-			    makechart();
-                            continue;
-                        }
-                        ididit=0;
-                        clrscr();
-                        setwnd(message_window);
-                        clrscr();
-			for (i=0; i < ABANDON; i++)
-			    if (isit(commands[i].name)) {
-				i = commands[i].value;
-				break;
-			    }
-			if (i < ABANDON) break;
-			for (; i < NUMCOMMANDS; i++)
-			    if (strcasecmp(commands[i].name, citem) == 0) {
-			    	    i = commands[i].value;
-				    break;
-			    }
-			if (i < NUMCOMMANDS) break;
-			listCommands(usecurses);
+static void makemoves(void) 
+{
+    int i, v, hitme;
+    clrscr();
+    setwnd(message_window);
+    while (TRUE) { /* command loop */
+	drawmaps(1);
+	while (TRUE)  { /* get a command */
+	    hitme = FALSE;
+	    justin = 0;
+	    Time = 0.0;
+	    i = -1;
+	    chew();
+	    setwnd(prompt_window);
+	    clrscr();
+	    proutn("COMMAND> ");
+	    if (scan() == IHEOL) {
+		makechart();
+		continue;
+	    }
+	    ididit=0;
+	    clrscr();
+	    setwnd(message_window);
+	    clrscr();
+	    for (i=0; i < ABANDON; i++)
+		if (isit(commands[i].name)) {
+		    v = commands[i].value;
+		    break;
 		}
-		commandhook(commands[i].name, TRUE);
-		switch (i) { /* command switch */
-                        case SRSCAN:                 // srscan
- 				srscan(SCAN_FULL);
- 				break;
-                        case STATUS:                 // status
- 				srscan(SCAN_STATUS);
- 				break;
-			case REQUEST:			// status request 
-				srscan(SCAN_REQUEST);
-				break;
- 			case LRSCAN:			// lrscan
- 				lrscan();
-                                break;
-			case PHASERS:			// phasers
-				phasers();
-				if (ididit) hitme = TRUE;
-				break;
-			case TORPEDO:			// photons
-				photon();
-				if (ididit) hitme = TRUE;
-				break;
-			case MOVE:			// move
-				warp(1);
-				break;
-			case SHIELDS:			// shields
-				doshield(1);
-				if (ididit) {
-					hitme=TRUE;
-					shldchg = 0;
-				}
-				break;
-			case DOCK:			// dock
-                                dock(1);
-                                if (ididit) attack(0);
-				break;
-			case DAMAGES:			// damages
-				dreprt();
-				break;
-			case CHART:			// chart
-				chart(0);
-				break;
-			case IMPULSE:			// impulse
-				impuls();
-				break;
-			case REST:		// rest
-				wait();
-				if (ididit) hitme = TRUE;
-				break;
-			case WARP:		// warp
-				setwrp();
-				break;
-                        case SCORE:                // score
-                                score();
-				break;
-			case SENSORS:			// sensors
-				sensor(TRUE);
-				break;
-			case ORBIT:			// orbit
-				orbit();
-				if (ididit) hitme = TRUE;
-				break;
-			case TRANSPORT:			// transport "beam"
-				beam();
-				break;
-			case MINE:			// mine
-				mine();
-				if (ididit) hitme = TRUE;
-				break;
-			case CRYSTALS:			// crystals
-				usecrystals();
-                                if (ididit) hitme = TRUE;
-				break;
-			case SHUTTLE:			// shuttle
-				shuttle();
-				if (ididit) hitme = TRUE;
-				break;
-			case PLANETS:			// Planet list
-				preport();
-				break;
-			case REPORT:			// Game Report 
-				report();
-				break;
-			case COMPUTER:			// use COMPUTER!
-				eta();
-				break;
-			case COMMANDS:
-				listCommands(usecurses);
-				break;
-			case EMEXIT:		// Emergency exit
-				clrscr();	// Hide screen
-				freeze(TRUE);	// forced save
-				exit(1);		// And quick exit
-				break;
-			case PROBE:
-				probe();		// Launch probe
-                                if (ididit) hitme = TRUE;
-				break;
-			case ABANDON:			// Abandon Ship
-				abandn();
-				break;
-			case DESTRUCT:			// Self Destruct
-				dstrct();
-				break;
-			case SAVE:			// Save Game
-				freeze(FALSE);
-                                clrscr();
-				if (skill > SKILL_GOOD)
-                                        prout("WARNING--Saved games produce no plaques!");
-				break;
-			case DEATHRAY:		// Try a desparation measure
-				deathray();
-				if (ididit) hitme = TRUE;
-				break;
-			case DEBUGCMD:		// What do we want for debug???
-#ifdef DEBUG
-				debugme();
-#endif
-				break;
-			case MAYDAY:		// Call for help
-				help();
-                                if (ididit) hitme = TRUE;
-				break;
-			case QUIT:
-				alldone = 1;	// quit the game
-#ifdef DEBUG
-				if (idebug) score();
-#endif
-				break;
-			case HELP:
-				helpme();	// get help
-				break;
+	    if (i < ABANDON) break;
+	    for (; i < NUMCOMMANDS; i++)
+		if (strcasecmp(commands[i].name, citem) == 0) {
+		    v = commands[i].value;
+		    break;
 		}
-		commandhook(commands[i].name, FALSE);
-		for (;;) {
-			if (alldone) break;		// Game has ended
-#ifdef DEBUG
-			if (idebug) prout("2500");
-#endif
-			if (Time != 0.0) {
-				events();
-				if (alldone) break;		// Events did us in
-			}
-			if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) { // Galaxy went Nova!
-				atover(0);
-				continue;
-			}
-			if (hitme && justin==0) {
-				attack(2);
-				if (alldone) break;
-				if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) {	// went NOVA! 
-					atover(0);
-					hitme = TRUE;
-					continue;
-				}
-			}
-			break;
-		}
-		if (alldone) break;
+	    if (i < NUMCOMMANDS && (!commands[i].option || (commands[i].option & game.options))) 
+		break;
+	    listCommands();
 	}
+	commandhook(commands[i].name, TRUE);
+	switch (v) { /* command switch */
+	case SRSCAN:                 // srscan
+	    srscan(SCAN_FULL);
+	    break;
+	case STATUS:                 // status
+	    srscan(SCAN_STATUS);
+	    break;
+	case REQUEST:			// status request 
+	    srscan(SCAN_REQUEST);
+	    break;
+	case LRSCAN:			// lrscan
+	    lrscan();
+	    break;
+	case PHASERS:			// phasers
+	    phasers();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case TORPEDO:			// photons
+	    photon();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case MOVE:			// move
+	    warp(1);
+	    break;
+	case SHIELDS:			// shields
+	    doshield(1);
+	    if (ididit) {
+		hitme=TRUE;
+		shldchg = 0;
+	    }
+	    break;
+	case DOCK:			// dock
+	    dock(1);
+	    if (ididit) attack(0);
+	    break;
+	case DAMAGES:			// damages
+	    dreprt();
+	    break;
+	case CHART:			// chart
+	    chart(0);
+	    break;
+	case IMPULSE:			// impulse
+	    impuls();
+	    break;
+	case REST:		// rest
+	    wait();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case WARP:		// warp
+	    setwrp();
+	    break;
+	case SCORE:                // score
+	    score();
+	    break;
+	case SENSORS:			// sensors
+	    sensor(TRUE);
+	    break;
+	case ORBIT:			// orbit
+	    orbit();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case TRANSPORT:			// transport "beam"
+	    beam();
+	    break;
+	case MINE:			// mine
+	    mine();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case CRYSTALS:			// crystals
+	    usecrystals();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case SHUTTLE:			// shuttle
+	    shuttle();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case PLANETS:			// Planet list
+	    preport();
+	    break;
+	case REPORT:			// Game Report 
+	    report();
+	    break;
+	case COMPUTER:			// use COMPUTER!
+	    eta();
+	    break;
+	case COMMANDS:
+	    listCommands();
+	    break;
+	case EMEXIT:		// Emergency exit
+	    clrscr();	// Hide screen
+	    freeze(TRUE);	// forced save
+	    exit(1);		// And quick exit
+	    break;
+	case PROBE:
+	    probe();		// Launch probe
+	    if (ididit) hitme = TRUE;
+	    break;
+	case ABANDON:			// Abandon Ship
+	    abandn();
+	    break;
+	case DESTRUCT:			// Self Destruct
+	    dstrct();
+	    break;
+	case SAVE:			// Save Game
+	    freeze(FALSE);
+	    clrscr();
+	    if (skill > SKILL_GOOD)
+		prout("WARNING--Saved games produce no plaques!");
+	    break;
+	case DEATHRAY:		// Try a desparation measure
+	    deathray();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case DEBUGCMD:		// What do we want for debug???
+#ifdef DEBUG
+	    debugme();
+#endif
+	    break;
+	case MAYDAY:		// Call for help
+	    help();
+	    if (ididit) hitme = TRUE;
+	    break;
+	case QUIT:
+	    alldone = 1;	// quit the game
+#ifdef DEBUG
+	    if (idebug) score();
+#endif
+	    break;
+	case HELP:
+	    helpme();	// get help
+	    break;
+	}
+	commandhook(commands[i].name, FALSE);
+	for (;;) {
+	    if (alldone) break;		// Game has ended
+#ifdef DEBUG
+	    if (idebug) prout("2500");
+#endif
+	    if (Time != 0.0) {
+		events();
+		if (alldone) break;		// Events did us in
+	    }
+	    if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) { // Galaxy went Nova!
+		atover(0);
+		continue;
+	    }
+	    if (hitme && justin==0) {
+		attack(2);
+		if (alldone) break;
+		if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) {	// went NOVA! 
+		    atover(0);
+		    hitme = TRUE;
+		    continue;
+		}
+	    }
+	    break;
+	}
+	if (alldone) break;
+    }
 }
 
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
     int i, option;
 
-	while ((option = getopt(argc, argv, "t")) != -1) {
-	    switch (option) {
-	    case 't':
-		usecurses = FALSE;
-		break;
-	    default:
-		fprintf(stderr, "usage: sst [-t] [startcommand...].\n");
-		exit(0);
+    game.options = OPTION_ALL &~ OPTION_IOMODES;
+    if (getenv("TERM"))
+	game.options |= OPTION_CURSES;
+    else
+	game.options |= OPTION_TTY;
+
+    while ((option = getopt(argc, argv, "t")) != -1) {
+	switch (option) {
+	case 't':
+	    game.options |= OPTION_TTY;
+	    game.options &=~ OPTION_CURSES;
+	    break;
+	default:
+	    fprintf(stderr, "usage: sst [-t] [startcommand...].\n");
+	    exit(0);
+	}
+    }
+
+    randomize();
+    iostart();
+
+    line[0] = '\0';
+    for (i = optind; i < argc;  i++) {
+	strcat(line, argv[i]);
+	strcat(line, " ");
+    }
+    while (TRUE) { /* Play a game */
+	setwnd(fullscreen_window);
+#ifdef DEBUG
+	prout("INITIAL OPTIONS: %0lx\n", game.options);
+#endif /* DEBUG */
+	clrscr();
+	prelim();
+	setup(line[0] == '\0');
+	if (alldone) {
+	    score();
+	    alldone = 0;
+	}
+	else makemoves();
+	skip(1);
+	stars();
+	skip(1);
+
+	if (tourn && alldone) {
+	    proutn("Do you want your score recorded?");
+	    if (ja()) {
+		chew2();
+		freeze(FALSE);
 	    }
 	}
-
-	randomize();
-	iostart(usecurses);
-
-	line[0] = '\0';
-	for (i = optind; i < argc;  i++) {
-		strcat(line, argv[i]);
-		strcat(line, " ");
-	}
-	while (TRUE) { /* Play a game */
-		setwnd(fullscreen_window);
-		clrscr();
-	        prelim();
-		setup(line[0] == '\0');
-		if (alldone) {
-			score();
-			alldone = 0;
-		}
-		else makemoves();
-		skip(1);
-		stars();
-		skip(1);
-
-		if (tourn && alldone) {
-			proutn("Do you want your score recorded?");
-			if (ja()) {
-				chew2();
-				freeze(FALSE);
-			}
-		}
-		proutn("Do you want to play again? ");
-		if (!ja()) break;
-	}
-	skip(1);
-	prout("May the Great Bird of the Galaxy roost upon your home planet.");
-	return 0;
+	proutn("Do you want to play again? ");
+	if (!ja()) break;
+    }
+    skip(1);
+    prout("May the Great Bird of the Galaxy roost upon your home planet.");
+    return 0;
 }
 
 
-void cramen(int i) {
-	/* return an enemy */
-	char *s;
+void cramen(int i) 
+{
+    /* return an enemy */
+    char *s;
 	
-	switch (i) {
-		case IHR: s = "Romulan"; break;
-		case IHK: s = "Klingon"; break;
-		case IHC: s = "Commander"; break;
-		case IHS: s = "Super-commander"; break;
-		case IHSTAR: s = "Star"; break;
-		case IHP: s = "Planet"; break;
-		case IHB: s = "Starbase"; break;
-		case IHBLANK: s = "Black hole"; break;
-		case IHT: s = "Tholian"; break;
-		case IHWEB: s = "Tholian web"; break;
-                case IHQUEST: s = "Stranger"; break;
-		default: s = "Unknown??"; break;
-	}
-	proutn(s);
+    switch (i) {
+    case IHR: s = "Romulan"; break;
+    case IHK: s = "Klingon"; break;
+    case IHC: s = "Commander"; break;
+    case IHS: s = "Super-commander"; break;
+    case IHSTAR: s = "Star"; break;
+    case IHP: s = "Planet"; break;
+    case IHB: s = "Starbase"; break;
+    case IHBLANK: s = "Black hole"; break;
+    case IHT: s = "Tholian"; break;
+    case IHWEB: s = "Tholian web"; break;
+    case IHQUEST: s = "Stranger"; break;
+    default: s = "Unknown??"; break;
+    }
+    proutn(s);
 }
 
-char *cramlc(enum loctype key, int x, int y) {
-	static char buf[32];
-	buf[0] = '\0';
-	if (key == quadrant) strcpy(buf, "Quadrant ");
-	else if (key == sector) strcpy(buf, "Sector ");
-	sprintf(buf+strlen(buf), "%d - %d", x, y);
-	return buf;
+char *cramlc(enum loctype key, int x, int y)
+{
+    static char buf[32];
+    buf[0] = '\0';
+    if (key == quadrant) strcpy(buf, "Quadrant ");
+    else if (key == sector) strcpy(buf, "Sector ");
+    sprintf(buf+strlen(buf), "%d - %d", x, y);
+    return buf;
 }
 
-void crmena(int i, int enemy, int key, int x, int y) {
-	if (i == 1) proutn("***");
-	cramen(enemy);
-	proutn(" at ");
-	proutn(cramlc(key, x, y));
+void crmena(int i, int enemy, int key, int x, int y) 
+{
+    if (i == 1) proutn("***");
+    cramen(enemy);
+    proutn(" at ");
+    proutn(cramlc(key, x, y));
 }
 
-void crmshp(void) {
-	char *s;
-	switch (ship) {
-		case IHE: s = "Enterprise"; break;
-		case IHF: s = "Faerie Queene"; break;
-		default:  s = "Ship???"; break;
-	}
-	proutn(s);
+void crmshp(void) 
+{
+    char *s;
+    switch (ship) {
+    case IHE: s = "Enterprise"; break;
+    case IHF: s = "Faerie Queene"; break;
+    default:  s = "Ship???"; break;
+    }
+    proutn(s);
 }
 
-void stars(void) {
-	prouts("******************************************************");
-	skip(1);
+void stars(void) 
+{
+    prouts("******************************************************");
+    skip(1);
 }
 
-double expran(double avrage) {
-	return -avrage*log(1e-7 + Rand());
+double expran(double avrage) 
+{
+    return -avrage*log(1e-7 + Rand());
 }
 
 double Rand(void) {
 	return rand()/(1.0 + (double)RAND_MAX);
 }
 
-void iran(int size, int *i, int *j) {
+void iran(int size, int *i, int *j) 
+{
     *i = Rand()*(size*1.0) + 1.0;
     *j = Rand()*(size*1.0) + 1.0;
 }
 
-void chew(void) {
+void chew(void)
+{
+    linep = line;
+    *linep = 0;
+}
+
+void chew2(void) 
+{
+    /* return IHEOL next time */
+    linep = line+1;
+    *linep = 0;
+}
+
+int scan(void) 
+{
+    int i;
+    char *cp;
+
+    // Init result
+    aaitem = 0.0;
+    *citem = 0;
+
+    // Read a line if nothing here
+    if (*linep == 0) {
+	if (linep != line) {
+	    chew();
+	    return IHEOL;
+	}
+	cgetline(line, sizeof(line));
+	fflush(stdin);
+	if (curwnd==prompt_window){
+	    clrscr();
+	    setwnd(message_window);
+	    clrscr();
+	}
 	linep = line;
-	*linep = 0;
-}
-
-void chew2(void) {
-	/* return IHEOL next time */
-	linep = line+1;
-	*linep = 0;
-}
-
-int scan(void) {
-	int i;
-	char *cp;
-
-	// Init result
-	aaitem = 0.0;
-	*citem = 0;
-
-	// Read a line if nothing here
-	if (*linep == 0) {
-		if (linep != line) {
-			chew();
-			return IHEOL;
-		}
-		cgetline(line, sizeof(line));
-                fflush(stdin);
-                if (curwnd==prompt_window){
-                   clrscr();
-                   setwnd(message_window);
-                   clrscr();
-                }
-		linep = line;
-	}
-	// Skip leading white space
-	while (*linep == ' ') linep++;
-	// Nothing left
-	if (*linep == 0) {
-		chew();
-		return IHEOL;
-	}
-	if (isdigit(*linep) || *linep=='+' || *linep=='-' || *linep=='.') {
-		// treat as a number
-	    i = 0;
-	    if (sscanf(linep, "%lf%n", &aaitem, &i) < 1) {
-		linep = line; // Invalid numbers are ignored
-		*linep = 0;
-		return IHEOL;
-	    }
-	    else {
-		// skip to end
-		linep += i;
-		return IHREAL;
-	    }
-	}
-	// Treat as alpha
-	cp = citem;
-	while (*linep && *linep!=' ') {
-		if ((cp - citem) < 9) *cp++ = tolower(*linep);
-		linep++;
-	}
-	*cp = 0;
-	return IHALPHA;
-}
-
-int ja(void) {
+    }
+    // Skip leading white space
+    while (*linep == ' ') linep++;
+    // Nothing left
+    if (*linep == 0) {
 	chew();
-	while (TRUE) {
-		scan();
-		chew();
-		if (*citem == 'y') return TRUE;
-		if (*citem == 'n') return FALSE;
-		proutn("Please answer with \"Y\" or \"N\": ");
+	return IHEOL;
+    }
+    if (isdigit(*linep) || *linep=='+' || *linep=='-' || *linep=='.') {
+	// treat as a number
+	i = 0;
+	if (sscanf(linep, "%lf%n", &aaitem, &i) < 1) {
+	    linep = line; // Invalid numbers are ignored
+	    *linep = 0;
+	    return IHEOL;
 	}
+	else {
+	    // skip to end
+	    linep += i;
+	    return IHREAL;
+	}
+    }
+    // Treat as alpha
+    cp = citem;
+    while (*linep && *linep!=' ') {
+	if ((cp - citem) < 9) *cp++ = tolower(*linep);
+	linep++;
+    }
+    *cp = 0;
+    return IHALPHA;
 }
 
-void huh(void) {
+int ja(void) 
+{
+    chew();
+    while (TRUE) {
+	scan();
 	chew();
-	skip(1);
-	prout("Beg your pardon, Captain?");
+	if (*citem == 'y') return TRUE;
+	if (*citem == 'n') return FALSE;
+	proutn("Please answer with \"Y\" or \"N\": ");
+    }
 }
 
-int isit(char *s) {
-	/* New function -- compares s to scaned citem and returns true if it
-	   matches to the length of s */
+void huh(void) 
+{
+    chew();
+    skip(1);
+    prout("Beg your pardon, Captain?");
+}
 
-	return strncasecmp(s, citem, max(1, strlen(citem))) == 0;
+int isit(char *s) 
+{
+    /* New function -- compares s to scanned citem and returns true if it
+       matches to the length of s */
+
+    return strncasecmp(s, citem, max(1, strlen(citem))) == 0;
 
 }
 
 #ifdef DEBUG
-void debugme(void) {
-	proutn("Reset levels? ");
-	if (ja() != 0) {
-		if (energy < inenrg) energy = inenrg;
-		shield = inshld;
-		torps = intorps;
-		lsupres = inlsr;
+void debugme(void) 
+{
+    proutn("Reset levels? ");
+    if (ja() != 0) {
+	if (energy < inenrg) energy = inenrg;
+	shield = inshld;
+	torps = intorps;
+	lsupres = inlsr;
+    }
+    proutn("Reset damage? ");
+    if (ja() != 0) {
+	int i;
+	for (i=0; i <= NDEVICES; i++) 
+	    if (game.damage[i] > 0.0) 
+		game.damage[i] = 0.0;
+	stdamtim = 1e30;
+    }
+    proutn("Toggle idebug? ");
+    if (ja() != 0) {
+	idebug = !idebug;
+	if (idebug) prout("Debug output ON");
+	else prout("Debug output OFF");
+    }
+    proutn("Cause selective damage? ");
+    if (ja() != 0) {
+	int i, key;
+	for (i=1; i <= NDEVICES; i++) {
+	    proutn("Kill ");
+	    proutn(device[i]);
+	    proutn("? ");
+	    chew();
+	    key = scan();
+	    if (key == IHALPHA &&  isit("y")) {
+		game.damage[i] = 10.0;
+		if (i == DRADIO) stdamtim = game.state.date;
+	    }
 	}
-	proutn("Reset damage? ");
-	if (ja() != 0) {
-		int i;
-		for (i=0; i <= NDEVICES; i++) if (damage[i] > 0.0) damage[i] = 0.0;
-		stdamtim = 1e30;
+    }
+    proutn("Examine/change events? ");
+    if (ja() != 0) {
+	int i;
+	for (i = 1; i < NEVENTS; i++) {
+	    int key;
+	    if (game.future[i] == 1e30) continue;
+	    switch (i) {
+	    case FSNOVA:  proutn("Supernova       "); break;
+	    case FTBEAM:  proutn("T Beam          "); break;
+	    case FSNAP:   proutn("Snapshot        "); break;
+	    case FBATTAK: proutn("Base Attack     "); break;
+	    case FCDBAS:  proutn("Base Destroy    "); break;
+	    case FSCMOVE: proutn("SC Move         "); break;
+	    case FSCDBAS: proutn("SC Base Destroy "); break;
+	    }
+	    proutn("%.2f", game.future[i]-game.state.date);
+	    chew();
+	    proutn("  ?");
+	    key = scan();
+	    if (key == IHREAL) {
+		game.future[i] = game.state.date + aaitem;
+	    }
 	}
-	proutn("Toggle idebug? ");
-	if (ja() != 0) {
-		idebug = !idebug;
-		if (idebug) prout("Debug output ON");
-		else prout("Debug output OFF");
-	}
-	proutn("Cause selective damage? ");
-	if (ja() != 0) {
-		int i, key;
-		for (i=1; i <= NDEVICES; i++) {
-			proutn("Kill ");
-			proutn(device[i]);
-			proutn("? ");
-			chew();
-			key = scan();
-			if (key == IHALPHA &&  isit("y")) {
-				damage[i] = 10.0;
-				if (i == DRADIO) stdamtim = game.state.date;
-			}
-		}
-	}
-	proutn("Examine/change events? ");
-	if (ja() != 0) {
-		int i;
-		for (i = 1; i < NEVENTS; i++) {
-			int key;
-			if (future[i] == 1e30) continue;
-			switch (i) {
-				case FSNOVA:  proutn("Supernova       "); break;
-				case FTBEAM:  proutn("T Beam          "); break;
-				case FSNAP:   proutn("Snapshot        "); break;
-				case FBATTAK: proutn("Base Attack     "); break;
-				case FCDBAS:  proutn("Base Destroy    "); break;
-				case FSCMOVE: proutn("SC Move         "); break;
-				case FSCDBAS: proutn("SC Base Destroy "); break;
-			}
-			proutn("%.2f", future[i]-game.state.date);
-			chew();
-			proutn("  ?");
-			key = scan();
-			if (key == IHREAL) {
-				future[i] = game.state.date + aaitem;
-			}
-		}
-		chew();
-	}
+	chew();
+    }
 }
-			
-
 #endif

@@ -10,14 +10,13 @@
 #include "sstlinux.h"
 
 static int linecount;	/* for paging */
-static int curses = TRUE;
 
 WINDOW *curwnd;
 
 static void outro(void)
 /* wrap up, either normally or due to signal */
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	clear();
 	curs_set(1);
 	(void)refresh();
@@ -28,9 +27,9 @@ static void outro(void)
     }
 }
 
-void iostart(int usecurses) 
+void iostart(void) 
 {
-    if ((curses = usecurses)) {
+    if (game.options & OPTION_CURSES) {
 
 	if (atexit(outro)){
 	    fprintf(stderr,"Unable to register outro(), exiting...\n");
@@ -73,7 +72,7 @@ void iostart(int usecurses)
 void waitfor(void)
 /* wait for user action -- OK to do nothing if on a TTY */
 {
-    if (curses)
+    if (game.options & OPTION_CURSES)
 	getch();
 }
 
@@ -94,7 +93,7 @@ void pause_game(int i)
 	    prompt = "[PRESS ENTER TO CONTINUE]";
 
     }
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	drawmaps(0);
 	setwnd(prompt_window);
 	wclear(prompt_window);
@@ -120,7 +119,7 @@ void pause_game(int i)
 void skip(int i) 
 {
     while (i-- > 0) {
-	if (curses) {
+	if (game.options & OPTION_CURSES) {
 	    proutn("\n\r");
 	} else {
 	    linecount++;
@@ -134,7 +133,7 @@ void skip(int i)
 
 static void vproutn(char *fmt, va_list ap) 
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	vwprintw(curwnd, fmt, ap);
 	wrefresh(curwnd);
     }
@@ -170,7 +169,7 @@ void prouts(char *fmt, ...)
     skip(1);
     for (s = buf; *s; s++) {
 	delay(500);
-	if (curses) {
+	if (game.options & OPTION_CURSES) {
 	    waddch(curwnd, *s);
 	    wrefresh(curwnd);
 	}
@@ -183,7 +182,7 @@ void prouts(char *fmt, ...)
 
 void cgetline(char *line, int max)
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	wgetnstr(curwnd, line, max);
 	strcat(line, "\n");
 	wrefresh(curwnd);
@@ -196,7 +195,7 @@ void cgetline(char *line, int max)
 void setwnd(WINDOW *wnd)
 /* change windows -- OK for this to be a no-op in tty mode */
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
      curwnd=wnd;
      curs_set(wnd == fullscreen_window || wnd == message_window || wnd == prompt_window);
     }
@@ -205,7 +204,7 @@ void setwnd(WINDOW *wnd)
 void clreol (void)
 /* clear to end of line -- can be a no-op in tty mode */
 {
-   if (curses) {
+   if (game.options & OPTION_CURSES) {
        wclrtoeol(curwnd);
        wrefresh(curwnd);
    }
@@ -214,7 +213,7 @@ void clreol (void)
 void clrscr (void)
 /* clear screen -- can be a no-op in tty mode */
 {
-   if (curses) {
+   if (game.options & OPTION_CURSES) {
        wclear(curwnd);
        wmove(curwnd,0,0);
        wrefresh(curwnd);
@@ -224,7 +223,7 @@ void clrscr (void)
 void textcolor (int color)
 {
 #ifdef A_COLOR
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	switch(color) {
 	case DEFAULT: 
 	    wattrset(curwnd, 0);
@@ -284,7 +283,7 @@ void textcolor (int color)
 
 void highvideo (void)
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	wattron(curwnd, A_REVERSE);
     }
 }
@@ -299,7 +298,7 @@ void commandhook(char *cmd, int before) {
 void drawmaps(short l)
 /* hook to be called after moving to redraw maps */
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	if (l == 1)
 	    sensor(FALSE);
 	if (l != 2) {
@@ -323,7 +322,7 @@ void drawmaps(short l)
 void boom(int ii, int jj)
 /* enemy fall down, go boom */ 
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	setwnd(srscan_window);
 	drawmaps(2);
 	wmove(srscan_window, ii*2+3, jj+2);
@@ -345,7 +344,7 @@ void boom(int ii, int jj)
 void warble(void)
 /* sound and visual effects for teleportation */
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	drawmaps(1);
 	setwnd(message_window);
 	sound(50);
@@ -358,7 +357,7 @@ void warble(void)
 void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, int iquad)
 /* torpedo-track animation */
 {
-    if (!curses) {
+    if (!game.options & OPTION_CURSES) {
 	if (l == 1) {
 	    if (n != 1) {
 		skip(1);
@@ -400,7 +399,7 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
 
 void makechart(void) 
 {
-    if (curses) {
+    if (game.options & OPTION_CURSES) {
 	setwnd(message_window);
 	wclear(message_window);
 	chart(0);
@@ -409,7 +408,7 @@ void makechart(void)
 
 void setpassword(void) 
 {
-    if (!curses) {
+    if (!game.options & OPTION_CURSES) {
 	while (TRUE) {
 	    scan();
 	    strcpy(game.passwd, citem);

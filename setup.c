@@ -468,7 +468,8 @@ int choose(int needprompt)
     damfac = 0.5 * skill;
     game.state.rembase = 3.0*Rand()+2.0;
     inbase = game.state.rembase;
-    inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();
+    if (game.options & OPTION_PLANETS)
+	inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();
     game.state.nromrem = (2.0+Rand())*skill;
     game.state.nscrem = (skill > SKILL_FAIR ? 1 : 0);
     game.state.remtime = 7.0 * length;
@@ -637,31 +638,34 @@ void newqad(int shutup)
     }
 
     // Decide if quadrant needs a Tholian
-    if ((skill < SKILL_GOOD && Rand() <= 0.02) ||   /* Lighten up if skill is low */
-	(skill == SKILL_GOOD && Rand() <= 0.05) ||
-	(skill > SKILL_GOOD && Rand() <= 0.08)
-#ifdef DEBUG
-	|| strcmp(passwd, "tholianx")==0
-#endif
-	) {
-	do {
-	    ithx = Rand() > 0.5 ? QUADSIZE : 1;
-	    ithy = Rand() > 0.5 ? QUADSIZE : 1;
-	} while (game.quad[ithx][ithy] != IHDOT);
-	game.quad[ithx][ithy] = IHT;
-	ithere = 1;
-	nenhere++;
-	game.kx[nenhere] = ithx;
-	game.ky[nenhere] = ithy;
-	game.kdist[nenhere] = game.kavgd[nenhere] =
-	    sqrt(square(sectx-ithx) + square(secty-ithy));
-	game.kpower[nenhere] = Rand()*400.0 +100.0 +25.0*skill;
-	/* Reserve unocupied corners */
-	if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
-	if (game.quad[1][QUADSIZE]==IHDOT) game.quad[1][QUADSIZE] = 'X';
-	if (game.quad[QUADSIZE][1]==IHDOT) game.quad[QUADSIZE][1] = 'X';
-	if (game.quad[QUADSIZE][QUADSIZE]==IHDOT) game.quad[QUADSIZE][QUADSIZE] = 'X';
+    if (game.options & OPTION_THOLIAN) {
+	if ((skill < SKILL_GOOD && Rand() <= 0.02) ||   /* Lighten up if skill is low */
+	    (skill == SKILL_GOOD && Rand() <= 0.05) ||
+	    (skill > SKILL_GOOD && Rand() <= 0.08)
+    #ifdef DEBUG
+	    || strcmp(game.passwd, "tholianx")==0
+    #endif
+	    ) {
+	    do {
+		ithx = Rand() > 0.5 ? QUADSIZE : 1;
+		ithy = Rand() > 0.5 ? QUADSIZE : 1;
+	    } while (game.quad[ithx][ithy] != IHDOT);
+	    game.quad[ithx][ithy] = IHT;
+	    ithere = 1;
+	    nenhere++;
+	    game.kx[nenhere] = ithx;
+	    game.ky[nenhere] = ithy;
+	    game.kdist[nenhere] = game.kavgd[nenhere] =
+		sqrt(square(sectx-ithx) + square(secty-ithy));
+	    game.kpower[nenhere] = Rand()*400.0 +100.0 +25.0*skill;
+	    /* Reserve unocupied corners */
+	    if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
+	    if (game.quad[1][QUADSIZE]==IHDOT) game.quad[1][QUADSIZE] = 'X';
+	    if (game.quad[QUADSIZE][1]==IHDOT) game.quad[QUADSIZE][1] = 'X';
+	    if (game.quad[QUADSIZE][QUADSIZE]==IHDOT) game.quad[QUADSIZE][QUADSIZE] = 'X';
+	}
     }
+
     sortkl();
 
     // Put in a few black holes

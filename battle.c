@@ -336,7 +336,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	    prout(" unaffected by photon blast.");
 	    return;
 	case IHQUEST: /* Hit a thingy */
-	    if (Rand()>0.7) {	// Used to be certain death 
+	    if (!(game.options & OPTION_THINGY) || Rand()>0.7) {
 		skip(1);
 		prouts("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!");
 		skip(1);
@@ -349,7 +349,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	    } else {
 		/*
 		 * Stas Sergeev added the possibility that
-		 * you can shove the Thingy.
+		 * you can shove the Thingy abd piss it off.
+		 * It then becomes an enemy and may fire at you.
 		 */
 		iqengry=1;
 		shoved=1;
