@@ -1,8 +1,6 @@
 #include <time.h>
 #include <sys/stat.h>
-#ifdef SERGEEV
-#include <conio.h>
-#endif /* SERGEEV */
+#include "conio.h"
 #include "sst.h"
 
 #ifdef __linux__
@@ -17,10 +15,10 @@ void prelim(void) {
 	skip(2);
 	prout("-SUPER- STAR TREK");
 	skip(1);
-#ifndef SERGEEV
+#ifndef __HISTORICAL__
 	prout("Latest update-21 Sept 78");
 	skip(1);
-#endif /* SERGEEV */
+#endif /* __HISTORICAL__ */
 }
 
 void freeze(int boss) {
@@ -400,9 +398,6 @@ void randomize(void) {
 }
 
 int choose(int needprompt) {
-#ifdef SERGEEV
-        int i;
-#endif /* SERGEEV */
         while (TRUE) {
 	tourn = 0;
 	thawed = 0;
@@ -425,13 +420,8 @@ int choose(int needprompt) {
 			srand((unsigned int)(int)aaitem);
 			break;
 		}
-#ifdef SERGEEV
-                if (isit("saved")) {
+		if (isit("frozen") || isit("frozen")) {
                         if (thaw()) continue;
-#else
-		if (isit("frozen")) {
-			thaw();
-#endif /* SERGEEV */
 			chew();
 #ifndef SERGEEV
 			if (*game.passwd==0) continue;
