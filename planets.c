@@ -22,7 +22,7 @@ static int consumeTime(void) {
 	events();	/* Used to avoid if future[FSCMOVE] within time */
 //	future[FSNOVA] = asave;
 	/*fails if game over, quadrant super-novas or we've moved to new quadrant*/
-	if (alldone || game.state.galaxy[quadx][quady] == 1000 || justin != 0) return 1;
+	if (alldone || game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE || justin != 0) return 1;
 	return 0;
 }
 

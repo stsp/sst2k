@@ -57,7 +57,7 @@ void imove(void) {
 					 * that attacks only happen if Klingons
 					 * are present and your skill is > 3.
 					 */
-                                        if (skill > 3 && klhere > 0 && game.state.galaxy[quadx][quady] != 1000)
+                                        if (skill > 3 && klhere > 0 && game.state.galaxy[quadx][quady] != SUPERNOVA_PLACE)
 					    attack(0);
 					if (alldone) return;
 				}
@@ -202,7 +202,7 @@ label100:
 			game.kdist[l] = finald;
 		}
 		sortkl();
-		if (game.state.galaxy[quadx][quady] != 1000 && iattak == 0)
+		if (game.state.galaxy[quadx][quady] != SUPERNOVA_PLACE && iattak == 0)
 			attack(0);
 		for (l = 1 ; l <= nenhere; l++) game.kavgd[l] = game.kdist[l];
 	}
@@ -727,7 +727,7 @@ void atover(int igrab) {
 		crmshp();
 		skip(1);
 		prout("safely out of quadrant.");
-		game.starch[quadx][quady] = game.damage[DRADIO] > 0.0 ? game.state.galaxy[quadx][quady]+1000:1;
+		game.starch[quadx][quady] = game.damage[DRADIO] > 0.0 ? game.state.galaxy[quadx][quady]+SUPERNOVA_PLACE:1;
 
 		/* Try to use warp engines */
 		if (game.damage[DWARPEN]) {
@@ -757,7 +757,7 @@ void atover(int igrab) {
 			return;
 		}
 		/* Repeat if another snova */
-	} while (game.state.galaxy[quadx][quady] == 1000);
+	} while (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE);
 	if (game.state.remkl==0) finish(FWON); /* Snova killed remaining enemy. */
 }
 
@@ -806,7 +806,7 @@ void timwrp() {
 			for (l = 1; l <= GALSIZE; l++)
 				for (ll = 1; ll <= GALSIZE; ll++)
 					if (game.starch[l][ll] > 1)
-						game.starch[l][ll]=game.damage[DRADIO]>0.0 ? game.state.galaxy[l][ll]+1000 :1;
+						game.starch[l][ll]=game.damage[DRADIO]>0.0 ? game.state.galaxy[l][ll]+SUPERNOVA_PLACE :1;
 			prout("Spock has reconstructed a correct star chart from memory");
 			if (game.damage[DRADIO] > 0.0) stdamtim = game.state.date;
 		}

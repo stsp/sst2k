@@ -58,6 +58,18 @@ typedef struct {
 	    remtime;		// remaining time
 } snapshot;				// Data that is snapshot
 
+/*
+ * This is how the integers in galaxy are encoded.
+ * Someday these should turn into structure fields.
+ */
+#define SUPERNOVA_PLACE	1000
+#define ENEMY_PLACE	100
+#define BASE_PLACE	10
+#define STAR_PLACE	1
+
+/* for newstuff */
+#define ROMULAN_PLACE	10
+
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,

@@ -132,9 +132,9 @@ void lrscan(void) {
 			if (x == 0 || x > GALSIZE || y == 0 || y > GALSIZE)
                                 proutn("  -1");
 			else {
-                                if (game.state.galaxy[x][y]<1000) proutn(" %3d", game.state.galaxy[x][y]);
+                                if (game.state.galaxy[x][y]<SUPERNOVA_PLACE) proutn(" %3d", game.state.galaxy[x][y]);
                                 else proutn("***");
-				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+1000 : 1;
+				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+SUPERNOVA_PLACE : 1;
 			}
 		}
                 prout(" ");
@@ -175,7 +175,7 @@ void chart(int nn) {
 			stdamtim = game.state.date;
 			for (i=1; i <= GALSIZE ; i++)
 				for (j=1; j <= GALSIZE; j++)
-					if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+1000;
+					if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+SUPERNOVA_PLACE;
 		}
 		else {
 		    proutn("(Last surveillance update %d stardates ago.",
@@ -193,7 +193,7 @@ void chart(int nn) {
                                 strcpy(buf, ".1.");
 			else if (game.starch[i][j] == 0)
                                 strcpy(buf, "...");
-                        else if (game.state.galaxy[i][j]>=1000)
+                        else if (game.state.galaxy[i][j]>=SUPERNOVA_PLACE)
                                 strcpy(buf, "***");
 			else
 				sprintf(buf, "%03d", game.state.galaxy[i][j]);
@@ -227,7 +227,7 @@ int srscan(int l) {
 		prout("  [Using Base's sensors]");
 	}
 	else proutn("     Short-range scan\n\r");
-	if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+1000:1;
+	if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+SUPERNOVA_PLACE:1;
 	scan();
 	if (isit("chart")) nn = TRUE;
 	if (isit("no")) rightside = FALSE;

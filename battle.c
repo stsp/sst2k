@@ -306,7 +306,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 				game.quad[ix][iy]=IHDOT;
 				game.state.rembase--;
 				basex=basey=0;
-				game.state.galaxy[quadx][quady] -= 10;
+				game.state.galaxy[quadx][quady] -= BASE_PLACE;
 				game.state.basekl++;
 				newcnd();
 				return;
@@ -513,7 +513,7 @@ void attack(int k) {
 			r += 0.002*game.kpower[l]*r;
 			torpedo(course, r, jx, jy, &hit, 0, 1, 1);
 			if (game.state.remkl==0) finish(FWON); /* Klingons did themselves in! */
-			if (game.state.galaxy[quadx][quady] == 1000 ||
+			if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE ||
 				alldone) return; /* Supernova or finished */
 			if (hit == 0) continue;
 		}
@@ -602,7 +602,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 	/* Decide what kind of enemy it is and update approriately */
 	if (type == IHR) {
 		/* chalk up a Romulan */
-		game.state.newstuf[quadx][quady] -= 10;
+		game.state.newstuf[quadx][quady] -= ROMULAN_PLACE;
 		irhere--;
 		game.state.nromkl++;
 		game.state.nromrem--;

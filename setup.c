@@ -161,9 +161,9 @@ void abandn(void) {
 					secty >= 1 && secty <= QUADSIZE &&
 					game.quad[sectx][secty] == IHDOT) break;
 			}
-			if (l < 11) break; /* found a spot */
-			sectx=5;
-			secty=5;
+			if (l < QUADSIZE+1) break; /* found a spot */
+			sectx=QUADSIZE/2;
+			secty=QUADSIZE/2;
 			newqad(1);
 		}
 	}
@@ -248,7 +248,7 @@ void setup(int needprompt) {
 		int contflag;
 		do {
 			do iran8(&ix, &iy);
-			while (game.state.galaxy[ix][iy] >= 10);
+			while (game.state.galaxy[ix][iy] >= BASE_PLACE);
 			contflag = FALSE;
 			for (j = i-1; j > 0; j--) {
 				/* Improved placement algorithm to spread out bases */
@@ -271,7 +271,7 @@ void setup(int needprompt) {
 		game.state.baseqx[i] = ix;
 		game.state.baseqy[i] = iy;
 		game.starch[ix][iy] = -1;
-		game.state.galaxy[ix][iy] += 10;
+		game.state.galaxy[ix][iy] += BASE_PLACE;
 	}
 	// Position ordinary Klingon Battle Cruisers
 	krem = inkling - incom - game.state.nscrem;
@@ -284,7 +284,7 @@ void setup(int needprompt) {
 		krem -= klump;
 		klump *= 100;
 		do iran8(&ix, &iy);
-		while (game.state.galaxy[ix][iy] + klump >= 1000);
+		while (game.state.galaxy[ix][iy] + klump >= SUPERNOVA_PLACE);
 		game.state.galaxy[ix][iy] += klump;
 	} while (krem > 0);
 	// Position Klingon Commander Ships
@@ -310,7 +310,7 @@ void setup(int needprompt) {
 			for (j = 1; j < i; j++)
 				if (game.state.cx[j]==ix && game.state.cy[j]==iy) break;
 		} while (j < i);
-		game.state.galaxy[ix][iy] += 100;
+		game.state.galaxy[ix][iy] += ENEMY_PLACE;
 		game.state.cx[i] = ix;
 		game.state.cy[i] = iy;
 	}
@@ -328,7 +328,7 @@ void setup(int needprompt) {
 	// Locate Romulans
 	for (i = 1; i <= game.state.nromrem; i++) {
 		iran8(&ix, &iy);
-		game.state.newstuf[ix][iy] += 10;
+		game.state.newstuf[ix][iy] += ROMULAN_PLACE;
 	}
 	// Locate the Super Commander
 	if (game.state.nscrem > 0) {
@@ -336,7 +336,7 @@ void setup(int needprompt) {
 		while (game.state.galaxy[ix][iy] >= 900);
 		game.state.isx = ix;
 		game.state.isy = iy;
-		game.state.galaxy[ix][iy] += 100;
+		game.state.galaxy[ix][iy] += ENEMY_PLACE;
 	}
 	// Place thing (in tournament game, thingx == -1, don't want one!)
 	if (thingx != -1) {
@@ -490,7 +490,7 @@ void dropin(int iquad, int *ix, int *iy) {
 void newcnd(void) {
 	condit = IHGREEN;
 	if (energy < 1000.0) condit = IHYELLOW;
-	if (game.state.galaxy[quadx][quady] > 99 || game.state.newstuf[quadx][quady] > 9)
+	if (game.state.galaxy[quadx][quady] >= ENEMY_PLACE || game.state.newstuf[quadx][quady] > 9)
 		condit = IHRED;
         if (!alive) condit=IHDEAD;
 }
@@ -531,17 +531,17 @@ void newqad(int shutup) {
 	if (quadnum > 999) {
 		return;
 	}
-	klhere = quadnum/100;
-	irhere = newnum/10;
+	klhere = quadnum/ENEMY_PLACE;
+	irhere = newnum/ROMULAN_PLACE;
 	nplan = newnum%10;
 	nenhere = klhere + irhere;
 
 	// Position Starship
 	game.quad[sectx][secty] = ship;
 
-	if (quadnum >= 100) {
+	if (quadnum >= ENEMY_PLACE) {
 		// Position ordinary Klingons
-		quadnum -= 100*klhere;
+		quadnum -= ENEMY_PLACE*klhere;
 		for (i = 1; i <= klhere; i++) {
 			dropin(IHK, &ix, &iy);
 			game.kx[i] = ix;
@@ -576,8 +576,8 @@ void newqad(int shutup) {
 		game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*skill;
 	}
 	// If quadrant needs a starbase, put it in
-	if (quadnum >= 10) {
-		quadnum -= 10;
+	if (quadnum >= BASE_PLACE) {
+		quadnum -= BASE_PLACE;
 		dropin(IHB, &basex, &basey);
 	}
 	
@@ -637,8 +637,8 @@ void newqad(int shutup) {
 #endif
                 ) {
                 do {
-                        ithx = Rand() > 0.5 ? 10 : 1;
-                        ithy = Rand() > 0.5 ? 10 : 1;
+                        ithx = Rand() > 0.5 ? QUADSIZE : 1;
+                        ithy = Rand() > 0.5 ? QUADSIZE : 1;
                 } while (game.quad[ithx][ithy] != IHDOT);
                 game.quad[ithx][ithy] = IHT;
                 ithere = 1;

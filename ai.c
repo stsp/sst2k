@@ -39,8 +39,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	nenhere--;
 	if (condit != IHDOCKED) newcnd();
 	/* Handle global matters related to escape */
-	game.state.galaxy[quadx][quady] -= 100;
-	game.state.galaxy[iqx][iqy] += 100;
+	game.state.galaxy[quadx][quady] -= ENEMY_PLACE;
+	game.state.galaxy[iqx][iqy] += ENEMY_PLACE;
 	if (ienm==IHS) {
 		ishere=0;
 		iscate=0;
@@ -311,10 +311,10 @@ static int movescom(int iqx, int iqy, int flag, int *ipage) {
 	}
 	if (justin && !iscate) return 1;
 	/* do the move */
-	game.state.galaxy[game.state.isx][game.state.isy] -= 100;
+	game.state.galaxy[game.state.isx][game.state.isy] -= ENEMY_PLACE;
 	game.state.isx = iqx;
 	game.state.isy = iqy;
-	game.state.galaxy[game.state.isx][game.state.isy] += 100;
+	game.state.galaxy[game.state.isx][game.state.isy] += ENEMY_PLACE;
 	if (ishere) {
 		/* SC has scooted, Remove him from current quadrant */
 		iscate=0;
@@ -588,7 +588,7 @@ void movetho(void) {
         game.ky[nenhere]=ithy;
 
 	/* check to see if all holes plugged */
-	for (i = 1; i < 11; i++) {
+	for (i = 1; i < QUADSIZE+1; i++) {
 		if (game.quad[1][i]!=IHWEB && game.quad[1][i]!=IHT) return;
 		if (game.quad[QUADSIZE][i]!=IHWEB && game.quad[QUADSIZE][i]!=IHT) return;
 		if (game.quad[i][1]!=IHWEB && game.quad[i][1]!=IHT) return;

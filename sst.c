@@ -454,14 +454,14 @@ static void makemoves(void) {
 				events();
 				if (alldone) break;		// Events did us in
 			}
-			if (game.state.galaxy[quadx][quady] == 1000) { // Galaxy went Nova!
+			if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) { // Galaxy went Nova!
 				atover(0);
 				continue;
 			}
 			if (hitme && justin==0) {
 				attack(2);
 				if (alldone) break;
-				if (game.state.galaxy[quadx][quady] == 1000) {	// went NOVA! 
+				if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) {	// went NOVA! 
 					atover(0);
 					hitme = TRUE;
 					continue;

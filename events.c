@@ -14,7 +14,7 @@ void events(void) {
 		stdamtim = game.state.date;
 		for (i=1; i <= GALSIZE ; i++)
 			for (j=1; j <= GALSIZE; j++)
-				if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+1000;
+				if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+SUPERNOVA_PLACE;
 	}
 
 	for (;;) {
@@ -77,7 +77,7 @@ void events(void) {
 				ipage=1;
 				snova(0,0);
 				game.future[FSNOVA] = game.state.date + expran(0.5*intime);
-				if (game.state.galaxy[quadx][quady] == 1000) return;
+				if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) return;
 				break;
 			case FSPY: /* Check with spy to see if S.C. should tractor beam */
 				if (game.state.nscrem == 0 ||
@@ -233,7 +233,7 @@ void events(void) {
 			case FSCDBAS: /* Supercommander destroys base */
 				game.future[FSCDBAS] = 1e30;
 				isatb = 2;
-				if (game.state.galaxy[game.state.isx][game.state.isy]%100 < 10) break; /* WAS RETURN! */
+				if (game.state.galaxy[game.state.isx][game.state.isy]%ENEMY_PLACE < BASE_PLACE) break; /* WAS RETURN! */
 				ixhold = batx;
 				iyhold = baty;
 				batx = game.state.isx;
@@ -245,7 +245,7 @@ void events(void) {
 					for (i = 1; i <= game.state.remcom; i++)
 						if (game.state.cx[i]==batx && game.state.cy[i]==baty) break;
 					if (i > game.state.remcom || game.state.rembase == 0 ||
-						game.state.galaxy[batx][baty] % 100 < 10) {
+						game.state.galaxy[batx][baty] % ENEMY_PLACE < BASE_PLACE) {
 						/* No action to take after all */
 						batx = baty = 0;
 						break;
@@ -256,7 +256,7 @@ void events(void) {
 				if (game.starch[batx][baty] == -1) game.starch[batx][baty] = 0;
 				/* Handle case where base is in same quadrant as starship */
 				if (batx==quadx && baty==quady) {
-					if (game.starch[batx][baty] > 999) game.starch[batx][baty] -= 10;
+					if (game.starch[batx][baty] >= SUPERNOVA_PLACE) game.starch[batx][baty] -= BASE_PLACE;
 					game.quad[basex][basey]= IHDOT;
 					basex=basey=0;
 					newcnd();
@@ -277,7 +277,7 @@ void events(void) {
 					else prout("a Klingon Commander");
 				}
 				/* Remove Starbase from galaxy */
-				game.state.galaxy[batx][baty] -= 10;
+				game.state.galaxy[batx][baty] -= BASE_PLACE;
 				for (i=1; i <= game.state.rembase; i++)
 					if (game.state.baseqx[i]==batx && game.state.baseqy[i]==baty) {
 						game.state.baseqx[i]=game.state.baseqx[game.state.rembase];
@@ -310,7 +310,7 @@ void events(void) {
 					probecx = i;
 					probecy = j;
 					if (i < 1 || i > GALSIZE || j < 1 || j > GALSIZE ||
-						game.state.galaxy[probecx][probecy] == 1000) {
+						game.state.galaxy[probecx][probecy] == SUPERNOVA_PLACE) {
 						// Left galaxy or ran into supernova
 						if (game.damage[DRADIO]==0.0 || condit == IHDOCKED) {
 							if (ipage==0) pause_game(1);
@@ -339,14 +339,14 @@ void events(void) {
 				   radio. */
 				if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED)
 					game.starch[probecx][probecy] = game.damage[DRADIO] > 0.0 ?
-										   game.state.galaxy[probecx][probecy]+1000 : 1;
+										   game.state.galaxy[probecx][probecy]+SUPERNOVA_PLACE : 1;
 				proben--; // One less to travel
 				if (proben == 0 && isarmed &&
-					game.state.galaxy[probecx][probecy] % 10 > 0) {
+					game.state.galaxy[probecx][probecy] % BASE_PLACE > 0) {
 					/* lets blow the sucker! */
 					snova(1,0);
 					game.future[FDSPROB] = 1e30;
-					if (game.state.galaxy[quadx][quady] == 1000) return;
+					if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) return;
 				}
 				break;
 		}
@@ -401,7 +401,7 @@ void wait(void) {
 		/* Repair Deathray if long rest at starbase */
 		if (origTime-delay >= 9.99 && condit == IHDOCKED)
 			game.damage[DDRAY] = 0.0;
-	} while (game.state.galaxy[quadx][quady] != 1000); // leave if quadrant supernovas
+	} while (game.state.galaxy[quadx][quady] != SUPERNOVA_PLACE); // leave if quadrant supernovas
 
 	resting = 0;
 	Time = 0;
@@ -477,7 +477,7 @@ void nova(int ix, int iy) {
 						game.quad[ii][jj] = IHDOT;
 						break;
 					case IHB: /* Destroy base */
-						game.state.galaxy[quadx][quady] -= 10;
+						game.state.galaxy[quadx][quady] -= BASE_PLACE;
 						for (i = 1; i <= game.state.rembase; i++)
 							if (game.state.baseqx[i]==quadx && game.state.baseqy[i]==quady) break;
 						game.state.baseqx[i] = game.state.baseqx[game.state.rembase];
@@ -605,14 +605,14 @@ void snova(int insx, int insy) {
 			left of universe */
 			for (nqx = 1; nqx<=GALSIZE; nqx++) {
 				for (nqy = 1; nqy<=GALSIZE; nqy++) {
-					stars += game.state.galaxy[nqx][nqy] % 10;
+					stars += game.state.galaxy[nqx][nqy] % BASE_PLACE;
 				}
 			}
 			if (stars == 0) return; /* nothing to supernova exists */
 			num = Rand()*stars + 1;
 			for (nqx = 1; nqx<=GALSIZE; nqx++) {
 				for (nqy = 1; nqy<=GALSIZE; nqy++) {
-					num -= game.state.galaxy[nqx][nqy] % 10;
+					num -= game.state.galaxy[nqx][nqy] % BASE_PLACE;
 					if (num <= 0) break;
 				}
 				if (num <=0) break;
@@ -640,7 +640,7 @@ void snova(int insx, int insy) {
 		else {
 			/* we are in the quadrant! */
 			insipient = 1;
-			num = Rand()* (game.state.galaxy[nqx][nqy]%10) + 1;
+			num = Rand()* (game.state.galaxy[nqx][nqy]%BASE_PLACE) + 1;
 			for (nsx=1; nsx < QUADSIZE; nsx++) {
 				for (nsy=1; nsy < QUADSIZE; nsy++) {
 					if (game.quad[nsx][nsy]==IHSTAR) {
@@ -738,7 +738,7 @@ void snova(int insx, int insy) {
 		game.damage[DRADIO] == 0 ||
 		condit == IHDOCKED)
 		game.starch[nqx][nqy] = 1;
-	game.state.galaxy[nqx][nqy] = 1000;
+	game.state.galaxy[nqx][nqy] = SUPERNOVA_PLACE;
 	/* If supernova destroys last klingons give special message */
 	if (game.state.remkl==0 && (nqx != quadx || nqy != quady)) {
 		skip(2);
