@@ -1485,17 +1485,20 @@ great exhibit for the Retrocomputing Museum <http://www.catb.org/retro/>.
 A few quick web searches later we found Tom Almy's page.  We
 downloaded his code and Dave verified that that it was a direct
 descendent of UT Super Star Trek -- even though it had been translated
-to C, he was able to recognize some of his FORTRAN code.
+to C, he was able to recognize names and techniques from the FORTRAN
+version.
 
-Thus, this game is a cousin of Eric Allman's BSD Trek game, which is also
-derived from UT Super Star Trek.  However, this one has had a lot more
-stuff folded into it over the years -- deep space probes, dilithium mining,
-the Tholian Web, and so forth.
+Thus, this game is a cousin of Eric Allman's BSD Trek game, which is
+also derived from UT Super Star Trek.  However, this one has had a lot
+more stuff folded into it over the years -- deep space probes,
+dilithium mining, the Tholian Web, and so forth.
 
-This lineage differs from most of the BASIC versions out there in that you
-set courses and firing directions with rectangular rather than polar 
-coordinates.  It also preserves the original numbered rather than named
-quadrants.
+One signature trait of this group of variants is that the sectors are
+10x10 rather than the 8x8 in Mike Mayfield's 1972 original and its
+BASIC descendants) Also, you set courses and firing directions with
+rectangular rather than polar coordinates.  It also preserves the
+original numbered quadrants rather than the astronomically-named 
+quadrants introduced into many BASIC versions.
 
 This game is now an open-source project; see the project site at 
 
