@@ -173,9 +173,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	if (nsteps < 1) nsteps = 1; /* This shouldn't be necessary */
 #ifdef DEBUG
 	if (idebug) {
-		proutn("NSTEPS = ");
-		crami(nsteps, 1);
-		skip(1);
+		prout("NSTEPS = %d", nsteps);
 	}
 #endif
 	/* Compute preferred values of delta X and Y */
@@ -192,8 +190,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	for (ll = 1; ll <= nsteps; ll++) {
 #ifdef DEBUG
 		if (idebug) {
-			crami(ll,2);
-			skip(1);
+			prout("%d", ll);
 		}
 #endif
 		/* Check if preferred position available */

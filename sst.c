@@ -1,6 +1,7 @@
 #define INCLUDED	// Define externs here
 #include "sst.h"
 #include <ctype.h>
+#include <stdarg.h>
 #ifdef MSDOS
 #include <dos.h>
 #endif
@@ -373,13 +374,13 @@ int main(int argc, char **argv) {
 		skip(1);
 
 		if (tourn && alldone) {
-			printf("Do you want your score recorded?");
+			proutn("Do you want your score recorded?");
 			if (ja()) {
 				chew2();
 				freeze(FALSE);
 			}
 		}
-		printf("Do you want to play again?");
+		proutn("Do you want to play again?");
 		if (!ja()) break;
 	}
 	skip(1);
@@ -410,10 +411,7 @@ void cramen(int i) {
 void cramlc(int key, int x, int y) {
 	if (key == 1) proutn(" Quadrant");
 	else if (key == 2) proutn(" Sector");
-	proutn(" ");
-	crami(x, 1);
-	proutn(" - ");
-	crami(y, 1);
+	proutn(" %d - %d", x, y);
 }
 
 void crmena(int i, int enemy, int key, int x, int y) {
@@ -536,12 +534,6 @@ void cramf(double x, int w, int d) {
 	proutn(buf);
 }
 
-void crami(int i, int w) {
-	char buf[16];
-	sprintf(buf, "%*d", w, i);
-	proutn(buf);
-}
-
 double square(double i) { return i*i; }
 									
 static void clearscreen(void) {
@@ -591,22 +583,34 @@ void skip(int i) {
 }
 
 
-void proutn(char *s) {
-	fputs(s, stdout);
+void proutn(char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
 }
 
-void prout(char *s) {
-	proutn(s);
-	skip(1);
+void prout(char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+    skip(1);
 }
 
-void prouts(char *s) {
+void prouts(char *fmt, ...) {
 	clock_t endTime;
+	char *s, buf[BUFSIZ];
 	/* print slowly! */
-	while (*s) {
+	va_list ap;
+	va_start(ap, fmt);
+	vsprintf(buf, fmt, ap);
+	va_end(ap);
+	skip(1);
+	for (s = buf; *s; s++) {
 		endTime = clock() + CLOCKS_PER_SEC*0.05;
 		while (clock() < endTime) ;
-		putchar(*s++);
+		putchar(*s);
 		fflush(stdout);
 	}
 }

@@ -42,44 +42,41 @@ void report(int f) {
 		case 5: s3="emeritus"; break;
 		default: s3="skilled"; break;
 	}
-	printf("\nYou %s playing a %s%s %s game.\n",
+	prout("");
+	prout("You %s playing a %s%s %s game.",
 		   alldone? "were": "are now", s1, s2, s3);
 	if (skill>3 && thawed && !alldone) prout("No plaque is allowed.");
-	if (tourn) printf("This is tournament game %d.\n", tourn);
-	if (f) printf("Your secret password is \"%s\"\n",game.passwd);
-	printf("%d of %d Klingons have been killed",
+	if (tourn) prout("This is tournament game %d.", tourn);
+	if (f) prout("Your secret password is \"%s\"",game.passwd);
+	proutn("%d of %d Klingons have been killed",
 		   game.state.killk+game.state.killc+game.state.nsckill, inkling);
-	if (game.state.killc) printf(", including %d Commander%s.\n", game.state.killc, game.state.killc==1?"":"s");
+	if (game.state.killc) prout(", including %d Commander%s.", game.state.killc, game.state.killc==1?"":"s");
 	else if (game.state.killk+game.state.nsckill > 0) prout(", but no Commanders.");
 	else prout(".");
-	if (skill > 2) printf("The Super Commander has %sbeen destroyed.\n",
+	if (skill > 2) prout("The Super Commander has %sbeen destroyed.",
 						  game.state.nscrem?"not ":"");
 	if (game.state.rembase != inbase) {
 		proutn("There ");
 		if (inbase-game.state.rembase==1) proutn("has been 1 base");
 		else {
-			proutn("have been ");
-			crami(inbase-game.state.rembase, 1);
-			proutn(" bases");
+		    proutn("have been %d bases", inbase-game.state.rembase);
 		}
-		proutn(" destroyed, ");
-		crami(game.state.rembase, 1);
-		prout(" remaining.");
+		prout(" destroyed, %d remaining.", game.state.rembase);
 	}
-	else printf("There are %d bases.\n", inbase);
+	else prout("There are %d bases.", inbase);
 	if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED || iseenit) {
 		/* Don't report this if not seen and
 			either the radio is dead or not at base! */
 		attakreport();
 		iseenit = 1;
 	}
-	if (casual) printf("%d casualt%s suffered so far.\n",
+	if (casual) prout("%d casualt%s suffered so far.",
 					   casual, casual==1? "y" : "ies");
-	if (nhelp) printf("There were %d call%s for help.\n",
+	if (nhelp) prout("There were %d call%s for help.",
 					  nhelp, nhelp==1 ? "" : "s");
 	if (ship == IHE) {
 		proutn("You have ");
-		if (nprobes) crami(nprobes,1);
+		if (nprobes) proutn("%d", nprobes);
 		else proutn("no");
 		proutn(" deep space probe");
 		if (nprobes!=1) proutn("s");
@@ -104,7 +101,7 @@ void report(int f) {
 				ai *= 2.0;
 				i++;
 			}
-			printf("Dilithium crystals have been used %d time%s.\n",
+			prout("Dilithium crystals have been used %d time%s.",
 				   i, i==1? "" : "s");
 		}
 	}
@@ -132,9 +129,9 @@ void lrscan(void) {
 	for (x = quadx-1; x <= quadx+1; x++) {
 		for (y = quady-1; y <= quady+1; y++) {
 			if (x == 0 || x > 8 || y == 0 || y > 8)
-				printf("   -1");
+				proutn("   -1");
 			else {
-				printf("%5d", game.state.galaxy[x][y]);
+				proutn("%5d", game.state.galaxy[x][y]);
 				game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+1000 :1;
 			}
 		}
@@ -155,7 +152,7 @@ void dreprt(void) {
 				prout("                IN FLIGHT   DOCKED");
 				jdam = TRUE;
 			}
-			printf("  %16s ", device[i]);
+			proutn("  %16s ", device[i]);
 			cramf(game.damage[i]+0.05, 8, 2);
 			proutn("  ");
 			cramf(docfac*game.damage[i]+0.005, 8, 2);
@@ -194,18 +191,18 @@ void chart(int nn) {
 
 	prout("      1    2    3    4    5    6    7    8");
 	prout("    ----------------------------------------");
-	if (nn==0) prout("  -");
+	/* if (nn==0) prout("  -"); */
 	for (i = 1; i <= 8; i++) {
-		printf("%d -", i);
+	        proutn("%d -", i);
 		for (j = 1; j <= 8; j++) {
 			if (game.starch[i][j] < 0)
-				printf("  .1.");
+				proutn("  .1.");
 			else if (game.starch[i][j] == 0)
-				printf("  ...");
+				proutn("  ...");
 			else if (game.starch[i][j] > 999)
-				printf("%5d", game.starch[i][j]-1000);
+				proutn("%5d", game.starch[i][j]-1000);
 			else
-				printf("%5d", game.state.galaxy[i][j]);
+				proutn("%5d", game.state.galaxy[i][j]);
 		}
 		prout("  -");
 	}
@@ -247,7 +244,7 @@ void srscan(int l) {
 			break;
 		case 2: // REQUEST
 			while (scan() == IHEOL)
-				printf("Information desired? ");
+				proutn("Information desired? ");
 			chew();
 			for (k = 1; k <= 10; k++)
 				if (strncmp(citem,requests[k],min(2,strlen(citem)))==0)
@@ -267,18 +264,18 @@ void srscan(int l) {
 	for (i = 1; i <= 10; i++) {
 		int jj = (k!=0 ? k : i);
 		if (leftside) {
-			printf("%2d  ", i);
+			proutn("%2d  ", i);
 			for (j = 1; j <= 10; j++) {
 				if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1))
-					printf("%c ",game.quad[i][j]);
+					proutn("%c ",game.quad[i][j]);
 				else
-					printf("- ");
+					proutn("- ");
 			}
 		}
 		if (rightside) {
 			switch (jj) {
 				case 1:
-					printf(" Stardate      %.1f", game.state.date);
+					proutn(" Stardate      %.1f", game.state.date);
 					break;
 				case 2:
 					if (condit != IHDOCKED) newcnd();
@@ -288,50 +285,50 @@ void srscan(int l) {
 						case IHYELLOW: cp = "YELLOW"; break;
 						case IHDOCKED: cp = "DOCKED"; break;
 					}
-					printf(" Condition     %s", cp);
+					proutn(" Condition     %s", cp);
 					break;
 				case 3:
-					printf(" Position     ");
+					proutn(" Position     ");
 					cramlc(0, quadx, quady);
-					putchar(',');
+					proutn(",");
 					cramlc(0, sectx, secty);
 					break;
 				case 4:
-					printf(" Life Support  ");
+					proutn(" Life Support  ");
 					if (game.damage[DLIFSUP] != 0.0) {
 						if (condit == IHDOCKED)
-							printf("DAMAGED, supported by starbase");
+							proutn("DAMAGED, supported by starbase");
 						else
-							printf("DAMAGED, reserves=%4.2f", lsupres);
+							proutn("DAMAGED, reserves=%4.2f", lsupres);
 					}
 					else
-						printf("ACTIVE");
+						proutn("ACTIVE");
 					break;
 				case 5:
-					printf(" Warp Factor   %.1f", warpfac);
+					proutn(" Warp Factor   %.1f", warpfac);
 					break;
 				case 6:
-					printf(" Energy        %.2f", energy);
+					proutn(" Energy        %.2f", energy);
 					break;
 				case 7:
-					printf(" Torpedoes     %d", torps);
+					proutn(" Torpedoes     %d", torps);
 					break;
 				case 8:
-					printf(" Shields       ");
+					proutn(" Shields       ");
 					if (game.damage[DSHIELD] != 0)
-						printf("DAMAGED,");
+						proutn("DAMAGED,");
 					else if (shldup)
-						printf("UP,");
+						proutn("UP,");
 					else
-						printf("DOWN,");
-					printf(" %d%% %.1f units",
+						proutn("DOWN,");
+					proutn(" %d%% %.1f units",
 						   (int)((100.0*shield)/inshld + 0.5), shield);
 					break;
 				case 9:
-					printf(" Klingons Left %d", game.state.remkl);
+					proutn(" Klingons Left %d", game.state.remkl);
 					break;
 				case 10:
-					printf(" Time Left     %.2f", game.state.remtime);
+					proutn(" Time Left     %.2f", game.state.remtime);
 					break;
 			}
 					

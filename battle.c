@@ -152,9 +152,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	crmshp();
 	prout(" heavily damaged.");
 	icas = 10.0+20.0*Rand();
-	proutn("***Sickbay reports ");
-	crami(icas, 1);
-	prout(" casualties.");
+	prout("***Sickbay reports %d casualties", icas);
 	casual += icas;
 	for (l=1; l <= NDEVICES; l++) {
 		if (l == DDRAY) continue; // Don't damage deathray 
@@ -532,7 +530,7 @@ void attack(int k) {
 		if (hit > hitmax) hitmax = hit;
 		hittot += hit;
 		fry(hit);
-		printf("Hit %g energy %g\n", hit, energy);
+		prout("Hit %g energy %g", hit, energy);
 		energy -= hit;
 	}
 	if (energy <= 0) {
@@ -551,25 +549,18 @@ void attack(int k) {
 	else {
 		/* Print message if starship suffered hit(s) */
 		skip(1);
-		proutn("Energy left ");
-		cramf(energy, 0, 2);
-		proutn("    shields ");
-		if (shldup) proutn("up, ");
-		else if (game.damage[DSHIELD] == 0) proutn("down, ");
+		proutn("Energy left %2d    shields ", (int)energy);
+		if (shldup) proutn("up ");
+		else if (game.damage[DSHIELD] == 0) proutn("down ");
 		else proutn("damaged, ");
 	}
-	crami(percent, 1);
-	proutn("%   torpedoes left ");
-	crami(torps, 1);
-	skip(1);
+	prout("%d%%,   torpedoes left %d", percent, torps);
 	/* Check if anyone was hurt */
 	if (hitmax >= 200 || hittot >= 500) {
 		int icas= hittot*Rand()*0.015;
 		if (icas >= 2) {
 			skip(1);
-			proutn("Mc Coy-  \"Sickbay to bridge.  We suffered ");
-			crami(icas, 1);
-			prout(" casualties");
+			prout("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties", icas);
 			prout("   in that last attack.\"");
 			casual += icas;
 		}
@@ -705,8 +696,7 @@ void photon(void) {
 			return;
 		}
 		else if (key == IHEOL) {
-			crami(torps,1);
-			prout(" torpedoes left.");
+			prout("%d torpedoes left.", torps);
 			proutn("Number of torpedoes to fire- ");
 			key = scan();
 		}
@@ -758,9 +748,7 @@ void photon(void) {
 	if (i == 1 && key == IHEOL) {
 		/* prompt for each one */
 		for (i = 1; i <= n; i++) {
-			proutn("Target sector for torpedo number");
-			crami(i, 2);
-			proutn("- ");
+		    proutn("Target sector for torpedo number %d- ", i);
 			key = scan();
 			if (key != IHREAL) {
 				huh();
@@ -787,9 +775,7 @@ void photon(void) {
 			/* misfire! */
 			r = (Rand()+1.2) * r;
 			if (n>1) {
-				prouts("***TORPEDO NUMBER");
-				crami(i, 2);
-				prouts(" MISFIRES.");
+			    prouts("***TORPEDO NUMBER %d MISFIRES", i);
 			}
 			else prouts("***TORPEDO MISFIRES.");
 			skip(1);
@@ -805,9 +791,7 @@ void photon(void) {
 		if (shldup != 0 || condit == IHDOCKED) r *= 1.0 + 0.0001*shield;
 		if (n != 1) {
 			skip(1);
-			proutn("Track for torpedo number");
-			crami(i, 2);
-			proutn("-   ");
+			proutn("Track for torpedo number %d-  ", i);
 		}
 		else {
 			skip(1);
@@ -862,9 +846,7 @@ static int checkshctrl(double rpow) {
 	if (icas) {
 		skip(1);
 		prout("McCoy to bridge- \"Severe radiation burns, Jim.");
-		proutn("  ");
-		crami(icas, 1);
-		prout(" casualties so far.\"");
+		prout("  %d casualties so far.\"", icas);
 		casual -= icas;
 	}
 	skip(1);
@@ -1083,9 +1065,7 @@ void phasers(void) {
 						int irec=(fabs(game.kpower[k])/(PHASEFAC*pow(0.9,game.kdist[k])))*
 								 (1.01+0.05*Rand()) + 1.0;
 						kz = k;
-						proutn("(");
-						crami(irec, 1);
-						proutn(")  ");
+						proutn("(%d)", irec);
 					}
 					proutn("units to fire at ");
 					crmena(0, ienm, 2, ii, jj);

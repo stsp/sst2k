@@ -68,11 +68,12 @@ void finish(FINTYPE ifin) {
 	int igotit = 0;
 	alldone = 1;
 	skip(3);
-	printf("It is stardate %.1f .\n\n", game.state.date);
+	prout("It is stardate %.1f.", game.state.date);
+	prout("");
 	switch (ifin) {
 		case FWON: // Game has been won
 			if (game.state.nromrem != 0)
-				printf("The remaining %d Romulans surrender to Starfleet Command.\n",
+				prout("The remaining %d Romulans surrender to Starfleet Command.",
 					   game.state.nromrem);
 			
 			prout("You have smashed the Klingon invasion fleet and saved");
@@ -325,40 +326,40 @@ void score(void) {
 	skip(2);
 	prout("Your score --");
 	if (game.state.nromkl)
-		printf("%6d Romulans destroyed                 %5d\n",
+		prout("%6d Romulans destroyed                 %5d",
 			   game.state.nromkl,20*game.state.nromkl);
 	if (game.state.nromrem)
-		printf("%6d Romulans captured                  %5d\n",
+		prout("%6d Romulans captured                  %5d",
 			   game.state.nromrem, game.state.nromrem);
 	if (game.state.killk)
-		printf("%6d ordinary Klingons destroyed        %5d\n",
+		prout("%6d ordinary Klingons destroyed        %5d",
 			   game.state.killk, 10*game.state.killk);
 	if (game.state.killc)
-		printf("%6d Klingon commanders destroyed       %5d\n",
+		prout("%6d Klingon commanders destroyed       %5d",
 			   game.state.killc, 50*game.state.killc);
 	if (game.state.nsckill)
-		printf("%6d Super-Commander destroyed          %5d\n",
+		prout("%6d Super-Commander destroyed          %5d",
 			   game.state.nsckill, 200*game.state.nsckill);
 	if (ithperd)
-		printf("%6.2f Klingons per stardate              %5d\n",
+		prout("%6.2f Klingons per stardate              %5d",
 			   perdate, ithperd);
 	if (game.state.starkl)
-		printf("%6d stars destroyed by your action     %5d\n",
+		prout("%6d stars destroyed by your action     %5d",
 			   game.state.starkl, -5*game.state.starkl);
 	if (game.state.nplankl)
-		printf("%6d planets destroyed by your action   %5d\n",
+		prout("%6d planets destroyed by your action   %5d",
 			   game.state.nplankl, -10*game.state.nplankl);
 	if (game.state.basekl)
-		printf("%6d bases destroyed by your action     %5d\n",
+		prout("%6d bases destroyed by your action     %5d",
 			   game.state.basekl, -100*game.state.basekl);
 	if (nhelp)
-		printf("%6d calls for help from starbase       %5d\n",
+		prout("%6d calls for help from starbase       %5d",
 			   nhelp, -45*nhelp);
 	if (casual)
-		printf("%6d casualties incurred                %5d\n",
+		prout("%6d casualties incurred                %5d",
 			   casual, -casual);
 	if (klship)
-		printf("%6d ship(s) lost or destroyed          %5d\n",
+		prout("%6d ship(s) lost or destroyed          %5d",
 			   klship, -100*klship);
 	if (alive==0)
 		prout("Penalty for getting yourself killed        -200");
@@ -372,10 +373,10 @@ void score(void) {
 			case 4: proutn("Expert game  "); break;
 			case 5: proutn("Emeritus game"); break;
 		}
-		printf("           %5d\n", iwon);
+		prout("           %5d", iwon);
 	}
 	skip(2);
-	printf("TOTAL SCORE                               %5d\n", iscore);
+	prout("TOTAL SCORE                               %5d", iscore);
 }
 
 void plaque(void) {
@@ -388,16 +389,16 @@ void plaque(void) {
 	skip(2);
 	
 	while (fp == NULL) {
-		printf("File or device name for your plaque:");
+		proutn("File or device name for your plaque:");
 		fgets(winner, 128, stdin);
 		winner[strlen(winner)-1] = '\0';
 		fp = fopen(winner, "w");
 		if (fp==NULL) {
-			printf("Invalid name.\n");
+			prout("Invalid name.");
 		}
 	}
 
-	printf("Enter name to go on plaque (up to 30 characters):");
+	proutn("Enter name to go on plaque (up to 30 characters):");
 	fgets(winner, 128, stdin);
 	winner[strlen(winner)-1] = '\0';
 	winner[30] = '\0';

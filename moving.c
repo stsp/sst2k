@@ -500,10 +500,11 @@ void warp(int i) {
 					prout("We can't do it, Captain. We haven't the energy.");
 				}
 				else {
-					proutn("We haven't the energy, but we could do it at warp ");
-					crami(iwarp, 1);
-					if (shldup)
-						prout(",\nif you'll lower the shields.");
+					proutn("We haven't the energy, but we could do it at warp %d", iwarp);
+					if (shldup) {
+						prout(",");
+						prout("if you'll lower the shields.");
+					}
 					else
 						prout(".");
 				}
@@ -837,8 +838,7 @@ void probe(void) {
 
 	if (key == IHEOL) {
 		/* slow mode, so let Kirk know how many probes there are left */
-		crami(nprobes,1);
-		prout(nprobes==1 ? " probe left." : " probes left.");
+		prout(nprobes==1 ? "%d probe left." : "%d probes left.", nprobes);
 		proutn("Are you sure you want to fire a probe? ");
 		if (ja()==0) return;
 	}

@@ -36,6 +36,7 @@ void freeze(int boss) {
 		skip(1);
 		return;
 	}
+	strcpy(game.magic, SSTMAGIC);
 	fwrite(&game, sizeof(game), 1, fp);
 
 	fclose(fp);
@@ -69,6 +70,11 @@ void thaw(void) {
 		return;
 	}
 	fread(&game, sizeof(game), 1, fp);
+	if (strcmp(game.magic, SSTMAGIC)) {
+		prout("Game file format is bad, should begin with " SSTMAGIC);
+		skip(1);
+		return;
+	}
 
 	fclose(fp);
 
@@ -239,13 +245,13 @@ void setup(void) {
 				if (distq < 6.0*(6-inbase) && Rand() < 0.75) {
 					contflag = TRUE;
 #ifdef DEBUG
-					printf("DEBUG: Abandoning base #%d at %d-%d\n", i, ix, iy);
+					proutn("DEBUG: Abandoning base #%d at %d-%d\n", i, ix, iy);
 #endif
 					break;
 				}
 #ifdef DEBUG
 				else if (distq < 6.0 * (6-inbase)) {
-					printf("DEBUG: saving base #%d, close to #%d\n", i, j);
+					proutn("DEBUG: saving base #%d, close to #%d\n", i, j);
 				}
 #endif
 			}
@@ -334,24 +340,26 @@ void setup(void) {
 	game.state.snap = 0;
 		
 	if (skill == 1) {
-		printf("It is stardate %d. The Federation is being attacked by\n",
+		prout("It is stardate %d. The Federation is being attacked by",
 			   (int)game.state.date);
-		printf("a deadly Klingon invasion force. As captain of the United\n"
-			   "Starship U.S.S. Enterprise, it is your mission to seek out\n"
-			   "and destroy this invasion force of %d battle cruisers.\n",
+		prout("a deadly Klingon invasion force. As captain of the United");
+		prout("Starship U.S.S. Enterprise, it is your mission to seek out");
+		prout("and destroy this invasion force of %d battle cruisers.",
 			   inkling);
-		printf("You have an initial allotment of %d stardates to complete\n"
-			   "your mission.  As you proceed you may be given more time.\n\n"
-			   "You will have %d supporting starbases.\n"
-			   "Starbase locations-  ",
-			   (int)intime, inbase);
+		prout("You have an initial allotment of %d stardates to complete", (int)intime);
+		prout("your mission.  As you proceed you may be given more time.");
+		prout("");
+		prout("You will have %d supporting starbases.", inbase);
+		proutn("Starbase locations-  ");
 	}
 	else {
-		printf("Stardate %d.\n\n"
-			   "%d Klingons.\nAn unknown number of Romulans\n",
-			   (int)game.state.date, inkling);
-		if (game.state.nscrem) printf("and one (GULP) Super-Commander.\n");
-		printf("%d stardates\n%d starbases in  ",(int)intime, inbase);
+		prout("Stardate %d.", (int)game.state.date);
+		prout("");
+		prout("%d Klingons.", inkling);
+		prout("An unknown number of Romulans.");
+		if (game.state.nscrem) prout("and one (GULP) Super-Commander.");
+			prout("%d stardates.",(int)intime);
+			proutn("%d starbases in  ", inbase);
 	}
 	for (i = 1; i <= inbase; i++) {
 		cramlc(0, game.state.baseqx[i], game.state.baseqy[i]);

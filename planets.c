@@ -446,7 +446,7 @@ void deathray(void) {
 			prout("   is still operational.\"");
 		}
 		else {
-			prout("   has been rendered disfunctional.\"");
+			prout("   has been rendered nonfunctional.\"");
 			game.damage[DDRAY] = 39.95;
 		}
 		return;
