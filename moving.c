@@ -42,7 +42,7 @@ void imove(void) {
 		for (l = 1; l <= n; l++) {
 			ix = (x += deltax) + 0.5;
 			iy = (y += deltay) + 0.5;
-			if (ix < 1 || ix > 10 || iy < 1 || iy > 10) {
+			if (ix < 1 || ix > QUADSIZE || iy < 1 || iy > QUADSIZE) {
 				/* Leaving quadrant -- allow final enemy attack */
 				/* Don't do it if being pushed by Nova */
 				if (nenhere != 0 && iattak != 2) {
@@ -62,8 +62,8 @@ void imove(void) {
 					if (alldone) return;
 				}
 				/* compute final position -- new quadrant and sector */
-				x = 10*(quadx-1)+sectx;
-				y = 10*(quady-1)+secty;
+				x = QUADSIZE*(quadx-1)+sectx;
+				y = QUADSIZE*(quady-1)+secty;
 				ix = x+10.0*dist*bigger*deltax+0.5;
 				iy = y+10.0*dist*bigger*deltay+0.5;
 				/* check for edge of galaxy */
@@ -78,11 +78,11 @@ void imove(void) {
 						iy = -iy + 1;
 						kink = 1;
 					}
-					if (ix > 80) {
+					if (ix > GALSIZE*QUADSIZE) {
 						ix = 161 - ix;
 						kink = 1;
 					}
-					if (iy > 80) {
+					if (iy > GALSIZE*QUADSIZE) {
 						iy = 161 - iy;
 						kink = 1;
 					}
@@ -102,10 +102,10 @@ void imove(void) {
 				}
 				/* Compute final position in new quadrant */
 				if (trbeam) return; /* Don't bother if we are to be beamed */
-				quadx = (ix+9)/10;
-				quady = (iy+9)/10;
-				sectx = ix - 10*(quadx-1);
-				secty = iy - 10*(quady-1);
+				quadx = (ix+9)/QUADSIZE;
+				quady = (iy+9)/QUADSIZE;
+				sectx = ix - QUADSIZE*(quadx-1);
+				secty = iy - QUADSIZE*(quady-1);
 				prout("\n\rEntering %s.",
 				      cramlc(quadrant, quadx, quady));
 				game.quad[sectx][secty] = ship;
@@ -373,8 +373,8 @@ static void getcd(int isprobe, int akey) {
 			}
 			itemp = 1;
 		}
-		if (irowq<1 || irowq > 8 || icolq<1 || icolq > 8 ||
-			irows<1 || irows > 10 || icols<1 || icols > 10) {
+		if (irowq<1 || irowq > GALSIZE || icolq<1 || icolq > GALSIZE ||
+			irows<1 || irows > QUADSIZE || icols<1 || icols > QUADSIZE) {
 				huh();
 				return;
 			}
@@ -588,10 +588,10 @@ void warp(int i) {
 			for (l = 1; l <= n; l++) {
 				x += deltax;
 				ix = x + 0.5;
-				if (ix < 1 || ix > 10) break;
+				if (ix < 1 || ix > QUADSIZE) break;
 				y += deltay;
 				iy = y +0.5;
-				if (iy < 1 || iy > 10) break;
+				if (iy < 1 || iy > QUADSIZE) break;
 				if (game.quad[ix][iy] != IHDOT) {
 					blooey = 0;
 					twarp = 0;
@@ -803,8 +803,8 @@ void timwrp() {
 
 		/* Revert star chart to earlier era, if it was known then*/
 		if (game.damage[DRADIO]==0.0 || stdamtim > game.state.date) {
-			for (l = 1; l <= 8; l++)
-				for (ll = 1; ll <= 8; ll++)
+			for (l = 1; l <= GALSIZE; l++)
+				for (ll = 1; ll <= GALSIZE; ll++)
 					if (game.starch[l][ll] > 1)
 						game.starch[l][ll]=game.damage[DRADIO]>0.0 ? game.state.galaxy[l][ll]+1000 :1;
 			prout("Spock has reconstructed a correct star chart from memory");
@@ -885,8 +885,8 @@ void probe(void) {
 	probeiny /= bigger;
 	probeinx /= bigger;
 	proben = 10.0*dist*bigger +0.5;
-	probex = quadx*10 + sectx - 1;	// We will use better packing than original
-	probey = quady*10 + secty - 1;
+	probex = quadx*QUADSIZE + sectx - 1;	// We will use better packing than original
+	probey = quady*QUADSIZE + secty - 1;
 	probecx = quadx;
 	probecy = quady;
 	game.future[FDSPROB] = game.state.date + 0.01; // Time to move one sector
@@ -950,7 +950,7 @@ void help(void) {
         for (l = 1; l <= 5; l++) {
                 ix = basex+3.0*Rand()-1;
                 iy = basey+3.0*Rand()-1;
-                if (ix>=1 && ix<=10 && iy>=1 && iy<=10 && game.quad[ix][iy]==IHDOT) {
+                if (ix>=1 && ix<=QUADSIZE && iy>=1 && iy<=QUADSIZE && game.quad[ix][iy]==IHDOT) {
                         /* found one -- finish up */
                         sectx=ix;
                         secty=iy;

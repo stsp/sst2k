@@ -12,8 +12,8 @@ void events(void) {
 	if (stdamtim == 1e30 && game.damage[DRADIO] != 0.0) {
 		/* chart will no longer be updated because radio is dead */
 		stdamtim = game.state.date;
-		for (i=1; i <= 8 ; i++)
-			for (j=1; j <= 8; j++)
+		for (i=1; i <= GALSIZE ; i++)
+			for (j=1; j <= GALSIZE; j++)
 				if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+1000;
 	}
 
@@ -58,8 +58,8 @@ void events(void) {
 			prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
 			prout("   surveillance reports are coming in.");
 			skip(1);
-			for (i=1; i <= 8 ; i++)
-				for (j=1; j <= 8; j++)
+			for (i=1; i <= GALSIZE ; i++)
+				for (j=1; j <= GALSIZE; j++)
 					if (game.starch[i][j] > 999) game.starch[i][j] = 1;
 			if (iseenit==0) {
 				attakreport(0);
@@ -309,7 +309,7 @@ void events(void) {
 				if (probecx != i || probecy != j) {
 					probecx = i;
 					probecy = j;
-					if (i < 1 || i > 8 || j < 1 || j > 8 ||
+					if (i < 1 || i > GALSIZE || j < 1 || j > GALSIZE ||
 						game.state.galaxy[probecx][probecy] == 1000) {
 						// Left galaxy or ran into supernova
 						if (game.damage[DRADIO]==0.0 || condit == IHDOCKED) {
@@ -317,7 +317,7 @@ void events(void) {
 							ipage = 1;
 							skip(1);
 							proutn("Lt. Uhura-  \"The deep space probe ");
-							if (i < 1 ||i > 8 || j < 1 || j > 8)
+							if (i < 1 ||i > GALSIZE || j < 1 || j > GALSIZE)
 								proutn("has left the galaxy");
 							else
 								proutn("is no longer transmitting");
@@ -438,7 +438,7 @@ void nova(int ix, int iy) {
 				if (j==2 && nn== 2) continue;
 				ii = hits[mm][1]+nn-2;
 				jj = hits[mm][2]+j-2;
-				if (ii < 1 || ii > 10 || jj < 1 || jj > 10) continue;
+				if (ii < 1 || ii > QUADSIZE || jj < 1 || jj > QUADSIZE) continue;
 				iquad = game.quad[ii][jj];
 				switch (iquad) {
 //					case IHDOT:	/* Empty space ends reaction
@@ -531,7 +531,7 @@ void nova(int ix, int iy) {
 						newcy = jj + jj - hits[mm][2];
 						crmena(1, iquad, 2, ii, jj);
 						proutn(" damaged");
-						if (newcx<1 || newcx>10 || newcy<1 || newcy>10) {
+						if (newcx<1 || newcx>QUADSIZE || newcy<1 || newcy>QUADSIZE) {
 							/* can't leave quadrant */
 							skip(1);
 							break;
@@ -603,15 +603,15 @@ void snova(int insx, int insy) {
 			/* Scheduled supernova -- select star */
 			/* logic changed here so that we won't favor quadrants in top
 			left of universe */
-			for (nqx = 1; nqx<=8; nqx++) {
-				for (nqy = 1; nqy<=8; nqy++) {
+			for (nqx = 1; nqx<=GALSIZE; nqx++) {
+				for (nqy = 1; nqy<=GALSIZE; nqy++) {
 					stars += game.state.galaxy[nqx][nqy] % 10;
 				}
 			}
 			if (stars == 0) return; /* nothing to supernova exists */
 			num = Rand()*stars + 1;
-			for (nqx = 1; nqx<=8; nqx++) {
-				for (nqy = 1; nqy<=8; nqy++) {
+			for (nqx = 1; nqx<=GALSIZE; nqx++) {
+				for (nqy = 1; nqy<=GALSIZE; nqy++) {
 					num -= game.state.galaxy[nqx][nqy] % 10;
 					if (num <= 0) break;
 				}
@@ -641,8 +641,8 @@ void snova(int insx, int insy) {
 			/* we are in the quadrant! */
 			insipient = 1;
 			num = Rand()* (game.state.galaxy[nqx][nqy]%10) + 1;
-			for (nsx=1; nsx < 10; nsx++) {
-				for (nsy=1; nsy < 10; nsy++) {
+			for (nsx=1; nsx < QUADSIZE; nsx++) {
+				for (nsy=1; nsy < QUADSIZE; nsy++) {
 					if (game.quad[nsx][nsy]==IHSTAR) {
 						num--;
 						if (num==0) break;

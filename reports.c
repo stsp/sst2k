@@ -129,7 +129,7 @@ void lrscan(void) {
 	for (x = quadx-1; x <= quadx+1; x++) {
 		proutn(" ");
 		for (y = quady-1; y <= quady+1; y++) {
-			if (x == 0 || x > 8 || y == 0 || y > 8)
+			if (x == 0 || x > GALSIZE || y == 0 || y > GALSIZE)
                                 proutn("  -1");
 			else {
                                 if (game.state.galaxy[x][y]<1000) proutn(" %3d", game.state.galaxy[x][y]);
@@ -173,8 +173,8 @@ void chart(int nn) {
 		if (condit == IHDOCKED) {
 			/* We are docked, so restore chart from base information */
 			stdamtim = game.state.date;
-			for (i=1; i <= 8 ; i++)
-				for (j=1; j <= 8; j++)
+			for (i=1; i <= GALSIZE ; i++)
+				for (j=1; j <= GALSIZE; j++)
 					if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+1000;
 		}
 		else {
@@ -184,9 +184,9 @@ void chart(int nn) {
 	}
 
 	prout("      1    2    3    4    5    6    7    8");
-	for (i = 1; i <= 8; i++) {
+	for (i = 1; i <= GALSIZE; i++) {
                 proutn("%d |", i);
-		for (j = 1; j <= 8; j++) {
+		for (j = 1; j <= GALSIZE; j++) {
 		        char buf[4];
                         proutn("  ");
 			if (game.starch[i][j] < 0)
@@ -203,7 +203,7 @@ void chart(int nn) {
 			proutn(buf);
 		}
                 proutn("  |");
-                if (i<8) proutn("\n\r");
+                if (i<GALSIZE) proutn("\n\r");
 	}
 	prout("");	/* flush output */
 }
@@ -238,10 +238,10 @@ int srscan(int l) {
 	while (scan() == IHEOL)
 	    proutn("Information desired? ");
 	chew();
-	for (k = 1; k <= 10; k++)
+	for (k = 1; k <= sizeof(requests)/sizeof(requests[0]); k++)
 	    if (strncmp(citem,requests[k],min(2,strlen(citem)))==0)
 		break;
-	if (k > 10) {
+	if (k > sizeof(requests)/sizeof(requests[0])) {
 	    prout("UNRECOGNIZED REQUEST. Legal requests are:\n"
 		  "  date, condition, position, lsupport, warpfactor,\n"
 		  "  energy, torpedoes, shields, klingons, time.");
@@ -346,7 +346,7 @@ int srscan(int l) {
 		break;
 	    }
 	}
-	if (i<10) proutn("\n\r");
+	if (i<sizeof(requests)/sizeof(requests[0])) proutn("\n\r");
 	if (k!=0) return(goodScan);
     }
     prout("");
@@ -389,13 +389,13 @@ void eta(void) {
 	}
         else {
                 if (quady>ix1) ix2 = 1;
-                else ix2=10;
+                else ix2=QUADSIZE;
                 if (quadx>iy1) iy2 = 1;
-                else iy2=10;
+                else iy2=QUADSIZE;
 	}
 
-	if (ix1 > 8 || ix1 < 1 || iy1 > 8 || iy1 < 1 ||
-		ix2 > 10 || ix2 < 1 || iy2 > 10 || iy2 < 1) {
+	if (ix1 > GALSIZE || ix1 < 1 || iy1 > GALSIZE || iy1 < 1 ||
+		ix2 > QUADSIZE || ix2 < 1 || iy2 > QUADSIZE || iy2 < 1) {
 		huh();
 		return;
 	}

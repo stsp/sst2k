@@ -18,6 +18,8 @@
 #define PHASEFAC (2.0)
 #define PLNETMAX (10)
 #define NEVENTS (8)
+#define GALSIZE	(8)
+#define QUADSIZE (10)
 
 typedef struct {
     int x;	/* Quadrant location of planet */
@@ -38,11 +40,11 @@ typedef struct {
 	basekl,			// destroyed bases
 	killk,			// Klingons killed
 	killc,			// commanders killed
-	galaxy[9][9], 	// The Galaxy (subscript 0 not used)
-	cx[11],cy[11],	// Commander quadrant coordinates
+	galaxy[GALSIZE+1][GALSIZE+1], 	// The Galaxy (subscript 0 not used)
+	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
 	baseqx[6],		// Base quadrant X
 	baseqy[6],		// Base quadrant Y
-	newstuf[9][9],	// Extended galaxy goodies
+	newstuf[GALSIZE+1][GALSIZE+1],	// Extended galaxy goodies
 	isx, isy,		// Coordinate of Super Commander
 	nscrem,			// remaining super commanders
 	nromkl,			// Romulans killed
@@ -68,16 +70,16 @@ EXTERN struct {
     char magic[sizeof(SSTMAGIC)];
     snapshot state;
     snapshot snapsht;
-    char quad[11][11];		// contents of our quadrant
-    double kpower[21];		// enemy energy levels
-    double kdist[21];		// enemy distances
-    double kavgd[21];		// average distances
+    char quad[QUADSIZE+1][QUADSIZE+1];		// contents of our quadrant
+    double kpower[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy energy levels
+    double kdist[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy distances
+    double kavgd[(QUADSIZE+1)*(QUADSIZE+1)];		// average distances
     double damage[NDEVICES+1];	// damage encountered
     double future[NEVENTS+1];	// future events
     char passwd[10];		// Self Destruct password
-    int kx[21];			// enemy sector locations
-    int ky[21];
-    int starch[9][9];		// star chart
+    int kx[(QUADSIZE+1)*(QUADSIZE+1)];			// enemy sector locations
+    int ky[(QUADSIZE+1)*(QUADSIZE+1)];
+    int starch[GALSIZE+1][GALSIZE+1];		// star chart
     /* members with macro definitions start here */
     int inkling,
 	inbase,

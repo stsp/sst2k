@@ -193,10 +193,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	for (l=1; l <= 15; l++) {
 		x += deltax;
 		ix = x + 0.5;
-		if (ix < 1 || ix > 10) break;
+		if (ix < 1 || ix > QUADSIZE) break;
 		y += deltay;
 		iy = y + 0.5;
-		if (iy < 1 || iy > 10) break;
+		if (iy < 1 || iy > QUADSIZE) break;
 		iquad=game.quad[ix][iy];
 		tracktorpedo(x, y, ix, iy, wait, l, i, n, iquad);
 		wait = 1;
@@ -225,7 +225,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 				yy = cos(ang)/temp;
 				jx=ix+xx+0.5;
 				jy=iy+yy+0.5;
-				if (jx<1 || jx>10 || jy<1 ||jy > 10) return;
+				if (jx<1 || jx>QUADSIZE || jy<1 ||jy > QUADSIZE) return;
 				if (game.quad[jx][jy]==IHBLANK) {
 					finish(FHOLE);
 					return;
@@ -273,7 +273,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 				yy = cos(ang)/temp;
 				jx=ix+xx+0.5;
 				jy=iy+yy+0.5;
-				if (jx<1 || jx>10 || jy<1 ||jy > 10) {
+				if (jx<1 || jx>QUADSIZE || jy<1 ||jy > QUADSIZE) {
 					prout(" damaged but not destroyed.");
 					return;
 				}
@@ -678,7 +678,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 static int targetcheck(double x, double y, double *course) {
 	double deltx, delty;
 	/* Return TRUE if target is invalid */
-	if (x < 1.0 || x > 10.0 || y < 1.0 || y > 10.0) {
+	if (x < 1.0 || x > QUADSIZE || y < 1.0 || y > QUADSIZE) {
 		huh();
 		return 1;
 	}

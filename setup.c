@@ -154,11 +154,11 @@ void abandn(void) {
 		for (;;) {
 			/* position next to base by trial and error */
 			game.quad[sectx][secty] = IHDOT;
-			for (l = 1; l <= 10; l++) {
+			for (l = 1; l <= QUADSIZE; l++) {
 				sectx = 3.0*Rand() - 1.0 + basex;
 				secty = 3.0*Rand() - 1.0 + basey;
-				if (sectx >= 1 && sectx <= 10 &&
-					secty >= 1 && secty <= 10 &&
+				if (sectx >= 1 && sectx <= QUADSIZE &&
+					secty >= 1 && secty <= QUADSIZE &&
 					game.quad[sectx][secty] == IHDOT) break;
 			}
 			if (l < 11) break; /* found a spot */
@@ -222,8 +222,8 @@ void setup(int needprompt) {
 	landed = -1;
 	alive = 1;
 	docfac = 0.25;
-	for (i = 1; i <= 8; i++)
-		for (j = 1; j <= 8; j++) game.state.newstuf[i][j] = game.starch[i][j] = 0;
+	for (i = 1; i <= GALSIZE; i++)
+		for (j = 1; j <= GALSIZE; j++) game.state.newstuf[i][j] = game.starch[i][j] = 0;
 	// Initialize times for extraneous events
 	game.future[FSNOVA] = game.state.date + expran(0.5 * intime);
 	game.future[FTBEAM] = game.state.date + expran(1.5 * (intime / game.state.remcom));
@@ -237,8 +237,8 @@ void setup(int needprompt) {
 	stdamtim = 1e30;
 	// Put stars in the galaxy
 	instar = 0;
-	for (i=1; i<=8; i++)
-		for (j=1; j<=8; j++) {
+	for (i=1; i<=GALSIZE; i++)
+		for (j=1; j<=GALSIZE; j++) {
 			int k = Rand()*9.0 + 1.0;
 			instar += k;
 			game.state.galaxy[i][j] = k;
@@ -525,8 +525,8 @@ void newqad(int shutup) {
 		ientesc = 1;
 	}
 	// Clear quadrant
-	for (i=1; i <= 10; i++)
-		for (j=1; j <= 10; j++) game.quad[i][j] = IHDOT;
+	for (i=1; i <= QUADSIZE; i++)
+		for (j=1; j <= QUADSIZE; j++) game.quad[i][j] = IHDOT;
 	// cope with supernova
 	if (quadnum > 999) {
 		return;
@@ -650,9 +650,9 @@ void newqad(int shutup) {
                 game.kpower[nenhere] = Rand()*400.0 +100.0 +25.0*skill;
                 /* Reserve unocupied corners */
                 if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
-                if (game.quad[1][10]==IHDOT) game.quad[1][10] = 'X';
-                if (game.quad[10][1]==IHDOT) game.quad[10][1] = 'X';
-                if (game.quad[10][10]==IHDOT) game.quad[10][10] = 'X';
+                if (game.quad[1][QUADSIZE]==IHDOT) game.quad[1][QUADSIZE] = 'X';
+                if (game.quad[QUADSIZE][1]==IHDOT) game.quad[QUADSIZE][1] = 'X';
+                if (game.quad[QUADSIZE][QUADSIZE]==IHDOT) game.quad[QUADSIZE][QUADSIZE] = 'X';
         }
         sortkl();
 
@@ -663,9 +663,9 @@ void newqad(int shutup) {
 	// Take out X's in corners if Tholian present
 	if (ithere) {
 		if (game.quad[1][1]=='X') game.quad[1][1] = IHDOT;
-		if (game.quad[1][10]=='X') game.quad[1][10] = IHDOT;
-		if (game.quad[10][1]=='X') game.quad[10][1] = IHDOT;
-		if (game.quad[10][10]=='X') game.quad[10][10] = IHDOT;
+		if (game.quad[1][QUADSIZE]=='X') game.quad[1][QUADSIZE] = IHDOT;
+		if (game.quad[QUADSIZE][1]=='X') game.quad[QUADSIZE][1] = IHDOT;
+		if (game.quad[QUADSIZE][QUADSIZE]=='X') game.quad[QUADSIZE][QUADSIZE] = IHDOT;
 	}		
 }
 

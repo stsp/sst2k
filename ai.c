@@ -3,9 +3,9 @@
 static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	int iqx, iqy, l;
 
-	iqx = quadx+(lookx+9)/10 - 1;
-	iqy = quady+(looky+9)/10 - 1;
-	if (iqx < 1 || iqx > 8 || iqy < 1 || iqy > 8 ||
+	iqx = quadx+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
+	iqy = quady+(looky+(QUADSIZE-1))/QUADSIZE - 1;
+	if (iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
 		game.state.galaxy[iqx][iqy] > 899)
 		return 0; /* no can do -- neg energy, supernovae, or >8 Klingons */
 	if (ienm == IHR) return 0; /* Romulans cannot escape! */
@@ -302,7 +302,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage) {
 	int i;
 
 	if ((iqx==quadx && iqy==quady) ||
-		iqx < 1 || iqx > 8 || iqy < 1 || iqy > 8 ||
+		iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
 		game.state.galaxy[iqx][iqy] > 899) return 1;
 	if (flag) {
 		/* Avoid quadrants with bases if we want to avoid Enterprise */
