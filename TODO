@@ -3,8 +3,6 @@
 * Yes-no confirmations and "press-to-continue" situations should print
   a recognizable standard prompt.
 
-* A real release, with downloadable tarballs and RPMs and so forth.
-
 * The time machine switch.  Specify a year, get only the features that
   then existed.  (This would be partly so people can try the original
   non-"super" version Matuszek and Reynolds wrote.)
