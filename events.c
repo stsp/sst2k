@@ -177,7 +177,7 @@ void events(void)
 		break;
 	    }
 	    i = 0;
-	    for_commanders (j) {
+	    for_starbases(j) {
 		for_commanders(k)
 		    if (game.state.baseqx[j]==game.state.cx[k] && game.state.baseqy[j]==game.state.cy[k] &&
 			(game.state.baseqx[j]!=quadx || game.state.baseqy[j]!=quady) &&
