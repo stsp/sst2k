@@ -78,9 +78,7 @@ void orbit(void) {
 	height = (1400.+7200.*Rand());
 	prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", height);
 	inorbit = 1;
-#ifdef SERGEEV
         ididit=1;
-#endif /* SERGEEV */
 }
 
 void sensor(void) {
@@ -176,9 +174,7 @@ void beam(void) {
 		skip(1);
 		prout("Kirk-  \"Energize.\"");
 	}
-#ifdef SERGEEV
         ididit=1;
-#endif /* SERGEEV */
 	skip(1);
 	prouts("WWHOOOIIIIIRRRRREEEE.E.E.  .  .  .  .   .    .");
 	skip(2);
@@ -230,9 +226,7 @@ void mine(void) {
 	if (consumeTime()) return;
 	prout("Mining operation complete.");
 	imine = 1;
-#ifdef SERGEEV
         ididit=1;
-#endif /* SERGEEV */
 }
 
 void usecrystals(void) {
@@ -282,9 +276,7 @@ void usecrystals(void) {
 	prout("   are going crazy, but I think it's");
 	prout("   going to work!!  Congratulations, Sir!\"");
 	cryprob *= 2.0;
-#ifdef SERGEEV
 	ididit=1;
-#endif /* SERGEEV */
 }
 
 void shuttle(void) {
