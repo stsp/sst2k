@@ -96,6 +96,7 @@ typedef struct {
 #define OPTION_THOLIAN	0x00000008	/* Tholians and their webs */
 #define OPTION_THINGY	0x00000010	/* Space Thingy can shoot back */
 #define OPTION_PROBE	0x00000020	/* deep-space probes */
+#define OPTION_SHOWME	0x00000040	/* bracket Enterprise in chart */
 
 /* Define devices */
 #define DSRSENS 0

@@ -208,7 +208,10 @@ void chart(int nn)
 	proutn("%d |", i);
 	for_quadrants(j) {
 	    char buf[4];
-	    proutn("  ");
+	    if ((game.options & OPTION_SHOWME) && i == quady && j == quadx)
+		proutn("<");
+	    else
+		proutn(" ");
 	    if (game.state.galaxy[i][j].supernova)
 		strcpy(buf, "***");
 	    else if (!game.state.galaxy[i][j].charted && game.state.galaxy[i][j].starbase)
@@ -221,6 +224,10 @@ void chart(int nn)
 		if (*cp == '0')
 		    *cp = '.';
 	    proutn(buf);
+	    if ((game.options & OPTION_SHOWME) && i == quady && j == quadx)
+		proutn(">");
+	    else
+		proutn(" ");
 	}
 	proutn("  |");
 	if (i<GALSIZE) proutn("\n\r");
@@ -293,7 +300,7 @@ static void status(int req)
 	break;
     case 6:
 	proutn("Energy        %.2f", energy);
-	if (icrystl)	/* ESR */
+	if (icrystl && (game.options & OPTION_SHOWME))	/* ESR */
 	    proutn(" (have crystals)");
 	break;
     case 7:
