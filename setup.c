@@ -385,9 +385,7 @@ void setup(int needprompt) {
 	skip(2);
 	prout("Good Luck!");
 	if (game.state.nscrem) prout("  YOU'LL NEED IT.");
-#ifdef SERGEEV
-        getche();
-#endif /* SERGEEV */
+        waitfor();
 	newqad(0);
         if (nenhere-iqhere-ithere) shldup=1.0;
 	if (neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
@@ -420,19 +418,13 @@ int choose(int needprompt) {
 			srand((unsigned int)(int)aaitem);
 			break;
 		}
-		if (isit("frozen") || isit("frozen")) {
+		if (isit("saved") || isit("frozen")) {
                         if (thaw()) continue;
 			chew();
-#ifndef SERGEEV
 			if (*game.passwd==0) continue;
-			randomize();
-			Rand(); Rand(); Rand(); Rand();
-#endif
 			if (!alldone) thawed = 1; // No plaque if not finished
                         report();
-#ifdef SERGEEV
-                        getche();
-#endif /* SERGEEV */
+                        waitfor();
 			return TRUE;
 		}
                 if (isit("regular")) break;
@@ -463,18 +455,7 @@ int choose(int needprompt) {
 			else if (skill == 0) proutn("Are you a Novice, Fair, Good, Expert, or Emeritus player? ");
 		}
 	}
-#ifndef SERGEEV
-	while (TRUE) {
-		scan();
-		strcpy(game.passwd, citem);
-		chew();
-		if (*game.passwd != 0) break;
-		proutn("Please type in a secret password-");
-	}
-#else
-        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
-        game.passwd[3]=0;
-#endif /* SERGEEV */
+	setpassword();
 #ifdef DEBUG
 	if (strcmp(game.passwd, "debug")==0) idebug = 1;
 #endif

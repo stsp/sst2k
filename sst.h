@@ -439,6 +439,8 @@ void ioend(void);
 void setwnd(short);
 void warble(void);
 void getline(char *, int);
+void waitfor(void);
+void setpassword(void);
 void commandhook(char *, int);
 
 typedef struct {

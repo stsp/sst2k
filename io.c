@@ -100,6 +100,13 @@ void clearscreen(void) {
 #endif
 }
 
+void waitfor(void) {
+/* wait for user action -- OK to do nothing if on a TTY */
+#ifdef SERGEEV
+	getche();
+#endif /* SERGEEV */
+}
+
 void pause_game(int i) {
 	char *prompt;
 #ifndef SERGEEV
@@ -301,6 +308,22 @@ void warble(void)
     nosound();
 #else
     prouts(" . . . . . ");
+#endif /* SERGEEV */
+}
+
+void setpassword(void) {
+#ifndef SERGEEV
+	while (TRUE) {
+		scan();
+		strcpy(game.passwd, citem);
+		chew();
+		if (*game.passwd != 0) break;
+		proutn("Please type in a secret password-");
+	}
+#else
+	int i;
+        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
+        game.passwd[3]=0;
 #endif /* SERGEEV */
 }
 
