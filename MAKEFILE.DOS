@@ -1,0 +1,14 @@
+MODEL=m
+CFLAGS=-f87 -2 -m$(MODEL)
+
+.c.obj:; bcc $(CFLAGS) -c $*.c
+
+OBJS= sst.obj setup.obj reports.obj finish.obj moving.obj\
+ battle.obj events.obj ai.obj planets.obj
+
+sst.exe:	$(OBJS) sst.lnk
+	bcc @sst.lnk
+
+
+sst.lnk:	makefile
+	>sst.lnk $(CFLAGS) -M $(OBJS) noeh$(MODEL).lib
