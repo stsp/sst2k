@@ -188,7 +188,6 @@ void rechart(void)
 void chart(int nn) 
 {
     int i,j;
-    char *cp;
     chew();
 
     if (game.damage[DRADIO] == 0.0)
@@ -217,12 +216,9 @@ void chart(int nn)
 	    else if (!game.state.galaxy[i][j].charted && game.state.galaxy[i][j].starbase)
 		strcpy(buf, ".1.");
 	    else if (game.state.galaxy[i][j].charted)
-		sprintf(buf, "%d%d%d", game.state.chart[i][j].klingons, game.state.chart[i][j].starbase, game.state.chart[i][j].stars);
+		sprintf(buf, "%3d", game.state.chart[i][j].klingons*100 + game.state.chart[i][j].starbase * 10 + game.state.chart[i][j].stars);
 	    else
 		strcpy(buf, "...");
-	    for (cp = buf; cp < buf + sizeof(buf); cp++)
-		if (*cp == '0')
-		    *cp = '.';
 	    proutn(buf);
 	    if ((game.options & OPTION_SHOWME) && i == quadx && j == quady)
 		proutn(">");
@@ -341,7 +337,7 @@ int srscan(int l)
 	    else
 		prout("  [Using Base's sensors]");
 	}
-	else proutn("     Short-range scan");
+	else prout("     Short-range scan");
 	if (goodScan && !game.damage[DRADIO]) { 
 	    game.state.chart[quadx][quady].klingons = game.state.galaxy[quadx][quady].klingons;
 	    game.state.chart[quadx][quady].starbase = game.state.galaxy[quadx][quady].starbase;
@@ -352,7 +348,7 @@ int srscan(int l)
 	if (isit("chart")) nn = TRUE;
 	if (isit("no")) rightside = FALSE;
 	chew();
-	proutn("    1 2 3 4 5 6 7 8 9 10\n");
+	prout("    1 2 3 4 5 6 7 8 9 10");
 	break;
     case SCAN_REQUEST:
 	while (scan() == IHEOL)
@@ -362,9 +358,9 @@ int srscan(int l)
 	    if (strncmp(citem,requests[req],min(2,strlen(citem)))==0)
 		break;
 	if (req > sizeof(requests)/sizeof(requests[0])) {
-	    prout("UNRECOGNIZED REQUEST. Legal requests are:\n"
-		  "  date, condition, position, lsupport, warpfactor,\n"
-		  "  energy, torpedoes, shields, klingons, time, bases.");
+	    prout("UNRECOGNIZED REQUEST. Legal requests are:");
+	    prout("  date, condition, position, lsupport, warpfactor,");
+	    prout("  energy, torpedoes, shields, klingons, time, bases.");
 	    return FALSE;
 	}
 	// no break

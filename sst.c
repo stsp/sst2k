@@ -537,7 +537,7 @@ int main(int argc, char **argv)
     while (TRUE) { /* Play a game */
 	setwnd(fullscreen_window);
 #ifdef DEBUG
-	prout("INITIAL OPTIONS: %0lx\n", game.options);
+	prout("INITIAL OPTIONS: %0lx", game.options);
 #endif /* DEBUG */
 	clrscr();
 	prelim();

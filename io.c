@@ -167,7 +167,6 @@ void prouts(char *fmt, ...)
     va_start(ap, fmt);
     vsprintf(buf, fmt, ap);
     va_end(ap);
-    skip(1);
     for (s = buf; *s; s++) {
 	delay(30);
 	if (game.options & OPTION_CURSES) {
@@ -349,16 +348,18 @@ void warble(void)
 /* sound and visual effects for teleportation */
 {
     if (game.options & OPTION_CURSES) {
-	drawmaps(1);
+	drawmaps(2);
 	setwnd(message_window);
 	sound(50);
+    }
+    prouts("     . . . . .     ");
+    if (game.options & OPTION_CURSES) {
 	delay(1000);
 	nosound();
-    } else
-	prouts(" . . . . . ");
+    }
 }
 
-void tracktorpedo(int ix, int iy, int l, int i, int n)
+void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
 /* torpedo-track animation */
 {
     if (!game.options & OPTION_CURSES) {
@@ -380,21 +381,21 @@ void tracktorpedo(int ix, int iy, int l, int i, int n)
 		drawmaps(2);
 		delay(400);
 	    }
-	    if ((game.quad[ix][iy]==IHDOT)||(game.quad[ix][iy]==IHBLANK)){
+	    if ((iquad==IHDOT)||(iquad==IHBLANK)){
 		put_srscan_sym(ix, iy, '+');
 		sound(l*10);
 		delay(100);
 		nosound();
-		put_srscan_sym(ix, iy, game.quad[ix][iy]);
+		put_srscan_sym(ix, iy, iquad);
 	    }
 	    else {
 		wattron(curwnd, A_REVERSE);
-		put_srscan_sym(ix, iy, game.quad[ix][iy]);
+		put_srscan_sym(ix, iy, iquad);
 		sound(500);
 		delay(1000);
 		nosound();
 		wattroff(curwnd, A_REVERSE);
-		put_srscan_sym(ix, iy, game.quad[ix][iy]);
+		put_srscan_sym(ix, iy, iquad);
 	    }
 	} else {
 	    proutn("%d - %d   ", ix, iy);

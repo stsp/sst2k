@@ -97,9 +97,10 @@ void imove(void)
 			finish(FNEG3);
 			return;
 		    }
-		    prout("\n\rYOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER\n\r"
-			  "AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,\n\r"
-			  "YOU WILL BE DESTROYED.\n\r");
+		    skip(1);
+		    prout("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER");
+		    prout("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,");
+		    prout("YOU WILL BE DESTROYED.");
 		}
 		/* Compute final position in new quadrant */
 		if (trbeam) return; /* Don't bother if we are to be beamed */
@@ -107,7 +108,8 @@ void imove(void)
 		quady = (iy+(QUADSIZE-1))/QUADSIZE;
 		sectx = ix - QUADSIZE*(quadx-1);
 		secty = iy - QUADSIZE*(quady-1);
-		prout("\n\rEntering %s.",
+		skip(1);
+		prout("Entering %s.",
 		      cramlc(quadrant, quadx, quady));
 		game.quad[sectx][secty] = ship;
 		newqad(0);
@@ -639,8 +641,8 @@ void setwrp(void)
 	return;
     }
     if (game.damage[DWARPEN] > 0.0 && aaitem > 4.0) {
-	prout("Engineer Scott- \"I'm doing my best, Captain,\n"
-	      "  but right now we can only go warp 4.\"");
+	prout("Engineer Scott- \"I'm doing my best, Captain,");
+	prout("  but right now we can only go warp 4.\"");
 	return;
     }
     if (aaitem > 10.0) {
@@ -955,7 +957,6 @@ void help(void)
 	    /* found one -- finish up */
 	    sectx=ix;
 	    secty=iy;
-	    game.quad[ix][iy]=IHMATER0;
 	    break;
 	}
     }
@@ -974,22 +975,26 @@ void help(void)
 	}
 	proutn(" attempt to re-materialize ");
 	crmshp();
-	warble();
-	if (Rand() > probf) break;
 	switch (l){
-	case 1: game.quad[ix][iy]=IHMATER1;
+	case 1: game.quad[ix][iy]=IHMATER0;
 	    break;
-	case 2: game.quad[ix][iy]=IHMATER2;
+	case 2: game.quad[ix][iy]=IHMATER1;
 	    break;
-	case 3: game.quad[ix][iy]=IHQUEST;
+	case 3: game.quad[ix][iy]=IHMATER2;
 	    break;
 	}
 	textcolor(RED);
+	warble();
+	if (Rand() > probf) break;
 	prout("fails.");
 	delay(500);
 	textcolor(DEFAULT);
     }
     if (l > 3) {
+	game.quad[ix][iy]=IHQUEST;
+	alive = 0;
+	drawmaps(1);
+	setwnd(message_window);
 	finish(FMATERIALIZE);
 	return;
     }

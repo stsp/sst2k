@@ -202,7 +202,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	iy = y + 0.5;
 	if (!VALID_SECTOR(ix, iy)) break;
 	iquad=game.quad[ix][iy];
-	tracktorpedo(ix, iy, l, i, n);
+	tracktorpedo(ix, iy, l, i, n, iquad);
 	if (iquad==IHDOT) continue;
 	/* hit something */
 	setwnd(message_window);

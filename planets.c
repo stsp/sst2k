@@ -69,7 +69,8 @@ void orbit(void)
     }
     if (plnetx == 0 || abs(sectx-plnetx) > 1 || abs(secty-plnety) > 1) {
 	crmshp();
-	prout(" not adjacent to planet.\n");
+	prout(" not adjacent to planet.");
+	skip(1);
 	return;
     }
     Time = 0.02+0.03*Rand();

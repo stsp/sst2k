@@ -479,7 +479,7 @@ void iostart(void);
 void setwnd(WINDOW *);
 void warble(void);
 void boom(int ii, int jj);
-void tracktorpedo(int ix, int iy, int l, int i, int n);
+void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad);
 void cgetline(char *, int);
 void waitfor(void);
 void setpassword(void);
