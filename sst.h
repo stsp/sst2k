@@ -443,7 +443,7 @@ void waitfor(void);
 void setpassword(void);
 void commandhook(char *, int);
 void makechart(void);
-void enqueue(char *s);
+void enqueue(char *);
 
 /* mode arguments for srscan() */
 #define SCAN_FULL		1
@@ -453,7 +453,7 @@ void enqueue(char *s);
 
 WINDOW *fullscreen_window;
 WINDOW *srscan_window;
-WINDOW *REPORT_WINDOW;
+WINDOW *report_window;
 WINDOW *lrscan_window;
 WINDOW *message_window;
 WINDOW *prompt_window;

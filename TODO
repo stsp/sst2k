@@ -5,8 +5,9 @@
   non-"super" version Matuszek and Reynolds wrote.)
 
   Dave Matuszek tells me that SRSCAN, MOVE, PHASERS, CALL, STATUS,
-  IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT CHART,
+  IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT, CHART,
   REST, DOCK, QUIT, and DAMAGE were in the original non-"super" version.
 
-* Fix the color support.
+* Code to hurl you out of quadrant if a supernova occurs as you warp in 
+  seems to hang.
 
