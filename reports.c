@@ -229,11 +229,13 @@ void chart(int nn) {
 		
 		
 int srscan(int l) {
+	static char requests[][3] =
+		{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
         char *cp = NULL;
         int leftside=TRUE, rightside=TRUE, i, j, jj, k=0, nn=FALSE, t, dam=0;
 	int goodScan=TRUE;
 	switch (l) {
-		case 1: // SRSCAN
+		case SCAN_FULL: // SRSCAN
 			if (game.damage[DSRSENS] != 0) {
 				/* Allow base's sensors if docked */
 				if (condit != IHDOCKED) {
@@ -247,17 +249,31 @@ int srscan(int l) {
                         if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+1000:1;
 			scan();
 			if (isit("chart")) nn = TRUE;
-			rightside = FALSE;
+			if (isit("no")) rightside = FALSE;
 			chew();
                         c_printf("    1 2 3 4 5 6 7 8 9 10\n\r");
 			break;
-		case 2: // REQUEST
-                        leftside=FALSE;
-                        break;
-		case 3: // STATUS
+		case SCAN_REQUEST:
+			while (scan() == IHEOL)
+				proutn("Information desired? ");
+			chew();
+			for (k = 1; k <= 10; k++)
+				if (strncmp(citem,requests[k],min(2,strlen(citem)))==0)
+					break;
+			if (k > 10) {
+				prout("UNRECOGNIZED REQUEST. Legal requests are:\n"
+					 "  date, condition, position, lsupport, warpfactor,\n"
+					 "  energy, torpedoes, shields, klingons, time.");
+				return FALSE;
+			}
+			// no "break"
+		case SCAN_STATUS: // STATUS
 			chew();
 			leftside = FALSE;
 			skip(1);
+		case SCAN_NO_LEFTSIDE: // REQUEST
+                        leftside=FALSE;
+                        break;
 	}
 	if (condit != IHDOCKED) newcnd();
 	for (i = 1; i <= 10; i++) {
@@ -348,8 +364,8 @@ int srscan(int l) {
     		if (i<10) c_printf("\n\r");
 	        if (k!=0) return(goodScan);
 	}
-	if (nn) chart(1);
 	prout("");
+	if (nn) chart(1);
         return(goodScan);
 }
 			

@@ -172,6 +172,8 @@ commands[] = {
 	{"QUIT",	QUIT},
 #define HELP	34
 	{"HELP",	HELP},
+#define REQUEST	35
+	{"REQUEST",	REQUEST},
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
@@ -307,7 +309,7 @@ static void makemoves(void) {
 		commandhook(commands[i].name, TRUE);
 		switch (i) { /* command switch */
                         case SRSCAN:                 // srscan
- 				srscan(SRSCAN);
+ 				srscan(SCAN_FULL);
  				break;
  			case LRSCAN:			// lrscan
  				lrscan();
@@ -380,6 +382,9 @@ static void makemoves(void) {
 				break;
 			case REPORT:			// Game Report 
 				report();
+				break;
+			case REQUEST:			// status request 
+				srscan(SCAN_REQUEST);
 				break;
 			case COMPUTER:			// use COMPUTER!
 				eta();

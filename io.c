@@ -350,11 +350,11 @@ void drawmaps(short l) {
      if (l!=2) setwnd(LEFTUPPER_WINDOW);
      gotoxy(1,1);
      enqueue("s");
-     srscan(1);
+     srscan(SCAN_FULL);
      if (l!=2){
         setwnd(SRSCAN_WINDOW);
         clrscr();
-        srscan(2);
+        srscan(SCAN_NO_LEFTSIDE);
         setwnd(LRSCAN_WINDOW);
         clrscr();
         enqueue("l");

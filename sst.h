@@ -447,6 +447,12 @@ void c_printf (char *format, ... );
 void makechart(void);
 void enqueue(char *s);
 
+/* mode arguments for srscan() */
+#define SCAN_FULL		1
+#define SCAN_REQUEST		2
+#define SCAN_STATUS		3
+#define SCAN_NO_LEFTSIDE	4
+
 typedef struct {
         int wndleft,wndtop,wndright,wndbottom;
 } wnd;
