@@ -227,8 +227,11 @@ static void helpme(void) {
 	fp = fopen(SSTDOC, "r");
 	if (fp == NULL) {
 		prout("Spock-  \"Captain, that information is missing from the");
-		prout("   computer. You need to find SST.DOC and put it in the");
-		prout("   current directory.\"");
+		prout("   computer.\"");
+		/*
+		 * This used to continue: "You need to find SST.DOC and put 
+		 * it in the current directory."
+		 */
 		return;
 	}
 	for (;;) {
