@@ -10,7 +10,7 @@ CFLAGS=     -O -g -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
 CFILES= sst.c finish.c reports.c setup.c moving.c battle.c events.c ai.c planets.c io.c
 OFILES= $(CFILES:.c=.o)
 HFILES=sst.h
-DOCS = README sst-doc.xml sst.xml TODO
+DOCS = README sst-doc.xml sst.xml sst-layer.xsl TODO
 
 # sst.doc and sst.6 are included so target system won't need xmlto
 SOURCES= $(CFILES) $(HFILES) $(DOCS) sst.doc sst.6 makehelp.py makefile sst.spec
@@ -26,7 +26,7 @@ sst.6: sst.xml
 	xmlto man sst.xml
 
 sst-doc.txt: sst-doc.xml
-	xmlto --skip-validation txt sst-doc.xml
+	xmlto -m sst-layer.xsl --skip-validation txt sst-doc.xml
 sst.doc: sst-doc.txt
 	makehelp.py >sst.doc
 

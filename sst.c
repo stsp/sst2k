@@ -480,7 +480,6 @@ int scan(void) {
 			return IHEOL;
 		}
 		getline(line, sizeof(line));
-		line[strlen(line)-1] = '\0';
 		linep = line;
 	}
 	// Skip leading white space
