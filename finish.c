@@ -56,7 +56,7 @@ void kaboom(void) {
 		int l=1;
 		while (l <= nenhere) {
 			if (kpower[l]*kdist[l] <= whammo) 
-				deadkl(kx[l],ky[l], quad[kx[l]][ky[l]], kx[l], ky[l]);
+				deadkl(kx[l],ky[l], frozen.quad[kx[l]][ky[l]], kx[l], ky[l]);
 			l++;
 		}
 	}

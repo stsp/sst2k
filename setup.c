@@ -38,7 +38,6 @@ void freeze(int boss) {
 	}
 	fwrite(&state, sizeof(state), 1, fp);
 	fwrite(&snapsht, sizeof(snapsht), 1, fp);
-	fwrite(quad, sizeof(quad), 1, fp);
 	fwrite(kx, sizeof(kx), 1, fp);
 	fwrite(ky, sizeof(ky), 1, fp);
 	fwrite(starch, sizeof(starch), 1, fp);
@@ -82,7 +81,6 @@ void thaw(void) {
 	}
 	fread(&state, sizeof(state), 1, fp);
 	fread(&snapsht, sizeof(snapsht), 1, fp);
-	fread(quad, sizeof(quad), 1, fp);
 	fread(kx, sizeof(kx), 1, fp);
 	fread(ky, sizeof(ky), 1, fp);
 	fread(starch, sizeof(starch), 1, fp);
@@ -161,13 +159,13 @@ void abandn(void) {
 		}
 		for (;;) {
 			/* position next to base by trial and error */
-			quad[sectx][secty] = IHDOT;
+			frozen.quad[sectx][secty] = IHDOT;
 			for (l = 1; l <= 10; l++) {
 				sectx = 3.0*Rand() - 1.0 + basex;
 				secty = 3.0*Rand() - 1.0 + basey;
 				if (sectx >= 1 && sectx <= 10 &&
 					secty >= 1 && secty <= 10 &&
-					quad[sectx][secty] == IHDOT) break;
+					frozen.quad[sectx][secty] == IHDOT) break;
 			}
 			if (l < 11) break; /* found a spot */
 			sectx=5;
@@ -176,7 +174,7 @@ void abandn(void) {
 		}
 	}
 	/* Get new commission */
-	quad[sectx][secty] = ship = IHF;
+	frozen.quad[sectx][secty] = ship = IHF;
 	prout("Starfleet puts you in command of another ship,");
 	prout("the Faerie Queene, which is antiquated but,");
 	prout("still useable.");
@@ -498,8 +496,8 @@ int choose(void) {
 
 void dropin(int iquad, int *ix, int *iy) {
 	do iran10(ix, iy);
-	while (quad[*ix][*iy] != IHDOT);
-	quad[*ix][*iy] = iquad;
+	while (frozen.quad[*ix][*iy] != IHDOT);
+	frozen.quad[*ix][*iy] = iquad;
 }
 
 void newcnd(void) {
@@ -538,7 +536,7 @@ void newqad(int shutup) {
 	}
 	// Clear quadrant
 	for (i=1; i <= 10; i++)
-		for (j=1; j <= 10; j++) quad[i][j] = IHDOT;
+		for (j=1; j <= 10; j++) frozen.quad[i][j] = IHDOT;
 	// cope with supernova
 	if (quadnum > 999) {
 		return;
@@ -549,7 +547,7 @@ void newqad(int shutup) {
 	nenhere = klhere + irhere;
 
 	// Position Starship
-	quad[sectx][secty] = ship;
+	frozen.quad[sectx][secty] = ship;
 
 	// Decide if quadrant needs a Tholian
 	if ((skill < 3 && Rand() <= 0.02) ||   /* Lighten up if skill is low */
@@ -562,14 +560,14 @@ void newqad(int shutup) {
 		do {
 			ithx = Rand() > 0.5 ? 10 : 1;
 			ithy = Rand() > 0.5 ? 10 : 1;
-		} while (quad[ithx][ithy] != IHDOT);
-		quad[ithx][ithy] = IHT;
+		} while (frozen.quad[ithx][ithy] != IHDOT);
+		frozen.quad[ithx][ithy] = IHT;
 		ithere = 1;
 		/* Reserve unocupied corners */
-		if (quad[1][1]==IHDOT) quad[1][1] = 'X';
-		if (quad[1][10]==IHDOT) quad[1][10] = 'X';
-		if (quad[10][1]==IHDOT) quad[10][1] = 'X';
-		if (quad[10][10]==IHDOT) quad[10][10] = 'X';
+		if (frozen.quad[1][1]==IHDOT) frozen.quad[1][1] = 'X';
+		if (frozen.quad[1][10]==IHDOT) frozen.quad[1][10] = 'X';
+		if (frozen.quad[10][1]==IHDOT) frozen.quad[10][1] = 'X';
+		if (frozen.quad[10][10]==IHDOT) frozen.quad[10][10] = 'X';
 	}
 
 	if (quadnum >= 100) {
@@ -587,14 +585,14 @@ void newqad(int shutup) {
 			if (state.cx[i]==quadx && state.cy[i]==quady) break;
 			
 		if (i <= state.remcom) {
-			quad[ix][iy] = IHC;
+			frozen.quad[ix][iy] = IHC;
 			kpower[klhere] = 950.0+400.0*Rand()+50.0*skill;
 			comhere = 1;
 		}
 
 		// If we need a super-commander, promote a Klingon
 		if (quadx == state.isx && quady == state.isy) {
-			quad[kx[1]][ky[1]] = IHS;
+			frozen.quad[kx[1]][ky[1]] = IHS;
 			kpower[1] = 1175.0 + 400.0*Rand() + 125.0*skill;
 			iscate = 1;
 			ishere = 1;
@@ -661,10 +659,10 @@ void newqad(int shutup) {
 
 	// Take out X's in corners if Tholian present
 	if (ithere) {
-		if (quad[1][1]=='X') quad[1][1] = IHDOT;
-		if (quad[1][10]=='X') quad[1][10] = IHDOT;
-		if (quad[10][1]=='X') quad[10][1] = IHDOT;
-		if (quad[10][10]=='X') quad[10][10] = IHDOT;
+		if (frozen.quad[1][1]=='X') frozen.quad[1][1] = IHDOT;
+		if (frozen.quad[1][10]=='X') frozen.quad[1][10] = IHDOT;
+		if (frozen.quad[10][1]=='X') frozen.quad[10][1] = IHDOT;
+		if (frozen.quad[10][10]=='X') frozen.quad[10][10] = IHDOT;
 	}		
 }
 

@@ -197,7 +197,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		proutn(" - ");
 		cramf(y, 0, 1);
 		proutn("   ");
-		iquad=quad[ix][iy];
+		iquad=frozen.quad[ix][iy];
 		if (iquad==IHDOT) continue;
 		/* hit something */
 		skip(1);
@@ -223,11 +223,11 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				jx=ix+xx+0.5;
 				jy=iy+yy+0.5;
 				if (jx<1 || jx>10 || jy<1 ||jy > 10) return;
-				if (quad[jx][jy]==IHBLANK) {
+				if (frozen.quad[jx][jy]==IHBLANK) {
 					finish(FHOLE);
 					return;
 				}
-				if (quad[jx][jy]!=IHDOT) {
+				if (frozen.quad[jx][jy]!=IHDOT) {
 					/* can't move into object */
 					return;
 				}
@@ -274,12 +274,12 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					prout(" damaged but not destroyed.");
 					return;
 				}
-				if (quad[jx][jy]==IHBLANK) {
+				if (frozen.quad[jx][jy]==IHBLANK) {
 					prout(" buffeted into black hole.");
 					deadkl(ix, iy, iquad, jx, jy);
 					return;
 				}
-				if (quad[jx][jy]!=IHDOT) {
+				if (frozen.quad[jx][jy]!=IHDOT) {
 					/* can't move into object */
 					prout(" damaged but not destroyed.");
 					return;
@@ -299,7 +299,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 						break;
 					}
 				}
-				quad[ix][iy]=IHDOT;
+				frozen.quad[ix][iy]=IHDOT;
 				state.rembase--;
 				basex=basey=0;
 				state.galaxy[quadx][quady] -= 10;
@@ -314,7 +314,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				state.plnets[iplnet] = nulplanet;
 				iplnet = 0;
 				plnetx = plnety = 0;
-				quad[ix][iy] = IHDOT;
+				frozen.quad[ix][iy] = IHDOT;
 				if (landed==1) {
 					/* captain parishes on planet */
 					finish(FDPLANET);
@@ -337,7 +337,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				proutn("Mr. Spock-");
 				prouts("  \"Facinating!\"");
 				skip(1);
-				quad[ix][iy] = IHDOT;
+				frozen.quad[ix][iy] = IHDOT;
 				return;
 			case IHBLANK: /* Black hole */
 				skip(1);
@@ -357,7 +357,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				h1 = fabs(h1);
 				if (h1 >= 600) {
 					prout(" destroyed.");
-					quad[ix][iy] = IHDOT;
+					frozen.quad[ix][iy] = IHDOT;
 					ithere = 0;
 					ithx = ithy = 0;
 					return;
@@ -367,7 +367,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					return;
 				}
 				prout(" disappears.");
-				quad[ix][iy] = IHWEB;
+				frozen.quad[ix][iy] = IHWEB;
 				ithere = ithx = ithy = 0;
 				{
 					int dum, my;
@@ -385,8 +385,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 		break;
 	}
 	if (shoved) {
-		quad[jx][jy]=iquad;
-		quad[ix][iy]=IHDOT;
+		frozen.quad[jx][jy]=iquad;
+		frozen.quad[ix][iy]=IHDOT;
 		proutn(" displaced by blast to");
 		cramlc(2, jx, jy);
 		skip(1);
@@ -469,7 +469,7 @@ void attack(int k) {
 		if (kpower[l] < 500) r *= 0.25; 
 		jx = kx[l];
 		jy = ky[l];
-		iquad = quad[jx][jy];
+		iquad = frozen.quad[jx][jy];
 		itflag = (iquad == IHK && r > 0.0005) || k == 0 ||
 			(iquad==IHC && r > 0.015) ||
 			(iquad==IHR && r > 0.3) ||
@@ -632,7 +632,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 
 	/* For each kind of enemy, finish message to player */
 	prout(" destroyestate.");
-	quad[ix][iy] = IHDOT;
+	frozen.quad[ix][iy] = IHDOT;
 	if (state.remkl==0) return;
 
 	state.remtime = state.remres/(state.remkl + 4*state.remcom);
@@ -1059,7 +1059,7 @@ void phasers(void) {
 			rpow = 0.0;
 			for (k = 1; k <= nenhere;) {
 				int ii = kx[k], jj = ky[k];
-				int ienm = quad[ii][jj];
+				int ienm = frozen.quad[ii][jj];
 				if (msgflag) {
 					proutn("Energy available= ");
 					cramf(energy-.006-(ifast?200:0), 0, 2);
@@ -1190,7 +1190,7 @@ void hittem(double *hits) {
 		}
 		else
 			proutn("Very small hit on ");
-		ienm = quad[ii][jj];
+		ienm = frozen.quad[ii][jj];
 		crmena(0,ienm,2,ii,jj);
 		skip(1);
 		if (kpow == 0) {

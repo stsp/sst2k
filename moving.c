@@ -31,7 +31,7 @@ void move(void) {
 		Time = future[FTBEAM] - state.date + 1e-5;
 	}
 	/* Move within the quadrant */
-	quad[sectx][secty] = IHDOT;
+	frozen.quad[sectx][secty] = IHDOT;
 	x = sectx;
 	y = secty;
 	n = 10.0*dist*bigger+0.5;
@@ -101,11 +101,11 @@ void move(void) {
 				proutn("\nEntering");
 				cramlc(1, quadx, quady);
 				skip(1);
-				quad[sectx][secty] = ship;
+				frozen.quad[sectx][secty] = ship;
 				newqad(0);
 				return;
 			}
-			iquad = quad[ix][iy];
+			iquad = frozen.quad[ix][iy];
 			if (iquad != IHDOT) {
 				/* object encountered in flight path */
 				stopegy = 50.0*dist/Time;
@@ -170,7 +170,7 @@ void move(void) {
 	finaly = secty;
 label100:
 	/* No quadrant change -- compute new avg enemy distances */
-	quad[sectx][secty] = ship;
+	frozen.quad[sectx][secty] = ship;
 	if (nenhere) {
 		for (l = 1; l <= nenhere; l++) {
 			finald = sqrt((ix-kx[l])*(double)(ix-kx[l]) +
@@ -567,7 +567,7 @@ void warp(int i) {
 				y += deltay;
 				iy = y +0.5;
 				if (iy < 1 || iy > 10) break;
-				if (quad[ix][iy] != IHDOT) {
+				if (frozen.quad[ix][iy] != IHDOT) {
 					blooey = 0;
 					twarp = 0;
 				}
@@ -921,7 +921,7 @@ void help(void) {
 		newqad(1);
 	}
 	/* dematerialize starship */
-	quad[sectx][secty]=IHDOT;
+	frozen.quad[sectx][secty]=IHDOT;
 	proutn("Starbase in");
 	cramlc(1, quadx, quady);
 	proutn(" responds--");
@@ -949,12 +949,12 @@ void help(void) {
 	for (l = 1; l <= 5; l++) {
 		ix = basex+3.0*Rand()-1;
 		iy = basey+3.0*Rand()-1;
-		if (ix>=1 && ix<=10 && iy>=1 && iy<=10 && quad[ix][iy]==IHDOT) {
+		if (ix>=1 && ix<=10 && iy>=1 && iy<=10 && frozen.quad[ix][iy]==IHDOT) {
 			/* found one -- finish up */
 			prout("succeeds.");
 			sectx=ix;
 			secty=iy;
-			quad[ix][iy]=ship;
+			frozen.quad[ix][iy]=ship;
 			dock();
 			skip(1);
 			prout("Lt. Uhura-  \"Captain, we made it!\"");

@@ -437,7 +437,7 @@ void deathray(void) {
 		prouts("Sulu- \"Captain!  It's working!\"");
 		skip(2);
 		while (nenhere > 0)
-			deadkl(kx[1],ky[1],quad[kx[1]][ky[1]],kx[1],ky[1]);
+			deadkl(kx[1],ky[1],frozen.quad[kx[1]][ky[1]],kx[1],ky[1]);
 		prout("Ensign Chekov-  \"Congratulations, Captain!\"");
 		if (state.remkl == 0) finish(FWON);
 		prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
@@ -488,7 +488,7 @@ void deathray(void) {
 		prout(" Mr. Sulu.");
 		for (i=1; i<=10; i++)
 			for (j=1; j<=10; j++)
-				if (quad[i][j] == IHDOT) quad[i][j] = IHQUEST;
+				if (frozen.quad[i][j] == IHDOT) frozen.quad[i][j] = IHQUEST;
 		prout("  Captain, our quadrant is now infested with");
 		prouts(" - - - - - -  *THINGS*.");
 		skip(1);

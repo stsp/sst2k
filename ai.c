@@ -187,7 +187,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	if (my != 0) my = my*motion < 0 ? -1 : 1;
 	nextx = comx;
 	nexty = comy;
-	quad[comx][comy] = IHDOT;
+	frozen.quad[comx][comy] = IHDOT;
 	/* main move loop */
 	for (ll = 1; ll <= nsteps; ll++) {
 #ifdef DEBUG
@@ -218,9 +218,9 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 				looky = nexty + krawly;
 				krawly = -krawly;
 			}
-			else if (quad[lookx][looky] != IHDOT) {
+			else if (frozen.quad[lookx][looky] != IHDOT) {
 				/* See if we should ram ship */
-				if (quad[lookx][looky] == ship &&
+				if (frozen.quad[lookx][looky] == ship &&
 					(ienm == IHC || ienm == IHS)) {
 					ram(1, ienm, comx, comy);
 					return;
@@ -250,7 +250,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		else break; /* done early */
 	}
 	/* Put commander in place within same quadrant */
-	quad[nextx][nexty] = ienm;
+	frozen.quad[nextx][nexty] = ienm;
 	if (nextx != comx || nexty != comy) {
 		/* it moved */
 		kx[loccom] = nextx;
@@ -280,7 +280,7 @@ void movcom(void) {
 	if (comhere) for (i = 1; i <= nenhere; i++) {
 		ix = kx[i];
 		iy = ky[i];
-		if (quad[ix][iy] == IHC) {
+		if (frozen.quad[ix][iy] == IHC) {
 			movebaddy(ix, iy, i, IHC);
 			break;
 		}
@@ -288,7 +288,7 @@ void movcom(void) {
 	if (ishere) for (i = 1; i <= nenhere; i++) {
 		ix = kx[i];
 		iy = ky[i];
-		if (quad[ix][iy] == IHS) {
+		if (frozen.quad[ix][iy] == IHS) {
 			movebaddy(ix, iy, i, IHS);
 			break;
 		}
@@ -299,8 +299,8 @@ void movcom(void) {
 	if (skill > 3) for (i = 1; i <= nenhere; i++) {
 		ix = kx[i];
 		iy = ky[i];
-		if (quad[ix][iy] == IHK || quad[ix][iy] == IHR)
-			movebaddy(ix, iy, i, quad[ix][iy]);
+		if (frozen.quad[ix][iy] == IHK || frozen.quad[ix][iy] == IHR)
+			movebaddy(ix, iy, i, frozen.quad[ix][iy]);
 	}
 
 	sortkl();
@@ -331,8 +331,8 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 		ientesc=0;
 		future[FSCDBAS]=1e30;
 		for (i = 1; i <= nenhere; i++) 
-			if (quad[kx[i]][ky[i]] == IHS) break;
-		quad[kx[i]][ky[i]] = IHDOT;
+			if (frozen.quad[kx[i]][ky[i]] == IHS) break;
+		frozen.quad[kx[i]][ky[i]] = IHDOT;
 		kx[i] = kx[nenhere];
 		ky[i] = ky[nenhere];
 		kdist[i] = kdist[nenhere];
@@ -572,15 +572,15 @@ void movetho(void) {
 	}
 
 	/* Do nothing if we are blocked */
-	if (quad[idx][idy]!= IHDOT && quad[idx][idy]!= IHWEB) return;
-	quad[ithx][ithy] = IHWEB;
+	if (frozen.quad[idx][idy]!= IHDOT && frozen.quad[idx][idy]!= IHWEB) return;
+	frozen.quad[ithx][ithy] = IHWEB;
 
 	if (ithx != idx) {
 		/* move in x axis */
 		im = fabs((double)idx - ithx)/((double)idx - ithx);
 		while (ithx != idx) {
 			ithx += im;
-			if (quad[ithx][ithy]==IHDOT) quad[ithx][ithy] = IHWEB;
+			if (frozen.quad[ithx][ithy]==IHDOT) frozen.quad[ithx][ithy] = IHWEB;
 		}
 	}
 	else if (ithy != idy) {
@@ -588,20 +588,20 @@ void movetho(void) {
 		im = fabs((double)idy - ithy)/((double)idy - ithy);
 		while (ithy != idy) {
 			ithy += im;
-			if (quad[ithx][ithy]==IHDOT) quad[ithx][ithy] = IHWEB;
+			if (frozen.quad[ithx][ithy]==IHDOT) frozen.quad[ithx][ithy] = IHWEB;
 		}
 	}
-	quad[ithx][ithy] = IHT;
+	frozen.quad[ithx][ithy] = IHT;
 
 	/* check to see if all holes plugged */
 	for (i = 1; i < 11; i++) {
-		if (quad[1][i]!=IHWEB && quad[1][i]!=IHT) return;
-		if (quad[10][i]!=IHWEB && quad[10][i]!=IHT) return;
-		if (quad[i][1]!=IHWEB && quad[i][1]!=IHT) return;
-		if (quad[i][10]!=IHWEB && quad[i][10]!=IHT) return;
+		if (frozen.quad[1][i]!=IHWEB && frozen.quad[1][i]!=IHT) return;
+		if (frozen.quad[10][i]!=IHWEB && frozen.quad[10][i]!=IHT) return;
+		if (frozen.quad[i][1]!=IHWEB && frozen.quad[i][1]!=IHT) return;
+		if (frozen.quad[i][10]!=IHWEB && frozen.quad[i][10]!=IHT) return;
 	}
 	/* All plugged up -- Tholian splits */
-	quad[ithx][ithy]=IHWEB;
+	frozen.quad[ithx][ithy]=IHWEB;
 	dropin(IHBLANK, &dum, &my);
 	crmena(1,IHT, 2, ithx, ithy);
 	prout(" completes web.");

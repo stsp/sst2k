@@ -270,7 +270,7 @@ void srscan(int l) {
 			printf("%2d  ", i);
 			for (j = 1; j <= 10; j++) {
 				if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1))
-					printf("%c ",quad[i][j]);
+					printf("%c ",frozen.quad[i][j]);
 				else
 					printf("- ");
 			}

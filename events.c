@@ -260,7 +260,7 @@ void events(void) {
 				/* Handle case where base is in same quadrant as starship */
 				if (batx==quadx && baty==quady) {
 					if (starch[batx][baty] > 999) starch[batx][baty] -= 10;
-					quad[basex][basey]= IHDOT;
+					frozen.quad[basex][basey]= IHDOT;
 					basex=basey=0;
 					newcnd();
 					skip(1);
@@ -424,7 +424,7 @@ void nova(int ix, int iy) {
 	}
 
 	/* handle initial nova */
-	quad[ix][iy] = IHDOT;
+	frozen.quad[ix][iy] = IHDOT;
 	crmena(1, IHSTAR, 2, ix, iy);
 	prout(" novas.");
 	state.galaxy[quadx][quady] -= 1;
@@ -444,7 +444,7 @@ void nova(int ix, int iy) {
 				ii = hits[mm][1]+nn-2;
 				jj = hits[mm][2]+j-2;
 				if (ii < 1 || ii > 10 || jj < 1 || jj > 10) continue;
-				iquad = quad[ii][jj];
+				iquad = frozen.quad[ii][jj];
 				switch (iquad) {
 //					case IHDOT:	/* Empty space ends reaction
 //					case IHQUEST:
@@ -466,7 +466,7 @@ void nova(int ix, int iy) {
 						state.starkl++;
 						crmena(1, IHSTAR, 2, ii, jj);
 						prout(" novas.");
-						quad[ii][jj] = IHDOT;
+						frozen.quad[ii][jj] = IHDOT;
 						break;
 					case IHP: /* Destroy planet */
 						state.newstuf[quadx][quady] -= 1;
@@ -479,7 +479,7 @@ void nova(int ix, int iy) {
 							finish(FPNOVA);
 							return;
 						}
-						quad[ii][jj] = IHDOT;
+						frozen.quad[ii][jj] = IHDOT;
 						break;
 					case IHB: /* Destroy base */
 						state.galaxy[quadx][quady] -= 10;
@@ -493,7 +493,7 @@ void nova(int ix, int iy) {
 						newcnd();
 						crmena(1, IHB, 2, ii, jj);
 						prout(" destroyed.");
-						quad[ii][jj] = IHDOT;
+						frozen.quad[ii][jj] = IHDOT;
 						break;
 					case IHE: /* Buffet ship */
 					case IHF:
@@ -541,7 +541,7 @@ void nova(int ix, int iy) {
 							skip(1);
 							break;
 						}
-						iquad1 = quad[newcx][newcy];
+						iquad1 = frozen.quad[newcx][newcy];
 						if (iquad1 == IHBLANK) {
 							proutn(", blasted into ");
 							crmena(0, IHBLANK, 2, newcx, newcy);
@@ -556,8 +556,8 @@ void nova(int ix, int iy) {
 						}
 						proutn(", buffeted to");
 						cramlc(2, newcx, newcy);
-						quad[ii][jj] = IHDOT;
-						quad[newcx][newcy] = iquad;
+						frozen.quad[ii][jj] = IHDOT;
+						frozen.quad[newcx][newcy] = iquad;
 						kx[ll] = newcx;
 						ky[ll] = newcy;
 						kavgd[ll] = sqrt(square(sectx-newcx)+square(secty-newcy));
@@ -651,7 +651,7 @@ void snova(int insx, int insy) {
 			num = Rand()* (state.galaxy[nqx][nqy]%10) + 1;
 			for (nsx=1; nsx < 10; nsx++) {
 				for (nsy=1; nsy < 10; nsy++) {
-					if (quad[nsx][nsy]==IHSTAR) {
+					if (frozen.quad[nsx][nsy]==IHSTAR) {
 						num--;
 						if (num==0) break;
 					}

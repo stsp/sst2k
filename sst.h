@@ -49,15 +49,13 @@ EXTERN struct foo {
 	    remtime;		// remaining time
 } state, snapsht;			// Data that is snapshot
 
-EXTERN char
-		quad[11][11];	// contents of our quadrant
-
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,
 // but I just didn't think of it back when I started.
 
 EXTERN struct foo2 {
+        char quad[11][11];	// contents of our quadrant
 	int inkling,
 	inbase,
 	incom,
