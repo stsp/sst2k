@@ -1652,22 +1652,32 @@ site</ulink>.</para>
 </para></listitem>
 </itemizedlist>
 
-<para>Modifications I made:</para>
+<para>Modifications I've made:</para>
 
 <itemizedlist>
 <listitem><para>
-I converted the flat-text SST.DOC file to XML-Docbook so it could be webbed.
-(That's what you're reading now.)
+I converted the flat-text SST.DOC file to XML-Docbook so it can be
+webbed. (That's what you're reading now.)
 </para></listitem>
 <listitem><para>
-I cleaned up a lot of grubby FORTRANisms in the code internals.
+The command-help code needed a rewrite because the flat-text form of
+the documentation is now generated from XML and doesn't have the
+easily recognizable section delimiters it used to.  I wrote a script
+to filter that flat-text form into an sst.doc that's easy to parse for
+command descriptions, and changed some logic in sst.c to match.
+</para></listitem>
+<listitem><para>
+I've cleaned up a lot of grubby FORTRANisms in the code internals --
+used sizeof(), replaced magic numeric constants with #defines,
+that sort of thing.
 </para></listitem>
 <listitem><para>
 I fixed a surprising number of typos in the code and documentation.
 </para></listitem>
 <listitem><para>
-I changed the freeze logic to emit an identifiable magic number and 
-the thaw logic to check for it.
+All the game state now lives in one big structure that can be
+written to and read from disk as one blob.  The write gives it an
+an identifiable magic number and the thaw logic checks for same. 
 </para></listitem>
 </itemizedlist>
 

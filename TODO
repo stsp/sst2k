@@ -18,7 +18,7 @@
   non-"super" version Matuszek and Reynolds wrote.)
 
   Dave Matuszek tells me that SRSCAN, MOVE, PHASERS, CALL, STATUS,
-  IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT\n" CHART,
+  IMPULSE, PHOTONS, ABANDON, LRSCAN, WARP, SHIELDS, DESTRUCT CHART,
   REST, DOCK, QUIT, and DAMAGE were in the original non-"super" version.
 
 * Write a curses-based interface.  Shouldn't be hard, all output goes through

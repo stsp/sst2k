@@ -14,7 +14,7 @@ sst:  $(OFILES)
 
 $(OFILES):  $(HFILES)
 
-sst-doc.txt:
+sst-doc.txt: sst-doc.xml
 	xmlto --skip-validation txt sst-doc.xml
 sst.doc: sst-doc.txt
 	makehelp.py >sst.doc
