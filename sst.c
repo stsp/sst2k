@@ -91,6 +91,8 @@ Eric Raymond's changes:
 
    2. Status report now indicates when dilithium crystals are on board.
 
+   3. Can now report vbases left in scrscan.
+
    */
 
 /* the input queue */

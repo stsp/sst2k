@@ -70,6 +70,9 @@ typedef struct {
 /* for newstuff */
 #define ROMULAN_PLACE	10
 
+/* for starch */
+#define CHART_UNKNOWN	-1
+
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
 // original names. Gee, I could have done this with the d structure,

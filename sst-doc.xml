@@ -1291,6 +1291,7 @@ information as follows:</para>
 <row><entry>SHIELDS</entry>     <entry>SHIELDS</entry>   <entry>S</entry></row>
 <row><entry>KLINGONS LEFT</entry><entry>KLINGONS</entry> <entry>K</entry></row>
 <row><entry>TIME LEFT</entry>   <entry>TIME</entry>     <entry>TI</entry></row>
+<row><entry>BASES LEFT</entry>   <entry>BASES</entry>   <entry>BA</entry></row>
 </tbody>
 </tgroup>
 </informaltable>
@@ -1761,14 +1762,14 @@ written to and read from disk as one blob.  The write gives it an
 an identifiable magic number and the thaw logic checks for same. 
 </para></listitem>
 <listitem><para>
-I made the internal pager work, nd in the process got rid of a number
+I made the internal pager work, and in the process got rid of a number
 of platform dependencies in the code.
 </para></listitem>
 <listitem><para>
 The HELP/CALL/SOS command is now MAYDAY.  SOS and CALL are still accepted.
 </para></listitem>
 <listitem><para>
-Status report now indicates if dilithium crystals arre on board.
+Status report now indicates if dilithium crystals are on board.
 </para></listitem>
 </itemizedlist>
 

@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void attakreport(int l) {
-     if (!l) {
+void attakreport(int curt) {
+     if (!curt) {
 	if (game.future[FCDBAS] < 1e30) {
 		prout("Starbase in %s is currently under Commander attack.",
 		      cramlc(quadrant, batx, baty));
@@ -189,7 +189,7 @@ void chart(int nn) {
 		for (j = 1; j <= GALSIZE; j++) {
 		        char buf[4];
                         proutn("  ");
-			if (game.starch[i][j] < 0)
+			if (game.starch[i][j] == CHART_UNKNOWN)
                                 strcpy(buf, ".1.");
 			else if (game.starch[i][j] == 0)
                                 strcpy(buf, "...");
@@ -207,13 +207,109 @@ void chart(int nn) {
 	}
 	prout("");	/* flush output */
 }
-		
+
+static void sectscan(int goodScan, int i, int j) {
+    if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1)){
+	if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
+	    switch (condit) {
+	    case IHRED: textcolor(RED); break;
+	    case IHGREEN: textcolor(GREEN); break;
+	    case IHYELLOW: textcolor(YELLOW); break;
+	    case IHDOCKED: textcolor(CYAN); break;
+	    case IHDEAD: textcolor(BROWN);
+	    }
+	    if (game.quad[i][j] != ship) 
+		highvideo();
+	}
+	if (game.quad[i][j] & DAMAGED) 
+	    highvideo();
+	proutn("%c ",game.quad[i][j] & ~DAMAGED);
+	textcolor(DEFAULT);
+    }
+    else
+	proutn("- ");
+}
+
+static void status(int req) {
+    char *cp = NULL;
+    int t, dam = 0;
+    switch (req) {
+    case 1:
+	proutn("Stardate      %.1f, Time Left %.2f", game.state.date, game.state.remtime);
+	break;
+    case 2:
+	if (condit != IHDOCKED) newcnd();
+	switch (condit) {
+	case IHRED: cp = "RED"; break;
+	case IHGREEN: cp = "GREEN"; break;
+	case IHYELLOW: cp = "YELLOW"; break;
+	case IHDOCKED: cp = "DOCKED"; break;
+	case IHDEAD: cp="DEAD"; break;
+	}
+	for (t=0;t<=NDEVICES;t++)
+	    if (game.damage[t]>0) dam++;
+	proutn("Condition     %s, %i DAMAGES", cp, dam);
+	break;
+    case 3:
+	proutn("Position      %d - %d , %d - %d",
+	       quadx, quady, sectx, secty);
+	break;
+    case 4:
+	proutn("Life Support  ");
+	if (game.damage[DLIFSUP] != 0.0) {
+	    if (condit == IHDOCKED)
+		proutn("DAMAGED, Base provides");
+	    else
+		proutn("DAMAGED, reserves=%4.2f", lsupres);
+	}
+	else
+	    proutn("ACTIVE");
+	break;
+    case 5:
+	proutn("Warp Factor   %.1f", warpfac);
+	break;
+    case 6:
+	proutn("Energy        %.2f", energy);
+	if (icrystl)	/* ESR */
+	    proutn(" (have crystals)");
+	break;
+    case 7:
+	proutn("Torpedoes     %d", torps);
+	break;
+    case 8:
+	proutn("Shields       ");
+	if (game.damage[DSHIELD] != 0)
+	    proutn("DAMAGED,");
+	else if (shldup)
+	    proutn("UP,");
+	else
+	    proutn("DOWN,");
+	proutn(" %d%% %.1f units",
+	       (int)((100.0*shield)/inshld + 0.5), shield);
+	break;
+    case 9:
+	proutn("Klingons Left %d", game.state.remkl);
+	break;
+    case 10:
+	attakreport(1);
+	break;
+    /*
+     * Note: attakreport() can in some cases produce two lines of
+     * output.  If that happens, and QUADSIZE is the normal 10, items
+     * 11 and up will be printed past the bottom of the quadrant display.
+     * Under the curses display logic they will get lost because they're
+     * written outside the report window.
+     */
+    case 11:	/* ESR */
+	proutn("Bases Left    %d", game.state.rembase);
+	break;
+    }
+}
 		
 int srscan(int l) {
     static char requests[][3] =
-	{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
-    char *cp = NULL;
-    int leftside=TRUE, rightside=TRUE, i, j, jj, k=0, nn=FALSE, t, dam=0;
+	{"","da","co","po","ls","wa","en","to","sh","kl","ti", "ba"};
+    int leftside=TRUE, rightside=TRUE, i, j, jj, req=0, nn=FALSE;
     int goodScan=TRUE;
     switch (l) {
     case SCAN_FULL: // SRSCAN
@@ -238,116 +334,38 @@ int srscan(int l) {
 	while (scan() == IHEOL)
 	    proutn("Information desired? ");
 	chew();
-	for (k = 1; k <= sizeof(requests)/sizeof(requests[0]); k++)
-	    if (strncmp(citem,requests[k],min(2,strlen(citem)))==0)
+	for (req = 1; req <= sizeof(requests)/sizeof(requests[0]); req++)
+	    if (strncmp(citem,requests[req],min(2,strlen(citem)))==0)
 		break;
-	if (k > sizeof(requests)/sizeof(requests[0])) {
+	if (req > sizeof(requests)/sizeof(requests[0])) {
 	    prout("UNRECOGNIZED REQUEST. Legal requests are:\n"
 		  "  date, condition, position, lsupport, warpfactor,\n"
-		  "  energy, torpedoes, shields, klingons, time.");
+		  "  energy, torpedoes, shields, klingons, time, bases.");
 	    return FALSE;
 	}
-	// no "break"
+	// no break
     case SCAN_STATUS: // STATUS
 	chew();
 	leftside = FALSE;
 	skip(1);
+	// no break
     case SCAN_NO_LEFTSIDE: // REQUEST
 	leftside=FALSE;
 	break;
     }
     if (condit != IHDOCKED) newcnd();
-    for (i = 1; i <= QUADSIZE; i++) {
-	jj = (k!=0 ? k : i);
-	if (leftside) {
+    for (i = 1; i <= max(QUADSIZE, sizeof(requests)/sizeof(requests[0])); i++) {
+	jj = (req!=0 ? req : i);
+	if (leftside && i <= QUADSIZE) {
 	    proutn("%2d  ", i);
 	    for (j = 1; j <= QUADSIZE; j++) {
-		if (goodScan || (abs(i-sectx)<= 1 && abs(j-secty) <= 1)){
-		    if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
-			switch (condit) {
-			case IHRED: textcolor(RED); break;
-			case IHGREEN: textcolor(GREEN); break;
-			case IHYELLOW: textcolor(YELLOW); break;
-			case IHDOCKED: textcolor(CYAN); break;
-			case IHDEAD: textcolor(BROWN);
-			}
-			if (game.quad[i][j] != ship) 
-			    highvideo();
-		    }
-		    if (game.quad[i][j] & DAMAGED) 
-			highvideo();
-		    proutn("%c ",game.quad[i][j] & ~DAMAGED);
-		    textcolor(DEFAULT);
-		}
-		else
-		    proutn("- ");
+		sectscan(goodScan, i, j);
 	    }
 	}
-	if (rightside) {
-	    switch (jj) {
-	    case 1:
-		proutn("Stardate      %.1f, Time Left %.2f", game.state.date, game.state.remtime);
-		break;
-	    case 2:
-		if (condit != IHDOCKED) newcnd();
-		switch (condit) {
-		case IHRED: cp = "RED"; break;
-		case IHGREEN: cp = "GREEN"; break;
-		case IHYELLOW: cp = "YELLOW"; break;
-		case IHDOCKED: cp = "DOCKED"; break;
-		case IHDEAD: cp="DEAD"; break;
-		}
-		for (t=0;t<=NDEVICES;t++)
-		    if (game.damage[t]>0) dam++;
-		proutn("Condition     %s, %i DAMAGES", cp, dam);
-		break;
-	    case 3:
-		proutn("Position      %d - %d , %d - %d",
-		       quadx, quady, sectx, secty);
-		break;
-	    case 4:
-		proutn("Life Support  ");
-		if (game.damage[DLIFSUP] != 0.0) {
-		    if (condit == IHDOCKED)
-			proutn("DAMAGED, Base provides");
-		    else
-			proutn("DAMAGED, reserves=%4.2f", lsupres);
-		}
-		else
-		    proutn("ACTIVE");
-		break;
-	    case 5:
-		proutn("Warp Factor   %.1f", warpfac);
-		break;
-	    case 6:
-		proutn("Energy        %.2f", energy);
-		if (icrystl)
-		    proutn(" (have crystals)");
-		break;
-	    case 7:
-		proutn("Torpedoes     %d", torps);
-		break;
-	    case 8:
-		proutn("Shields       ");
-		if (game.damage[DSHIELD] != 0)
-		    proutn("DAMAGED,");
-		else if (shldup)
-		    proutn("UP,");
-		else
-		    proutn("DOWN,");
-		proutn(" %d%% %.1f units",
-		       (int)((100.0*shield)/inshld + 0.5), shield);
-		break;
-	    case 9:
-		proutn("Klingons Left %d", game.state.remkl);
-		break;
-	    case 10:
-		attakreport(1);
-		break;
-	    }
-	}
+	if (rightside)
+	    status(jj);
 	if (i<sizeof(requests)/sizeof(requests[0])) proutn("\n\r");
-	if (k!=0) return(goodScan);
+	if (req!=0) return(goodScan);
     }
     prout("");
     if (nn) chart(1);

@@ -241,7 +241,7 @@ void setup(int needprompt) {
 		for (j=1; j<=GALSIZE; j++) {
 			int k = Rand()*9.0 + 1.0;
 			instar += k;
-			game.state.galaxy[i][j] = k;
+			game.state.galaxy[i][j] = k * STAR_PLACE;
 		}
 	// Locate star bases in galaxy
 	for (i = 1; i <= inbase; i++) {
@@ -270,7 +270,7 @@ void setup(int needprompt) {
 			
 		game.state.baseqx[i] = ix;
 		game.state.baseqy[i] = iy;
-		game.starch[ix][iy] = -1;
+		game.starch[ix][iy] = CHART_UNKNOWN;
 		game.state.galaxy[ix][iy] += BASE_PLACE;
 	}
 	// Position ordinary Klingon Battle Cruisers
