@@ -1,8 +1,6 @@
-#ifdef SERGEEV
-#include <conio.h>
 #include <unistd.h>
+#include "conio.h"
 #include "sstlinux.h"
-#endif /* SERGEEV */
 #include "sst.h"
 
 void doshield(int i) {

@@ -1,26 +1,14 @@
-#ifdef SERGEEV
 #define _GNU_SOURCE
-#endif /* SERGEEV */
 #include <stdio.h>
-#ifdef SERGEEV
 #include <unistd.h>
-#endif /* SERGEEV */
 #include <termios.h>
 #include <curses.h>
 #include <signal.h>
 #include <ctype.h>
 #include <stdarg.h>
-#ifdef SERGEEV
-#include <conio.h>
-#endif /* SERGEEV */
-#ifdef MSDOS
-#include <dos.h>
-#endif
-#include <time.h>
 
-#ifdef SERGEEV
+#include "conio.h"
 #include "sstlinux.h"
-#endif /* SERGEEV */
 #include "sst.h"
 
 #ifndef SERGEEV
@@ -336,7 +324,7 @@ void setpassword(void) {
 #endif /* SERGEEV */
 }
 
-void getline(char *line, int max) {
+void cgetline(char *line, int max) {
     if (curses) {
 #ifndef SERGEEV
 	wgetnstr(stdscr, line, max);

@@ -437,10 +437,11 @@ void iostart(int);
 void ioend(void);
 void setwnd(short);
 void warble(void);
-void getline(char *, int);
+void cgetline(char *, int);
 void waitfor(void);
 void setpassword(void);
 void commandhook(char *, int);
+void c_printf (char *format, ... );
 
 typedef struct {
         int wndleft,wndtop,wndright,wndbottom;
