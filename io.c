@@ -169,7 +169,7 @@ void prouts(char *fmt, ...)
     va_end(ap);
     skip(1);
     for (s = buf; *s; s++) {
-	delay(500);
+	delay(200);
 	if (game.options & OPTION_CURSES) {
 	    waddch(curwnd, *s);
 	    wrefresh(curwnd);
