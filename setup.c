@@ -228,7 +228,11 @@ void setup(int needprompt)
     alive = 1;
     docfac = 0.25;
     for (i = 1; i <= GALSIZE; i++)
-	for (j = 1; j <= GALSIZE; j++) game.state.newstuf[i][j] = game.starch[i][j] = 0;
+	for (j = 1; j <= GALSIZE; j++) {
+	    game.state.galaxy[i][j].charted = 0;
+	    game.state.galaxy[i][j].planets = 0;
+	    game.state.galaxy[i][j].romulans = 0;
+	}
     // Initialize times for extraneous events
     game.future[FSNOVA] = game.state.date + expran(0.5 * intime);
     game.future[FTBEAM] = game.state.date + expran(1.5 * (intime / game.state.remcom));
@@ -246,14 +250,14 @@ void setup(int needprompt)
 	for (j=1; j<=GALSIZE; j++) {
 	    int k = Rand()*9.0 + 1.0;
 	    instar += k;
-	    game.state.galaxy[i][j] = k * STAR_PLACE;
+	    game.state.galaxy[i][j].stars = k;
 	}
     // Locate star bases in galaxy
     for (i = 1; i <= inbase; i++) {
 	int contflag;
 	do {
 	    do iran(GALSIZE, &ix, &iy);
-	    while (BASES(game.state.galaxy[ix][iy]));
+	    while (game.state.galaxy[ix][iy].starbase);
 	    contflag = FALSE;
 	    for (j = i-1; j > 0; j--) {
 		/* Improved placement algorithm to spread out bases */
@@ -275,8 +279,8 @@ void setup(int needprompt)
 			
 	game.state.baseqx[i] = ix;
 	game.state.baseqy[i] = iy;
-	game.starch[ix][iy] = CHART_UNKNOWN;
-	game.state.galaxy[ix][iy] += BASE_PLACE;
+	game.state.galaxy[ix][iy].starbase = 1;
+	game.state.chart[ix][iy].starbase = 1;
     }
     // Position ordinary Klingon Battle Cruisers
     krem = inkling - incom - game.state.nscrem;
@@ -287,10 +291,8 @@ void setup(int needprompt)
 	int klump = (1.0 - r*r)*klumper;
 	if (klump > krem) klump = krem;
 	krem -= klump;
-	klump *= KLINGON_PLACE;
-	do iran(GALSIZE, &ix, &iy);
-	while (game.state.galaxy[ix][iy] + klump >= SUPERNOVA_PLACE);
-	game.state.galaxy[ix][iy] += klump;
+	do iran(GALSIZE,&ix,&iy); while (game.state.galaxy[ix][iy].supernova);
+	game.state.galaxy[ix][iy].klingons += klump;
     } while (krem > 0);
     // Position Klingon Commander Ships
 #ifdef DEBUG
@@ -309,21 +311,21 @@ void setup(int needprompt)
 #endif
 		    iran(GALSIZE, &ix, &iy);
 	    }
-	    while ((game.state.galaxy[ix][iy] <= KLINGON_PLACE && Rand() < 0.75)||
-		   NOEXIT(game.state.galaxy[ix][iy]));
+	    while ((!game.state.galaxy[ix][iy].klingons && Rand() < 0.75)||
+		   game.state.galaxy[ix][iy].supernova||
+		   game.state.galaxy[ix][iy].klingons > 8);
 	    // check for duplicate
 	    for (j = 1; j < i; j++)
 		if (game.state.cx[j]==ix && game.state.cy[j]==iy) break;
 	} while (j < i);
-	game.state.galaxy[ix][iy] += KLINGON_PLACE;
+	game.state.galaxy[ix][iy].klingons++;
 	game.state.cx[i] = ix;
 	game.state.cy[i] = iy;
     }
     // Locate planets in galaxy
     for (i = 0; i < inplan; i++) {
-	do iran(GALSIZE, &ix, &iy);
-	while (game.state.newstuf[ix][iy] > 0);
-	game.state.newstuf[ix][iy] = 1;
+	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planets);
+	game.state.galaxy[ix][iy].planets = 1;
 	game.state.plnets[i].x = ix;
 	game.state.plnets[i].y = iy;
 	game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
@@ -333,15 +335,15 @@ void setup(int needprompt)
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
 	iran(GALSIZE, &ix, &iy);
-	game.state.newstuf[ix][iy] += ROMULAN_PLACE;
+	game.state.galaxy[ix][iy].romulans = 1;
     }
     // Locate the Super Commander
     if (game.state.nscrem > 0) {
 	do iran(GALSIZE, &ix, &iy);
-	while (game.state.galaxy[ix][iy] >= 900);
+	while (game.state.galaxy[ix][iy].supernova || game.state.galaxy[ix][iy].klingons > 8);
 	game.state.isx = ix;
 	game.state.isy = iy;
-	game.state.galaxy[ix][iy] += KLINGON_PLACE;
+	game.state.galaxy[ix][iy].klingons++;
     }
     // Place thing (in tournament game, thingx == -1, don't want one!)
     if (thingx != -1) {
@@ -500,7 +502,7 @@ void newcnd(void)
 {
     condit = IHGREEN;
     if (energy < 1000.0) condit = IHYELLOW;
-    if (game.state.galaxy[quadx][quady] >= KLINGON_PLACE || game.state.newstuf[quadx][quady] >= ROMULAN_PLACE)
+    if (game.state.galaxy[quadx][quady].klingons || game.state.galaxy[quadx][quady].romulans)
 	condit = IHRED;
     if (!alive) condit=IHDEAD;
 }
@@ -508,8 +510,6 @@ void newcnd(void)
 
 void newqad(int shutup) 
 {
-    int quadnum = game.state.galaxy[quadx][quady];
-    int newnum = game.state.newstuf[quadx][quady];
     int i, j, ix, iy, nplan;
 
     iattak = 1;
@@ -537,22 +537,21 @@ void newqad(int shutup)
     }
     // Clear quadrant
     for (i=1; i <= QUADSIZE; i++)
-	for (j=1; j <= QUADSIZE; j++) game.quad[i][j] = IHDOT;
+	for (j=1; j <= QUADSIZE; j++) 
+	    game.quad[i][j] = IHDOT;
     // cope with supernova
-    if (quadnum >= SUPERNOVA_PLACE) {
+    if (game.state.galaxy[quadx][quady].supernova)
 	return;
-    }
-    klhere = KLINGONS(quadnum);
-    irhere = ROMULANS(newnum);
-    nplan = newnum%10;
+    klhere = game.state.galaxy[quadx][quady].klingons;
+    irhere = game.state.galaxy[quadx][quady].romulans;
+    nplan  = game.state.galaxy[quadx][quady].planets;
     nenhere = klhere + irhere;
 
     // Position Starship
     game.quad[sectx][secty] = ship;
 
-    if (quadnum >= KLINGON_PLACE) {
+    if (game.state.galaxy[quadx][quady].klingons) {
 	// Position ordinary Klingons
-	quadnum -= KLINGON_PLACE*klhere;
 	for (i = 1; i <= klhere; i++) {
 	    dropin(IHK, &ix, &iy);
 	    game.kx[i] = ix;
@@ -587,10 +586,8 @@ void newqad(int shutup)
 	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*skill;
     }
     // If quadrant needs a starbase, put it in
-    if (quadnum >= BASE_PLACE) {
-	quadnum -= BASE_PLACE;
+    if (game.state.galaxy[quadx][quady].starbase)
 	dropin(IHB, &basex, &basey);
-    }
 	
     if (nplan) {
 	// If quadrant needs a planet, put it in
@@ -604,7 +601,8 @@ void newqad(int shutup)
     // Check for condition
     newcnd();
     // And finally the stars
-    for (i = 1; i <= quadnum; i++) dropin(IHSTAR, &ix, &iy);
+    for (i = 1; i <= game.state.galaxy[quadx][quady].stars; i++) 
+	dropin(IHSTAR, &ix, &iy);
 
     // Check for RNZ
     if (irhere > 0 && klhere == 0) {
@@ -672,7 +670,8 @@ void newqad(int shutup)
 
     // Put in a few black holes
     for (i = 1; i <= 3; i++)
-	if (Rand() > 0.5) dropin(IHBLANK, &ix, &iy);
+	if (Rand() > 0.5) 
+	    dropin(IHBLANK, &ix, &iy);
 
     // Take out X's in corners if Tholian present
     if (ithere) {

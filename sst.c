@@ -114,9 +114,7 @@ Eric Raymond's changes:
 
    2. Status report now indicates when dilithium crystals are on board.
 
-   3. Can now report starbases left in scrscan.
-
-   4. Per Dave Matuszek's remarks, Thingy state is not saved across games.
+   3. Per Dave Matuszek's remarks, Thingy state is not saved across games.
    */
 
 /* the input queue */
@@ -485,14 +483,14 @@ static void makemoves(void)
 		events();
 		if (alldone) break;		// Events did us in
 	    }
-	    if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) { // Galaxy went Nova!
+	    if (game.state.galaxy[quadx][quady].supernova) { // Galaxy went Nova!
 		atover(0);
 		continue;
 	    }
 	    if (hitme && justin==0) {
 		attack(2);
 		if (alldone) break;
-		if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE) {	// went NOVA! 
+		if (game.state.galaxy[quadx][quady].supernova) {	// went NOVA! 
 		    atover(0);
 		    hitme = TRUE;
 		    continue;

@@ -40,11 +40,9 @@ typedef struct {
 	basekl,			// destroyed bases
 	killk,			// Klingons killed
 	killc,			// commanders killed
-	galaxy[GALSIZE+1][GALSIZE+1], 	// The Galaxy (subscript 0 not used)
 	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
 	baseqx[BASEMAX],		// Base quadrant X
 	baseqy[BASEMAX],		// Base quadrant Y
-	newstuf[GALSIZE+1][GALSIZE+1],	// Extended galaxy goodies
 	isx, isy,		// Coordinate of Super Commander
 	nscrem,			// remaining super commanders
 	nromkl,			// Romulans killed
@@ -55,27 +53,21 @@ typedef struct {
 	double date,		// stardate
 	    remres,		// remaining resources
 	    remtime;		// remaining time
+    struct {
+	int stars;
+	int planets;
+	int starbase;
+	int klingons;
+	int romulans;
+	int supernova;
+	int charted;
+    } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
+    struct {
+	int stars;
+	int starbase;
+	int klingons;
+    } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
-
-/*
- * This is how the integers in the galaxy array are encoded.
- * Someday these should turn into structure fields.
- */
-#define SUPERNOVA_PLACE	1000
-#define KLINGON_PLACE	100
-#define BASE_PLACE	10
-#define STAR_PLACE	1
-#define KLINGONS(n)	((n)/KLINGON_PLACE)
-#define BASES(n)	(((n)%KLINGON_PLACE)/BASE_PLACE)
-#define STARS(n)	((n)%BASE_PLACE)
-#define NOEXIT(s)	((s) > 899)	/* supernova or >8 Klingons */
-
-/* for newstuff */
-#define ROMULAN_PLACE	10
-#define ROMULANS(n)	((n)/ROMULAN_PLACE)
-
-/* for starch */
-#define CHART_UNKNOWN	-1
 
 #define SKILL_NONE	0
 #define SKILL_NOVICE	1
@@ -135,7 +127,6 @@ EXTERN struct {
     char passwd[10];		// Self Destruct password
     int kx[(QUADSIZE+1)*(QUADSIZE+1)];			// enemy sector locations
     int ky[(QUADSIZE+1)*(QUADSIZE+1)];
-    int starch[GALSIZE+1][GALSIZE+1];		// star chart
     /* members with macro definitions start here */
     int inkling,
 	inbase,
@@ -403,6 +394,7 @@ void doshield(int);
 void dock(int);
 void dreprt(void);
 void chart(int);
+void rechart(void);
 void impuls(void);
 void wait(void);
 void setwrp(void);

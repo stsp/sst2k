@@ -300,7 +300,6 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	case IHB: /* Hit a base */
 	    skip(1);
 	    prout("***STARBASE DESTROYED..");
-	    if (game.starch[quadx][quady] < 0) game.starch[quadx][quady] = 0;
 	    for (ll=1; ll<=game.state.rembase; ll++) {
 		if (game.state.baseqx[ll]==quadx && game.state.baseqy[ll]==quady) {
 		    game.state.baseqx[ll]=game.state.baseqx[game.state.rembase];
@@ -311,7 +310,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	    game.quad[ix][iy]=IHDOT;
 	    game.state.rembase--;
 	    basex=basey=0;
-	    game.state.galaxy[quadx][quady] -= BASE_PLACE;
+	    game.state.galaxy[quadx][quady].starbase--;
+	    game.state.chart[quadx][quady].starbase--;
 	    game.state.basekl++;
 	    newcnd();
 	    return;
@@ -319,7 +319,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	    crmena(1, iquad, 2, ix, iy);
 	    prout(" destroyed.");
 	    game.state.nplankl++;
-	    game.state.newstuf[quadx][quady] -= 1;
+	    game.state.galaxy[quadx][quady].planets--;
 	    DESTROY(&game.state.plnets[iplnet]);
 	    iplnet = 0;
 	    plnetx = plnety = 0;
@@ -520,9 +520,10 @@ void attack(int torps_ok)
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[l]*r;
 	    torpedo(course, r, jx, jy, &hit, 0, 1, 1);
-	    if (game.state.remkl==0) finish(FWON); /* Klingons did themselves in! */
-	    if (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE ||
-		alldone) return; /* Supernova or finished */
+	    if (game.state.remkl==0) 
+		finish(FWON); /* Klingons did themselves in! */
+	    if (game.state.galaxy[quadx][quady].supernova || alldone) 
+		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
 	if (shldup != 0 || shldchg != 0 || condit==IHDOCKED) {
@@ -612,7 +613,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     /* Decide what kind of enemy it is and update approriately */
     if (type == IHR) {
 	/* chalk up a Romulan */
-	game.state.newstuf[quadx][quady] -= ROMULAN_PLACE;
+	game.state.galaxy[quadx][quady].romulans--;
 	irhere--;
 	game.state.nromkl++;
 	game.state.nromrem--;
@@ -627,7 +628,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     }
     else {
 	/* Some type of a Klingon */
-	game.state.galaxy[quadx][quady] -= KLINGON_PLACE;
+	game.state.galaxy[quadx][quady].klingons--;
 	klhere--;
 	game.state.remkl--;
 	switch (type) {
@@ -828,7 +829,7 @@ void photon(void)
 	if (shldup || condit == IHDOCKED) 
 	    r *= 1.0 + 0.0001*shield;
 	torpedo(course[i], r, sectx, secty, &dummy, 0, i, n);
-	if (alldone||game.state.galaxy[quadx][quady]==SUPERNOVA_PLACE)
+	if (alldone || game.state.galaxy[quadx][quady].supernova)
 	    return;
     }
     if (game.state.remkl==0) finish(FWON);

@@ -408,7 +408,7 @@ void makechart(void)
 
 void setpassword(void) 
 {
-    if (!game.options & OPTION_CURSES) {
+    if (!(game.options & OPTION_CURSES)) {
 	while (TRUE) {
 	    scan();
 	    strcpy(game.passwd, citem);

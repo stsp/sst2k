@@ -7,7 +7,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     iqx = quadx+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
     iqy = quady+(looky+(QUADSIZE-1))/QUADSIZE - 1;
     if (iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
-	NOEXIT(game.state.galaxy[iqx][iqy]))
+	game.state.galaxy[iqx][iqy].supernova ||
+	game.state.galaxy[iqx][iqy].klingons > 8)
 	return 0; /* no can do -- neg energy, supernovae, or >8 Klingons */
     if (ienm == IHR) return 0; /* Romulans cannot escape! */
     if (irun == 0) {
@@ -40,8 +41,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     nenhere--;
     if (condit != IHDOCKED) newcnd();
     /* Handle global matters related to escape */
-    game.state.galaxy[quadx][quady] -= KLINGON_PLACE;
-    game.state.galaxy[iqx][iqy] += KLINGON_PLACE;
+    game.state.galaxy[quadx][quady].klingons--;
+    game.state.galaxy[iqx][iqy].klingons++;
     if (ienm==IHS) {
 	ishere=0;
 	iscate=0;
@@ -307,7 +308,9 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 
     if ((iqx==quadx && iqy==quady) ||
 	iqx < 1 || iqx > GALSIZE || iqy < 1 || iqy > GALSIZE ||
-	NOEXIT(game.state.galaxy[iqx][iqy])) return 1;
+	game.state.galaxy[iqx][iqy].supernova ||
+	game.state.galaxy[iqx][iqy].klingons > 8) 
+	return 1;
     if (flag) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
 	for (i = 1; i <= game.state.rembase; i++)
@@ -315,10 +318,10 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
     }
     if (justin && !iscate) return 1;
     /* do the move */
-    game.state.galaxy[game.state.isx][game.state.isy] -= KLINGON_PLACE;
+    game.state.galaxy[game.state.isx][game.state.isy].klingons--;
     game.state.isx = iqx;
     game.state.isy = iqy;
-    game.state.galaxy[game.state.isx][game.state.isy] += KLINGON_PLACE;
+    game.state.galaxy[game.state.isx][game.state.isy].klingons++;
     if (ishere) {
 	/* SC has scooted, Remove him from current quadrant */
 	iscate=0;
@@ -345,7 +348,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	    game.state.plnets[i].crystals == 1) {
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
-	    game.state.newstuf[game.state.isx][game.state.isy] -= 1;
+	    game.state.galaxy[game.state.isx][game.state.isy].planets -= 1;
 	    if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;
@@ -428,7 +431,9 @@ void scom(int *ipage)
 	    ibqy = game.state.baseqy[i];
 	    if ((ibqx == quadx && ibqy == quady) ||
 		(ibqx == batx && ibqy == baty) ||
-		NOEXIT(game.state.galaxy[ibqx][ibqy])) continue;
+		game.state.galaxy[ibqx][ibqy].supernova ||
+		game.state.galaxy[ibqx][ibqy].klingons > 8) 
+		continue;
 	    /* if there is a commander, an no other base is appropriate,
 	       we will take the one with the commander */
 	    for (j = 1; j <= game.state.remcom; j++) {
@@ -530,7 +535,7 @@ void scom(int *ipage)
 #endif
 	(Rand() > 0.2 ||
 	 (game.damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
-	 game.starch[game.state.isx][game.state.isy] > 0))
+	 !game.state.galaxy[game.state.isx][game.state.isy].charted))
 	return;
     if (*ipage==0) pause_game(1);
     *ipage = 1;

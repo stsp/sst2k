@@ -7,4 +7,6 @@
 * Code to hurl you out of quadrant if a supernova occurs as you warp in 
   seems to hang.
 
-* Regenerate Thingy at random location when unfreezing a game.
+* "Bases left" report doesn't look right in the -t version.
+
+* Orbit height is negative.

@@ -58,7 +58,7 @@ void imove(void)
 		     * that attacks only happen if Klingons
 		     * are present and your skill is good.
 		     */
-		    if (skill > SKILL_GOOD && klhere > 0 && game.state.galaxy[quadx][quady] != SUPERNOVA_PLACE)
+		    if (skill > SKILL_GOOD && klhere > 0 && !game.state.galaxy[quadx][quady].supernova)
 			attack(0);
 		    if (alldone) return;
 		}
@@ -200,7 +200,7 @@ no_quad_change:
 	    game.kdist[l] = finald;
 	}
 	sortkl();
-	if (game.state.galaxy[quadx][quady] != SUPERNOVA_PLACE && iattak == 0)
+	if (!game.state.galaxy[quadx][quady].supernova && iattak == 0)
 	    attack(0);
 	for (l = 1 ; l <= nenhere; l++) game.kavgd[l] = game.kdist[l];
     }
@@ -264,7 +264,7 @@ static void getcd(int isprobe, int akey) {
 	
 	if (landed == 1 && !isprobe) {
 		prout("Dummy! You can't leave standard orbit until you");
-		proutn("are back abourt the ");
+		proutn("are back aboard the ");
 		crmshp();
 		prout(".");
 		chew();
@@ -730,8 +730,8 @@ void atover(int igrab)
 	crmshp();
 	skip(1);
 	prout("safely out of quadrant.");
-	game.starch[quadx][quady] = game.damage[DRADIO] > 0.0 ? game.state.galaxy[quadx][quady]+SUPERNOVA_PLACE:1;
-
+	if (game.damage[DRADIO] == 0.0)
+	    game.state.galaxy[quadx][quady].charted = TRUE;
 	/* Try to use warp engines */
 	if (game.damage[DWARPEN]) {
 	    skip(1);
@@ -759,14 +759,16 @@ void atover(int igrab)
 	    finish(FSNOVAED);
 	    return;
 	}
+    } while 
 	/* Repeat if another snova */
-    } while (game.state.galaxy[quadx][quady] == SUPERNOVA_PLACE);
-    if (game.state.remkl==0) finish(FWON); /* Snova killed remaining enemy. */
+	(game.state.galaxy[quadx][quady].supernova);
+    if (game.state.remkl==0) 
+	finish(FWON); /* Snova killed remaining enemy. */
 }
 
 void timwrp() 
 {
-    int l, ll, gotit;
+    int l, gotit;
     prout("***TIME WARP ENTERED.");
     if (game.state.snap && Rand() < 0.5) {
 	/* Go back in time */
@@ -804,16 +806,11 @@ void timwrp()
 	    prout("Checkov-  \"Security reports the Galileo has reappeared in the dock!\"");
 	    iscraft = 1;
 	}
-
-	/* Revert star chart to earlier era, if it was known then*/
-	if (game.damage[DRADIO]==0.0 || stdamtim > game.state.date) {
-	    for (l = 1; l <= GALSIZE; l++)
-		for (ll = 1; ll <= GALSIZE; ll++)
-		    if (game.starch[l][ll] > 1)
-			game.starch[l][ll]=game.damage[DRADIO]>0.0 ? game.state.galaxy[l][ll]+SUPERNOVA_PLACE :1;
-	    prout("Spock has reconstructed a correct star chart from memory");
-	    if (game.damage[DRADIO] > 0.0) stdamtim = game.state.date;
-	}
+	/* 
+	 * There used to be code to do the actual reconstrction here,
+	 * but the starchart is now part of the snapshotted galaxy state.
+	 */
+	prout("Spock has reconstructed a correct star chart from memory");
     }
     else {
 	/* Go forward in time */

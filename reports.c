@@ -135,9 +135,15 @@ void lrscan(void)
 	    if (x == 0 || x > GALSIZE || y == 0 || y > GALSIZE)
 		proutn("  -1");
 	    else {
-		if (game.state.galaxy[x][y]<SUPERNOVA_PLACE) proutn(" %3d", game.state.galaxy[x][y]);
-		else proutn("***");
-		game.starch[x][y] = game.damage[DRADIO] > 0 ? game.state.galaxy[x][y]+SUPERNOVA_PLACE : 1;
+		if (!game.damage[DRADIO])
+		    game.state.galaxy[x][y].charted = TRUE;
+		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
+		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
+		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
+		if (game.state.galaxy[x][y].supernova) 
+		    proutn("***");
+		else
+		    proutn(" %-3d", game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars);
 	    }
 	}
 	prout(" ");
@@ -165,6 +171,20 @@ void dreprt(void)
     if (!jdam) prout("All devices functional.");
 }
 
+void rechart(void)
+/* update the chart in the Enterprise's computer from galaxy data */
+{
+    int i, j;
+    stdamtim = game.state.date;
+    for (i=1; i <= GALSIZE ; i++)
+	for (j=1; j <= GALSIZE; j++) 
+	    if (game.state.galaxy[i][j].charted) {
+		game.state.chart[i][j].klingons = game.state.galaxy[i][j].klingons;
+		game.state.chart[i][j].starbase = game.state.galaxy[i][j].starbase;
+		game.state.chart[i][j].stars = game.state.galaxy[i][j].stars;
+	    }
+}
+
 void chart(int nn) 
 {
     int i,j;
@@ -177,16 +197,15 @@ void chart(int nn)
     if (stdamtim != 1e30) {
 	if (condit == IHDOCKED) {
 	    /* We are docked, so restore chart from base information */
-	    stdamtim = game.state.date;
-	    for (i=1; i <= GALSIZE ; i++)
-		for (j=1; j <= GALSIZE; j++)
-		    if (game.starch[i][j] == 1) game.starch[i][j] = game.state.galaxy[i][j]+SUPERNOVA_PLACE;
+	    rechart();
 	}
-	else {
-	    proutn("(Last surveillance update %d stardates ago.",
+	else if (game.state.date-stdamtim) {
+	    prout("(Last surveillance update %d stardates ago).",
 		   (int)(game.state.date-stdamtim));
 	}
     }
+    else if (game.damage[DRADIO] == 0.0)
+	rechart();
 
     prout("      1    2    3    4    5    6    7    8");
     for (i = 1; i <= GALSIZE; i++) {
@@ -194,14 +213,14 @@ void chart(int nn)
 	for (j = 1; j <= GALSIZE; j++) {
 	    char buf[4];
 	    proutn("  ");
-	    if (game.starch[i][j] == CHART_UNKNOWN)
-		strcpy(buf, ".1.");
-	    else if (game.starch[i][j] == 0)
-		strcpy(buf, "...");
-	    else if (game.state.galaxy[i][j]>=SUPERNOVA_PLACE)
+	    if (game.state.galaxy[i][j].supernova)
 		strcpy(buf, "***");
+	    else if (!game.state.galaxy[i][j].charted && game.state.galaxy[i][j].starbase)
+		strcpy(buf, ".1.");
+	    else if (game.state.galaxy[i][j].charted)
+		sprintf(buf, "%d%d%d", game.state.chart[i][j].klingons, game.state.chart[i][j].starbase, game.state.chart[i][j].stars);
 	    else
-		sprintf(buf, "%03d", game.state.galaxy[i][j]);
+		strcpy(buf, "...");
 	    for (cp = buf; cp < buf + sizeof(buf); cp++)
 		if (*cp == '0')
 		    *cp = '.';
@@ -301,23 +320,13 @@ static void status(int req)
     case 10:
 	attakreport(1);
 	break;
-	/*
-	 * Note: attakreport() can in some cases produce two lines of
-	 * output.  If that happens, and QUADSIZE is the normal 10, items
-	 * 11 and up will be printed past the bottom of the quadrant display.
-	 * Under the curses display logic they will get lost because they're
-	 * written outside the report window.
-	 */
-    case 11:	/* ESR */
-	proutn("Bases Left    %d", game.state.rembase);
-	break;
     }
 }
 		
 int srscan(int l) 
 {
     static char requests[][3] =
-	{"","da","co","po","ls","wa","en","to","sh","kl","ti", "ba"};
+	{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
     int leftside=TRUE, rightside=TRUE, i, j, jj, req=0, nn=FALSE;
     int goodScan=TRUE;
     switch (l) {
@@ -332,7 +341,12 @@ int srscan(int l)
 		prout("  [Using Base's sensors]");
 	}
 	else proutn("     Short-range scan\n\r");
-	if (goodScan) game.starch[quadx][quady] = game.damage[DRADIO]>0.0 ? game.state.galaxy[quadx][quady]+SUPERNOVA_PLACE:1;
+	if (goodScan && !game.damage[DRADIO]) { 
+	    game.state.chart[quadx][quady].klingons = game.state.galaxy[quadx][quady].klingons;
+	    game.state.chart[quadx][quady].starbase = game.state.galaxy[quadx][quady].starbase;
+	    game.state.chart[quadx][quady].stars = game.state.galaxy[quadx][quady].stars;
+	    game.state.galaxy[quadx][quady].charted = TRUE;
+	}
 	scan();
 	if (isit("chart")) nn = TRUE;
 	if (isit("no")) rightside = FALSE;
