@@ -1,0 +1,6 @@
+#!/bin/sh 
+#
+# Upload gpsd docs
+#
+xmlto --skip-validation xhtml-nochunks ../sst-doc.xml
+scp *.html *.jpg esr@shell.berlios.de:/home/groups/sst/htdocs
