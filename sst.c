@@ -502,14 +502,21 @@ int main(int argc, char **argv) {
 	    }
 	}
 
+#ifndef SERGEEV
 	iostart(usecurses);
-	prelim(); 
+#else
+	randomize();
+        textattr(7);
+        clrscr();
+        setwnd(0);
+#endif /* SERGEEV */
 	line[0] = '\0';
 	for (i = optind; i < argc;  i++) {
 		strcat(line, argv[i]);
 		strcat(line, " ");
 	}
 	while (TRUE) { /* Play a game */
+		prelim(); 
 		setup(line[0] == '\0');
 		if (alldone) {
 			score();
@@ -639,6 +646,13 @@ int scan(void) {
 			return IHEOL;
 		}
 		getline(line, sizeof(line));
+#ifdef SERGEEV
+                fflush(stdin);
+                if (curwnd==5){
+                   clrscr();
+                   setwnd(4);
+                   clrscr();
+#endif /* SERGEEV */
 		linep = line;
 	}
 	// Skip leading white space

@@ -436,6 +436,10 @@ void probe(void);
 void clearscreen(void);
 void iostart(int);
 void ioend(void);
+#ifdef SERGEEV
+#define getline cgetline
+void setwnd(short);
+#endif /* SERGEEV */
 void getline(char *, int);
 void commandhook(char *, int);
 
