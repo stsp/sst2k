@@ -1757,6 +1757,9 @@ of platform dependencies in the code.
 <listitem><para>
 The HELP/CALL/SOS command is now MAYDAY.  SOS and CALL are still accepted.
 </para></listitem>
+<listitem><para>
+Status report now indicates if dilithium crystals arre on board.
+</para></listitem>
 </itemizedlist>
 
 <para>Here are some good pages on the history of Star Trek games:</para>
