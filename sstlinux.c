@@ -10,18 +10,6 @@
 
 static int fd = 0;
 
-#ifdef SERGEEV
-int c_printf (char *format, ... )
-{
-    char buffer[BUFSIZ]; /* Well, BUFSIZ is from ncurses...  */
-    va_list argp;
-    va_start(argp,format);
-    vsprintf(buffer,format,argp);
-    va_end(argp);
-    return waddstr(conio_scr,buffer);
-}
-#endif /* SERGEEV */
-
 void sound(unsigned int freq)
 {
     if(fd==0) fd=open("/dev/console", O_RDONLY);
