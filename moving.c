@@ -209,9 +209,7 @@ label100:
 	}
 	newcnd();
 	iattak = 0;
-#ifdef SERGEEV
 	drawmaps(0);
-#endif /* SERGEEV */
 	return;
 }
 

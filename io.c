@@ -101,10 +101,10 @@ void clearscreen(void) {
 }
 
 void pause_game(int i) {
-#ifndef SERGEEV
-    char buf[BUFSIZ], *prompt;
-#else /* SERGEEV */
 	char *prompt;
+#ifndef SERGEEV
+        char buf[BUFSIZ];
+#else /* SERGEEV */
         drawmaps(0);
         setwnd(5);
 #endif /* SERGEEV */
@@ -287,6 +287,7 @@ void prouts(char *fmt, ...) {
 }
 
 void warble(void)
+/* sound and visual effects for teleportation */
 {
 #ifdef SERGEEV
     int posx, posy;

@@ -423,9 +423,7 @@ int isit(char *);
 void preport(void);
 void orbit(void);
 void sensor(void);
-#ifdef SERGEEV
 void drawmaps(short);
-#endif /* SERGEEV */
 void beam(void);
 void mine(void);
 void usecrystals(void);
@@ -438,16 +436,12 @@ void probe(void);
 void clearscreen(void);
 void iostart(int);
 void ioend(void);
-#ifdef SERGEEV
 void setwnd(short);
-#endif /* SERGEEV */
 void warble(void);
 void getline(char *, int);
 void commandhook(char *, int);
 
-#ifdef SERGEEV
 typedef struct {
         int wndleft,wndtop,wndright,wndbottom;
 } wnd;
 extern wnd wnds[6];
-#endif /* SERGEEV */

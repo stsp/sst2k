@@ -261,8 +261,9 @@ static void helpme(void) {
 	fclose(fp);
 }
 
+void drawmaps(short l) {
+/* hook to be called after moving to redraw maps */
 #ifdef SERGEEV
-void drawmaps(short l){
      _setcursortype(_NOCURSOR);
      if (l==1) sensor();
      if (l!=2) setwnd(1);
@@ -279,8 +280,8 @@ void drawmaps(short l){
         lrscan();
         _setcursortype(_NORMALCURSOR);
      }
-}
 #endif /* SERGEEV */
+}
 
 static void makemoves(void) {
 	int i, hitme;
@@ -289,9 +290,7 @@ static void makemoves(void) {
         setwnd(4);
 #endif /* SERGEEV */
 	while (TRUE) { /* command loop */
-#ifdef SERGEEV
                 drawmaps(1);
-#endif /* SERGEEV */
                 while (TRUE)  { /* get a command */
 			hitme = FALSE;
 			justin = 0;

@@ -10,6 +10,7 @@
 
 static int fd = 0;
 
+#ifdef SERGEEV
 int c_printf (char *format, ... )
 {
     char buffer[BUFSIZ]; /* Well, BUFSIZ is from ncurses...  */
@@ -19,6 +20,7 @@ int c_printf (char *format, ... )
     va_end(argp);
     return waddstr(conio_scr,buffer);
 }
+#endif /* SERGEEV */
 
 void sound(unsigned int freq)
 {

@@ -82,10 +82,7 @@ void orbit(void) {
 }
 
 void sensor(void) {
-#ifdef SERGEEV
-    if (game.damage[DSRSENS] != 0.0) return;
-    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
-#else
+#ifndef SERGEEV
 	skip(1);
 	chew();
 	if (game.damage[DSRSENS] != 0.0) {
@@ -96,7 +93,9 @@ void sensor(void) {
 		prout("No planet in this quadrant.");
 		return;
 	}
-#endif /* SERGEEV */
+#else
+    if (game.damage[DSRSENS] != 0.0) return;
+    if ((plnetx != 0)&&(game.state.plnets[iplnet].known == 0)) {
 	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, quadx, quady));
 	skip(1);
 	prout("         Planet at %s is of class %s.", 
@@ -108,7 +107,6 @@ void sensor(void) {
 	if (game.state.plnets[iplnet].crystals == 0) proutn(" no");
 	prout(" dilithium crystals present.\"");
 	if (game.state.plnets[iplnet].known == unknown) game.state.plnets[iplnet].known = known;
-#ifdef SERGEEV
     }
 #endif /* SERGEEV */
 }
