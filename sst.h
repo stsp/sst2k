@@ -433,7 +433,6 @@ void debugme(void);
 void attakreport(int);
 void movetho(void);
 void probe(void);
-void clearscreen(void);
 void iostart(int);
 void ioend(void);
 void setwnd(short);

@@ -81,25 +81,6 @@ void ioend(void) {
     outro(0);
 }
 
-void clearscreen(void) {
-	/* Somehow we need to clear the screen */
-#ifdef __BORLANDC__
-	extern void clrscr(void);
-	clrscr();
-#else
-	if (curses) {
-	    wclear(stdscr);
-	    wrefresh(stdscr);
-	} else {
-		// proutn("\033[2J"); /* Hope for an ANSI display */
-		/* much more in that old-TTY spirit to just throw linefeeds */
-		int i;
-		for (i = 0; i < screenheight; i++)
-		    putchar('\n');
-	}
-#endif
-}
-
 void waitfor(void) {
 /* wait for user action -- OK to do nothing if on a TTY */
 #ifdef SERGEEV
@@ -140,7 +121,10 @@ void pause_game(int i) {
 		proutn(prompt);
 		fgets(buf, sizeof(buf), stdin);
 		if (i != 0) {
-			clearscreen();
+		    /* much more in that old-TTY spirit to throw linefeeds */
+		    int j;
+		    for (j = 0; j < screenheight; j++)
+			putchar('\n');
 		}
 		linecount = 0;
 	}
