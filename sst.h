@@ -452,10 +452,6 @@ void enqueue(char *s);
 #define SCAN_STATUS		3
 #define SCAN_NO_LEFTSIDE	4
 
-typedef struct {
-        int wndleft,wndtop,wndright,wndbottom;
-} wnd;
-extern wnd wnds[6];
 /* these need to track io.c:wnd */
 #define FULLSCREEN_WINDOW	0
 #define LEFTUPPER_WINDOW	1

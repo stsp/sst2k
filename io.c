@@ -23,12 +23,15 @@ static int curses = TRUE;
 #endif /* SERGEEV */
 
 #ifdef SERGEEV
-wnd wnds[6]={{1,1,80,25},	/* FULLSCREEN_WINDOW */
-	     {1,1,25,12},	/* LEFTUPPER_WINDOW */
-	     {26,2,80,12},	/* SRSCAN_WINDOW */
-	     {65,1,80,10},	/* LRSCAN_WINDOW */
-	     {1,13,80,23},	/* LOWER_WINDOW */
-	     {1,24,80,25},	/* BOTTOM_WINDOW */
+typedef struct {
+        int wndleft,wndtop,wndright,wndbottom;
+} wnd;
+static wnd wnds[6]={{1,1,80,25},	/* FULLSCREEN_WINDOW */
+		    {1,1,25,12},	/* LEFTUPPER_WINDOW */
+		    {26,2,80,12},	/* SRSCAN_WINDOW */
+		    {65,1,80,10},	/* LRSCAN_WINDOW */
+		    {1,13,80,23},	/* LOWER_WINDOW */
+		    {1,24,80,25},	/* BOTTOM_WINDOW */
 };
 short curwnd;
 #endif /* SERGEEV */
