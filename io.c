@@ -164,9 +164,11 @@ void skip(int i) {
 	}
 #else /* SERGEEV */
         while (i-- > 0) proutn("\n\r");
+#endif /* SERGEEV */
 }
 
 static void vproutn(char *fmt, va_list ap) {
+#ifdef SERGEEV
     char *s, *p;
     vasprintf(&s, fmt, ap);
     p=s;

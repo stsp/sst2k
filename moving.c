@@ -107,7 +107,7 @@ void imove(void) {
 				quady = (iy+9)/10;
 				sectx = ix - 10*(quadx-1);
 				secty = iy - 10*(quady-1);
-				proutn("\n\rEntering %s.",
+				prout("\n\rEntering %s.",
 				      cramlc(quadrant, quadx, quady));
 				game.quad[sectx][secty] = ship;
 				newqad(0);
