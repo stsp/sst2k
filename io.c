@@ -286,11 +286,7 @@ void prouts(char *fmt, ...) {
 #endif /* SERGEEV */
 }
 
-#ifndef SERGEEV
 void getline(char *line, int max) {
-#else /* SERGEEV */
-void cgetline(char *line, int max) {
-#endif /* SERGEEV */
     if (curses) {
 #ifndef SERGEEV
 	wgetnstr(stdscr, line, max);

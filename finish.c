@@ -1,6 +1,3 @@
-#ifdef SERGEEV
-#include <conio.h>
-#endif /* SERGEEV */
 #include "sst.h"
 #include <string.h>
 #include <time.h>
@@ -19,21 +16,13 @@ void dstrct() {
 	prouts("          8"); skip(1);
 	prouts("             7"); skip(1);
 	prouts("                6"); skip(1);
-#ifdef SERGEEV
 	skip(1);
-#endif /* SERGEEV */
 	prout("ENTER-CORRECT-PASSWORD-TO-CONTINUE-");
-#ifdef SERGEEV
 	skip(1);
-#endif /* SERGEEV */
 	prout("SELF-DESTRUCT-SEQUENCE-OTHERWISE-");
-#ifdef SERGEEV
 	skip(1);
-#endif /* SERGEEV */
 	prout("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED");
-#ifdef SERGEEV
 	skip(1);
-#endif /* SERGEEV */
 	scan();
 	chew();
 	if (strcmp(game.passwd, citem) != 0) {
@@ -404,12 +393,7 @@ void plaque(void) {
 	
 	while (fp == NULL) {
                 proutn("File or device name for your plaque: ");
-#ifdef SERGEEV
                 getline(winner, sizeof(winner));
-#else
-		fgets(winner, 128, stdin);
-		winner[strlen(winner)-1] = '\0';
-#endif /* SERGEEV */
 		fp = fopen(winner, "w");
 		if (fp==NULL) {
                         prout("Invalid name.");

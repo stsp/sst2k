@@ -260,9 +260,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait) {
 					   1000.0*sqrt(square(ix-inx)+square(iy-iny))*
 					   fabs(sin(bullseye-angle));
 				*hit = fabs(*hit);
-#ifndef SERGEEV
-				newcnd(); /* undock */
-#endif /* SERGEEV */
+				newcnd(); /* we're blown out of dock */
 				/* We may be displaced. */
 				if (landed==1 || condit==IHDOCKED) return; /* Cheat if on a planet */
 				ang = angle + 2.5*(Rand()-0.5);
@@ -654,9 +652,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 
 	int i,j;
 
-#ifdef SERGEEV	
         skip(1);
-#endif /* SERGEEV */
 	crmena(1, type, 2, ixx, iyy);
 	/* Decide what kind of enemy it is and update approriately */
 	if (type == IHR) {
