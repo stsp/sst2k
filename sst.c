@@ -1,11 +1,9 @@
 #define INCLUDED	// Define externs here
 #include <ctype.h>
 #include <getopt.h>
-#ifdef SERGEEV
-#include <conio.h>
 #include <time.h>
+#include "conio.h"
 #include "sstlinux.h"
-#endif /* SERGEEV */
 #include "sst.h"
 
 #ifndef SSTDOC
@@ -86,69 +84,100 @@ SERGEEV, not yet completely merged):
     10. Ramming a black hole is no longer instant death.  There is a
         chance you might get timewarped instead.
 
+    11. "freeze" command reverts to "save", most people will understand this
+        better anyway.
+
+Eric Raymond's changes:
+
+     1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
+
    */
 
-static char *commands[] = {
-#ifdef SERGEEV
-        "--",
-        "---",
-#else
-	"srscan",
-	"lrscan",
+static struct 
+{
+    char *name;
+    int value;
+}
+commands[] = {
+#ifndef SERGEEV
+#define SRSCAN	1
+	{"SRSCAN",	SRSCAN},
+	{"STATUS",	SRSCAN},
+#define LRSCAN	2
+	{"LRSCAN",	LRSCAN},
 #endif /* SERGEEV */
-	"phasers",
-#ifdef SERGEEV
-        "torpedo",
-#else
-	"photons",
+#define PHASERS	3
+	{"PHASERS",	PHASERS},
+#define TORPEDO	4
+        {"TORPEDO",	TORPEDO},
+	{"PHOTONS",	TORPEDO},
+#define MOVE	5
+	{"MOVE",	MOVE},
+#define SHIELDS	6
+	{"SHIELDS",	SHIELDS},
+#define DOCK	7
+	{"DOCK",	DOCK},
+#define DAMAGES	8
+	{"DAMAGES",	DAMAGES},
+#define CHART	9
+	{"CHART",	CHART},
+#define IMPULSE	10
+	{"IMPULSE",	IMPULSE},
+#define REST	11
+	{"REST",	REST},
+#define WARP	12
+	{"WARP",	WARP},
+#define SCORE	13
+	{"SCORE",	SCORE},
+#ifndef SERGEEV
+#define SENSORS	14
+	{"SENSORS",	SENSORS},
 #endif /* SERGEEV */
-	"move",
-	"shields",
-	"dock",
-	"damages",
-	"chart",
-	"impulse",
-	"rest",
-	"warp",
+#define ORBIT	15
+	{"ORBIT",	ORBIT},
+#define TRANSPORT	17
+	{"TRANSPORT",	TRANSPORT},
+#define MINE	18
+	{"MINE",	MINE},
+#define CRYSTALS 19
+	{"CRYSTALS",	CRYSTALS},
+#define SHUTTLE	20
+	{"SHUTTLE",	SHUTTLE},
+#define PLANETS	21
+	{"PLANETS",	PLANETS},
 #ifdef SERGEEV
-        "score",
-        "----",
-#else
-	"status",
-	"sensors",
+#define REQUEST	22
+	{"REQUEST",	REQUEST},
 #endif /* SERGEEV */
-	"orbit",
-	"transport",
-	"mine",
-	"crystals",
-	"shuttle",
-	"planets",
-#ifdef SERGEEV
-        "-----",
-#else
-	"request",
-#endif /* SERGEEV */
-	"report",
-	"computer",
-	"commands",
-	"emexit",
-	"probe",
-	"abandon",
-	"destruct",
-#ifdef SERGEEV
-        "save",
-#else
-	"freeze",
-#endif /* SERGEEV */
-	"deathray",
-	"debug",
-#ifdef SERGEEV
-        "sos",
-#else
-	"call",
-#endif /* SERGEEV */
-	"quit",
-	"help"
+#define REPORT	23
+	{"REPORT",	REPORT},
+#define COMPUTER	24
+	{"COMPUTER",	COMPUTER},
+#define COMMANDS	25
+	{"COMMANDS",	COMMANDS},
+#define EMEXIT	26
+	{"EMEXIT",	EMEXIT},
+#define PROBE	27
+	{"PROBE",	PROBE},
+#define SAVE	28
+	{"SAVE",	SAVE},
+	{"FREEZE",	SAVE},
+#define ABANDON	29
+	{"ABANDON",	ABANDON},
+#define DESTRUCT 30
+	{"DESTRUCT",	DESTRUCT},
+#define DEATHRAY 31
+	{"DEATHRAY",	DEATHRAY},
+#define DEBUGCMD	32
+	{"DEBUG",	DEBUGCMD},
+#define MAYDAY	33
+	{"MAYDAY",	MAYDAY},
+	{"SOS",		MAYDAY},
+	{"CALL",	MAYDAY},
+#define QUIT	34
+	{"QUIT",	QUIT},
+#define HELP	35
+	{"HELP",	HELP},
 };
 
 #ifdef SERGEEV
@@ -159,15 +188,14 @@ short curwnd;
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 
 static void listCommands(int x) {
-        proutn   ("LEGAL COMMANDS ARE:\n\r"
-                  "   MOVE      PHASERS   SOS       PROBE\n\r"
-                  "   COMPUTER  IMPULSE   TORPEDO   ABANDON\n\r"
-                  "   EMEXIT    WARP      SHIELDS   DESTRUCT\n\r"
-                  "   CHART     REST      DOCK      QUIT\n\r"
-                  "   DAMAGES   REPORT    SCORE     ORBIT\n\r"
-                  "   TRANSPORT MINE      CRYSTALS  SHUTTLE\n\r"
-                  "   PLANETS   DEATHRAY  SAVE      COMMANDS\n\r");
-	if (x) prout("   HELP");
+    int i;
+    prout("LEGAL COMMANDS ARE:");
+    for (i = 0; i < NUMCOMMANDS; i++) {
+	proutn("%-12s ", commands[i].name);
+	if (i % 5 == 4)
+	    skip(1);
+    }
+    skip(1);
 }
 
 static void helpme(void) {
@@ -191,7 +219,10 @@ static void helpme(void) {
 #endif /* SERGEEV */
 		if (key == IHEOL) return;
 		for (i = 0; i < NUMCOMMANDS; i++) {
-			if (strcmp(commands[i], citem)==0) break;
+		    if (strcasecmp(commands[i].name, citem)==0) {
+			i = commands[i].value;
+			break;
+		    }
 		}
 		if (i != NUMCOMMANDS) break;
 		skip(1);
@@ -201,12 +232,12 @@ static void helpme(void) {
 		chew();
 		skip(1);
 	}
-	if (i == 23) {
+	if (i == COMMANDS) {
 		strcpy(cmdbuf, " ABBREV");
 	}
 	else {
-	    for (j = 0; commands[i][j]; j++)
-		cmdbuf[j] = toupper(commands[i][j]);
+	    for (j = 0; commands[i].name[j]; j++)
+		cmdbuf[j] = toupper(commands[i].name[j]);
 	    cmdbuf[j] = '\0';
 	}
 	fp = fopen(SSTDOC, "r");
@@ -229,7 +260,7 @@ static void helpme(void) {
 		for (cp = linebuf+3; isspace(*cp); cp++)
 			continue;
 		linebuf[strlen(linebuf)-1] = '\0';
-		if (strcmp(cp, cmdbuf) == 0)
+		if (strcasecmp(cp, cmdbuf) == 0)
 		    break;
 	    }
 	}
@@ -303,124 +334,124 @@ static void makemoves(void) {
                         setwnd(4);
                         clrscr();
 #endif /* SERGEEV */
-			for (i=0; i < 26; i++)
-				if (isit(commands[i]))
-					break;
-			if (i < 26) break;
+			for (i=0; i < ABANDON; i++)
+			    if (isit(commands[i].name)) {
+				i = commands[i].value;
+				break;
+			    }
+			if (i < ABANDON) break;
 			for (; i < NUMCOMMANDS; i++)
-				if (strcmp(commands[i], citem) == 0) break;
+			    if (strcasecmp(commands[i].name, citem) == 0) {
+			    	    i = commands[i].value;
+				    break;
+			    }
 			if (i < NUMCOMMANDS) break;
 
 			listCommands(TRUE);
 		}
-		commandhook(commands[i], TRUE);
+		commandhook(commands[i].name, TRUE);
 		switch (i) { /* command switch */
 #ifndef SERGEEV
-                        case 0:                 // srscan
+                        case SRSCAN:                 // srscan
  				srscan(1);
  				break;
- 			case 1:			// lrscan
+ 			case LRSCAN:			// lrscan
  				lrscan();
                                 break;
 #endif /* SERGEEV */
-			case 2:			// phasers
+			case PHASERS:			// phasers
 				phasers();
 				if (ididit) hitme = TRUE;
 				break;
-			case 3:			// photons
+			case TORPEDO:			// photons
 				photon();
 				if (ididit) hitme = TRUE;
 				break;
-			case 4:			// move
+			case MOVE:			// move
 				warp(1);
 				break;
-			case 5:			// shields
+			case SHIELDS:			// shields
 				doshield(1);
 				if (ididit) {
 					hitme=TRUE;
 					shldchg = 0;
 				}
 				break;
-			case 6:			// dock
+			case DOCK:			// dock
                                 dock(1);
                                 if (ididit) attack(0);
 				break;
-			case 7:			// damages
+			case DAMAGES:			// damages
 				dreprt();
 				break;
-			case 8:			// chart
+			case CHART:			// chart
 				chart(0);
 				break;
-			case 9:			// impulse
+			case IMPULSE:			// impulse
 				impuls();
 				break;
-			case 10:		// rest
+			case REST:		// rest
 				wait();
 				if (ididit) hitme = TRUE;
 				break;
-			case 11:		// warp
+			case WARP:		// warp
 				setwrp();
 				break;
-                        case 12:                // score
+                        case SCORE:                // score
                                 score();
 				break;
 #ifndef SERGEEV
-			case 13:			// sensors
+			case SENSORS:			// sensors
 				sensor();
 				break;
 #endif /* SERGEEV */
-			case 14:			// orbit
+			case ORBIT:			// orbit
 				orbit();
 				if (ididit) hitme = TRUE;
 				break;
-			case 15:			// transport "beam"
+			case TRANSPORT:			// transport "beam"
 				beam();
 				break;
-			case 16:			// mine
+			case MINE:			// mine
 				mine();
 				if (ididit) hitme = TRUE;
 				break;
-			case 17:			// crystals
+			case CRYSTALS:			// crystals
 				usecrystals();
                                 if (ididit) hitme = TRUE;
 				break;
-			case 18:			// shuttle
+			case SHUTTLE:			// shuttle
 				shuttle();
 				if (ididit) hitme = TRUE;
 				break;
-			case 19:			// Planet list
+			case PLANETS:			// Planet list
 				preport();
 				break;
-			case 20:			// Status information
-				srscan(2);
-				break;
-			case 21:			// Game Report 
+			case REPORT:			// Game Report 
 				report();
 				break;
-			case 22:			// use COMPUTER!
+			case COMPUTER:			// use COMPUTER!
 				eta();
 				break;
-			case 23:
+			case COMMANDS:
 				listCommands(TRUE);
 				break;
-			case 24:		// Emergency exit
-#ifdef SERGEEV
+			case EMEXIT:		// Emergency exit
 				clrscr();	// Hide screen
-#endif /* SERGEEV */
 				freeze(TRUE);	// forced save
 				exit(1);		// And quick exit
 				break;
-			case 25:
+			case PROBE:
 				probe();		// Launch probe
                                 if (ididit) hitme = TRUE;
 				break;
-			case 26:			// Abandon Ship
+			case ABANDON:			// Abandon Ship
 				abandn();
 				break;
-			case 27:			// Self Destruct
+			case DESTRUCT:			// Self Destruct
 				dstrct();
 				break;
-			case 28:			// Save Game
+			case SAVE:			// Save Game
 				freeze(FALSE);
 #ifdef SERGEEV
                                 clrscr();
@@ -428,30 +459,30 @@ static void makemoves(void) {
 				if (skill > 3)
                                         prout("WARNING--Saved games produce no plaques!");
 				break;
-			case 29:			// Try a desparation measure
+			case DEATHRAY:		// Try a desparation measure
 				deathray();
 				if (ididit) hitme = TRUE;
 				break;
-			case 30:			// What do we want for debug???
+			case DEBUGCMD:		// What do we want for debug???
 #ifdef DEBUG
 				debugme();
 #endif
 				break;
-			case 31:		// Call for help
+			case MAYDAY:		// Call for help
 				help();
                                 if (ididit) hitme = TRUE;
 				break;
-			case 32:
+			case QUIT:
 				alldone = 1;	// quit the game
 #ifdef DEBUG
 				if (idebug) score();
 #endif
 				break;
-			case 33:
+			case HELP:
 				helpme();	// get help
 				break;
 		}
-		commandhook(commands[i], FALSE);
+		commandhook(commands[i].name, FALSE);
 		for (;;) {
 			if (alldone) break;		// Game has ended
 #ifdef DEBUG
@@ -701,7 +732,7 @@ int isit(char *s) {
 	/* New function -- compares s to scaned citem and returns true if it
 	   matches to the length of s */
 
-	return strncmp(s, citem, max(1, strlen(citem))) == 0;
+	return strncasecmp(s, citem, max(1, strlen(citem))) == 0;
 
 }
 
