@@ -208,7 +208,7 @@ void chart(int nn)
 	proutn("%d |", i);
 	for_quadrants(j) {
 	    char buf[4];
-	    if ((game.options & OPTION_SHOWME) && i == quady && j == quadx)
+	    if ((game.options & OPTION_SHOWME) && i == quadx && j == quady)
 		proutn("<");
 	    else
 		proutn(" ");
@@ -224,7 +224,7 @@ void chart(int nn)
 		if (*cp == '0')
 		    *cp = '.';
 	    proutn(buf);
-	    if ((game.options & OPTION_SHOWME) && i == quady && j == quadx)
+	    if ((game.options & OPTION_SHOWME) && i == quadx && j == quady)
 		proutn(">");
 	    else
 		proutn(" ");
