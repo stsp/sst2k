@@ -188,29 +188,12 @@ void chart(int nn) {
 	for (i = 1; i <= 8; i++) {
                 proutn("%d |", i);
 		for (j = 1; j <= 8; j++) {
-		    char buf[4];
+		        char buf[4];
                         proutn("  ");
 			if (game.starch[i][j] < 0)
                                 strcpy(buf, ".1.");
 			else if (game.starch[i][j] == 0)
                                 strcpy(buf, "...");
-			else if (game.starch[i][j] > 999)
-                                if ((i==quadx)&&(j==quady)){
-                                   gotoxy(wherex()-1,wherey());
-                                   if (game.starch[i][i]<2000)
-				       sprintf(buf, "%03d", game.starch[i][j]-1000);
-                                   else 
-				       strcpy(buf, "***");
-                                }
-                                else
-                                    if (game.starch[i][j]<2000) 
-					sprintf(buf, "%03d", game.starch[i][j]-1000);
-                                    else 
-					strcpy(buf, "***");
-                        else if ((i==quadx)&&(j==quady)){
-                                gotoxy(wherex()-1,wherey());
-                                sprintf(buf, "%03d", game.state.galaxy[i][j]);
-                        }
                         else if (game.state.galaxy[i][j]>=1000)
                                 strcpy(buf, "***");
 			else
