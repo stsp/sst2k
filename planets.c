@@ -1,7 +1,5 @@
 #include "sst.h"
 
-static int height;
-
 static char *classes[] = {"M","N","O"};
 
 static int consumeTime(void) 
@@ -71,15 +69,15 @@ void orbit(void)
     }
     if (plnetx == 0 || abs(sectx-plnetx) > 1 || abs(secty-plnety) > 1) {
 	crmshp();
-	prout(" not adjacient to planet.\n");
+	prout(" not adjacent to planet.\n");
 	return;
     }
     Time = 0.02+0.03*Rand();
     prout("Helmsman Sulu-  \"Entering standard orbit, Sir.\"");
     newcnd();
     if (consumeTime()) return;
-    height = (1400.+7200.*Rand());
-    prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", height);
+    game.height = (1400.0+7200.0*Rand());
+    prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", game.height);
     inorbit = 1;
     ididit=1;
 }
@@ -319,7 +317,7 @@ void shuttle(void)
 	prout("  you may not fly down.\"");
 	return;
     }
-    Time = 3.0e-5*height;
+    Time = 3.0e-5*game.height;
     if (Time >= 0.8*game.state.remtime) {
 	prout("First Officer Spock-  \"Captain, I compute that such");
 	proutn("  a maneuver would require approximately 2d%% of our",

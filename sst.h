@@ -212,7 +212,8 @@ EXTERN struct {
 	probex,
 	probey,
 	probeinx,
-	probeiny;
+	probeiny,
+	height;
 } game;
 
 #define inkling game.inkling		// Initial number of klingons
