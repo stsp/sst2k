@@ -220,7 +220,8 @@ void dock(int l) {
 		return;
 	}
 	condit = IHDOCKED;
-	prout("Docked.");
+        if (l) prout("Docked.");
+        ididit=1;
 	if (energy < inenrg) energy = inenrg;
 	shield = inshld;
 	torps = intorps;
@@ -888,6 +889,9 @@ void help(void) {
 	/* There's more than one way to move in this game! */
 	double ddist, xdist, probf;
 	int line = 0, l, ix, iy;
+#ifdef SERGEEV
+	int pox, posy;
+#endif /* SERGEEV */
 
 	chew();
 	/* Test for conditions which prevent calling for help */
@@ -935,6 +939,25 @@ void help(void) {
 	proutn("");
 	crmshp();
 	prout(" dematerializes.");
+#ifdef SERGEEV
+        sectx=0;
+        for (l = 1; l <= 5; l++) {
+                ix = basex+3.0*Rand()-1;
+                iy = basey+3.0*Rand()-1;
+                if (ix>=1 && ix<=10 && iy>=1 && iy<=10 && game.quad[ix][iy]==IHDOT) {
+                        /* found one -- finish up */
+                        sectx=ix;
+                        secty=iy;
+                        game.quad[ix][iy]=IHMATER0;
+                        break;
+                }
+        }
+        if (sectx==0){
+           prout("You have been lost in space...");
+           finish(FMATERIALIZE);
+           return;
+        }
+#endif /* SERGEEV */
 	/* Give starbase three chances to rematerialize starship */
 	probf = pow((1.0 - pow(0.98,ddist)), 0.33333333);
 	for (l = 1; l <= 3; l++) {

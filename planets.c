@@ -320,7 +320,7 @@ void shuttle(void) {
 		proutn("  a maneuver would require approximately 2d%% of our",
 		      (int)(100*Time/game.state.remtime));
 		prout("remaining time.");
-		prout("Are you sure this is wise?\" ");
+		proutn("Are you sure this is wise?\" ");
 		if (ja()==0) {
 			Time = 0.0;
 			return;
