@@ -199,11 +199,11 @@ static void helpme(void) {
 	key = scan();
 	while (TRUE) {
 		if (key == IHEOL) {
-                        setwnd(BOTTOM_WINDOW);
+                        setwnd(prompt_window);
                         proutn("Help on what command? ");
 			key = scan();
 		}
-                setwnd(LOWER_WINDOW);
+                setwnd(message_window);
 		if (key == IHEOL) return;
 		for (i = 0; i < NUMCOMMANDS; i++) {
 		    if (strcasecmp(commands[i].name, citem)==0) {
@@ -271,7 +271,7 @@ void enqueue(char *s) {
 static void makemoves(void) {
 	int i, hitme;
         clrscr();
-        setwnd(LOWER_WINDOW);
+        setwnd(message_window);
 	while (TRUE) { /* command loop */
                 drawmaps(1);
                 while (TRUE)  { /* get a command */
@@ -280,7 +280,7 @@ static void makemoves(void) {
 			Time = 0.0;
 			i = -1;
 			chew();
-                        setwnd(BOTTOM_WINDOW);
+                        setwnd(prompt_window);
                         clrscr();
 			proutn("COMMAND> ");
                         if (scan() == IHEOL) {
@@ -289,7 +289,7 @@ static void makemoves(void) {
                         }
                         ididit=0;
                         clrscr();
-                        setwnd(LOWER_WINDOW);
+                        setwnd(message_window);
                         clrscr();
 			for (i=0; i < ABANDON; i++)
 			    if (isit(commands[i].name)) {
@@ -492,7 +492,7 @@ int main(int argc, char **argv) {
 		strcat(line, " ");
 	}
 	while (TRUE) { /* Play a game */
-		setwnd(FULLSCREEN_WINDOW);
+		setwnd(fullscreen_window);
 		clrscr();
 	        prelim();
 		setup(line[0] == '\0');
@@ -618,9 +618,9 @@ int scan(void) {
 		}
 		cgetline(line, sizeof(line));
                 fflush(stdin);
-                if (curwnd==BOTTOM_WINDOW){
+                if (curwnd==prompt_window){
                    clrscr();
-                   setwnd(LOWER_WINDOW);
+                   setwnd(message_window);
                    clrscr();
                 }
 		linep = line;

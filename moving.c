@@ -986,16 +986,16 @@ void help(void) {
                 textcolor(RED);
 		prout("fails.");
                 delay(500);
-                textcolor(LIGHTGRAY);
+                textcolor(DEFAULT);
 	}
 	if (l > 3) {
 		finish(FMATERIALIZE);
 		return;
 	}
 	game.quad[ix][iy]=ship;
-	textcolor(WHITE);
+	textcolor(GREEN);
 	prout("succeeds.");
-	textcolor(LIGHTGRAY);
+	textcolor(DEFAULT);
 	dock(0);
 	skip(1);
 	prout("Lt. Uhura-  \"Captain, we made it!\"");

@@ -268,8 +268,8 @@ int srscan(int l) {
                                                 case IHRED: textcolor(RED); break;
                                                 case IHGREEN: textcolor(GREEN); break;
                                                 case IHYELLOW: textcolor(YELLOW); break;
-                                                case IHDOCKED: textcolor(LIGHTGRAY); break;
-                                                case IHDEAD: textcolor(WHITE);
+                                                case IHDOCKED: textcolor(CYAN); break;
+                                                case IHDEAD: textcolor(BROWN);
                                         }
                                         if (game.quad[i][j] != ship) 
 					    highvideo();
@@ -277,7 +277,7 @@ int srscan(int l) {
                                    if (game.quad[i][j] & DAMAGED) 
 				       highvideo();
                                    proutn("%c ",game.quad[i][j] & ~DAMAGED);
-                                   textcolor(LIGHTGRAY);
+                                   textcolor(DEFAULT);
                                 }
 				else
 					proutn("- ");

@@ -32,6 +32,7 @@ static void outro(void)
 void iostart(int usecurses) 
 {
     if ((curses = usecurses)) {
+
 	if (atexit(outro)){
 	    fprintf(stderr,"Unable to register outro(), exiting...\n");
 	    exit(1);
@@ -43,14 +44,30 @@ void iostart(int usecurses)
 	(void)saveterm();
 	(void)nonl();
 	(void)cbreak();
+#ifdef FOO
+	{
+	int background = COLOR_WHITE;
+	start_color();
+	init_pair(COLOR_BLACK, COLOR_BLACK, background);
+	init_pair(COLOR_GREEN, COLOR_GREEN, background);
+	init_pair(COLOR_RED, COLOR_RED, background);
+	init_pair(COLOR_CYAN, COLOR_CYAN, background);
+	init_pair(COLOR_WHITE, COLOR_WHITE, background);
+	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, background);
+	init_pair(COLOR_BLUE, COLOR_BLUE, background);
+	init_pair(COLOR_YELLOW, COLOR_YELLOW, background);
+	}
+#endif /* A_COLOR */
 	//(void)noecho();
-	FULLSCREEN_WINDOW = stdscr;
-	SRSCAN_WINDOW     = newwin(12, 25, 0,       0);
+	fullscreen_window = stdscr;
+	srscan_window     = newwin(12, 25, 0,       0);
 	REPORT_WINDOW     = newwin(10, 0,  1,       25);
-	LRSCAN_WINDOW     = newwin(10, 0,  0,       64); 
-	LOWER_WINDOW      = newwin(0,  0,  12,      0);
-	BOTTOM_WINDOW     = newwin(1,  0,  LINES-1, 0); 
-	scrollok(LOWER_WINDOW, TRUE);
+	lrscan_window     = newwin(10, 0,  0,       64); 
+	message_window      = newwin(0,  0,  12,      0);
+	prompt_window     = newwin(1,  0,  LINES-1, 0); 
+	scrollok(message_window, TRUE);
+	setwnd(fullscreen_window);
+	textcolor(DEFAULT);
     }
 }
 
@@ -81,13 +98,13 @@ void pause_game(int i)
     }
     if (curses) {
 	drawmaps(0);
-	setwnd(BOTTOM_WINDOW);
-	wclear(BOTTOM_WINDOW);
-	waddstr(BOTTOM_WINDOW, prompt);
-	wgetnstr(BOTTOM_WINDOW, buf, sizeof(buf));
-	wclear(BOTTOM_WINDOW);
-	wrefresh(BOTTOM_WINDOW);
-	setwnd(LOWER_WINDOW);
+	setwnd(prompt_window);
+	wclear(prompt_window);
+	waddstr(prompt_window, prompt);
+	wgetnstr(prompt_window, buf, sizeof(buf));
+	wclear(prompt_window);
+	wrefresh(prompt_window);
+	setwnd(message_window);
     } else {
 	putchar('\n');
 	proutn(prompt);
@@ -185,7 +202,7 @@ void setwnd(WINDOW *wnd)
 {
     if (curses) {
      curwnd=wnd;
-     curs_set(wnd == FULLSCREEN_WINDOW || wnd == LOWER_WINDOW);
+     curs_set(wnd == fullscreen_window || wnd == message_window || wnd == prompt_window);
     }
 }
 
@@ -212,14 +229,68 @@ void textcolor (int color)
 {
     if (curses) {
 	wattroff(curwnd, A_REVERSE);
-	// FIXME
-   }
+#ifdef FOO
+	switch(color) {
+	case DEFAULT: 
+	    wattrset(curwnd, 0);
+	    break;
+	case BLACK: 
+	    wattron(curwnd, COLOR_PAIR(BLACK));
+	    break;
+	case BLUE: 
+	    wattron(curwnd, COLOR_PAIR(BLUE));
+	    break;
+	case GREEN: 
+	    wattron(curwnd, COLOR_PAIR(GREEN));
+	    break;
+	case CYAN: 
+	    wattron(curwnd, COLOR_PAIR(CYAN));
+	    break;
+	case RED: 
+	    wattron(curwnd, COLOR_PAIR(RED));
+	    break;
+	case MAGENTA: 
+	    wattron(curwnd, COLOR_PAIR(MAGENTA));
+	    break;
+	case BROWN: 
+	    wattron(curwnd, COLOR_PAIR(YELLOW));
+	    break;
+	case LIGHTGRAY: 
+	    wattron(curwnd, COLOR_PAIR(WHITE));
+	    break;
+	case DARKGRAY: 
+	    wattron(curwnd, COLOR_PAIR(BLACK) | A_BOLD);
+	    break;
+	case LIGHTBLUE: 
+	    wattron(curwnd, COLOR_PAIR(BLUE) | A_BOLD);
+	    break;
+	case LIGHTGREEN: 
+	    wattron(curwnd, COLOR_PAIR(GREEN) | A_BOLD);
+	    break;
+	case LIGHTCYAN: 
+	    wattron(curwnd, COLOR_PAIR(CYAN) | A_BOLD);
+	    break;
+	case LIGHTRED: 
+	    wattron(curwnd, COLOR_PAIR(RED) | A_BOLD);
+	    break;
+	case LIGHTMAGENTA: 
+	    wattron(curwnd, COLOR_PAIR(MAGENTA) | A_BOLD);
+	    break;
+	case YELLOW: 
+	    wattron(curwnd, COLOR_PAIR(YELLOW) | A_BOLD);
+	    break;
+	case WHITE:
+	    wattron(curwnd, COLOR_PAIR(WHITE) | A_BOLD);
+	    break;
+	}
+#endif /* FOO */
+    }
 }
 
 void highvideo (void)
 {
     if (curses) {
-	attron(A_REVERSE);
+	wattron(curwnd, A_REVERSE);
     }
 }
  
@@ -237,7 +308,7 @@ void drawmaps(short l)
 	if (l == 1) 
 	    sensor();
 	if (l != 2) {
-	    setwnd(SRSCAN_WINDOW);
+	    setwnd(srscan_window);
 	    wmove(curwnd, 0, 0);
 	    enqueue("no");
 	    srscan(SCAN_FULL);
@@ -245,9 +316,9 @@ void drawmaps(short l)
 	    wclear(REPORT_WINDOW);
 	    wmove(REPORT_WINDOW, 0, 0);
 	    srscan(SCAN_NO_LEFTSIDE);
-	    setwnd(LRSCAN_WINDOW);
-	    wclear(LRSCAN_WINDOW);
-	    wmove(LRSCAN_WINDOW, 0, 0);
+	    setwnd(lrscan_window);
+	    wclear(lrscan_window);
+	    wmove(lrscan_window, 0, 0);
 	    enqueue("l");
 	    lrscan();
 	}
@@ -258,20 +329,20 @@ void boom(int ii, int jj)
 /* enemy fall down, go boom */ 
 {
     if (curses) {
-	setwnd(SRSCAN_WINDOW);
+	setwnd(srscan_window);
 	drawmaps(2);
-	wmove(SRSCAN_WINDOW, ii*2+3, jj+2);
-	wattron(SRSCAN_WINDOW, A_REVERSE);
-	waddch(SRSCAN_WINDOW, game.quad[ii][jj]);
-	wrefresh(SRSCAN_WINDOW);
+	wmove(srscan_window, ii*2+3, jj+2);
+	wattron(srscan_window, A_REVERSE);
+	waddch(srscan_window, game.quad[ii][jj]);
+	wrefresh(srscan_window);
 	sound(500);
 	delay(1000);
 	nosound();
-	wmove(SRSCAN_WINDOW, ii*2+3, jj+2);
-	wattroff(SRSCAN_WINDOW, A_REVERSE);
-	waddch(SRSCAN_WINDOW, game.quad[ii][jj]);
-	wrefresh(SRSCAN_WINDOW);
-	setwnd(LOWER_WINDOW);
+	wmove(srscan_window, ii*2+3, jj+2);
+	wattroff(srscan_window, A_REVERSE);
+	waddch(srscan_window, game.quad[ii][jj]);
+	wrefresh(srscan_window);
+	setwnd(message_window);
 	delay(500);
     }
 } 
@@ -281,7 +352,7 @@ void warble(void)
 {
     if (curses) {
 	drawmaps(1);
-	setwnd(LOWER_WINDOW);
+	setwnd(message_window);
 	sound(50);
 	delay(1000);
 	nosound();
@@ -335,8 +406,8 @@ void tracktorpedo(int x, int y, int ix, int iy, int wait, int l, int i, int n, i
 void makechart(void) 
 {
     if (curses) {
-	setwnd(LOWER_WINDOW);
-	wclear(LOWER_WINDOW);
+	setwnd(message_window);
+	wclear(message_window);
 	chart(0);
     }
 }

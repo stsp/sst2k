@@ -451,12 +451,12 @@ void enqueue(char *s);
 #define SCAN_STATUS		3
 #define SCAN_NO_LEFTSIDE	4
 
-WINDOW *FULLSCREEN_WINDOW;
-WINDOW *SRSCAN_WINDOW;
+WINDOW *fullscreen_window;
+WINDOW *srscan_window;
 WINDOW *REPORT_WINDOW;
-WINDOW *LRSCAN_WINDOW;
-WINDOW *LOWER_WINDOW;
-WINDOW *BOTTOM_WINDOW;
+WINDOW *lrscan_window;
+WINDOW *message_window;
+WINDOW *prompt_window;
 
 extern void clreol(void);
 extern void clrscr(void);
@@ -464,6 +464,7 @@ extern void textcolor(int color);
 extern void highvideo(void);
 
 enum COLORS {
+   DEFAULT,
    BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY,
    DARKGRAY, LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE
 };

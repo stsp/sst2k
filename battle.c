@@ -186,9 +186,9 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 	deltax /= bigger;
 	deltay /= bigger;
         if (game.damage[DSRSENS]==0 || condit==IHDOCKED) 
-	    setwnd(SRSCAN_WINDOW);
+	    setwnd(srscan_window);
 	else 
-	    setwnd(LOWER_WINDOW);
+	    setwnd(message_window);
 	/* Loop to move a single torpedo */
 	for (l=1; l <= 15; l++) {
 		x += deltax;
@@ -202,7 +202,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 		wait = 1;
 		if (iquad==IHDOT) continue;
 		/* hit something */
-		setwnd(LOWER_WINDOW);
+		setwnd(message_window);
 		switch(iquad) {
 			case IHE: /* Hit our ship */
 			case IHF:
@@ -397,8 +397,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int wait, i
 		}
 		break;
 	}
-        if(curwnd!=LOWER_WINDOW) {
-	    setwnd(LOWER_WINDOW);
+        if(curwnd!=message_window) {
+	    setwnd(message_window);
 	}
 	if (shoved) {
 		game.quad[jx][jy]=iquad;
