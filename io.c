@@ -130,7 +130,7 @@ void pause_game(int i) {
 		wrefresh(stdscr);
 	} else {
 		putchar('\n');
-		prout(prompt);
+		proutn(prompt);
 		fgets(buf, sizeof(buf), stdin);
 		if (i != 0) {
 			clearscreen();
