@@ -45,10 +45,9 @@ void freeze(int boss) {
 }
 
 
-void thaw(void) {
-	char *x, *y;
+int thaw(void) {
 	FILE *fp;
-	int key;
+        int key;
 
 	game.passwd[0] = '\0';
 	if ((key = scan()) == IHEOL) {
@@ -57,7 +56,7 @@ void thaw(void) {
 	}
 	if (key != IHALPHA) {
 		huh();
-		return;
+		return 1;
 	}
 	chew();
 	if (strchr(citem, '.') == NULL) {
@@ -67,18 +66,19 @@ void thaw(void) {
 		proutn("Can't find game file ");
 		proutn(citem);
 		skip(1);
-		return;
+		return 1;
 	}
 	fread(&game, sizeof(game), 1, fp);
 	if (strcmp(game.magic, SSTMAGIC)) {
 		prout("Game file format is bad, should begin with " SSTMAGIC);
 		skip(1);
-		return;
+		fclose(fp);
+		return 1;
 	}
 
 	fclose(fp);
 
-	/* I hope that's enough! */
+        return 0;
 }
 
 void abandn(void) {
@@ -182,13 +182,13 @@ void abandn(void) {
 void setup(int needprompt) {
 	int i,j, krem, klumper;
 	int ix, iy;
-	alldone = gamewon = 0;
 #ifdef DEBUG
 	idebug = 0;
 #endif
 	//  Decide how many of everything
 	if (choose(needprompt)) return; // frozen game
 	// Prepare the Enterprise
+        alldone = gamewon = 0;
 	ship = IHE;
 	energy = inenrg = 5000.0;
 	shield = inshld = 2500.0;
@@ -207,6 +207,7 @@ void setup(int needprompt) {
 	game.state.date = indate = 100.0*(int)(31.0*Rand()+20.0);
 	game.state.killk = game.state.killc = nkinks = nhelp = resting = casual = game.state.nromkl = 0;
 	isatb = iscate = imine = icrystl = icraft = game.state.nsckill = game.state.nplankl = 0;
+        game.state.starkl = game.state.basekl = 0;
 	iscraft = 1;
 	landed = -1;
 	alive = 1;
@@ -328,7 +329,7 @@ void setup(int needprompt) {
 		game.state.galaxy[ix][iy] += 100;
 	}
 	// Place thing (in tournament game, thingx == -1, don't want one!)
-	if (Rand() < 0.1 && thingx != -1) {
+	if (thingx != -1) {
 		iran8(&thingx, &thingy);
 	}
 	else {
@@ -336,7 +337,7 @@ void setup(int needprompt) {
 	}
 
 //	idate = date;
-	skip(3);
+	skip(2);
 	game.state.snap = 0;
 		
 	if (skill == 1) {
@@ -374,7 +375,7 @@ void setup(int needprompt) {
 	prout("Good Luck!");
 	if (game.state.nscrem) prout("  YOU'LL NEED IT.");
 	newqad(0);
-	if (nenhere) shldup=1.0;
+        if (nenhere-iqhere-ithere) shldup=1.0;
 	if (neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
 
@@ -515,6 +516,8 @@ void newqad(int shutup) {
 	landed = -1;
 	ientesc = 0;
 	ithere = 0;
+        iqhere=0;
+        iqengry=0;
 	iseenit = 0;
 	if (iscate) {
 		// Attempt to escape Super-commander, so tbeam back!
@@ -535,27 +538,6 @@ void newqad(int shutup) {
 
 	// Position Starship
 	game.quad[sectx][secty] = ship;
-
-	// Decide if quadrant needs a Tholian
-	if ((skill < 3 && Rand() <= 0.02) ||   /* Lighten up if skill is low */
-		(skill == 3 && Rand() <= 0.05) ||
-		(skill > 3 && Rand() <= 0.08)
-#ifdef DEBUG
-		|| strcmp(game.passwd, "tholianx")==0
-#endif
-		) {
-		do {
-			ithx = Rand() > 0.5 ? 10 : 1;
-			ithy = Rand() > 0.5 ? 10 : 1;
-		} while (game.quad[ithx][ithy] != IHDOT);
-		game.quad[ithx][ithy] = IHT;
-		ithere = 1;
-		/* Reserve unocupied corners */
-		if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
-		if (game.quad[1][10]==IHDOT) game.quad[1][10] = 'X';
-		if (game.quad[10][1]==IHDOT) game.quad[10][1] = 'X';
-		if (game.quad[10][10]==IHDOT) game.quad[10][10] = 'X';
-	}
 
 	if (quadnum >= 100) {
 		// Position ordinary Klingons
@@ -581,7 +563,7 @@ void newqad(int shutup) {
 		if (quadx == game.state.isx && quady == game.state.isy) {
 			game.quad[game.kx[1]][game.ky[1]] = IHS;
 			game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*skill;
-			iscate = 1;
+                        iscate = game.state.remkl>1;
 			ishere = 1;
 		}
 	}
@@ -615,7 +597,7 @@ void newqad(int shutup) {
 	for (i = 1; i <= quadnum; i++) dropin(IHSTAR, &ix, &iy);
 
 	// Check for RNZ
-	if (irhere > 0 && klhere == 0 && basex == 0) {
+	if (irhere > 0 && klhere == 0) {
 		neutz = 1;
 		if (game.damage[DRADIO] <= 0.0) {
 			skip(1);
@@ -631,7 +613,14 @@ void newqad(int shutup) {
 		// Put in THING if needed
 		if (thingx == quadx && thingy == quady) {
 			dropin(IHQUEST, &ix, &iy);
-			thingx = thingy = 0; // Transient
+                        iran8(&thingx, &thingy);
+                        nenhere++;
+                        iqhere=1;
+                        game.kx[nenhere] = ix;
+                        game.ky[nenhere] = iy;
+                        game.kdist[nenhere] = game.kavgd[nenhere] =
+			    sqrt(square(sectx-ix) + square(secty-iy));
+                        game.kpower[nenhere] = Rand()*6000.0 +500.0 +250.0*skill;
 			if (game.damage[DSRSENS] == 0.0) {
 				skip(1);
 				prout("MR. SPOCK- \"Captain, this is most unusual.");
@@ -639,6 +628,34 @@ void newqad(int shutup) {
 			}
 		}
 	}
+
+        // Decide if quadrant needs a Tholian
+        if ((skill < 3 && Rand() <= 0.02) ||   /* Lighten up if skill is low */
+                (skill == 3 && Rand() <= 0.05) ||
+                (skill > 3 && Rand() <= 0.08)
+#ifdef DEBUG
+                || strcmp(passwd, "tholianx")==0
+#endif
+                ) {
+                do {
+                        ithx = Rand() > 0.5 ? 10 : 1;
+                        ithy = Rand() > 0.5 ? 10 : 1;
+                } while (game.quad[ithx][ithy] != IHDOT);
+                game.quad[ithx][ithy] = IHT;
+                ithere = 1;
+                nenhere++;
+                game.kx[nenhere] = ithx;
+                game.ky[nenhere] = ithy;
+                game.kdist[nenhere] = game.kavgd[nenhere] =
+		    sqrt(square(sectx-ithx) + square(secty-ithy));
+                game.kpower[nenhere] = Rand()*400.0 +100.0 +25.0*skill;
+                /* Reserve unocupied corners */
+                if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
+                if (game.quad[1][10]==IHDOT) game.quad[1][10] = 'X';
+                if (game.quad[10][1]==IHDOT) game.quad[10][1] = 'X';
+                if (game.quad[10][10]==IHDOT) game.quad[10][10] = 'X';
+        }
+        sortkl();
 
 	// Put in a few black holes
 	for (i = 1; i <= 3; i++)
@@ -659,7 +676,7 @@ void sortkl(void) {
 
 	// The author liked bubble sort. So we will use it. :-(
 
-	if (nenhere < 2) return;
+        if (nenhere-iqhere-ithere < 2) return;
 
 	do {
 		sw = FALSE;

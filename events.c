@@ -2,10 +2,8 @@
 #include <math.h>
 
 void events(void) {
-
-	int ictbeam=0, ipage=0, istract=0, line, i, j, k, l, ixhold, iyhold;
-	double fintim = game.state.date + Time, datemin, xtime, repair, yank;
-	
+        int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
+        double fintim = game.state.date + Time, datemin, xtime, repair, yank=0;
 
 #ifdef DEBUG
 	if (idebug) prout("EVENTS");
@@ -25,7 +23,7 @@ void events(void) {
 		if (alldone) return;
 		datemin = fintim;
 		for (l=1; l<=NEVENTS; l++)
-			if (game.future[l] <= datemin) {
+			if (game.future[l] < datemin) {
 				line = l;
 				datemin = game.future[l];
 			}
@@ -64,7 +62,7 @@ void events(void) {
 				for (j=1; j <= 8; j++)
 					if (game.starch[i][j] > 999) game.starch[i][j] = 1;
 			if (iseenit==0) {
-				attakreport();
+				attakreport(0);
 				iseenit = 1;
 			}
 			skip(1);
@@ -75,7 +73,7 @@ void events(void) {
 		Time -= xtime;
 		switch (line) {
 			case FSNOVA: /* Supernova */
-				if (ipage==0) pause(1);
+				if (ipage==0) pause_game(1);
 				ipage=1;
 				snova(0,0);
 				game.future[FSNOVA] = game.state.date + expran(0.5*intime);
@@ -114,7 +112,7 @@ void events(void) {
 				}
 				/* tractor beaming cases merge here */
 				yank = sqrt(yank);
-				if (ipage==0) pause(1);
+				if (ipage==0) pause_game(1);
 				ipage=1;
 				Time = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 				ictbeam = 1;
@@ -170,6 +168,7 @@ void events(void) {
 				newqad(0);
 				/* Adjust finish time to time of tractor beaming */
 				fintim = game.state.date+Time;
+                                attack(0);
 				if (game.state.remcom <= 0) game.future[FTBEAM] = 1e30;
 				else game.future[FTBEAM] = game.state.date+Time+expran(1.5*intime/game.state.remcom);
 				break;
@@ -212,12 +211,12 @@ void events(void) {
 				if (game.damage[DRADIO] != 0.0 &&
 					condit != IHDOCKED) break; /* No warning :-( */
 				iseenit = 1;
-				if (ipage==0) pause(1);
+				if (ipage==0) pause_game(1);
 				ipage = 1;
 				skip(1);
 				proutn("Lt. Uhura-  \"Captain, the starbase in ");
 				prout(cramlc(quadrant, batx, baty));
-				prout("   reports that it is under atttack and that it can");
+				prout("   reports that it is under attack and that it can");
 				proutn("   hold out only until stardate %d",
 		       			(int)game.future[FCDBAS]);
 				prout(".\"");
@@ -267,7 +266,7 @@ void events(void) {
 				else if (game.state.rembase != 1 &&
 						 (game.damage[DRADIO] <= 0.0 || condit == IHDOCKED)) {
 					/* Get word via subspace radio */
-					if (ipage==0) pause(1);
+					if (ipage==0) pause_game(1);
 					ipage = 1;
 					skip(1);
 					prout("Lt. Uhura-  \"Captain, Starfleet Command reports that");
@@ -314,7 +313,7 @@ void events(void) {
 						game.state.galaxy[probecx][probecy] == 1000) {
 						// Left galaxy or ran into supernova
 						if (game.damage[DRADIO]==0.0 || condit == IHDOCKED) {
-							if (ipage==0) pause(1);
+							if (ipage==0) pause_game(1);
 							ipage = 1;
 							skip(1);
 							proutn("Lt. Uhura-  \"The deep space probe ");
@@ -328,7 +327,7 @@ void events(void) {
 						break;
 					}
 					if (game.damage[DRADIO]==0.0   || condit == IHDOCKED) {
-						if (ipage==0) pause(1);
+						if (ipage==0) pause_game(1);
 						ipage = 1;
 						skip(1);
 						proutn("Lt. Uhura-  \"The deep space probe is now in ");
@@ -373,7 +372,7 @@ void wait(void) {
 	origTime = delay = aaitem;
 	if (delay <= 0.0) return;
 	if (delay >= game.state.remtime || nenhere != 0) {
-		prout("Are you sure? ");
+		proutn("Are you sure? ");
 		if (ja() == 0) return;
 	}
 
@@ -394,7 +393,6 @@ void wait(void) {
 			Time = temp;
 		}
 		if (Time < delay) attack(0);
-		if (nenhere==0) movetho();
 		if (alldone) return;
 		events();
 		ididit = 1;
@@ -412,7 +410,7 @@ void wait(void) {
 void nova(int ix, int iy) {
 	static double course[] =
 		{0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5};
-	int bot, top, top2, burst, hits[11][3], kount, icx, icy, mm, nn, j;
+        int bot, top, top2, hits[11][3], kount, icx, icy, mm, nn, j;
 	int iquad, iquad1, i, ll, newcx, newcy, ii, jj;
 	if (Rand() < 0.05) {
 		/* Wow! We've supernova'ed */

@@ -131,6 +131,8 @@ EXTERN struct {
 	batx,
 	baty,
 	ithere,
+        iqhere,
+        iqengry,
 	ithx,
 	ithy,
 	iseenit,
@@ -205,6 +207,8 @@ EXTERN struct {
 #define ishere game.ishere			// Super-commander in quandrant
 #define neutz game.neutz			// Romulan Neutral Zone
 #define irhere game.irhere			// Romulans in quadrant
+#define iqhere game.iqhere			// Thing in quadrant
+#define iqengry game.iqengry			// Thing attacking
 #define icraft game.icraft			// Kirk in Galileo
 #define ientesc game.ientesc		// Attempted escape from supercommander
 #define iscraft game.iscraft		// =1 if craft on ship, -1 if removed from game
@@ -339,6 +343,10 @@ char *device[NDEVICES+1] = {
 #define IHYELLOW 'Y'
 #define IHRED 'R'
 #define IHDOCKED 'D'
+#define IHDEAD 'Z'
+#define IHMATER0 '-'
+#define IHMATER1 'o'
+#define IHMATER2 '0'
 
 
 /* Function prototypes */
@@ -354,7 +362,7 @@ void phasers(void);
 void photon(void);
 void warp(int);
 void doshield(int);
-void dock(void);
+void dock(int);
 void dreprt(void);
 void chart(int);
 void impuls(void);
@@ -369,7 +377,7 @@ void finish(FINTYPE);
 void dstrct(void);
 void kaboom(void);
 void freeze(int);
-void thaw(void);
+int thaw(void);
 void plaque(void);
 int scan(void);
 #define IHEOL (0)
@@ -390,7 +398,7 @@ double expran(double);
 double Rand(void);
 void iran8(int *, int *);
 void iran10(int *, int *);
-double square(double);
+#define square(i) ((i)*(i))
 void dropin(int, int*, int*);
 void newcnd(void);
 void sortkl(void);
@@ -402,7 +410,7 @@ void timwrp(void);
 void movcom(void);
 void torpedo(double, double, int, int, double *);
 void huh(void);
-void pause(int);
+void pause_game(int);
 void nova(int, int);
 void snova(int, int);
 void scom(int *);
@@ -419,7 +427,7 @@ void usecrystals(void);
 void shuttle(void);
 void deathray(void);
 void debugme(void);
-void attakreport(void);
+void attakreport(int);
 void movetho(void);
 void probe(void);
 void clearscreen(void);

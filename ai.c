@@ -24,12 +24,12 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) {
 	   We know this if either short or long range sensors are working */
 	if (game.damage[DSRSENS] == 0.0 || game.damage[DLRSENS] == 0.0 ||
 		condit == IHDOCKED) {
-		proutn("***");
-		cramen(ienm);
+    		crmena(1, ienm, 2, game.kx[loccom], game.ky[loccom]);
 		proutn(" escapes to %s (and regains strength).",
 		       cramlc(quadrant, iqx, iqy));
 	}
 	/* handle local matters related to escape */
+	game.quad[game.kx[loccom]][game.ky[loccom]] = IHDOT;
 	game.kx[loccom] = game.kx[nenhere];
 	game.ky[loccom] = game.ky[nenhere];
 	game.kavgd[loccom] = game.kavgd[nenhere];
@@ -181,7 +181,6 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 	if (my != 0) my = my*motion < 0 ? -1 : 1;
 	nextx = comx;
 	nexty = comy;
-	game.quad[comx][comy] = IHDOT;
 	/* main move loop */
 	for (ll = 1; ll <= nsteps; ll++) {
 #ifdef DEBUG
@@ -242,6 +241,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		else break; /* done early */
 	}
 	/* Put commander in place within same quadrant */
+	game.quad[comx][comy] = IHDOT;
 	game.quad[nextx][nexty] = ienm;
 	if (nextx != comx || nexty != comy) {
 		/* it moved */
@@ -252,6 +252,8 @@ static void movebaddy(int comx, int comy, int loccom, int ienm) {
 		if (game.damage[DSRSENS] == 0 || condit == IHDOCKED) {
 			proutn("***");
 			cramen(ienm);
+			proutn(" from");
+			cramlc(2, comx, comy);
 			if (game.kdist[loccom] < dist1) proutn(" advances to");
 			else proutn(" retreats to ");
 			prout(cramlc(sector, nextx, nexty));
@@ -297,8 +299,8 @@ void movcom(void) {
 	sortkl();
 }
 
-static int checkdest(int iqx, int iqy, int flag, int *ipage) {
-	int i, j;
+static int movescom(int iqx, int iqy, int flag, int *ipage) {
+	int i;
 
 	if ((iqx==quadx && iqy==quady) ||
 		iqx < 1 || iqx > 8 || iqy < 1 || iqy > 8 ||
@@ -308,13 +310,13 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 		for (i = 1; i <= game.state.rembase; i++)
 			if (game.state.baseqx[i]==iqx && game.state.baseqy[i]==iqy) return 1;
 	}
-
+	if (justin && !iscate) return 1;
 	/* do the move */
 	game.state.galaxy[game.state.isx][game.state.isy] -= 100;
 	game.state.isx = iqx;
 	game.state.isy = iqy;
 	game.state.galaxy[game.state.isx][game.state.isy] += 100;
-	if (iscate) {
+	if (ishere) {
 		/* SC has scooted, Remove him from current quadrant */
 		iscate=0;
 		isatb=0;
@@ -342,7 +344,7 @@ static int checkdest(int iqx, int iqy, int flag, int *ipage) {
 		        DESTROY(&game.state.plnets[i]);
 			game.state.newstuf[game.state.isx][game.state.isy] -= 1;
 			if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
-				if (*ipage==0) pause(1);
+				if (*ipage==0) pause_game(1);
 				*ipage = 1;
 				prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
 				proutn("   a planet in ");
@@ -458,32 +460,32 @@ void scom(int *ipage) {
 	/* try moving in both x and y directions */
 	iqx = game.state.isx + ideltax;
 	iqy = game.state.isy + ideltax;
-	if (checkdest(iqx, iqy, flag, ipage)) {
+	if (movescom(iqx, iqy, flag, ipage)) {
 		/* failed -- try some other maneuvers */
 		if (ideltax==0 || ideltay==0) {
 			/* attempt angle move */
 			if (ideltax != 0) {
 				iqy = game.state.isy + 1;
-				if (checkdest(iqx, iqy, flag, ipage)) {
+				if (movescom(iqx, iqy, flag, ipage)) {
 					iqy = game.state.isy - 1;
-					checkdest(iqx, iqy, flag, ipage);
+					movescom(iqx, iqy, flag, ipage);
 				}
 			}
 			else {
 				iqx = game.state.isx + 1;
-				if (checkdest(iqx, iqy, flag, ipage)) {
+				if (movescom(iqx, iqy, flag, ipage)) {
 					iqx = game.state.isx - 1;
-					checkdest(iqx, iqy, flag, ipage);
+					movescom(iqx, iqy, flag, ipage);
 				}
 			}
 		}
 		else {
 			/* try moving just in x or y */
 			iqy = game.state.isy;
-			if (checkdest(iqx, iqy, flag, ipage)) {
+			if (movescom(iqx, iqy, flag, ipage)) {
 				iqy = game.state.isy + ideltay;
 				iqx = game.state.isx;
-				checkdest(iqx, iqy, flag, ipage);
+				movescom(iqx, iqy, flag, ipage);
 			}
 		}
 	}
@@ -500,11 +502,12 @@ void scom(int *ipage) {
 			iseenit = 0;
 			isatb=1;
 			game.future[FSCDBAS] = game.state.date + 1.0 +2.0*Rand();
-			if (batx != 0) game.future[FSCDBAS] += game.future[FCDBAS]-game.state.date;
+			if (game.future[FCDBAS] < 1e30) game.future[FSCDBAS] +=
+				game.future[FCDBAS]-game.state.date;
 			if (game.damage[DRADIO] > 0 && condit != IHDOCKED)
 				return; /* no warning */
 			iseenit = 1;
-			if (*ipage == 0)  pause(1);
+			if (*ipage == 0)  pause_game(1);
 			*ipage=1;
 			proutn("Lt. Uhura-  \"Captain, the starbase in ");
 			proutn(cramlc(quadrant, game.state.isx, game.state.isy));
@@ -529,7 +532,7 @@ void scom(int *ipage) {
 		 (game.damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
 		 game.starch[game.state.isx][game.state.isy] > 0))
 		return;
-	if (*ipage==0) pause(1);
+	if (*ipage==0) pause_game(1);
 	*ipage = 1;
 	prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
 	proutn("   the Super-commander is in ");
@@ -582,6 +585,8 @@ void movetho(void) {
 		}
 	}
 	game.quad[ithx][ithy] = IHT;
+        game.kx[nenhere]=ithx;
+        game.ky[nenhere]=ithy;
 
 	/* check to see if all holes plugged */
 	for (i = 1; i < 11; i++) {
@@ -596,5 +601,6 @@ void movetho(void) {
 	crmena(1,IHT, 2, ithx, ithy);
 	prout(" completes web.");
 	ithere = ithx = ithy = 0;
+	nenhere--;
 	return;
 }

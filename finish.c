@@ -307,7 +307,7 @@ void score(void) {
 	double timused = game.state.date - indate;
 	int ithperd, iwon, klship;
 
-	pause(0);
+	pause_game(0);
 
 	iskill = skill;
 	if ((timused == 0 || game.state.remkl != 0) && timused < 5.0) timused = 5.0;

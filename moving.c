@@ -1,11 +1,12 @@
+#include <unistd.h>
 #include "sst.h"
 
 static void getcd(int, int);
 
 void imove(void) {
 	double angle, deltax, deltay, bigger, x, y,
-	finald, finalx, finaly, stopegy;
-	int trbeam = 0, n, l, ix, iy, kink, kinks, iquad;
+        finald, finalx, finaly, stopegy, probf;
+        int trbeam = 0, n, l, ix=0, iy=0, kink, kinks, iquad;
 
 	if (inorbit) {
 		prout("Helmsman Sulu- \"Leaving standard orbit.\"");
@@ -98,11 +99,11 @@ void imove(void) {
 				quady = (iy+9)/10;
 				sectx = ix - 10*(quadx-1);
 				secty = iy - 10*(quady-1);
-				prout("");
-				prout("Entering %s.",
+				proutn("\n\rEntering %s.",
 				      cramlc(quadrant, quadx, quady));
 				game.quad[sectx][secty] = ship;
 				newqad(0);
+                                if (skill>1) attack(0);
 				return;
 			}
 			iquad = game.quad[ix][iy];
@@ -117,6 +118,7 @@ void imove(void) {
 					case IHC:
 					case IHS:
 					case IHR:
+                                        case IHQUEST:
 						sectx = ix;
 						secty = iy;
 						ram(0, iquad, sectx, secty);
@@ -131,7 +133,23 @@ void imove(void) {
 						crmshp();
 						proutn(" pulled into black hole at ");
 						prout(cramlc(sector, ix, iy));
-						finish(FHOLE);
+						/*
+						 * Getting pulled into a black 
+						 * hole was certain death in
+						 * Almy's original.  Stas 
+						 * Sergeev added a possibility
+						 * that you'll get timewarped
+						 * instead.
+						 */
+                                                n=0;
+                                                for (l=1;l<=NDEVICES+1;l++)
+                                                    if (game.damage[l]>0) n++;
+                                                probf=pow(1.4,(energy+shield)/5000.0-1.0)*
+                                                       pow(1.3,1.0/(n+1)-1.0);
+                                                if (Rand()>probf) 
+						    timwrp();
+                                                else 
+						    finish(FHOLE);
 						return;
 					default:
 						/* something else */
@@ -186,9 +204,9 @@ label100:
 	return;
 }
 
-void dock(void) {
+void dock(int l) {
 	chew();
-	if (condit == IHDOCKED) {
+        if (condit == IHDOCKED && l) {
 		prout("Already docked.");
 		return;
 	}
@@ -211,7 +229,7 @@ void dock(void) {
 		(game.future[FCDBAS] < 1e30 || isatb == 1) && iseenit == 0) {
 		/* get attack report from base */
 		prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
-		attakreport();
+		attakreport(0);
 		iseenit = 1;
 	}
 }
@@ -226,7 +244,7 @@ static void getcd(int isprobe, int akey) {
 	   are always displayed y - x, where +y is downward! */
 
 	
-	int irowq=quadx, icolq=quady, irows, icols, itemp=0, iprompt=0, key;
+        int irowq=quadx, icolq=quady, irows, icols, itemp=0, iprompt=0, key=0;
 	double xi, xj, xk, xl;
 	double deltax, deltay;
 	int automatic = -1;
@@ -443,7 +461,7 @@ void impuls(void) {
 	if (Time >= game.state.remtime) {
 		prout("First Officer Spock- \"Captain, our speed under impulse");
 		prout("power is only 0.95 sectors per stardate. Are you sure");
-		prout("we dare spend the time?\"");
+		proutn("we dare spend the time?\" ");
 		if (ja() == 0) return;
 	}
 	/* Activate impulse engines and pay the cost */
@@ -519,8 +537,8 @@ void warp(int i) {
 			proutn("  a trip would require approximately %2.0f",
 				100.0*Time/game.state.remtime);
 			prout(" percent of our");
-			prout(" remaining time.  Are you sure this is wise?\"");
-			if (ja() == 0) { ididit = 0; return;}
+                        proutn("  remaining time.  Are you sure this is wise?\" ");
+                        if (ja() == 0) { ididit = 0; Time=0; return;}
 		}
 	}
 	/* Entry WARPX */
@@ -600,7 +618,7 @@ void setwrp(void) {
 	
 	while ((key=scan()) == IHEOL) {
 		chew();
-		proutn("Warp factor-");
+		proutn("Warp factor- ");
 	}
 	chew();
 	if (key != IHREAL) {
@@ -628,7 +646,7 @@ void setwrp(void) {
 	warpfac = aaitem;
 	wfacsq=warpfac*warpfac;
 	if (warpfac <= oldfac || warpfac <= 6.0) {
-		proutn("Helmsman Sulu- \"Warp factor %do, Captain.\"", 
+		proutn("Helmsman Sulu- \"Warp factor %d, Captain.\"", 
 			(int)warpfac);
 		return;
 	}
@@ -840,7 +858,7 @@ void probe(void) {
 		key = scan();
 	}
 	else if (key == IHEOL) {
-		proutn("Arm NOVAMAX warhead?");
+		proutn("Arm NOVAMAX warhead? ");
 		isarmed = ja();
 	}
 	getcd(TRUE, key);
@@ -945,7 +963,7 @@ void help(void) {
 			sectx=ix;
 			secty=iy;
 			game.quad[ix][iy]=ship;
-			dock();
+			dock(0);
 			skip(1);
 			prout("Lt. Uhura-  \"Captain, we made it!\"");
 			return;

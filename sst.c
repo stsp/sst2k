@@ -217,7 +217,8 @@ static void makemoves(void) {
 				}
 				break;
 			case 6:			// dock
-				dock();
+				dock(1);
+                                if (ididit) attack(0);
 				break;
 			case 7:			// damages
 				dreprt();
@@ -411,6 +412,7 @@ void cramen(int i) {
 		case IHBLANK: s = "Black hole"; break;
 		case IHT: s = "Tholian"; break;
 		case IHWEB: s = "Tholian web"; break;
+                case IHQUEST: s = "Stranger"; break;
 		default: s = "Unknown??"; break;
 	}
 	proutn(s);
@@ -502,6 +504,7 @@ int scan(void) {
 	}
 	if (isdigit(*linep) || *linep=='+' || *linep=='-' || *linep=='.') {
 		// treat as a number
+	    i = 0;
 	    if (sscanf(linep, "%lf%n", &aaitem, &i) < 1) {
 		linep = line; // Invalid numbers are ignored
 		*linep = 0;
@@ -534,8 +537,6 @@ int ja(void) {
 	}
 }
 
-double square(double i) { return i*i; }
-									
 void huh(void) {
 	chew();
 	skip(1);

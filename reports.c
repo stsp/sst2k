@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-void attakreport(void) {
+void attakreport(int l) {
+    if (!l) {
 	if (game.future[FCDBAS] < 1e30) {
-		prout("Starbase in %s is currently under attack.",
+		prout("Starbase in %s is currently under Commander attack.",
 		      cramlc(quadrant, batx, baty));
 		prout("It can hold out until Stardate %d.", 
 		      (int)game.future[FCDBAS]);
@@ -16,6 +17,12 @@ void attakreport(void) {
 		prout("It can hold out until Stardate %d.", 
 		      (int)game.future[FSCDBAS]);
 	}
+     } else {
+        if (game.future[FCDBAS] < 1e30)
+           proutn("Base in %i - %i attacked by C. Alive until %.1f", batx, baty, game.future[FCDBAS]);
+        if (isatb == 1)
+           proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, game.future[FSCDBAS]);
+     }
 }
 	
 
@@ -63,7 +70,7 @@ void report(int f) {
 	if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED || iseenit) {
 		/* Don't report this if not seen and
 			either the radio is dead or not at base! */
-		attakreport();
+		attakreport(0);
 		iseenit = 1;
 	}
 	if (casual) prout("%d casualt%s suffered so far.",
@@ -89,7 +96,7 @@ void report(int f) {
 	}
 	if (icrystl) {
 		if (cryprob <= .05)
-			prout("Dilithium crystals aboard ship...not yet used.");
+			prout("Dilithium crystals aboard ship... not yet used.");
 		else {
 			int i=0;
 			double ai = 0.05;
@@ -319,7 +326,7 @@ void srscan(int l) {
 					proutn(" Klingons Left %d", game.state.remkl);
 					break;
 				case 10:
-					proutn(" Time Left     %.2f", game.state.remtime);
+					attakreport(1);
 					break;
 			}
 					
@@ -363,11 +370,11 @@ void eta(void) {
 		}
 		ix2 = aaitem + 0.5;
 	}
-	else {	// same quadrant
-		ix2 = ix1;
-		iy2 = iy1;
-		ix1 = quady;	// ya got me why x and y are reversed!
-		iy1 = quadx;
+        else {
+                if (quady>ix1) ix2 = 1;
+                else ix2=10;
+                if (quadx>iy1) iy2 = 1;
+                else iy2=10;
 	}
 
 	if (ix1 > 8 || ix1 < 1 || iy1 > 8 || iy1 < 1 ||

@@ -412,7 +412,7 @@ void deathray(void) {
 	}
 	prout("Spock-  \"Captain, the 'Experimental Death Ray'");
 	prout("  is highly unpredictible.  Considering the alternatives,");
-	prout("  are you sure this is wise?\" ");
+	proutn("  are you sure this is wise?\" ");
 	if (ja()==0) return;
 	prout("Spock-  \"Acknowledged.\"");
 	skip(1);

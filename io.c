@@ -82,7 +82,7 @@ void clearscreen(void) {
 #endif
 }
 
-void pause(int i) {
+void pause_game(int i) {
     char buf[BUFSIZ], *prompt;
 	if (i==1) {
 		if (skill > 2)
@@ -121,13 +121,13 @@ void skip(int i) {
 	    int y, x;
 	    getyx(stdscr, y, x);
 	    if (y == screenheight-1)
-		pause(0);
+		pause_game(0);
 	    else
 		waddch(stdscr, '\n');
 	} else {
 	    linecount++;
 	    if (linecount >= screenheight)
-		pause(0);
+		pause_game(0);
 	    else
 		putchar('\n');
 	}

@@ -124,6 +124,7 @@ void doshield(int i) {
 			shield += aaitem;
 			energy -= aaitem;
 			return;
+		case NONE:;	/* avoid gcc warning */
 	}
 }
 
@@ -142,6 +143,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 		case IHC: type = 2.0; break;
 		case IHS: type = 2.5; break;
 		case IHT: type = 0.5; break;
+                case IHQUEST: type = 4.0; break;
 	}
 	proutn(ibumpd ? " rammed by " : " rams ");
 	crmena(0, ienm, 2, ix, iy);
@@ -162,7 +164,7 @@ void ram(int ibumpd, int ienm, int ix, int iy) {
 	}
 	shldup = 0;
 	if (game.state.remkl) {
-		pause(2);
+		pause_game(2);
 		dreprt();
 	}
 	else finish(FWON);
@@ -209,7 +211,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				*hit = fabs(*hit);
 				newcnd(); /* undock */
 				/* We may be displaced. */
-				if (landed==1) return; /* Cheat if on a planet */
+				if (landed==1 || condit==IHDOCKED) return; /* Cheat if on a planet */
 				ang = angle + 2.5*(Rand()-0.5);
 				temp = fabs(sin(ang));
 				if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
@@ -279,12 +281,13 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					prout(" damaged but not destroyed.");
 					return;
 				}
-				prout(" damaged--");
+				proutn(" damaged--");
 				game.kx[ll] = jx;
 				game.ky[ll] = jy;
 				shoved = 1;
 				break;
 			case IHB: /* Hit a base */
+				skip(1);
 				prout("***STARBASE DESTROYED..");
 				if (game.starch[quadx][quady] < 0) game.starch[quadx][quady] = 0;
 				for (ll=1; ll<=game.state.rembase; ll++) {
@@ -324,16 +327,25 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				prout(" unaffected by photon blast.");
 				return;
 			case IHQUEST: /* Hit a thingy */
+                            if (Rand()>0.7) {	// Used to be certain death 
 				skip(1);
 				prouts("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!");
 				skip(1);
 				prouts("    HACK!     HACK!    HACK!        *CHOKE!*  ");
 				skip(1);
 				proutn("Mr. Spock-");
-				prouts("  \"Facinating!\"");
+				prouts("  \"Fascinating!\"");
 				skip(1);
-				game.quad[ix][iy] = IHDOT;
-				return;
+                                deadkl(ix, iy, iquad, ix, iy);
+                            } else {
+				/*
+				 * Stas Sergeev added the possibility that
+				 * you can shove the Thingy.
+				 */
+                                iqengry=1;
+                                shoved=1;
+                            }
+			    return;
 			case IHBLANK: /* Black hole */
 				skip(1);
 				crmena(1, IHBLANK, 2, ix, iy);
@@ -344,8 +356,6 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				prout("***Torpedo absorbed by Tholian web.");
 				return;
 			case IHT:  /* Hit a Tholian */
-				skip(1);
-				crmena(1, IHT, 2, ix, iy);
 				h1 = 700.0 + 100.0*Rand() -
 					 1000.0*sqrt(square(ix-inx)+square(iy-iny))*
 					 fabs(sin(bullseye-angle));
@@ -357,6 +367,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 					ithx = ithy = 0;
 					return;
 				}
+				skip(1);
+				crmena(1, IHT, 2, ix, iy);
 				if (Rand() > 0.05) {
 					prout(" survives photon blast.");
 					return;
@@ -364,6 +376,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 				prout(" disappears.");
 				game.quad[ix][iy] = IHWEB;
 				ithere = ithx = ithy = 0;
+				nenhere--;
 				{
 					int dum, my;
 					dropin(IHBLANK, &dum, &my);
@@ -395,7 +408,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit) {
 
 static void fry(double hit) {
 	double ncrit, extradm;
-	int ktr=1, l, ll, j, cdam[6], crptr;
+	int ktr=1, l, ll, j, cdam[NDEVICES+1], crptr;
 
 	/* a critical hit occured */
 	if (hit < (275.0-25.0*skill)*(1.0+0.5*Rand())) return;
@@ -403,7 +416,7 @@ static void fry(double hit) {
 	ncrit = 1.0 + hit/(500.0+100.0*Rand());
 	proutn("***CRITICAL HIT--");
 	/* Select devices and cause damage */
-	for (l = 1; l <= ncrit; l++) {
+	for (l = 1; l <= ncrit && l <= NDEVICES; l++) {
 		do {
 			j = NDEVICES*Rand()+1.0;
 			/* Cheat to prevent shuttle damage unless on ship */
@@ -447,8 +460,8 @@ void attack(int k) {
 		neutz = 0;
 		return;
 	}
-	if (((comhere || ishere) && (justin == 0)) || skill == 5) movcom();
-	if (nenhere==0) return;
+	if ((((comhere || ishere) && (justin == 0)) || skill == 5)&&(k!=0)) movcom();
+	if (nenhere==0 || (nenhere==1 && iqhere && iqengry==0)) return;
 	pfac = 1.0/inshld;
 	if (shldchg == 1) chgfac = 0.25+0.5*Rand();
 	skip(1);
@@ -463,10 +476,12 @@ void attack(int k) {
 		jx = game.kx[l];
 		jy = game.ky[l];
 		iquad = game.quad[jx][jy];
+                if (iquad==IHT || (iquad==IHQUEST && !iqengry)) continue;
 		itflag = (iquad == IHK && r > 0.0005) || k == 0 ||
 			(iquad==IHC && r > 0.015) ||
 			(iquad==IHR && r > 0.3) ||
-			(iquad==IHS && r > 0.07);
+                        (iquad==IHS && r > 0.07) ||
+                        (iquad==IHQUEST && r > 0.05);
 		if (itflag) {
 			/* Enemy uses phasers */
 			if (condit == IHDOCKED) continue; /* Don't waste the effort! */
@@ -484,7 +499,7 @@ void attack(int k) {
 				crmena(0, iquad, i, jx, jy);
 			}
 			attempt = 1;
-			prout("--");
+			prout("  ");
 			r = (Rand()+Rand())*0.5 -0.5;
 			r += 0.002*game.kpower[l]*r;
 			torpedo(course, r, jx, jy, &hit);
@@ -493,9 +508,9 @@ void attack(int k) {
 				alldone) return; /* Supernova or finished */
 			if (hit == 0) continue;
 		}
-		if (shldup != 0 || shldchg != 0) {
+                if (shldup != 0 || shldchg != 0 || condit==IHDOCKED) {
 			/* shields will take hits */
-			double absorb, hitsh, propor = pfac*shield;
+                        double absorb, hitsh, propor = pfac*shield*(condit==IHDOCKED ? 2.1 : 1.0);
 			if(propor < 0.1) propor = 0.1;
 			hitsh = propor*chgfac*hit+1.0;
 			atackd=1;
@@ -584,6 +599,10 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 		/* Killed a Tholian */
 		ithere = 0;
 	}
+        else if (type == IHQUEST) {
+		/* Killed a Thingy */
+             iqhere=iqengry=thingx=thingy=0;
+        }
 	else {
 		/* Some type of a Klingon */
 		game.state.galaxy[quadx][quady] -= 100;
@@ -622,10 +641,9 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy) {
 
 	game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
-	if (type == IHT) return;
-
 	/* Remove enemy ship from arrays describing local conditions */
-
+        if (game.future[FCDBAS] < 1e30 && batx==quadx && baty==quady && type==IHC)
+	    game.future[FCDBAS] = 1e30;
 	for (i=1; i<=nenhere; i++)
 		if (game.kx[i]==ix && game.ky[i]==iy) break;
 	nenhere--;
@@ -658,7 +676,7 @@ static int targetcheck(double x, double y, double *course) {
 		skip(1);
 		prout("Spock-  \"Bridge to sickbay.  Dr. McCoy,");
 		prout("  I recommend an immediate review of");
-		prout("  the Captain's psychological profile.");
+		prout("  the Captain's psychological profile.\"");
 		chew();
 		return 1;
 	}
@@ -704,6 +722,7 @@ void photon(void) {
 				chew();
 				prout("Maximum of 3 torpedoes per burst.");
 				key = IHEOL;
+                                return;
 			}
 			if (n <= torps) break;
 			chew();
@@ -856,7 +875,7 @@ void phasers(void) {
 	int kz = 0, k=1, i; /* Cheating inhibitor */
 	int ifast=0, no=0, ipoop=1, msgflag = 1;
 	enum {NOTSET, MANUAL, FORCEMAN, AUTOMATIC} automode = NOTSET;
-	int key;
+	int key=0;
 
 	skip(1);
 	/* SR sensors and Computer */
@@ -953,7 +972,7 @@ void phasers(void) {
 				key = scan();
 			}
 			if (key != IHREAL && nenhere != 0) {
-				prout("Phasers locked on target. Energy available = %.2f", ifast?energy-200.0:energy);
+				prout("Phasers locked on target. Energy available: %.2f", ifast?energy-200.0:energy);
 			}
 			do {
 				while (key != IHREAL) {
@@ -1081,7 +1100,6 @@ void phasers(void) {
 				}
 				if (aaitem < 0) {
 					/* abort out */
-					ididit = 0;
 					chew();
 					return;
 				}
@@ -1106,7 +1124,7 @@ void phasers(void) {
 				chew();
 				return;
 			}
-			if (key == IHALPHA & isit("no")) {
+			if (key == IHALPHA && isit("no")) {
 				no = 1;
 			}
 			energy -= rpow;
@@ -1161,6 +1179,7 @@ void hittem(double *hits) {
 		else
 			proutn("Very small hit on ");
 		ienm = game.quad[ii][jj];
+                if (ienm==IHQUEST) iqengry=1;
 		crmena(0,ienm,2,ii,jj);
 		skip(1);
 		if (kpow == 0) {
