@@ -341,7 +341,7 @@ void score(void) {
 		prout("%6d Super-Commander destroyed          %5d",
 			   game.state.nsckill, 200*game.state.nsckill);
 	if (ithperd)
-		prout("%6.2f Klingons per stardate              %5d",
+		prout("%.2f Klingons per stardate              %5d",
 			   perdate, ithperd);
 	if (game.state.starkl)
 		prout("%6d stars destroyed by your action     %5d",
