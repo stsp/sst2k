@@ -103,77 +103,78 @@ static struct
 commands[] = {
 #define SRSCAN	1
 	{"SRSCAN",	SRSCAN},
-	{"STATUS",	SRSCAN},
-#define LRSCAN	2
+#define STATUS	2
+	{"STATUS",	STATUS},
+#define REQUEST	3
+	{"REQUEST",	REQUEST},
+#define LRSCAN	4
 	{"LRSCAN",	LRSCAN},
-#define PHASERS	3
+#define PHASERS	5
 	{"PHASERS",	PHASERS},
-#define TORPEDO	4
+#define TORPEDO	6
         {"TORPEDO",	TORPEDO},
 	{"PHOTONS",	TORPEDO},
-#define MOVE	5
+#define MOVE	7
 	{"MOVE",	MOVE},
-#define SHIELDS	6
+#define SHIELDS	8
 	{"SHIELDS",	SHIELDS},
-#define DOCK	7
+#define DOCK	9
 	{"DOCK",	DOCK},
-#define DAMAGES	8
+#define DAMAGES	10
 	{"DAMAGES",	DAMAGES},
-#define CHART	9
+#define CHART	11
 	{"CHART",	CHART},
-#define IMPULSE	10
+#define IMPULSE	12
 	{"IMPULSE",	IMPULSE},
-#define REST	11
+#define REST	13
 	{"REST",	REST},
-#define WARP	12
+#define WARP	14
 	{"WARP",	WARP},
-#define SCORE	13
+#define SCORE	15
 	{"SCORE",	SCORE},
-#define SENSORS	14
+#define SENSORS	16
 	{"SENSORS",	SENSORS},
-#define ORBIT	15
+#define ORBIT	17
 	{"ORBIT",	ORBIT},
-#define TRANSPORT	16
+#define TRANSPORT	18
 	{"TRANSPORT",	TRANSPORT},
-#define MINE	17
+#define MINE	19
 	{"MINE",	MINE},
-#define CRYSTALS 18
+#define CRYSTALS	20
 	{"CRYSTALS",	CRYSTALS},
-#define SHUTTLE	19
+#define SHUTTLE	21
 	{"SHUTTLE",	SHUTTLE},
-#define PLANETS	20
+#define PLANETS	22
 	{"PLANETS",	PLANETS},
-#define REPORT	21
+#define REPORT	23
 	{"REPORT",	REPORT},
-#define COMPUTER	23
+#define COMPUTER	24
 	{"COMPUTER",	COMPUTER},
-#define COMMANDS	24
+#define COMMANDS	25
 	{"COMMANDS",	COMMANDS},
-#define EMEXIT	25
+#define EMEXIT	26
 	{"EMEXIT",	EMEXIT},
-#define PROBE	26
+#define PROBE	27
 	{"PROBE",	PROBE},
-#define SAVE	27
+#define SAVE	28
 	{"SAVE",	SAVE},
 	{"FREEZE",	SAVE},
-#define ABANDON	28
+#define ABANDON	29
 	{"ABANDON",	ABANDON},
-#define DESTRUCT 29
+#define DESTRUCT	30
 	{"DESTRUCT",	DESTRUCT},
-#define DEATHRAY 30
+#define DEATHRAY	31
 	{"DEATHRAY",	DEATHRAY},
-#define DEBUGCMD	31
+#define DEBUGCMD	32
 	{"DEBUG",	DEBUGCMD},
-#define MAYDAY	32
+#define MAYDAY	33
 	{"MAYDAY",	MAYDAY},
 	{"SOS",		MAYDAY},
 	{"CALL",	MAYDAY},
-#define QUIT	33
+#define QUIT	34
 	{"QUIT",	QUIT},
-#define HELP	34
+#define HELP	35
 	{"HELP",	HELP},
-#define REQUEST	35
-	{"REQUEST",	REQUEST},
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
@@ -311,6 +312,12 @@ static void makemoves(void) {
                         case SRSCAN:                 // srscan
  				srscan(SCAN_FULL);
  				break;
+                        case STATUS:                 // status
+ 				srscan(SCAN_STATUS);
+ 				break;
+			case REQUEST:			// status request 
+				srscan(SCAN_REQUEST);
+				break;
  			case LRSCAN:			// lrscan
  				lrscan();
                                 break;
@@ -382,9 +389,6 @@ static void makemoves(void) {
 				break;
 			case REPORT:			// Game Report 
 				report();
-				break;
-			case REQUEST:			// status request 
-				srscan(SCAN_REQUEST);
 				break;
 			case COMPUTER:			// use COMPUTER!
 				eta();
