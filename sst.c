@@ -508,7 +508,7 @@ int main(int argc, char **argv)
 {
     int i, option;
 
-    game.options = OPTION_ALL &~ OPTION_IOMODES;
+    game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME);
     if (getenv("TERM"))
 	game.options |= OPTION_CURSES | OPTION_SHOWME;
     else
