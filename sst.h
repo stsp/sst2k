@@ -21,33 +21,33 @@ typedef struct {
 	int pclass; /* class M, N, or O (1, 2, or 3) */
 	int crystals; /* has crystals */
 	int known;   /* =1 contents known, =2 shuttle on this planet */
-} PLANETS;
+} planet;
 
-EXTERN struct foo {
-		int snap,		// snapshot taken
-		remkl,			// remaining klingons
-	    remcom,			// remaining commanders
-		rembase,		// remaining bases
-		starkl,			// destroyed stars
-		basekl,			// destroyed bases
-		killk,			// Klingons killed
-		killc,			// commanders killed
-		galaxy[9][9], 	// The Galaxy (subscript 0 not used)
-		cx[11],cy[11],	// Commander quadrant coordinates
-		baseqx[6],		// Base quadrant X
-		baseqy[6],		// Base quadrant Y
-		newstuf[9][9],	// Extended galaxy goodies
-		isx, isy,		// Coordinate of Super Commander
-		nscrem,			// remaining super commanders
-		nromkl,			// Romulans killed
-		nromrem,		// Romulans remaining
-		nsckill,		// super commanders killed
-		nplankl;		// destroyed planets
-	PLANETS plnets[PLNETMAX+1];  // Planet information
+typedef struct {
+    int snap,		// snapshot taken
+	remkl,			// remaining klingons
+	remcom,			// remaining commanders
+	rembase,		// remaining bases
+	starkl,			// destroyed stars
+	basekl,			// destroyed bases
+	killk,			// Klingons killed
+	killc,			// commanders killed
+	galaxy[9][9], 	// The Galaxy (subscript 0 not used)
+	cx[11],cy[11],	// Commander quadrant coordinates
+	baseqx[6],		// Base quadrant X
+	baseqy[6],		// Base quadrant Y
+	newstuf[9][9],	// Extended galaxy goodies
+	isx, isy,		// Coordinate of Super Commander
+	nscrem,			// remaining super commanders
+	nromkl,			// Romulans killed
+	nromrem,		// Romulans remaining
+	nsckill,		// super commanders killed
+	nplankl;		// destroyed planets
+	planet plnets[PLNETMAX+1];  // Planet information
 	double date,		// stardate
-		remres,			// remaining resources
+	    remres,		// remaining resources
 	    remtime;		// remaining time
-} state, snapsht;			// Data that is snapshot
+} snapshot;				// Data that is snapshot
 
 // Scalar variables that are needed for freezing the game
 // are placed in a structure. #defines are used to access by their
@@ -55,6 +55,8 @@ EXTERN struct foo {
 // but I just didn't think of it back when I started.
 
 EXTERN struct foo2 {
+    snapshot state;
+    snapshot snapsht;
     char quad[11][11];		// contents of our quadrant
     double kpower[21];		// enemy energy levels
     double kdist[21];		// enemy distances
@@ -129,7 +131,7 @@ EXTERN struct foo2 {
 	proben,
 	isarmed,
 	nprobes;
-	double inresor,
+    double inresor,
 	intime,
 	inenrg,
 	inshld,
@@ -153,113 +155,110 @@ EXTERN struct foo2 {
 	probey,
 	probeinx,
 	probeiny;
-} frozen;
+} game;
 
-#define inkling frozen.inkling		// Initial number of klingons
-#define inbase frozen.inbase			// Initial number of bases
-#define incom frozen.incom			// Initian number of commanders
-#define instar frozen.instar			// Initial stars
-#define intorps frozen.intorps		// Initial/Max torpedoes
-#define condit frozen.condit			// Condition (red, yellow, green docked)
-#define torps frozen.torps			// number of torpedoes
-#define ship frozen.ship				// Ship type -- 'E' is Enterprise
-#define quadx frozen.quadx			// where we are
-#define quady frozen.quady			//
-#define sectx frozen.sectx			// where we are
-#define secty frozen.secty			//
-#define length frozen.length			// length of game
-#define skill frozen.skill			// skill level
-#define basex frozen.basex			// position of base in current quad
-#define basey frozen.basey			//
-#define klhere frozen.klhere			// klingons here
-#define comhere frozen.comhere		// commanders here
-#define casual frozen.casual			// causalties
-#define nhelp frozen.nhelp			// calls for help
-#define nkinks frozen.nkinks			//
-#define ididit frozen.ididit			// Action taken -- allows enemy to attack
-#define gamewon frozen.gamewon		// Finished!
-#define alive frozen.alive			// We are alive (not killed)
-#define justin frozen.justin			// just entered quadrant
-#define alldone frozen.alldone		// game is now finished
-#define shldchg frozen.shldchg		// shield is changing (affects efficiency)
-#define thingx frozen.thingx			// location of strange object in galaxy
-#define thingy frozen.thingy			//
-#define plnetx frozen.plnetx			// location of planet in quadrant
-#define plnety frozen.plnety			//
-#define inorbit frozen.inorbit		// orbiting
-#define landed frozen.landed			// party on planet (1), on ship (-1)
-#define iplnet frozen.iplnet			// planet # in quadrant
-#define imine frozen.imine			// mining
-#define inplan frozen.inplan			// initial planets
-#define nenhere frozen.nenhere		// Number of enemies in quadrant
-#define ishere frozen.ishere			// Super-commander in quandrant
-#define neutz frozen.neutz			// Romulan Neutral Zone
-#define irhere frozen.irhere			// Romulans in quadrant
-#define icraft frozen.icraft			// Kirk in Galileo
-#define ientesc frozen.ientesc		// Attempted escape from supercommander
-#define iscraft frozen.iscraft		// =1 if craft on ship, -1 if removed from game
-#define isatb frozen.isatb			// =1 if SuperCommander is attacking base
-#define iscate frozen.iscate			// Super Commander is here
+#define inkling game.inkling		// Initial number of klingons
+#define inbase game.inbase			// Initial number of bases
+#define incom game.incom			// Initian number of commanders
+#define instar game.instar			// Initial stars
+#define intorps game.intorps		// Initial/Max torpedoes
+#define condit game.condit			// Condition (red, yellow, green docked)
+#define torps game.torps			// number of torpedoes
+#define ship game.ship				// Ship type -- 'E' is Enterprise
+#define quadx game.quadx			// where we are
+#define quady game.quady			//
+#define sectx game.sectx			// where we are
+#define secty game.secty			//
+#define length game.length			// length of game
+#define skill game.skill			// skill level
+#define basex game.basex			// position of base in current quad
+#define basey game.basey			//
+#define klhere game.klhere			// klingons here
+#define comhere game.comhere		// commanders here
+#define casual game.casual			// causalties
+#define nhelp game.nhelp			// calls for help
+#define nkinks game.nkinks			//
+#define ididit game.ididit			// Action taken -- allows enemy to attack
+#define gamewon game.gamewon		// Finished!
+#define alive game.alive			// We are alive (not killed)
+#define justin game.justin			// just entered quadrant
+#define alldone game.alldone		// game is now finished
+#define shldchg game.shldchg		// shield is changing (affects efficiency)
+#define thingx game.thingx			// location of strange object in galaxy
+#define thingy game.thingy			//
+#define plnetx game.plnetx			// location of planet in quadrant
+#define plnety game.plnety			//
+#define inorbit game.inorbit		// orbiting
+#define landed game.landed			// party on planet (1), on ship (-1)
+#define iplnet game.iplnet			// planet # in quadrant
+#define imine game.imine			// mining
+#define inplan game.inplan			// initial planets
+#define nenhere game.nenhere		// Number of enemies in quadrant
+#define ishere game.ishere			// Super-commander in quandrant
+#define neutz game.neutz			// Romulan Neutral Zone
+#define irhere game.irhere			// Romulans in quadrant
+#define icraft game.icraft			// Kirk in Galileo
+#define ientesc game.ientesc		// Attempted escape from supercommander
+#define iscraft game.iscraft		// =1 if craft on ship, -1 if removed from game
+#define isatb game.isatb			// =1 if SuperCommander is attacking base
+#define iscate game.iscate			// Super Commander is here
 #ifdef DEBUG
-#define idebug frozen.idebug			// Debug mode
+#define idebug game.idebug			// Debug mode
 #endif
-#define iattak frozen.iattak			// attack recursion elimination (was cracks[4])
-#define icrystl frozen.icrystl		// dilithium crystals aboard
-#define tourn frozen.tourn			// Tournament number
-#define thawed frozen.thawed			// Thawed game
-#define batx frozen.batx				// Base coordinates being attacked
-#define baty frozen.baty				//
-#define ithere frozen.ithere			// Tholean is here 
-#define ithx frozen.ithx				// coordinates of tholean
-#define ithy frozen.ithy
-#define iseenit frozen.iseenit		// Seen base attack report
-#define inresor frozen.inresor		// initial resources
-#define intime frozen.intime			// initial time
-#define inenrg frozen.inenrg			// Initial/Max Energy
-#define inshld frozen.inshld			// Initial/Max Shield
-#define inlsr frozen.inlsr			// initial life support resources
-#define indate frozen.indate			// Initial date
-#define energy frozen.energy			// Energy level
-#define shield frozen.shield			// Shield level
-#define shldup frozen.shldup			// Shields are up
-#define warpfac frozen.warpfac		// Warp speed
-#define wfacsq frozen.wfacsq			// squared warp factor
-#define lsupres frozen.lsupres		// life support reserves
-#define dist frozen.dist				// movement distance
-#define direc frozen.direc			// movement direction
-#define Time frozen.Time				// time taken by current operation
-#define docfac frozen.docfac			// repair factor when docking (constant?)
-#define resting frozen.resting		// rest time
-#define damfac frozen.damfac			// damage factor
-#define stdamtim frozen.stdamtim		// time that star chart was damaged
-#define cryprob frozen.cryprob		// probability that crystal will work
-#define probex frozen.probex			// location of probe
-#define probey frozen.probey
-#define probecx frozen.probecx		// current probe quadrant
-#define probecy frozen.probecy	
-#define probeinx frozen.probeinx		// Probe x,y increment
-#define probeiny frozen.probeiny		
-#define proben frozen.proben			// number of moves for probe
-#define isarmed frozen.isarmed		// Probe is armed
-#define nprobes frozen.nprobes		// number of probes available
+#define iattak game.iattak			// attack recursion elimination (was cracks[4])
+#define icrystl game.icrystl		// dilithium crystals aboard
+#define tourn game.tourn			// Tournament number
+#define thawed game.thawed			// Thawed game
+#define batx game.batx				// Base coordinates being attacked
+#define baty game.baty				//
+#define ithere game.ithere			// Tholean is here 
+#define ithx game.ithx				// coordinates of tholean
+#define ithy game.ithy
+#define iseenit game.iseenit		// Seen base attack report
+#define inresor game.inresor		// initial resources
+#define intime game.intime			// initial time
+#define inenrg game.inenrg			// Initial/Max Energy
+#define inshld game.inshld			// Initial/Max Shield
+#define inlsr game.inlsr			// initial life support resources
+#define indate game.indate			// Initial date
+#define energy game.energy			// Energy level
+#define shield game.shield			// Shield level
+#define shldup game.shldup			// Shields are up
+#define warpfac game.warpfac		// Warp speed
+#define wfacsq game.wfacsq			// squared warp factor
+#define lsupres game.lsupres		// life support reserves
+#define dist game.dist				// movement distance
+#define direc game.direc			// movement direction
+#define Time game.Time				// time taken by current operation
+#define docfac game.docfac			// repair factor when docking (constant?)
+#define resting game.resting		// rest time
+#define damfac game.damfac			// damage factor
+#define stdamtim game.stdamtim		// time that star chart was damaged
+#define cryprob game.cryprob		// probability that crystal will work
+#define probex game.probex			// location of probe
+#define probey game.probey
+#define probecx game.probecx		// current probe quadrant
+#define probecy game.probecy	
+#define probeinx game.probeinx		// Probe x,y increment
+#define probeiny game.probeiny		
+#define proben game.proben			// number of moves for probe
+#define isarmed game.isarmed		// Probe is armed
+#define nprobes game.nprobes		// number of probes available
 
 /* the following global state doesn't need to be saved */
 EXTERN int fromcommandline; // Game start from command line options
 EXTERN char	*device[ndevice+1];
-EXTERN PLANETS nulplanet;	// zeroed planet structure
+EXTERN planet nulplanet;	// zeroed planet structure
 EXTERN int iscore, iskill; // Common PLAQ
 EXTERN double perdate;
+EXTERN double aaitem;
+EXTERN char citem[10];
 
 typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
 			  FMATERIALIZE, FPHASER, FLOST, FMINING, FDPLANET,
 			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
 			  FHOLE} FINTYPE ;
-
-
-EXTERN double aaitem;
-EXTERN char citem[10];
-
 
 /* Define devices */
 #define DSRSENS 1
@@ -291,7 +290,7 @@ EXTERN char citem[10];
 #define FDSPROB 8   // Move deep space probe
 
 #ifdef INCLUDED
-PLANETS nulplanet = {0};
+planet nulplanet = {0};
 char *device[ndevice+1] = {
 	"",
 	"S. R. Sensors",

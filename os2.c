@@ -23,8 +23,8 @@ int getch(void) {
 	struct termio oldstate, newstate;
     ioctl(0,TCGETA,&oldstate);
 	newstate = oldstate;
-	newstate.c_iflag = 0;
-	newstate.c_lflag = 0;
+	newgame.state.c_iflag = 0;
+	newgame.state.c_lflag = 0;
 	ioctl(0,TCSETA,&newstate);
 	read(0, &chbuf, 1);
     ioctl(0,TCSETA,&oldstate);
