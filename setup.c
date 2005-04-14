@@ -264,13 +264,13 @@ void setup(int needprompt)
 		if (distq < 6.0*(BASEMAX+1-inbase) && Rand() < 0.75) {
 		    contflag = TRUE;
 #ifdef DEBUG
-		    proutn("DEBUG: Abandoning base #%d at %d-%d\n", i, ix, iy);
+		    prout("DEBUG: Abandoning base #%d at %d-%d", i, ix, iy);
 #endif
 		    break;
 		}
 #ifdef DEBUG
 		else if (distq < 6.0 * (BASEMAX+1-inbase)) {
-		    proutn("DEBUG: saving base #%d, close to #%d\n", i, j);
+		    prout("DEBUG: saving base #%d, close to #%d", i, j);
 		}
 #endif
 	    }
@@ -290,7 +290,9 @@ void setup(int needprompt)
 	int klump = (1.0 - r*r)*klumper;
 	if (klump > krem) klump = krem;
 	krem -= klump;
-	do iran(GALSIZE,&ix,&iy); while (game.state.galaxy[ix][iy].supernova);
+	do iran(GALSIZE,&ix,&iy);
+	while (game.state.galaxy[ix][iy].supernova ||
+		game.state.galaxy[ix][iy].klingons + klump > 9);
 	game.state.galaxy[ix][iy].klingons += klump;
     } while (krem > 0);
     // Position Klingon Commander Ships

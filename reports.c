@@ -194,11 +194,11 @@ void chart(int nn)
 	rechart();
 
     if (lastchart < game.state.date && condit == IHDOCKED) {
-	proutn("Spock-  \"I revised the Star Chart from the starbase's records.\"\n");
+	prout("Spock-  \"I revised the Star Chart from the starbase's records.\"");
 	rechart();
     }
 
-    if (nn == 0) proutn("       STAR CHART FOR THE KNOWN GALAXY\n");
+    if (nn == 0) prout("       STAR CHART FOR THE KNOWN GALAXY");
     if (game.state.date > lastchart)
 	prout("(Last surveillance update %d stardates ago).",
 	      (int)(game.state.date-lastchart));
@@ -226,9 +226,8 @@ void chart(int nn)
 		proutn(" ");
 	}
 	proutn("  |");
-	if (i<GALSIZE) proutn("\n");
+	if (i<GALSIZE) skip(1);
     }
-    prout("");	/* flush output */
 }
 
 static void sectscan(int goodScan, int i, int j) 
@@ -384,7 +383,7 @@ int srscan(int l)
 	}
 	if (rightside)
 	    status(jj);
-	if (i<sizeof(requests)/sizeof(requests[0])) proutn("\n");
+	if (i<sizeof(requests)/sizeof(requests[0])) skip(1);
 	if (req!=0) return(goodScan);
     }
     prout("");

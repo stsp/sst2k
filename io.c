@@ -121,7 +121,7 @@ void skip(int i)
 {
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
-	    proutn("\n\r");
+	    proutn("\n");
 	} else {
 	    linecount++;
 	    if (linecount >= rows)

@@ -5,4 +5,4 @@
   non-"super" version Matuszek and Reynolds wrote.)
 
 * Code to hurl you out of quadrant if a supernova occurs as you warp in 
-  seems to hang.
+  seems to hang.  One bad case is when you get stopped by a star.
