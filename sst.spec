@@ -18,7 +18,7 @@ The classic Super Star Trek game from the days of slow teletypes, reloaded.
 %setup -q
 
 %build
-make %{?_smp_mflags}
+make %{?_smp_mflags} all sst-doc.html
 
 %install
 [ "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf "$RPM_BUILD_ROOT"
