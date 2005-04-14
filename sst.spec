@@ -7,6 +7,7 @@ License: GPL
 Group: Games
 Summary: Sst (screen mode)
 BuildRoot: %{_tmppath}/%{name}-root
+#Freshmeat-Name: strek
 
 %description
 Save the Federation from the invading Klingons!  Visit exotic planets and
@@ -41,3 +42,8 @@ cp sst-doc.html "$RPM_BUILD_ROOT"%{_defaultdocdir}/sst/index.html
 %{_defaultdocdir}/sst/index.html
 
 %changelog
+
+* Thu Apr 14 2005 Eric S. Raymond <esr@snark.thyrsus.com> - 2.0-1
+- First release under new management.
+
+

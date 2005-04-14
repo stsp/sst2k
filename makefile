@@ -1,6 +1,6 @@
 #	Makefile for the Super Star Trek game
 
-VERS=$(shell sed <sst.spec -n -e '/Version: \(.*\)/s//\1/p')
+VERSION=$(shell sed <sst.spec -n -e '/Version: \(.*\)/s//\1/p')
 
 CFLAGS= -O1 -g -Wall -DSSTDOC='"/usr/share/doc/sst/sst.doc"'
 
@@ -35,7 +35,7 @@ sst:  $(OFILES)
 $(OFILES):  $(HFILES)
 
 sst.6: sst.xml
-	xmlto --skip-validation man sst.xml
+	xmlto man sst.xml
 
 sst-doc.txt: sst-doc.xml
 	xmlto -m sst-layer.xsl txt sst-doc.xml
@@ -62,13 +62,16 @@ clean:
 	rm -f *.o sst sst-doc.html sst-doc.txt sst.doc
 
 # The "trunk" below assumes this is a Subversion working copy
-sst-$(VERS).tar.gz: $(SOURCES) sst.6
-	ls $(SOURCES) sst.6 | sed s:^:sst-$(VERS)/: >MANIFEST
-	(cd ..; ln -s trunk sst-$(VERS))
-	(cd ..; tar -czvf trunk/sst-$(VERS).tar.gz `cat trunk/MANIFEST`)
-	(cd ..; rm sst-$(VERS))
+sst-$(VERSION).tar.gz: $(SOURCES) sst.6
+	ls $(SOURCES) sst.6 | sed s:^:sst-$(VERSION)/: >MANIFEST
+	(cd ..; ln -s trunk sst-$(VERSION))
+	(cd ..; tar -czvf trunk/sst-$(VERSION).tar.gz `cat trunk/MANIFEST`)
+	(cd ..; rm sst-$(VERSION))
 
-dist: sst-$(VERS).tar.gz
+dist: sst-$(VERSION).tar.gz
 
-release: sst-$(VERS).tar.gz sst.html
-	shipper -f; rm -f CHANGES ANNOUNCE* *.6 *.html *.rpm *.lsm MANIFEST
+release: sst-$(VERSION).tar.gz sst.html
+	shipper; rm -f CHANGES ANNOUNCE* *.6 *.html *.rpm *.lsm MANIFEST
+
+version:
+	@echo $(VERSION)

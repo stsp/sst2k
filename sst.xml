@@ -14,10 +14,9 @@
 <refsynopsisdiv id='synopsis'>
 
 <cmdsynopsis>
-  <command>sst 
-       <arg choice='opt'>-t </arg> 
-       <arg rep='repeat' ><replaceable>command</replaceable></arg>
-  </command>
+<command>sst</command>
+<arg choice='opt'>-t </arg> 
+<arg rep='repeat' ><replaceable>command</replaceable></arg>  
 </cmdsynopsis>
 
 </refsynopsisdiv>
