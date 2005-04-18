@@ -121,7 +121,10 @@ void skip(int i)
 {
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
-	    proutn("\n");
+	    if (curwnd == message_window && getcury(curwnd) == getmaxy(curwnd))
+		pause_game(0);
+	    else
+		proutn("\n");
 	} else {
 	    linecount++;
 	    if (linecount >= rows)
