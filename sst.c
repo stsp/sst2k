@@ -196,7 +196,7 @@ commands[] = {
 #define MAYDAY	32
 	{"MAYDAY",	MAYDAY,		0},
 	//{"SOS",		MAYDAY,		0},
-	{"CALL",	MAYDAY,		0},
+	//{"CALL",	MAYDAY,		0},
 #define QUIT	33
 	{"QUIT",	QUIT,		0},
 #define HELP	34

@@ -1,11 +1,11 @@
 Name: sst
 Version: 2.0
 Release: 1
-URL: http://www.catb.org/~esr/sst/
+URL: http://sst.berlios.de
 Source0: %{name}-%{version}.tar.gz
 License: GPL
 Group: Games
-Summary: Sst (screen mode)
+Summary: the classic game of Super Star Trek
 BuildRoot: %{_tmppath}/%{name}-root
 #Freshmeat-Name: strek
 

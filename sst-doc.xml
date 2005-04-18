@@ -1010,13 +1010,13 @@ Klingons.</para>
 <sect1><title>Call Starbase for Help</title>
 
 <literallayout>
-Mnemonic:  CALL
+Mnemonic:  MAYDAY
 (No abbreviation)
 </literallayout>
 
 <para>[Originally, this command was called <quote>HELP</quote>, but
 these days it might be misinterpreted as built-in
-documentation!]</para>
+documentation! In some later versions it was CALL.]</para>
 
 <para>When you get into serious trouble, you may call starbase for
 help.  Starbases have a device called a <quote>long-range transporter
@@ -1509,7 +1509,6 @@ The emeritus game is strictly for masochists.</para>
  ------    ------------                           -----------
  ABANDON   ABANDON                                shuttle craft
  C         CHART                                  (none)
- CALL      CALL (for help)                        subspace radio
  CO        COMPUTER                               computer
  CR        CRYSTALS                               (none)
  DA        DAMAGES                                (none)
@@ -1521,6 +1520,7 @@ The emeritus game is strictly for masochists.</para>
  I         IMPULSE &lt;MANUAL&gt; &lt;DISPLACEMENT&gt;        impulse engines
            IMPULSE AUTOMATIC &lt;DESTINATION&gt;        impulse engines and computer
  L         LRSCAN                                 long-range sensors
+ MAYDAY    MAYDAY (for help)                      subspace radio
  MI        MINE                                   (none)
  M         MOVE &lt;MANUAL&gt; &lt;DISPLACEMENT&gt;           warp engines
            MOVE AUTOMATIC &lt;DESTINATION&gt;           warp engines and computer
@@ -1766,7 +1766,7 @@ I made the internal pager work, and in the process got rid of a number
 of platform dependencies in the code.
 </para></listitem>
 <listitem><para>
-The HELP/CALL/SOS command is now MAYDAY.  SOS and CALL are still accepted.
+The HELP/CALL/SOS command is now MAYDAY.
 </para></listitem>
 <listitem><para>
 Status report now indicates if dilithium crystals are on board.
