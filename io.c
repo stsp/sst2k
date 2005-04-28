@@ -121,10 +121,14 @@ void skip(int i)
 {
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
-	    if (curwnd == message_window && getcury(curwnd) == getmaxy(curwnd))
+	    if (curwnd == message_window && linecount >= getmaxy(curwnd) - 3) {
 		pause_game(0);
-	    else
+		clrscr();
+	    } else {
 		proutn("\n");
+		if (curwnd == message_window)
+		    linecount++;
+	    }
 	} else {
 	    linecount++;
 	    if (linecount >= rows)
@@ -221,6 +225,7 @@ void clrscr (void)
        wmove(curwnd,0,0);
        wrefresh(curwnd);
    }
+   linecount = 0;
 }
 
 void textcolor (int color)
