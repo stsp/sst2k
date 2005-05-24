@@ -479,11 +479,11 @@ int choose(int needprompt)
     game.state.nscrem = (skill > SKILL_FAIR ? 1 : 0);
     game.state.remtime = 7.0 * length;
     intime = game.state.remtime;
-    game.state.remkl = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
-    inkling = game.state.remkl;
+    inkling = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
     incom = skill + 0.0625*inkling*Rand();
     game.state.remcom= min(10, incom);
     incom = game.state.remcom;
+    game.state.remkl = inkling + incom + game.state.nscrem;
     game.state.remres = (inkling+4*incom)*intime;
     inresor = game.state.remres;
     if (inkling > 50) {
