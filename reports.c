@@ -124,7 +124,7 @@ void lrscan(void)
 	    prout("LONG-RANGE SENSORS DAMAGED.");
 	    return;
 	}
-	proutn("Starbase's long-range scan");
+	prout("Starbase's long-range scan");
     }
     else {
 	prout("Long-range scan");
