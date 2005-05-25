@@ -209,6 +209,7 @@ no_quad_change:
     newcnd();
     iattak = 0;
     drawmaps(0);
+    setwnd(message_window);
     return;
 }
 
