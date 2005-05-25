@@ -436,7 +436,7 @@ void deathray(void)
 	while (nenhere > 0)
 	    deadkl(game.kx[1],game.ky[1],game.quad[game.kx[1]][game.ky[1]],game.kx[1],game.ky[1]);
 	prout("Ensign Chekov-  \"Congratulations, Captain!\"");
-	if (game.state.remkl == 0) finish(FWON);
+	if (KLINGREM == 0) finish(FWON);
 	prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
 	if (Rand() <= 0.05) {
 	    prout("   is still operational.\"");

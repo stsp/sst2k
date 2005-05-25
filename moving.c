@@ -763,7 +763,7 @@ void atover(int igrab)
     } while 
 	/* Repeat if another snova */
 	(game.state.galaxy[quadx][quady].supernova);
-    if (game.state.remkl==0) 
+    if (KLINGREM==0) 
 	finish(FWON); /* Snova killed remaining enemy. */
 }
 

@@ -46,19 +46,15 @@ typedef struct {
     int snap,		// snapshot taken
 	remkl,			// remaining klingons
 	remcom,			// remaining commanders
+	nscrem,			// remaining super commanders
 	rembase,		// remaining bases
 	starkl,			// destroyed stars
 	basekl,			// destroyed bases
-	killk,			// Klingons killed
-	killc,			// commanders killed
 	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
 	baseqx[BASEMAX+1],		// Base quadrant X
 	baseqy[BASEMAX+1],		// Base quadrant Y
 	isx, isy,		// Coordinate of Super Commander
-	nscrem,			// remaining super commanders
-	nromkl,			// Romulans killed
 	nromrem,		// Romulans remaining
-	nsckill,		// super commanders killed
 	nplankl;		// destroyed planets
 	planet plnets[PLNETMAX];  // Planet information
 	double date,		// stardate
@@ -79,6 +75,14 @@ typedef struct {
 	int klingons;
     } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
+
+#define NKILLK (inkling - game.state.remkl)
+#define NKILLC (incom - game.state.remcom)
+#define NKILLSC (inscom - game.state.nscrem)
+#define NKILLROM (inrom - game.state.nromrem)
+#define KLINGREM (game.state.remkl + game.state.remcom + game.state.nscrem)
+#define INKLINGTOT (inkling + incom + inscom)
+#define KLINGKILLED (INKLINGTOT - KLINGREM)
 
 #define SKILL_NONE	0
 #define SKILL_NOVICE	1
@@ -158,6 +162,8 @@ EXTERN struct {
     int inkling,
 	inbase,
 	incom,
+	inscom,
+	inrom,
 	instar,
 	intorps,
 	condit,
@@ -246,6 +252,8 @@ EXTERN struct {
 #define inkling game.inkling		// Initial number of klingons
 #define inbase game.inbase		// Initial number of bases
 #define incom game.incom		// Initian number of commanders
+#define inscom game.inscom		// Initian number of commanders
+#define inrom game.inrom		// Initian number of commanders
 #define instar game.instar		// Initial stars
 #define intorps game.intorps		// Initial/Max torpedoes
 #define condit game.condit		// Condition (red/yellow/green/docked)

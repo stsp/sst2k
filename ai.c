@@ -378,7 +378,7 @@ void scom(int *ipage)
 #endif
 
     /* Decide on being active or passive */
-    flag = ((game.state.killc+game.state.killk)/(game.state.date+0.01-indate) < 0.1*skill*(skill+1.0) ||
+    flag = ((NKILLC+NKILLK)/(game.state.date+0.01-indate) < 0.1*skill*(skill+1.0) ||
 	    (game.state.date-indate) < 3.0);
     if (iscate==0 && flag) {
 	/* compute move away from Enterprise */

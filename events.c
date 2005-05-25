@@ -687,7 +687,6 @@ void snova(int insx, int insy)
 	iscdead = 1;
 	game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
     }
-    game.state.remkl -= kldead;
     if (game.state.remcom) {
 	int maxloop = game.state.remcom, l;
 	for (l = 1; l <= maxloop; l++) {
@@ -703,6 +702,7 @@ void snova(int insx, int insy)
 	    }
 	}
     }
+    game.state.remkl -= kldead;
     /* destroy Romulans and planets in supernovaed quadrant */
     nrmdead = game.state.galaxy[nqx][nqy].romulans;
     game.state.galaxy[nqx][nqy].romulans = 0;
@@ -731,11 +731,7 @@ void snova(int insx, int insy)
     if (insx) {
 	game.state.starkl += game.state.galaxy[nqx][nqy].stars;
 	game.state.basekl += game.state.galaxy[nqx][nqy].starbase;
-	game.state.killk += kldead;
-	game.state.killc += comdead;
-	game.state.nromkl += nrmdead;
 	game.state.nplankl += npdead;
-	game.state.nsckill += iscdead;
     }
     /* mark supernova in galaxy and in star chart */
     if ((quadx == nqx && quady == nqy) ||
@@ -743,7 +739,7 @@ void snova(int insx, int insy)
 	condit == IHDOCKED)
 	game.state.galaxy[nqx][nqy].supernova = TRUE;
     /* If supernova destroys last klingons give special message */
-    if (game.state.remkl==0 && (nqx != quadx || nqy != quady)) {
+    if (KLINGREM==0 && (nqx != quadx || nqy != quady)) {
 	skip(2);
 	if (insx == 0) prout("Lucky you!");
 	proutn("A supernova in %s has just destroyed the last Klingons.",

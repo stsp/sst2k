@@ -54,10 +54,9 @@ void report(void)
     if (skill>SKILL_GOOD && thawed && !alldone) prout("No plaque is allowed.");
     if (tourn) prout("This is tournament game %d.", tourn);
     prout("Your secret password is \"%s\"",game.passwd);
-    proutn("%d of %d Klingons have been killed",
-	   game.state.killk+game.state.killc+game.state.nsckill, inkling);
-    if (game.state.killc) prout(", including %d Commander%s.", game.state.killc, game.state.killc==1?"":"s");
-    else if (game.state.killk+game.state.nsckill > 0) prout(", but no Commanders.");
+    proutn("%d of %d Klingons have been killed", KLINGKILLED, INKLINGTOT);
+    if (NKILLC) prout(", including %d Commander%s.", NKILLC, NKILLC==1?"":"s");
+    else if (NKILLK + NKILLSC > 0) prout(", but no Commanders.");
     else prout(".");
     if (skill > SKILL_FAIR) prout("The Super Commander has %sbeen destroyed.",
 				  game.state.nscrem?"not ":"");
@@ -311,7 +310,7 @@ static void status(int req)
 	       (int)((100.0*shield)/inshld + 0.5), shield);
 	break;
     case 9:
-	proutn("Klingons Left %d", game.state.remkl);
+	proutn("Klingons Left %d", KLINGREM);
 	break;
     case 10:
 	attakreport(1);

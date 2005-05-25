@@ -168,7 +168,7 @@ void ram(int ibumpd, int ienm, int ix, int iy)
 	game.damage[l] += Time + extradm; /* Damage for at least time of travel! */
     }
     shldup = 0;
-    if (game.state.remkl) {
+    if (KLINGREM) {
 	pause_game(2);
 	dreprt();
     }
@@ -518,7 +518,7 @@ void attack(int torps_ok)
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[l]*r;
 	    torpedo(course, r, jx, jy, &hit, 1, 1);
-	    if (game.state.remkl==0) 
+	    if (KLINGREM==0) 
 		finish(FWON); /* Klingons did themselves in! */
 	    if (game.state.galaxy[quadx][quady].supernova || alldone) 
 		return; /* Supernova or finished */
@@ -613,7 +613,6 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	/* chalk up a Romulan */
 	game.state.galaxy[quadx][quady].romulans--;
 	irhere--;
-	game.state.nromkl++;
 	game.state.nromrem--;
     }
     else if (type == IHT) {
@@ -628,7 +627,6 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	/* Some type of a Klingon */
 	game.state.galaxy[quadx][quady].klingons--;
 	klhere--;
-	game.state.remkl--;
 	switch (type) {
 	case IHC:
 	    comhere = 0;
@@ -642,14 +640,13 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	    game.future[FTBEAM] = FOREVER;
 	    if (game.state.remcom != 0)
 		game.future[FTBEAM] = game.state.date + expran(1.0*incom/game.state.remcom);
-	    game.state.killc++;
 	    break;
 	case IHK:
-	    game.state.killk++;
+	    game.state.remkl--;
 	    break;
 	case IHS:
-	    game.state.nscrem = ishere = game.state.isx = game.state.isy = isatb = iscate = 0;
-	    game.state.nsckill = 1;
+	    game.state.nscrem--;
+	    ishere = game.state.isx = game.state.isy = isatb = iscate = 0;
 	    game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
 	    break;
 	}
@@ -658,7 +655,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     /* For each kind of enemy, finish message to player */
     prout(" destroyed.");
     game.quad[ix][iy] = IHDOT;
-    if (game.state.remkl==0) return;
+    if (KLINGREM==0) return;
 
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
@@ -830,7 +827,7 @@ void photon(void)
 	if (alldone || game.state.galaxy[quadx][quady].supernova)
 	    return;
     }
-    if (game.state.remkl==0) finish(FWON);
+    if (KLINGREM==0) finish(FWON);
 }
 
 	
@@ -1211,7 +1208,7 @@ void hittem(double *hits)
 	skip(1);
 	if (kpow == 0) {
 	    deadkl(ii, jj, ienm, ii, jj);
-	    if (game.state.remkl==0) finish(FWON);
+	    if (KLINGREM==0) finish(FWON);
 	    if (alldone) return;
 	    kk--; /* don't do the increment */
 	}

@@ -219,8 +219,8 @@ void setup(int needprompt)
     // Set up assorted game parameters
     batx = baty = 0;
     game.state.date = indate = 100.0*(int)(31.0*Rand()+20.0);
-    game.state.killk = game.state.killc = nkinks = nhelp = resting = casual = game.state.nromkl = 0;
-    isatb = iscate = imine = icrystl = icraft = game.state.nsckill = game.state.nplankl = 0;
+    nkinks = nhelp = resting = casual = 0;
+    isatb = iscate = imine = icrystl = icraft = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     iscraft = 1;
     landed = -1;
@@ -231,6 +231,9 @@ void setup(int needprompt)
 	    game.state.galaxy[i][j].charted = 0;
 	    game.state.galaxy[i][j].planets = 0;
 	    game.state.galaxy[i][j].romulans = 0;
+	    game.state.galaxy[i][j].klingons = 0;
+	    game.state.galaxy[i][j].starbase = 0;
+	    game.state.galaxy[i][j].supernova = 0;
 	}
     // Initialize times for extraneous events
     game.future[FSNOVA] = game.state.date + expran(0.5 * intime);
@@ -282,7 +285,7 @@ void setup(int needprompt)
 	game.state.chart[ix][iy].starbase = 1;
     }
     // Position ordinary Klingon Battle Cruisers
-    krem = inkling - incom - game.state.nscrem;
+    krem = inkling;
     klumper = 0.25*skill*(9.0-length)+1.0;
     if (klumper > 9) klumper = 9; // Can't have more than 9 in quadrant
     do {
@@ -364,7 +367,7 @@ void setup(int needprompt)
 	prout("a deadly Klingon invasion force. As captain of the United");
 	prout("Starship U.S.S. Enterprise, it is your mission to seek out");
 	prout("and destroy this invasion force of %d battle cruisers.",
-	      inkling);
+	      INKLINGTOT);
 	prout("You have an initial allotment of %d stardates to complete", (int)intime);
 	prout("your mission.  As you proceed you may be given more time.");
 	prout("");
@@ -374,7 +377,7 @@ void setup(int needprompt)
     else {
 	prout("Stardate %d.", (int)game.state.date);
 	prout("");
-	prout("%d Klingons.", inkling);
+	prout("%d Klingons.", INKLINGTOT);
 	prout("An unknown number of Romulans.");
 	if (game.state.nscrem) prout("and one (GULP) Super-Commander.");
 	prout("%d stardates.",(int)intime);
@@ -475,15 +478,14 @@ int choose(int needprompt)
     inbase = game.state.rembase;
     if (game.options & OPTION_PLANETS)
 	inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();
-    game.state.nromrem = (2.0+Rand())*skill;
-    game.state.nscrem = (skill > SKILL_FAIR ? 1 : 0);
+    game.state.nromrem = inrom = (2.0+Rand())*skill;
+    game.state.nscrem = inscom = (skill > SKILL_FAIR ? 1 : 0);
     game.state.remtime = 7.0 * length;
     intime = game.state.remtime;
-    inkling = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
+    game.state.remkl = inkling = 2.0*intime*((skill+1 - 2*Rand())*skill*0.1+.15);
     incom = skill + 0.0625*inkling*Rand();
-    game.state.remcom= min(10, incom);
+    game.state.remcom = min(10, incom);
     incom = game.state.remcom;
-    game.state.remkl = inkling + incom + game.state.nscrem;
     game.state.remres = (inkling+4*incom)*intime;
     inresor = game.state.remres;
     if (inkling > 50) {
