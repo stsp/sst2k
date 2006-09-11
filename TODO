@@ -3,6 +3,3 @@
 * The time machine switch.  Specify a year, get only the features that
   then existed.  (This would be partly so people can try the original
   non-"super" version Matuszek and Reynolds wrote.)
-
-* Code to hurl you out of quadrant if a supernova occurs as you warp in 
-  seems to hang.  One bad case is when you get stopped by a star.
