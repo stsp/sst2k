@@ -172,7 +172,7 @@ game.</para>
 
 <para>Space is vast, and it takes precious time to move from one place to
 another.  In comparison, other things happen so quickly that we
-assume the take no time at all. Two ways that time can pass are when
+assume they take no time at all. Two ways that time can pass are when
 you move, or when you issue a command to sit still and rest for a
 period of time.  You will sometimes want to do the latter, since the
 various devices aboard your starship may be damaged and require time
@@ -768,18 +768,18 @@ instantaneously, the hits you receive will be intermediate between
 what they would be if the shields were completely up or completely
 down. </para>
 
-<para>You may not fire phasers through your shields.  However you may use
-the <quote>high-speed shield control</quote> to lower shields, fire phasers, and
-raise the shields again before the Klingons can react.  Since rapid
-lowering and raising of the shields requires more energy than normal
-speed operation, it costs you 200 units of energy to activate this
-control.  It is automatically activated when you fire phasers while
-shields are up.  You may fire photon torpedoes, but they may be
-deflected considerably from their intended course as they pass
+<para>You may not fire phasers through your shields.  However you may
+use the <quote>high-speed shield control</quote> to lower shields,
+fire phasers, and raise the shields again before the Klingons can
+react.  Since rapid lowering and raising of the shields requires more
+energy than normal speed operation, it costs you 200 units of energy
+to activate this control.  It is automatically activated when you fire
+phasers while shields are up.  You may fire photon torpedoes, but they
+may be deflected considerably from their intended course as they pass
 through the shields (depending on shield strength).</para>
 
 <para>You may transfer energy beteen the ship's energy (given as
-<quote>Energy</quote> in the status) and the shields.  Thee word
+<quote>Energy</quote> in the status) and the shields.  The word
 <quote>TRANSFER</quote> may be abbreviated <quote>T</quote>.  The
 ammount of energy to transfer is the number of units of energy you
 wish to take from the ship's energy and put into the shields.  If you
@@ -1015,10 +1015,10 @@ Mnemonic:  MAYDAY
 </literallayout>
 
 <para>[Originally, this command was called <quote>HELP</quote>, but
-these days it might be misinterpreted as built-in
+these days that might be misconstrued as an attempt to browae built-in
 documentation! In some later versions it was CALL.]</para>
 
-<para>When you get into serious trouble, you may call starbase for
+<para>When you get into serious trouble, you may call a starbase for
 help.  Starbases have a device called a <quote>long-range transporter
 beam</quote> which they can use to teleport you to base.  This works
 by dematerializing your starship at its current position and
@@ -1400,9 +1400,9 @@ inform you how long the base under attack can last.  Since the
 <quote>Super-Commander</quote> is more powerful than an ordinary
 commander, he can destroy a base more quickly.</para>
 
-<para>The <quote>Super-Commander</quote> travels around the galaxy at a speed of about
-warp 6 or 7.  His movement is strictly time based; the more time
-passes, the further he can go.</para>
+<para>The <quote>Super-Commander</quote> travels around the galaxy at
+a speed of about warp 6 or 7.  His movement is strictly time based;
+the more time passes, the further he can go.</para>
 
 <para>Scattered through the galaxy are certain zones of control,
 collectively designated the <quote>Romulan Neutral Zone</quote>.  Any
@@ -1572,6 +1572,58 @@ Impulse engines require 20 units to warm up, plus 100 units per
 </chapter>
 <chapter><title>Game History and Modifications</title>
 
+<sect1><title>Origins</title>
+
+<para>The original Star Trek seems to have been written by Mike
+Mayfield at the beginning of the 1970s.  His first version was in
+BASIC for a Sigma 7 in 1971; on 1972 he rewrote it in Hewlett
+Packard BASIC.</para>
+
+<para>While some people claim to have recollections of playing Trek
+games in the late 1960s, the earlier ones seem actually to have been
+variants of
+<ulink url='http://en.wikipedia.org/wiki/Spacewar!'>
+SPACEWAR</ulink>, the earlier space-combat game on the
+PDP-1. Mayfield <ulink
+url='http://www3.sympatico.ca/maury/games/space/star_trek.html'>wrote
+in 2000</ulink> that he invented the Trek-style galactic grid, and the
+evidence seems to back that up.</para>
+
+<para>Many different versions radiated from Mayfield's original; most
+are descended from a version misleadingly called SPACEWR that David
+Ahl published in <citetitle>101 BASIC Computer Games</citetitle>,
+1973. This was a port of Mayfield's version obtained from the HP
+Contributed Programs library.</para>
+
+<para>Our "Super Star Trek" came through a Taurus BASIC program by
+Grady Hicks dated 5 April 1973. This does not appear to have been
+derived from Ahl's SPACEWR, at least not directly. The header says
+"GENERAL IDEA STOLEN FROM PENN. U.", and the game has several features
+not present in SPACEWR: notably, the Death Ray, ramming, and the
+Klingon summons to surrender.</para>
+
+<para>Dave Matuszek, Paul Reynolds et. al. at UT Austin translated the
+Hicks port into FORTRAN and considerably enhanced it.  The name "Super
+Star Trek" and many design features (including command abbreviations
+rather than command numbers) were probably picked up from a second
+BASIC version published by David Ahl in his 1978 sequel
+<citetitle>BASIC Computer Games</citetitle>.</para>
+
+<para>One signature trait of FORTRAN SST and its descendants is that
+the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's 1972
+original and its BASIC descendants) Also, you set courses and firing
+directions with rectangular rather than polar coordinates.  FORTRAN SST
+also preserves the original numbered quadrants rather than the
+astronomically-named quadrants introduced in David Ahl's 1978 BASIC
+version and descendants.</para>
+
+<para>Eric Allman's BSD Trek game is one of these, also descended from
+FORTRAN SST via translation to C.  However, the mainline SST (now
+SST2K) has had a lot more stuff folded into it over the years &mdash;
+deep space probes, dilithium mining, the Tholian Web, and so
+forth.</para>
+</sect1>
+
 <sect1><title>Tom Almy's story</title>
 
 <para>Back in (about) 1977 I got a copy of this Super Star Trek game for
@@ -1698,6 +1750,8 @@ better anyway.</para>
 </listitem>
 </itemizedlist>
 
+<para>My changes got merged into SST2K in 2005, and I wortk on it now.</para>
+
 </sect1>
 <sect1><title>Eric Raymond's story</title>
 
@@ -1713,19 +1767,7 @@ url='http://www.catb.org/retro/'>Retrocomputing Museum</ulink>.</para>
 downloaded his code and Dave verified that that it was a direct
 descendent of UT Super Star Trek &mdash; even though it had been translated
 to C, he was able to recognize names and techniques from the FORTRAN
-version.</para>
-
-<para>Thus, this game is a cousin of Eric Allman's BSD Trek game, which is
-also derived from UT Super Star Trek.  However, this one has had a lot
-more stuff folded into it over the years &mdash; deep space probes,
-dilithium mining, the Tholian Web, and so forth.</para>
-
-<para>One signature trait of this group of variants is that the sectors are
-10x10 rather than the 8x8 in Mike Mayfield's 1972 original and its
-BASIC descendants) Also, you set courses and firing directions with
-rectangular rather than polar coordinates.  It also preserves the
-original numbered quadrants rather than the astronomically-named 
-quadrants introduced into many BASIC versions.</para>
+version he co-wrote.</para>
 
 <para>This game is now an open-source project; see the <ulink
 url='http://developer.berlios.de/projects/sst/'>project
@@ -1773,6 +1815,10 @@ Status report now indicates if dilithium crystals are on board.
 </para></listitem>
 <listitem><para>
 At Dave's prompting, restored the Space Thingy's original elusive behavior.
+</para></listitem>
+<listitem><para>
+Clean separation of game engine from the UI code, improving Stas
+Sergeev's excellent work on the curses interface.
 </para></listitem>
 </itemizedlist>
 
