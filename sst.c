@@ -107,15 +107,15 @@ Here are Stas Sergeev's changes:
 
 Eric Raymond's changes:
 
- Mainly, I translated this C code out of FORTRAN into C -- created #defines
-   for a lot of magic numbers and refactored the heck out of it.
+Mainly, I translated this C code out of FORTRAN into C -- created #defines
+for a lot of magic numbers and refactored the heck out of it.
 
    1. "sos" and "call" becomes "mayday", "freeze" and "save" are both good.
 
    2. Status report now indicates when dilithium crystals are on board.
 
    3. Per Dave Matuszek's remarks, Thingy state is not saved across games.
-   */
+*/
 
 /* the input queue */
 static char line[128], *linep = line;
@@ -386,14 +386,14 @@ static void makemoves(void)
 	case IMPULSE:			// impulse
 	    impuls();
 	    break;
-	case REST:		// rest
+	case REST:			// rest
 	    wait();
 	    if (ididit) hitme = TRUE;
 	    break;
-	case WARP:		// warp
+	case WARP:			// warp
 	    setwrp();
 	    break;
-	case SCORE:                // score
+	case SCORE:           	 	// score
 	    score();
 	    break;
 	case SENSORS:			// sensors
@@ -430,13 +430,13 @@ static void makemoves(void)
 	case COMMANDS:
 	    listCommands();
 	    break;
-	case EMEXIT:		// Emergency exit
-	    clrscr();	// Hide screen
-	    freeze(TRUE);	// forced save
-	    exit(1);		// And quick exit
+	case EMEXIT:			// Emergency exit
+	    clrscr();			// Hide screen
+	    freeze(TRUE);		// forced save
+	    exit(1);			// And quick exit
 	    break;
 	case PROBE:
-	    probe();		// Launch probe
+	    probe();			// Launch probe
 	    if (ididit) hitme = TRUE;
 	    break;
 	case ABANDON:			// Abandon Ship
@@ -451,21 +451,21 @@ static void makemoves(void)
 	    if (skill > SKILL_GOOD)
 		prout("WARNING--Saved games produce no plaques!");
 	    break;
-	case DEATHRAY:		// Try a desparation measure
+	case DEATHRAY:			// Try a desparation measure
 	    deathray();
 	    if (ididit) hitme = TRUE;
 	    break;
-	case DEBUGCMD:		// What do we want for debug???
+	case DEBUGCMD:			// What do we want for debug???
 #ifdef DEBUG
 	    debugme();
 #endif
 	    break;
-	case MAYDAY:		// Call for help
+	case MAYDAY:			// Call for help
 	    help();
 	    if (ididit) hitme = TRUE;
 	    break;
 	case QUIT:
-	    alldone = 1;	// quit the game
+	    alldone = 1;		// quit the game
 #ifdef DEBUG
 	    if (idebug) score();
 #endif
@@ -482,7 +482,7 @@ static void makemoves(void)
 #endif
 	    if (Time != 0.0) {
 		events();
-		if (alldone) break;		// Events did us in
+		if (alldone) break;	// Events did us in
 	    }
 	    if (game.state.galaxy[quadx][quady].supernova) { // Galaxy went Nova!
 		atover(0);
