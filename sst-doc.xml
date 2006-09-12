@@ -1623,18 +1623,19 @@ write their own Trek game, loosely based on the Hicks version, in
 CDC6600 FORTRAN.  At that time, it was just called "Star Trek"; the
 "Super" was added by later developers.</para>
 
-<para>At the time the CDC6600 FORTRAN source was translated to C
-it emitted the message "Latest update-21 Sept 78".  Thus, it actually
-predated (and may have influenced) the best-known BASIC version, the
-"Super Star Trek" published by David Ahl in his November 1978 sequel
+<para>At the time the UT FORTRAN source was translated to C it emitted
+the message "Latest update-21 Sept 78".  Thus, it actually predated
+(and may have influenced) the best-known BASIC version, the "Super
+Star Trek" published by David Ahl in his November 1978 sequel
 <citetitle>BASIC Computer Games</citetitle>.</para>
 
-<para>Ahl's "Super Star Trek" had been reworked by Robert Leedom and
+<para>This 1978 "Super Star Trek" had been reworked by Robert Leedom and
 friends from (according to Leedom) Mayfield's HP port. There is
 internal evidence to suggest that at least some features of Leedom's
 SST may have derived from the UT FORTRAN version.  In particular, Dave
 Matuszek recalls implementing command words to replace the original
-numeric command codes, a feature Leedom's SST also had.</para>
+numeric command codes, a feature Leedom's SST also had but the
+1973 and 1975 SPACWRs did not.</para>
 
 <para>One signature trait of the UT FORTRAN game and its descendants
 is that the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's
@@ -1647,9 +1648,9 @@ descendants.</para>
 <!-- navigation. -->
 
 <para>Eric Allman's BSD Trek game is one of these, also descended from
-FORTRAN Star Trek via translation to C.  However, the mainline S (now
-SST2K) has had a lot more stuff folded into it over the years &mdash;
-deep space probes, dilithium mining, the Tholian Web, and so
+FORTRAN Star Trek via translation to C.  However, the mainline version
+(now SST2K) has had a lot more stuff folded into it over the years
+&mdash; deep space probes, dilithium mining, the Tholian Web, and so
 forth.</para>
 </sect1>
 
