@@ -1621,9 +1621,10 @@ intolerable on a TTY at 110 baud.  It must, therefore, have been
 rather longer than  the one we have.)  The Austin crew proceeded to
 write their own Trek game, loosely based on the Hicks version, in
 CDC6600 FORTRAN.  At that time, it was just called "Star Trek"; the
-"Super" was added by later developers.</para>
+"Super" was added by later developers. In the rest of this history
+we'll call it the "UT FORTRAN" version.</para>
 
-<para>At the time the UT FORTRAN source was translated to C it emitted
+<para>At the time the UT FORTRAN source was last translated to C it emitted
 the message "Latest update-21 Sept 78".  Thus, it actually predated
 (and may have influenced) the best-known BASIC version, the "Super
 Star Trek" published by David Ahl in his November 1978 sequel
@@ -1648,7 +1649,7 @@ descendants.</para>
 <!-- navigation. -->
 
 <para>Eric Allman's BSD Trek game is one of these, also descended from
-FORTRAN Star Trek via translation to C.  However, the mainline version
+the UT FORTRAN version via translation to C.  However, the mainline version
 (now SST2K) has had a lot more stuff folded into it over the years
 &mdash; deep space probes, dilithium mining, the Tholian Web, and so
 forth.</para>
@@ -1656,7 +1657,7 @@ forth.</para>
 
 <sect1><title>Tom Almy's story</title>
 
-<para>Back in (about) 1977 I got a copy of this Super Star Trek game for
+<para>Back in (about) 1977 I got a copy of the Super Star Trek game for
 the CDC 6600 mainframe computer. Someone had converted it to PDP-11
 Fortran but couldn't get it to run because of its size. I modified
 the program to use overlays and managed to shoehorn it in on the 56k
@@ -1723,7 +1724,7 @@ so I implemented it based on its description.</para>
 <sect1><title>Stas Sergeev's story</title>
 
 <para>I started from an older Tom Almy version and added features I had
-seen in mainframe variants of the game, I wrote a screen-oriented 
+seen in other mainframe variants of the game, I wrote a screen-oriented 
 interface for it based on the curses library.</para>
 
 <itemizedlist>
