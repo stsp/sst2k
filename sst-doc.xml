@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE book PUBLIC 
     "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-    "docbook/docbookxx.dtd">
-
+    "docbook/docbookxx.dtd"[
+<!ENTITY sst-site      "http://sst.berlios.de/">
+<!ENTITY retro         "http://catb.org/~esr/retro/">
+]>
 <book>
 <bookinfo>
 <title>Super Star Trek</title>
@@ -93,7 +95,7 @@ respect the copyrights of the originators of Star Trek.</para>
 			  Curses Interface By
                               Stas Sergeev 
 
-			  SST 2K polishing by
+		SST 2K polishing and historical research by
 			     Eric S. Raymond
 </literallayout>
 </dedication>
@@ -1576,8 +1578,12 @@ Impulse engines require 20 units to warm up, plus 100 units per
 
 <para>The original Star Trek seems to have been written by Mike
 Mayfield at the beginning of the 1970s.  His first version was in
-BASIC for a Sigma 7 in 1971; in 1972 he rewrote it in Hewlett
-Packard BASIC.</para>
+BASIC for a Sigma 7 in 1971; in 1972 he rewrote it in Hewlett Packard
+BASIC. The source is <ulink
+url="&sst-site;www/historic/mayfield.basic">available</ulink> on the
+SST2K website. In January 1975 it became part of the DECUS library
+under the name <ulink
+url='http://www.trailing-edge.com/~shoppa/decus/110174.html'>SPACWR</ulink>.</para>
 
 <para>While some people claim to have recollections of playing Trek
 games in the late 1960s, the earlier ones seem actually to have been
@@ -1587,39 +1593,48 @@ SPACEWAR</ulink>, the earlier space-combat game on the
 PDP-1. Mayfield <ulink
 url='http://www3.sympatico.ca/maury/games/space/star_trek.html'>wrote
 in 2000</ulink> that he invented the Trek-style galactic grid, and the
-evidence seems to back that up.</para>
+evidence seems to back that up.  Some of the confusion probably stems 
+from the fact that Mayfield's original and several early descendants 
+were distributed under the name SPACWR.</para>
 
 <para>Many different versions radiated from Mayfield's original; most
-are descended from a version misleadingly called SPACEWR that David
+og the ones in BASIC are descended from a SPACWR version that David
 Ahl published in <citetitle>101 BASIC Computer Games</citetitle>,
-1973. This was a port of Mayfield's version obtained from the HP
-Contributed Programs library.</para>
+July 1973. This was a port of Mayfield's version obtained from the HP
+Contributed Programs library.  </para>
 
 <para>Our SST2K is descended from a Taurus BASIC program by Grady
 Hicks dated 5 April 1973. This does not appear to have been derived
-from Ahl's SPACEWR, at least not directly. The header says "GENERAL
-IDEA STOLEN FROM PENN. U.", and the game has several features not
-present in SPACEWR: notably, the Death Ray, ramming, and the Klingon
-summons to surrender.</para>
+from Ahl's SPACWR. The header says "GENERAL IDEA STOLEN FROM
+PENN. U.", and the game has several features not present in SPACEWR:
+notably, the Death Ray, ramming, and the Klingon summons to surrender.
+And, of course, it predates Ahl's book.  The source is <ulink
+url="&sst-site;www/historic/UT-Trek.basic">available</ulink> on the
+SST2K website.</para>
 
 <para>Dave Matuszek, Paul Reynolds et. al. at UT Austin played the
 Hicks version on a CDC6600, but disliked the long load time and
 extreme slowness of the BASIC program. (David Matuszek notes that the
-version of the Hicks port he played had a habit of throwing long
+Hicks version he played had a habit of throwing long
 quotes from Marcus Aurelius at the users, a feature he found
-intolerable at 110 baud.)  The Austinites proceeded to write their own
-Trek game, loosely based on the Hicks version, in CDC6600 FORTRAN.  At
-that time, it was just called "Star Trek"; the "Super" was added by
-later developers.</para>
+intolerable on a TTY at 110 baud.  It must, therefore, have been
+rather longer than  the one we have.)  The Austin crew proceeded to
+write their own Trek game, loosely based on the Hicks version, in
+CDC6600 FORTRAN.  At that time, it was just called "Star Trek"; the
+"Super" was added by later developers.</para>
 
-<para>The name "Super Star Trek" and many design features may have
-been picked up from a descendant of SPACEWR, reworked by Robert Leedom
-and friends and published by David Ahl in his 1978 sequel
-<citetitle>BASIC Computer Games</citetitle>. On the other hand, there
-is internal evidence to suggest that at least some features of Leedom's
+<para>At the time the CDC6600 FORTRAN source was translated to C
+it emitted the message "Latest update-21 Sept 78".  Thus, it actually
+predated (and may have influenced) the best-known BASIC version, the
+"Super Star Trek" published by David Ahl in his November 1978 sequel
+<citetitle>BASIC Computer Games</citetitle>.</para>
+
+<para>Ahl's "Super Star Trek" had been reworked by Robert Leedom and
+friends from (according to Leedom) Mayfield's HP port. There is
+internal evidence to suggest that at least some features of Leedom's
 SST may have derived from the UT FORTRAN version.  In particular, Dave
 Matuszek recalls implementing command words to replace the original
-numeric command codes, and this was apparently before 1978.</para>
+numeric command codes, a feature Leedom's SST also had.</para>
 
 <para>One signature trait of the UT FORTRAN game and its descendants
 is that the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's
@@ -1730,7 +1745,7 @@ fired upon.</para>
 </listitem>
 <listitem>
 <para>Probe target you enter is now the destination quadrant. Before I don't 
-      remember what it was, but it was something I had difficulty using)</para>
+      remember what it was, but it was something I had difficulty using.</para>
 </listitem>
 <listitem>
 <para>Secret password is now autogenerated.</para>
@@ -1764,18 +1779,18 @@ better anyway.</para>
 </listitem>
 </itemizedlist>
 
-<para>My changes got merged into SST2K in 2005, and I wortk on it now.</para>
+<para>My changes got merged into SST2K in 2005, and I work on it now.</para>
 
 </sect1>
 <sect1><title>Eric Raymond's story</title>
 
-<para>I played the FORTRAN version of this game in the mid-1970s on a
+<para>I played the FORTRAN version of this game in the late 1970s on a
 DEC minicomputer.  In the late 1980s Dave Matuszek and I became
 friends; I was vaguely aware that he had had something to do with the
 original Star Trek game.  In October 2004, sitting in Dave's living
 room, we got to talking about the game and I realized it would make a
 great exhibit for the <ulink
-url='http://www.catb.org/retro/'>Retrocomputing Museum</ulink>.</para>
+url='&retro;'>Retrocomputing Museum</ulink>.</para>
 
 <para>A few quick web searches later we found Tom Almy's page.  We
 downloaded his code and Dave verified that that it was a direct
@@ -1783,7 +1798,7 @@ descendent of UT Super Star Trek &mdash; even though it had been translated
 to C, he was able to recognize names and techniques from the FORTRAN
 version he co-wrote.</para>
 
-<para>This game is now an open-source project; see the <ulink
+<para>This game became an open-source project; see the <ulink
 url='http://developer.berlios.de/projects/sst/'>project
 site</ulink>.</para>
 
