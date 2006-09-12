@@ -42,25 +42,21 @@ Dave Matuszek says:
 
 Here are Tom Almy's changes:
 
-   Compared to original version, I've changed the "help" command to
-   "call" and the "terminate" command to "quit" to better match
-   user expectations. The DECUS version apparently made those changes
-   as well as changing "freeze" to "save". However I like "freeze".
-   (Both "freeze" and "save" work in SST2K.)
+   In early 1997, I got the bright idea to look for references to
+   "Super Star Trek" on the World Wide Web. There weren't many hits,
+   but there was one that came up with 1979 Fortran sources! This
+   version had a few additional features that mine didn't have,
+   however mine had some feature it didn't have. So I merged its
+   features that I liked. I also took a peek at the DECUS version (a
+   port, less sources, to the PDP-10), and some other variations.
 
-   When I got a later (1979) version of Super Star Trek that I was converting
-   from, I added the emexit command from it.
+   1, Compared to the original UT version, I've changed the "help" command to
+      "call" and the "terminate" command to "quit" to better match
+      user expectations. The DECUS version apparently made those changes
+      as well as changing "freeze" to "save". However I like "freeze".
+      (Both "freeze" and "save" work in SST2K.)
 
-   That 1979 version also mentions srscan and lrscan working when
-   docked (using the starbase's scanners), so I made some changes here
-   to do this (and indicating that fact to the player), and then realized
-   the base would have a subspace radio as well -- doing a Chart when docked
-   updates the star chart, and all radio reports will be heard. The Dock
-   command will also give a report if a base is under attack.
-
-   Also added:
-
-   1. The experimental deathray originally had only a 5% chance of
+   2. The experimental deathray originally had only a 5% chance of
       success, but could be used repeatedly. I guess after a couple
       years of use, it was less "experimental" because the 1979
       version had a 70% success rate. However it was prone to breaking
@@ -68,23 +64,32 @@ Here are Tom Almy's changes:
       failure modes (great humor!).  (Now controlled by OPTION_DEATHRAY
       and turned off if game type is "plain".)
 
-   2. Tholian Web from the 1979 version.  (Now controlled by
+   3. The 1979 version also mentions srscan and lrscan working when
+      docked (using the starbase's scanners), so I made some changes here
+      to do this (and indicating that fact to the player), and then realized
+      the base would have a subspace radio as well -- doing a Chart when docked
+      updates the star chart, and all radio reports will be heard. The Dock
+      command will also give a report if a base is under attack.
+
+   4. Tholian Web from the 1979 version.  (Now controlled by
       OPTION_THOLIAN and turned off if game type is "plain".)
 
-   3. Enemies can ram the Enterprise. (Now controlled by OPTION_RAMMING
+   5. Enemies can ram the Enterprise. (Now controlled by OPTION_RAMMING
       and turned off if game type is "plain".)
 
-   4. Regular Klingons and Romulans can move in Expert and Emeritus games. 
+   6. Regular Klingons and Romulans can move in Expert and Emeritus games. 
       This code could use improvement. (Now controlled by OPTION_MVBADDY
       and turned off if game type is "plain".)
 
-   5. The deep-space probe feature from the DECUS version.  (Now controlled
+   7. The deep-space probe feature from the DECUS version.  (Now controlled
       by OPTION_PROBE and turned off if game type is "plain").
 
-   6. Bugfix: Klingon commander movements are no longer reported if long-range 
+   8. 'emexit' command from the 1979 version.
+
+   9. Bugfix: Klingon commander movements are no longer reported if long-range 
       sensors are damaged.
 
-   7. Bugfix: Better base positioning at startup (more spread out).
+   10. Bugfix: Better base positioning at startup (more spread out).
       That made sense to add because most people abort games with 
       bad base placement.
 
