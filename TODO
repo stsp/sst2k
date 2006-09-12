@@ -1,5 +1,7 @@
 		Super Star Trek TO-DO list
 
-* The time machine switch.  Specify a year, get only the features that
-  then existed.  (This would be partly so people can try the original
-  non-"super" version Matuszek and Reynolds wrote.)
+* Wrap a GUI around it.
+
+* Find out what the deathray behavior was before Tom Almy changed it,
+  and reverse the change when the game type is 'plain'.
+

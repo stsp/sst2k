@@ -101,6 +101,10 @@ typedef struct {
 #define OPTION_THINGY	0x00000010	/* Space Thingy can shoot back */
 #define OPTION_PROBE	0x00000020	/* deep-space probes */
 #define OPTION_SHOWME	0x00000040	/* bracket Enterprise in chart */
+#define OPTION_RAMMING	0x00000080	/* enemies may ram Enterprise */
+#define OPTION_MVBADDY	0x00000100	/* more enemies can move */
+#define OPTION_BLKHOLE	0x00000200	/* black hole may timewarp you */
+#define OPTION_BASE	0x00000400	/* bases have good shields */
 
 /* Define devices */
 #define DSRSENS 0

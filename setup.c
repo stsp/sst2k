@@ -467,6 +467,23 @@ int choose(int needprompt)
 	    else if (skill == SKILL_NONE) proutn("Are you a Novice, Fair, Good, Expert, or Emeritus player? ");
 	}
     }
+    // Choose game options -- added by ESR for SST2K
+    if (scan() != IHALPHA) {
+	chew();
+	proutn("Choose your game options: ");
+	scan();
+    }
+    if (isit("plain"))
+	// Approximates the UT FORTRAN version.
+	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE);
+    if (isit("almy"))
+	// Approximates Tom Almy's version.
+	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE);
+    else if (strlen(citem)) {
+	    proutn("What is \"");
+	    proutn(citem);
+	    prout("\"?");
+    }
     setpassword();
 #ifdef DEBUG
     if (strcmp(game.passwd, "debug")==0) idebug = 1;

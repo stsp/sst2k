@@ -15,19 +15,28 @@ Dave Matuszek says:
 
    SRSCAN, MOVE, PHASERS, CALL, STATUS, IMPULSE, PHOTONS, ABANDON,
    LRSCAN, WARP, SHIELDS, DESTRUCT, CHART, REST, DOCK, QUIT, and DAMAGE
-   were in the original non-"super" version.
+   were in the original non-"super" version of UT FORTRAN Star Trek.
 
    Tholians weren't in the original. Dave is dubious about their merits.
+   (They are now controlled by OPTION_THOLIAN and turned off if the game
+   type is "plain".)
 
    Planets and dilithium crystals weren't in the original.  Dave is OK
-   with this idea. He says the bit about the Galileo getting
-   turned into a McDonald's is "consistant with our original vision".
+   with this idea. (It's now controlled by OPTION_PLANETS and turned 
+   off if the game type is "plain".)
+
+   Dave says the bit about the Galileo getting turned into a
+   McDonald's is "consistant with our original vision".  (This has been
+   left permanently enabled, as it can only happen if OPTION_PLANETS
+   is on.)
 
    Dave also says the Space Thingy should not be preserved across saved
    games, so you can't prove to others that you've seen it.  He says it
    shouldn't fire back, either.  It should do nothing except scream and
    disappear when hit by photon torpedos.  It's OK that it may move
-   when attacked, but it didn't in the original.
+   when attacked, but it didn't in the original.  (Whether the Thingy
+   can fire back is now controlled by OPTION_THINGY and turned off if the
+   game type is "plain" or "almy".  The no-save behavior has been restored.)
 
    The Faerie Queen, black holes, and time warping were in the original.
 
@@ -37,6 +46,7 @@ Here are Tom Almy's changes:
    "call" and the "terminate" command to "quit" to better match
    user expectations. The DECUS version apparently made those changes
    as well as changing "freeze" to "save". However I like "freeze".
+   (Both "freeze" and "save" work in SST2K.)
 
    When I got a later version of Super Star Trek that I was converting
    from, I added the emexit command.
@@ -48,62 +58,75 @@ Here are Tom Almy's changes:
    updates the star chart, and all radio reports will be heard. The Dock
    command will also give a report if a base is under attack.
 
-   Movecom no longer reports movement if sensors are damaged so you wouldn't
-   otherwise know it.
+   Klingon commander movements are no longer reported if long-range 
+   sensors are damaged.
 
    Also added:
 
-   1. Better base positioning at startup
+   1. Better base positioning at startup.
 
-   2. Deathray improvement (but keeping original failure alternatives)
+   2. Deathray improvement (but keeping original failure alternatives).
 
-   3. Tholian Web.
+   3. Tholian Web.  (Now controlled by OPTION_THOLIAN and turned off 
+      if game type is "plain".)
 
-   4. Enemies can ram the Enterprise. Regular Klingons and Romulans can
-      move in Expert and Emeritus games. This code could use improvement.
+   4. Enemies can ram the Enterprise. (Now controlled by OPTION_RAMMING
+      and turned off if game type is "plain".)
 
-   5. The deep space probe looks interesting! DECUS version
+   5. Regular Klingons and Romulans can move in Expert and Emeritus games. 
+      This code could use improvement. (Now controlled by OPTION_MVBADDY
+      and turned off if game type is "plain".)
 
-   6. Perhaps cloaking to be added later? BSD version
+   6. The deep-space probe feature from the DECUS version.  (Now controlled
+      by OPTION_PROBE and turned off if game type is "plain").
+
+   In June 2004 I fixed a number of bugs involving: 1) parsing invalid
+   numbers, 2) manual phasers when SR scan is damaged and commander is
+   present, 3) time warping into the future, 4) hang when moving
+   klingons in crowded quadrants.  (These fixes are in SST2K.)
 
 Here are Stas Sergeev's changes:
 
    1. The Space Thingy can be shoved, if you ram it, and can fire back if 
-      fired upon.
+      fired upon. (Now controlled by OPTION_THINGY and turned off if game 
+      type is "plain" or "almy".)
 
-   2. The Tholian can be hit with phasers
-
-   3. When you are docked, base covers you with an almost invincible shields 
-      (a commander can still ram you, or a Romulan can destroy the base,
+   2. When you are docked, base covers you with an almost invincible shield. 
+      (A commander can still ram you, or a Romulan can destroy the base,
       or a SCom can even succeed with direct attack IIRC, but this rarely 
-      happens).
+      happens.)  (Now controlled by OPTION_BASE and turned off if game 
+      type is "plain" or "almy".)
 
-   4. SCom can't escape from you if no more enemies remain (without this, 
+   3. Ramming a black hole is no longer instant death.  There is a
+      chance you might get timewarped instead. (Now controlled by 
+      OPTION_BLKHOLE and turned off if game type is "plain" or "almy".)
+
+   4. The Tholian can be hit with phasers.
+
+   5. SCom can't escape from you if no more enemies remain (without this, 
       chasing SCom can take an eternity).
 
-   5. Probe target you enter is now the destination quadrant. Before I don't 
+   6. Probe target you enter is now the destination quadrant. Before I don't 
       remember what it was, but it was something I had difficulty using.
 
-   6. Secret password is now autogenerated.
+   7. Secret password is now autogenerated.
 
-   7. "Plaque" is adjusted for A4 paper :-)
+   8. "Plaque" is adjusted for A4 paper :-)
 
-   8. Phasers now tells you how much energy needed, but only if the computer 
-       is alive.
+   9. Phasers now tells you how much energy needed, but only if the computer 
+      is alive.
 
-   9. Planets are auto-scanned when you enter the quadrant.
+   10. Planets are auto-scanned when you enter the quadrant.
 
-   10. Mining or using crystals in presense of enemy now yields an attack.
+   11. Mining or using crystals in presense of enemy now yields an attack.
        There are other minor adjustments to what yields an attack
        and what does not.
 
-   11. Ramming a black hole is no longer instant death.  There is a
-       chance you might get timewarped instead.
-
    12. "freeze" command reverts to "save", most people will understand this
-        better anyway.
+       better anyway. (SST2K recognizes both.)
 
-   13. Screen-oriented interface, with sensor scans always up.
+   13. Screen-oriented interface, with sensor scans always up.  (SST2K
+       supports both screen-oriented and TTY modes.)
 
 Eric Raymond's changes:
 
@@ -114,7 +137,10 @@ for a lot of magic numbers and refactored the heck out of it.
 
    2. Status report now indicates when dilithium crystals are on board.
 
-   3. Per Dave Matuszek's remarks, Thingy state is not saved across games.
+   3. Per Dave Matuszek's remarks, Thingy state is never saved across games.
+
+   4. Added game option selection so you can play a close (but not bug-for-
+      bug identical) approximation of older versions.
 */
 
 /* the input queue */

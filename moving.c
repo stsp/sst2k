@@ -153,7 +153,7 @@ void imove(void)
 			if (game.damage[l]>0) 
 			    n++;
 		    probf=pow(1.4,(energy+shield)/5000.0-1.0)*pow(1.3,1.0/(n+1)-1.0);
-		    if (Rand()>probf) 
+		    if ((game.options & OPTION_BLKHOLE) && Rand()>probf) 
 			timwrp();
 		    else 
 			finish(FHOLE);

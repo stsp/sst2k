@@ -151,7 +151,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	else {
 	    if (forces > 1000.0) /* Very strong -- move in for kill */
 		motion = (1.0-square(Rand()))*dist1 + 1.0;
-	    if (condit==IHDOCKED) /* protected by base -- back off ! */
+	    if (condit==IHDOCKED && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
 		motion -= skill*(2.0-square(Rand()));
 	}
 #ifdef DEBUG
@@ -213,7 +213,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 		looky = nexty + krawly;
 		krawly = -krawly;
 	    }
-	    else if (game.quad[lookx][looky] != IHDOT) {
+	    else if ((game.options & OPTION_RAMMING) && game.quad[lookx][looky] != IHDOT) {
 		/* See if we should ram ship */
 		if (game.quad[lookx][looky] == ship &&
 		    (ienm == IHC || ienm == IHS)) {
@@ -294,12 +294,13 @@ void movcom(void)
     /* if skill level is high, move other Klingons and Romulans too!
        Move these last so they can base their actions on what the
        commander(s) do. */
-    if (skill >= SKILL_EXPERT) for_local_enemies(i) {
-	ix = game.kx[i];
-	iy = game.ky[i];
-	if (game.quad[ix][iy] == IHK || game.quad[ix][iy] == IHR)
-	    movebaddy(ix, iy, i, game.quad[ix][iy]);
-    }
+    if (skill >= SKILL_EXPERT && (game.options & OPTION_MVBADDY)) 
+	for_local_enemies(i) {
+	    ix = game.kx[i];
+	    iy = game.ky[i];
+	    if (game.quad[ix][iy] == IHK || game.quad[ix][iy] == IHR)
+		movebaddy(ix, iy, i, game.quad[ix][iy]);
+	}
 
     sortkl();
 }

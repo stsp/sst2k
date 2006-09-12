@@ -349,7 +349,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    } else {
 		/*
 		 * Stas Sergeev added the possibility that
-		 * you can shove the Thingy abd piss it off.
+		 * you can shove the Thingy and piss it off.
 		 * It then becomes an enemy and may fire at you.
 		 */
 		iqengry=1;

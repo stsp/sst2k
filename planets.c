@@ -10,7 +10,7 @@ static int consumeTime(void)
 //  double asave;
     ididit = 1;
 #if 0
-    /* Don't wory about this */
+    /* Don't worry about this */
     if (future[FTBEAM] <= game.state.date+Time && game.state.remcom != 0 && condit != IHDOCKED) {
 	/* We are about to be tractor beamed -- operation fails */
 	return 1;

@@ -230,6 +230,36 @@ and start a new game.</para>
 <para>The Klingons are waiting.</para>
 
 </chapter>
+<chapter><title>Starting the Game</title>
+
+<para>The program will ask you some setup questions.  You can give it 
+command-line arguments that will be treated as answers.  Any token
+may be abbreviated to a unique prefix.</para>
+
+<para>The first question concerns whether you want a regullar,
+tournament, or saved game.  For discussion, see the <link
+linkend="freeze">description of the freeze command</link>.</para>
+
+<para>The second question will concern the length of the game.  
+Longer games include more enemies.</para>
+
+<para>The third question will set the game's difficulty level.
+You should probably start out at the novice level, even if you are
+already familiar with one of the other versions of the Star Trek
+game&mdash;but, of course, the level of game you play is up to you.  If
+you want to start at the Expert level, go ahead.  It's your funeral.
+The Emeritus game is strictly for masochists.</para>
+
+<para>The fourth question, new in SST2K, sets your game options.  A
+blank answer enables all SST2K features.  The option 'plain' disables
+a number of features (Tholians, planets &amp; dilithium, Thingies
+shooting back, deep-space-probes, Klingon ramming and movement,
+time-warping through black holes), approximating the original CDC 6600
+FORTRAN game from UT Austin.  The option 'almy' approximates Tom
+Almy's C translation from 1979, disabling Thingies shooting back and
+time-warping through black holes.</para>
+
+</chapter>
 <chapter><title>How To Issue Commands</title>
 
 <para>When the game is waiting for you to enter a command it will
@@ -303,7 +333,7 @@ complicated, but you will learn the abbreviations qGuickly enough.</para>
 
 <orderedlist>
 <listitem><para>You can abbreviate practically anything</para></listitem>
-<listitem><para>If you forget, the computer will proompt you</para></listitem>
+<listitem><para>If you forget, the computer will prompt you</para></listitem>
 <listitem><para>If you remember, you can type it all on one line</para></listitem>
 </orderedlist>
 
@@ -1220,7 +1250,7 @@ in the galaxy.  Since planets do not show up on long-range scans, the
 only way to obtain this information is with the <quote>SENSORS</quote> command.</para>
 
 </sect1>
-<sect1><title>Freeze</title>
+<sect1 id="freeze"><title>Freeze</title>
 
 <literallayout> 
 Mnemonic:  FREEZE
@@ -1496,12 +1526,6 @@ and Klingon kill rate, provided you are promoted from either the
 print the certificate to a file, import it into your word processor,
 selecting Courier 8pt font, and then print in <quote>landscape
 orientation</quote>.</para>
-
-<para>You should probably start out at the novice level, even if you are
-already familiar with one of the other versions of the Star Trek
-game&mdash;but, of course, the level of game you play is up to you.  If
-you want to start at the Expert level, go ahead.  It's your funeral.
-The emeritus game is strictly for masochists.</para>
 
 </chapter>
 <chapter><title>Handy Reference Page</title>
