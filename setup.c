@@ -473,13 +473,19 @@ int choose(int needprompt)
 	proutn("Choose your game options: ");
 	scan();
     }
-    if (isit("plain"))
+    if (isit("plain")) {
 	// Approximates the UT FORTRAN version.
 	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE);
-    if (isit("almy"))
+	game.options |= OPTION_PLAIN;
+    } 
+    if (isit("almy")) {
 	// Approximates Tom Almy's version.
 	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE);
-    else if (strlen(citem)) {
+	game.options |= OPTION_ALMY;
+    }
+    if (isit("fancy"))
+	/* do nothing */;
+    if (strlen(citem)) {
 	    proutn("What is \"");
 	    proutn(citem);
 	    prout("\"?");

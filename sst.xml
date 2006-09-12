@@ -47,11 +47,11 @@ remainder of the command line before standard input.  Thus, for
 example, you can invoke the program as</para>
 
 <programlisting>
-sst regular medium good plain
+sst regular medium good fancy
 </programlisting>
 
-<para>to start a regular medium game as a good player in 'plain'
-mode (with only the features from the FOTRAN original enabled).</para>
+<para>to start a regular medium game as a good player in 'fancy'
+mode (all features enabled).</para>
 </refsect1>
 
 <refsect1 id='authors'><title>AUTHORS</title> 

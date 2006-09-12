@@ -251,13 +251,14 @@ you want to start at the Expert level, go ahead.  It's your funeral.
 The Emeritus game is strictly for masochists.</para>
 
 <para>The fourth question, new in SST2K, sets your game options.  A
-blank answer enables all SST2K features.  The option 'plain' disables
-a number of features (Tholians, planets &amp; dilithium, Thingies
-shooting back, deep-space-probes, Klingon ramming and movement,
-time-warping through black holes), approximating the original CDC 6600
-FORTRAN game from UT Austin.  The option 'almy' approximates Tom
-Almy's C translation from 1979, disabling Thingies shooting back and
-time-warping through black holes.</para>
+blank answer or 'fancy' enables all SST2K features.  The option
+'plain' disables a number of features (Tholians, planets &amp;
+dilithium, Thingies shooting back, deep-space-probes, Klingon ramming
+and movement, time-warping through black holes, death-ray upgrade),
+approximating the original CDC 6600 FORTRAN game from UT Austin.  The
+option 'almy' approximates Tom Almy's C translation from 1979,
+disabling Thingies shooting back, base shields, and time-warping
+through black holes.</para>
 
 </chapter>
 <chapter><title>How To Issue Commands</title>

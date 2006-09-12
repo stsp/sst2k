@@ -105,6 +105,8 @@ typedef struct {
 #define OPTION_MVBADDY	0x00000100	/* more enemies can move */
 #define OPTION_BLKHOLE	0x00000200	/* black hole may timewarp you */
 #define OPTION_BASE	0x00000400	/* bases have good shields */
+#define OPTION_PLAIN	0x01000000	/* user chose plain game */
+#define OPTION_ALMY	0x02000000	/* user chose Almy variant */
 
 /* Define devices */
 #define DSRSENS 0

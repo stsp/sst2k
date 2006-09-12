@@ -48,38 +48,47 @@ Here are Tom Almy's changes:
    as well as changing "freeze" to "save". However I like "freeze".
    (Both "freeze" and "save" work in SST2K.)
 
-   When I got a later version of Super Star Trek that I was converting
-   from, I added the emexit command.
+   When I got a later (1979) version of Super Star Trek that I was converting
+   from, I added the emexit command from it.
 
-   That later version also mentions srscan and lrscan working when
+   That 1979 version also mentions srscan and lrscan working when
    docked (using the starbase's scanners), so I made some changes here
    to do this (and indicating that fact to the player), and then realized
    the base would have a subspace radio as well -- doing a Chart when docked
    updates the star chart, and all radio reports will be heard. The Dock
    command will also give a report if a base is under attack.
 
-   Klingon commander movements are no longer reported if long-range 
-   sensors are damaged.
-
    Also added:
 
-   1. Better base positioning at startup.
-
-   2. Deathray improvement (but keeping original failure alternatives).
-
-   3. Tholian Web.  (Now controlled by OPTION_THOLIAN and turned off 
-      if game type is "plain".)
-
-   4. Enemies can ram the Enterprise. (Now controlled by OPTION_RAMMING
+   1. The experimental deathray originally had only a 5% chance of
+      success, but could be used repeatedly. I guess after a couple
+      years of use, it was less "experimental" because the 1979
+      version had a 70% success rate. However it was prone to breaking
+      after use. I upgraded the deathray, but kept the original set of
+      failure modes (great humor!).  (Now controlled by OPTION_DEATHRAY
       and turned off if game type is "plain".)
 
-   5. Regular Klingons and Romulans can move in Expert and Emeritus games. 
+   2. Tholian Web from the 1979 version.  (Now controlled by
+      OPTION_THOLIAN and turned off if game type is "plain".)
+
+   3. Enemies can ram the Enterprise. (Now controlled by OPTION_RAMMING
+      and turned off if game type is "plain".)
+
+   4. Regular Klingons and Romulans can move in Expert and Emeritus games. 
       This code could use improvement. (Now controlled by OPTION_MVBADDY
       and turned off if game type is "plain".)
 
-   6. The deep-space probe feature from the DECUS version.  (Now controlled
+   5. The deep-space probe feature from the DECUS version.  (Now controlled
       by OPTION_PROBE and turned off if game type is "plain").
 
+   6. Bugfix: Klingon commander movements are no longer reported if long-range 
+      sensors are damaged.
+
+   7. Bugfix: Better base positioning at startup (more spread out).
+      That made sense to add because most people abort games with 
+      bad base placement.
+
+   In June 2002, I fixed two known bugs and a documentation typo.
    In June 2004 I fixed a number of bugs involving: 1) parsing invalid
    numbers, 2) manual phasers when SR scan is damaged and commander is
    present, 3) time warping into the future, 4) hang when moving
@@ -103,8 +112,8 @@ Here are Stas Sergeev's changes:
 
    4. The Tholian can be hit with phasers.
 
-   5. SCom can't escape from you if no more enemies remain (without this, 
-      chasing SCom can take an eternity).
+   5. SCom can't escape from you if no more enemies remain 
+      (without this, chasing SCom can take an eternity).
 
    6. Probe target you enter is now the destination quadrant. Before I don't 
       remember what it was, but it was something I had difficulty using.
@@ -534,7 +543,7 @@ int main(int argc, char **argv)
 {
     int i, option;
 
-    game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME);
+    game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME | OPTION_PLAIN | OPTION_ALMY);
     if (getenv("TERM"))
 	game.options |= OPTION_CURSES | OPTION_SHOWME;
     else

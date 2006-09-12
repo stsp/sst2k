@@ -2,6 +2,3 @@
 
 * Wrap a GUI around it.
 
-* Find out what the deathray behavior was before Tom Almy changed it,
-  and reverse the change when the game type is 'plain'.
-

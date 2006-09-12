@@ -395,7 +395,7 @@ void shuttle(void)
 
 void deathray(void) 
 {
-    double r = Rand();
+    double dprob, r = Rand();
 	
     ididit = 0;
     skip(1);
@@ -430,20 +430,25 @@ void deathray(void)
     skip(1);
     prouts("WHIRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
     skip(1);
-    if (r > .30) {
+    dprob = .30;
+    if (game.options & OPTION_PLAIN)
+	dprob = .5;
+    if (r > dprob) {
 	prouts("Sulu- \"Captain!  It's working!\"");
 	skip(2);
 	while (nenhere > 0)
 	    deadkl(game.kx[1],game.ky[1],game.quad[game.kx[1]][game.ky[1]],game.kx[1],game.ky[1]);
 	prout("Ensign Chekov-  \"Congratulations, Captain!\"");
 	if (KLINGREM == 0) finish(FWON);
-	prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
-	if (Rand() <= 0.05) {
-	    prout("   is still operational.\"");
-	}
-	else {
-	    prout("   has been rendered nonfunctional.\"");
-	    game.damage[DDRAY] = 39.95;
+	if ((game.options & OPTION_PLAIN) == 0) {
+	    prout("Spock-  \"Captain, I believe the `Experimental Death Ray'");
+	    if (Rand() <= 0.05) {
+		prout("   is still operational.\"");
+	    }
+	    else {
+		prout("   has been rendered nonfunctional.\"");
+		game.damage[DDRAY] = 39.95;
+	    }
 	}
 	return;
     }
