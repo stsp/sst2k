@@ -478,14 +478,14 @@ int choose(int needprompt)
 	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE);
 	game.options |= OPTION_PLAIN;
     } 
-    if (isit("almy")) {
+    else if (isit("almy")) {
 	// Approximates Tom Almy's version.
 	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE);
 	game.options |= OPTION_ALMY;
     }
-    if (isit("fancy"))
+    else if (isit("fancy"))
 	/* do nothing */;
-    if (strlen(citem)) {
+    else if (strlen(citem)) {
 	    proutn("What is \"");
 	    proutn(citem);
 	    prout("\"?");
