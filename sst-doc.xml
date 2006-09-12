@@ -1576,7 +1576,7 @@ Impulse engines require 20 units to warm up, plus 100 units per
 
 <para>The original Star Trek seems to have been written by Mike
 Mayfield at the beginning of the 1970s.  His first version was in
-BASIC for a Sigma 7 in 1971; on 1972 he rewrote it in Hewlett
+BASIC for a Sigma 7 in 1971; in 1972 he rewrote it in Hewlett
 Packard BASIC.</para>
 
 <para>While some people claim to have recollections of playing Trek
@@ -1595,30 +1595,44 @@ Ahl published in <citetitle>101 BASIC Computer Games</citetitle>,
 1973. This was a port of Mayfield's version obtained from the HP
 Contributed Programs library.</para>
 
-<para>Our "Super Star Trek" came through a Taurus BASIC program by
-Grady Hicks dated 5 April 1973. This does not appear to have been
-derived from Ahl's SPACEWR, at least not directly. The header says
-"GENERAL IDEA STOLEN FROM PENN. U.", and the game has several features
-not present in SPACEWR: notably, the Death Ray, ramming, and the
-Klingon summons to surrender.</para>
+<para>Our SST2K is descended from a Taurus BASIC program by Grady
+Hicks dated 5 April 1973. This does not appear to have been derived
+from Ahl's SPACEWR, at least not directly. The header says "GENERAL
+IDEA STOLEN FROM PENN. U.", and the game has several features not
+present in SPACEWR: notably, the Death Ray, ramming, and the Klingon
+summons to surrender.</para>
 
-<para>Dave Matuszek, Paul Reynolds et. al. at UT Austin translated the
-Hicks port into FORTRAN and considerably enhanced it.  The name "Super
-Star Trek" and many design features (including command abbreviations
-rather than command numbers) were probably picked up from a second
-BASIC version published by David Ahl in his 1978 sequel
-<citetitle>BASIC Computer Games</citetitle>.</para>
+<para>Dave Matuszek, Paul Reynolds et. al. at UT Austin played the
+Hicks version on a CDC6600, but disliked the long load time and
+extreme slowness of the BASIC program. (David Matuszek notes that the
+version of the Hicks port he played had a habit of throwing long
+quotes from Marcus Aurelius at the users, a feature he found
+intolerable at 110 baud.)  The Austinites proceeded to write their own
+Trek game, loosely based on the Hicks version, in CDC6600 FORTRAN.  At
+that time, it was just called "Star Trek"; the "Super" was added by
+later developers.</para>
 
-<para>One signature trait of FORTRAN SST and its descendants is that
-the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's 1972
-original and its BASIC descendants) Also, you set courses and firing
-directions with rectangular rather than polar coordinates.  FORTRAN SST
-also preserves the original numbered quadrants rather than the
-astronomically-named quadrants introduced in David Ahl's 1978 BASIC
-version and descendants.</para>
+<para>The name "Super Star Trek" and many design features may have
+been picked up from a descendant of SPACEWR, reworked by Robert Leedom
+and friends and published by David Ahl in his 1978 sequel
+<citetitle>BASIC Computer Games</citetitle>. On the other hand, there
+is internal evidence to suggest that at least some features of Leedom's
+SST may have derived from the UT FORTRAN version.  In particular, Dave
+Matuszek recalls implementing command words to replace the original
+numeric command codes, and this was apparently before 1978.</para>
+
+<para>One signature trait of the UT FORTRAN game and its descendants
+is that the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's
+1972 original and its BASIC descendants).  The UT FORTRAN version also
+preserves the original numbered quadrants rather than the
+astronomically-named quadrants introduced in Ahl's SST and its
+descendants.</para>
+
+<!-- Dave thinks his Fortran Star Trek used the clockface for quadrant -->
+<!-- navigation. -->
 
 <para>Eric Allman's BSD Trek game is one of these, also descended from
-FORTRAN SST via translation to C.  However, the mainline SST (now
+FORTRAN Star Trek via translation to C.  However, the mainline S (now
 SST2K) has had a lot more stuff folded into it over the years &mdash;
 deep space probes, dilithium mining, the Tholian Web, and so
 forth.</para>
