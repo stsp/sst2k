@@ -16,6 +16,9 @@ String fallback[] = {
     "*photons.label: Torps",
     "*destruct.label: Destruct",
     "*quit.label: Quit",
+    /* text window resources */
+    "*text.resizable: true",
+    "*text.resize: ResizeBoth",
     /* layout constraints */
     "*photons.fromHoriz: phasers",
     "*destruct.fromHoriz: photons",
@@ -54,8 +57,7 @@ int main (int argc, char **argv)
     /* the command window */
     text = XtVaCreateManagedWidget ("text", asciiTextWidgetClass, form, 
 				    XtNfromVert, buttons, 
-				    XtNresize, XawtextResizeBoth, 
-				    XtNresizable, True, NULL);
+				    NULL);
 
     /* sample text so the widget will be identifiable */
     XtVaSetValues (text, XtNtype, XawAsciiString, 
