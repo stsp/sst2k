@@ -11,6 +11,7 @@
 static XtAppContext app_context;
 static Widget toplevel, text, form; 
 static Widget navigation, weapons, status, planets, misc; 
+static Widget navlabel, weaplabel, statlabel, planlabel, misclabel;
 
 static String fallback[] = {
     /* text window resources */
@@ -96,26 +97,46 @@ int main(int argc, char **argv)
 				       XtNfromVert, text, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    navlabel  = XtVaCreateManagedWidget("Navigation:   ", 
+					labelWidgetClass, navigation,
+					XtNborderWidth, 0,
+					NULL); 
     weapons  = XtVaCreateManagedWidget("weapons", 
 				       boxWidgetClass, form,
 				       XtNfromVert, navigation, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    weaplabel  = XtVaCreateManagedWidget("Weapons:      ", 
+					 labelWidgetClass, weapons,
+					 XtNborderWidth, 0,
+					 NULL); 
     status   = XtVaCreateManagedWidget("status", 
 				       boxWidgetClass, form,
 				       XtNfromVert, weapons, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    statlabel  = XtVaCreateManagedWidget("Status:       ", 
+					 labelWidgetClass, status,
+					 XtNborderWidth, 0,
+					 NULL); 
     planets  = XtVaCreateManagedWidget("planets", 
 				       boxWidgetClass, form,
 				       XtNfromVert, status, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    planlabel  = XtVaCreateManagedWidget("Planets:      ", 
+					 labelWidgetClass, planets,
+					 XtNborderWidth, 0,
+					 NULL); 
     misc  = XtVaCreateManagedWidget("misc", 
 				       boxWidgetClass, form,
 				       XtNfromVert, planets, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    misclabel  = XtVaCreateManagedWidget("Miscellaneous:", 
+					 labelWidgetClass, misc,
+					 XtNborderWidth, 0,
+					 NULL); 
     for (cp = commands; cp < commands + sizeof(commands)/sizeof(commands[0]); cp++) {
 	cp->widget = XtVaCreateManagedWidget(cp->name, 
 					     commandWidgetClass, 
