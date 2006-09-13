@@ -9,7 +9,8 @@
 #include "sst.h"
 
 static XtAppContext app_context;
-static Widget toplevel, form, text, buttons; 
+static Widget toplevel, text, form; 
+static Widget navigation, weapons, status, planets, misc; 
 
 static String fallback[] = {
     /* text window resources */
@@ -21,8 +22,10 @@ static String fallback[] = {
 struct cmd_t {
     char *name;
     void (*callback)(Widget, XtPointer, XtPointer);
+    Widget *parent;
     int enable;
     Widget widget;
+
 };
 
 static void quit_proc(Widget w, XtPointer client_data, XtPointer call_data)
@@ -38,35 +41,39 @@ static void noargs_proc(Widget w, XtPointer client_data, XtPointer call_data)
 }
 
 static struct cmd_t commands[] = {
-    {"Phasers",		NULL,		0},
-    {"Torpedo",		NULL,		0},
-    {"Move",		NULL,		0},
-    {"Shields",		NULL,		0},
-    {"Dock",		noargs_proc,	0},
-    {"Damages",		noargs_proc,	0},
-    {"Chart",		noargs_proc,	0},
-    {"Impulse",		NULL,		0},
-    {"Rest",		NULL,		0},
-    {"Warp",		NULL,		0},
-    {"Score",		noargs_proc,	0},
-    {"Sensors",		noargs_proc,	OPTION_PLANETS},
-    {"Orbit",		noargs_proc,	OPTION_PLANETS},
-    {"Transport",	noargs_proc,	OPTION_PLANETS},
-    {"Mine",		noargs_proc,	OPTION_PLANETS},
-    {"Crystals",	noargs_proc,	OPTION_PLANETS},
-    {"Shuttle",		noargs_proc,	OPTION_PLANETS},
-    {"Planets",		noargs_proc,	OPTION_PLANETS},
-    {"Report",		noargs_proc,	0},
-    {"Computer",	noargs_proc,   	0},
-    {"Emexit",		noargs_proc,	0},
-    {"Probe",		NULL,		OPTION_PROBE},
-    {"Save",		NULL,		0},
-    {"Abandon",		noargs_proc,	0},
-    {"Destruct",	noargs_proc,	0},
-    {"Deathray",	noargs_proc,	0},
-    {"Mayday",		noargs_proc,	0},
-    {"Quit",		quit_proc,	0},
-    {"Help",		noargs_proc,	0},
+    {"Move",		NULL,		&navigation,	0},
+    {"Dock",		noargs_proc,	&navigation,	0},
+    {"Chart",		noargs_proc,	&navigation,	0},
+    {"Impulse",		NULL,		&navigation,	0},
+    {"Rest",		NULL,		&navigation,	0},
+    {"Warp",		NULL,		&navigation,	0},
+    {"Probe",		NULL,		&navigation,	OPTION_PROBE},
+
+    {"Phasers",		NULL,		&weapons,	0},
+    {"Torpedo",		NULL,		&weapons,	0},
+    {"Shields",		NULL,		&weapons,	0},
+    {"Damages",		noargs_proc,	&weapons,	0},
+    {"Abandon",		noargs_proc,	&weapons,	0},
+    {"Destruct",	noargs_proc,	&weapons,	0},
+    {"Deathray",	noargs_proc,	&weapons,	0},
+    {"Mayday",		noargs_proc,	&weapons,	0},
+
+    {"Score",		noargs_proc,	&status,	0},
+    {"Report",		noargs_proc,	&status,	0},
+    {"Computer",	noargs_proc,   	&status,	0},
+
+    {"Sensors",		noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Orbit",		noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Transport",	noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Mine",		noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Crystals",	noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Shuttle",		noargs_proc,	&planets,	OPTION_PLANETS},
+    {"Planets",		noargs_proc,	&planets,	OPTION_PLANETS},
+
+    {"Emexit",		noargs_proc,	&misc,		0},
+    {"Save",		NULL,		&misc,		0},
+    {"Quit",		quit_proc,	&misc,		0},
+    {"Help",		noargs_proc,	&misc,		0},
 };
 
 int main(int argc, char **argv)
@@ -83,15 +90,36 @@ int main(int argc, char **argv)
 				   XtNwidth, 400, XtNheight, 200,
 				   NULL);
     XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
-    /* The button panel */
-    buttons  = XtVaCreateManagedWidget("form", 
+    /* The button panels */
+    navigation  = XtVaCreateManagedWidget("navigation", 
 				       boxWidgetClass, form,
 				       XtNfromVert, text, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
+    weapons  = XtVaCreateManagedWidget("weapons", 
+				       boxWidgetClass, form,
+				       XtNfromVert, navigation, 
+				       XtNorientation, XtorientHorizontal,
+				       NULL); 
+    status   = XtVaCreateManagedWidget("status", 
+				       boxWidgetClass, form,
+				       XtNfromVert, weapons, 
+				       XtNorientation, XtorientHorizontal,
+				       NULL); 
+    planets  = XtVaCreateManagedWidget("planets", 
+				       boxWidgetClass, form,
+				       XtNfromVert, status, 
+				       XtNorientation, XtorientHorizontal,
+				       NULL); 
+    misc  = XtVaCreateManagedWidget("misc", 
+				       boxWidgetClass, form,
+				       XtNfromVert, planets, 
+				       XtNorientation, XtorientHorizontal,
+				       NULL); 
     for (cp = commands; cp < commands + sizeof(commands)/sizeof(commands[0]); cp++) {
 	cp->widget = XtVaCreateManagedWidget(cp->name, 
-					     commandWidgetClass, buttons, 
+					     commandWidgetClass, 
+					     *cp->parent, 
 					     XtNlabel, cp->name,
 					     NULL);
 	if (cp->callback)
