@@ -75,3 +75,7 @@ release: sst-$(VERSION).tar.gz sst.html
 
 version:
 	@echo $(VERSION)
+
+# Experimental XaW code, not yet integrated with the game
+xio: xio.c
+	cc xio.c -lXaw3d -o xio
