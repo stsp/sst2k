@@ -1,4 +1,21 @@
 		Super Star Trek TO-DO list
 
-* Wrap a GUI around it.
 
+Short-term items:
+
+* Bring the online help in sync with our commands changes
+
+* Find out why the online help contains the escape sequences like ~@~T (Eric?)
+
+* Adjust the sst.spec wrt the build system changes
+
+* Maybe make a release
+
+
+Long-term items:
+
+* gettextize
+
+* Russian translation
+
+* Wrap a GUI around it.

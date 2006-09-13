@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <termios.h>
 #include <curses.h>
 #include <signal.h>
 #include <ctype.h>

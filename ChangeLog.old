@@ -1,0 +1,106 @@
+Tom Almy story:
+
+Back in (about) 1977 I got a copy of this Super Star Trek game for
+the CDC 6600 mainframe computer. Someone had converted it to PDP-11
+Fortran but couldn't get it to run because of its size. I modified
+the program to use overlays and managed to shoehorn it in on the 56k
+byte machine.
+
+I liked the game so much I put some time into fixing bugs, mainly
+what could be called continuity errors and loopholes in the game's
+logic. We even played a couple tournaments.
+
+In 1979, I lost access to that PDP-11. I did save the source code
+listing. In 1995, missing that old friend, I started converting the
+program into portable ANSI C. It's been slow, tedious work that took
+over a year to accomplish.
+
+In early 1997, I got the bright idea to look for references to "Super
+Star Trek" on the World Wide Web. There weren't many hits, but there
+was one that came up with 1979 Fortran sources! This version had a
+few additional features that mine didn't have, however mine had some
+feature it didn't have. So I merged its features that I liked. I also
+took a peek at the DECUS version (a port, less sources, to the
+PDP-10), and some other variations.
+
+Modifications I made:
+
+  Compared to original version, I've changed the "help" command to
+  "call" and the "terminate" command to "quit" to better match user
+  expectations. The DECUS version apparently made those changes as well
+  as changing "freeze" to "save". However I like "freeze".
+
+  I added EMEXIT from the 1979 version.
+
+  That later version also mentions srscan and lrscan working when
+  docked (using the starbase's scanners), so I made some changes here
+  to do this (and indicating that fact to the player), and then
+  realized the base would have a subspace radio as well -- doing a
+  Chart when docked updates the star chart, and all radio reports will
+  be heard. The Dock command will also give a report if a base is under
+  attack.
+
+  It also had some added logic to spread the initial positioning of
+  bases. That made sense to add because most people abort games with
+  bad base placement.
+
+  The experimental deathray originally had only a 5% chance of success,
+  but could be used repeatedly. I guess after a couple years of use, it
+  was less "experimental" because the 1979 version had a 70% success
+  rate. However it was prone to breaking after use. I upgraded the
+  deathray, but kept the original set of failure modes (great humor!).
+
+  I put in the Tholian Web code from the 1979 version.
+
+  I added code so that Romulans and regular Klingons could move in
+  advanced games. I re-enabled the code which allows enemy ships to
+  ram the Enterprise; it had never worked right. The 1979 version
+  seems to have it all fixed up, but I'm still not overly happy with
+  the algorithm.
+
+  The DECUS version had a Deep Space Probe. Looked like a good idea
+  so I implimented it based on its description.
+
+
+Stas Sergeev story:
+
+Found Tom Almy's C sources - yeah! Hmm, not too playable - I've got
+used to that nice text-based GUI I've seen on an IBM S/370 port, and the
+command-line control gets me quite annoyed. But that's a good starting
+point for some improvements - the sources are finally here! I was about
+to start writing an S/370 emulator to get it a go, and now here are
+the sources - what a great finding.
+
+[a bit later]
+
+Added a text-based interface which makes the game much more playable.
+Initially I made it for DOS using conio.h. Later I decided to make a
+linux port, and I ported it using a linux-conio package. I had to patch
+linux-conio a lot, so you have to use my version. The colors are still
+wrong though.
+I also fixed an uncountable amount of bugs and added some features, I
+can't remember now which ones.
+
+[3 years later]
+
+I dusted off the game and finally got around to move it to autoconf.
+For building with Borland C under DOS, use the build_bc.bat file.
+
+It turned out Tom Almy also did a linux port and made some bug-fixing
+work, although to the much smaller extent than I did. I contacted him
+and notified about my port, but he expressed no interest. :(
+
+[a year later]
+
+I've found out that Eric S Raymond (ESR) took over the development
+of the Tom Almy's sources. He could use mine instead as they are
+much more advanced, but oh well... Now I have to find out the way
+to incorporate my mods into his version and hope that he can do
+the better work on that game than I could (which is most likely
+the case).
+.....
+OK, the changes were incorporated, however Eric removed the conio
+port and therefore the game can no longer be compiled with bcc/DOS.
+The DJGPP port might still be possible in the future.
+
+  -- Stas Sergeev <stsp@users.sourceforge.net>

@@ -1,13 +1,10 @@
-#define INCLUDED	// Define externs here
 #include <ctype.h>
 #include <getopt.h>
 #include <time.h>
 #include "sstlinux.h"
 #include "sst.h"
 
-#ifndef SSTDOC
-#define SSTDOC	"sst.doc"
-#endif
+#define DOC_NAME "sst.doc"
 	
 /*
 
@@ -160,12 +157,37 @@ for a lot of magic numbers and refactored the heck out of it.
 /* the input queue */
 static char line[128], *linep = line;
 
+struct game game;
+int thingx, thingy, iqhere, iqengry;
+int iscore, iskill; // Common PLAQ
+double aaitem;
+double perdate;
+char citem[10];
+
+char *device[NDEVICES] = {
+	"S. R. Sensors",
+	"L. R. Sensors",
+	"Phasers",
+	"Photon Tubes",
+	"Life Support",
+	"Warp Engines",
+	"Impulse Engines",
+	"Shields",
+	"Subspace Radio",
+	"Shuttle Craft",
+	"Computer",
+	"Transporter",
+	"Shield Control",
+	"Death Ray",
+	"D. S. Probe"};									
+
 static struct 
 {
     char *name;
     int value;
     unsigned long option;
 }
+
 commands[] = {
 #define SRSCAN	0
 	{"SRSCAN",	SRSCAN,		OPTION_TTY},
@@ -300,9 +322,12 @@ static void helpme(void)
 	cmdbuf[j] = '\0';
     }
     fp = fopen(SSTDOC, "r");
+    if (fp == NULL)
+        fp = fopen(DOC_NAME, "r");
     if (fp == NULL) {
 	prout("Spock-  \"Captain, that information is missing from the");
-	prout("   computer.\"");
+        prout("   computer. You need to find "DOC_NAME" and put it in the");
+        prout("   current directory or to "SSTDOC".\"");
 	/*
 	 * This used to continue: "You need to find SST.DOC and put 
 	 * it in the current directory."

@@ -1,12 +1,15 @@
+#ifndef __SST_H__
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <curses.h>
-#ifndef INCLUDED
-#define EXTERN extern
+
+#ifdef DATA_DIR
+#define SSTDOC DATA_DIR"/"DOC_NAME
 #else
-#define EXTERN
+#define SSTDOC DOC_NAME
 #endif
 
 #define min(x, y)	((x)<(y)?(x):(y))
@@ -148,9 +151,9 @@ typedef struct {
 
 #define SSTMAGIC	"SST2.0\n"
 
-EXTERN WINDOW *curwnd;
+extern WINDOW *curwnd;
 
-EXTERN struct {
+struct game {
     char magic[sizeof(SSTMAGIC)];
     unsigned long options;
     snapshot state;
@@ -253,7 +256,8 @@ EXTERN struct {
 	probeinx,
 	probeiny,
 	height;
-} game;
+};
+extern struct game game;
 
 #define inkling game.inkling		// Initial number of klingons
 #define inbase game.inbase		// Initial number of bases
@@ -344,14 +348,14 @@ EXTERN struct {
 #define nprobes game.nprobes		// number of probes available
 
 /* the following global state doesn't need to be saved */
-EXTERN char	*device[NDEVICES];
-EXTERN int iscore, iskill; // Common PLAQ
-EXTERN double perdate;
-EXTERN double aaitem;
-EXTERN char citem[10];
+extern char *device[NDEVICES];
+extern int iscore, iskill; // Common PLAQ
+extern double perdate;
+extern double aaitem;
+extern char citem[10];
 
 /* the Space Thingy's global state should *not* be saved! */
-EXTERN int thingx, thingy, iqhere, iqengry;
+extern int thingx, thingy, iqhere, iqengry;
 
 typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
@@ -359,25 +363,6 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
 			  FHOLE} FINTYPE ;
 enum loctype {neither, quadrant, sector};
-
-#ifdef INCLUDED
-char *device[NDEVICES] = {
-	"S. R. Sensors",
-	"L. R. Sensors",
-	"Phasers",
-	"Photon Tubes",
-	"Life Support",
-	"Warp Engines",
-	"Impulse Engines",
-	"Shields",
-	"Subspace Radio",
-	"Shuttle Craft",
-	"Computer",
-	"Transporter",
-	"Shield Control",
-	"Death Ray",
-	"D. S. Probe"};									
-#endif
 
 #ifndef TRUE
 #define TRUE (1)
@@ -526,3 +511,5 @@ enum COLORS {
 };
 
 #define DAMAGED	128	/* marker for damaged ship in starmap */
+
+#endif

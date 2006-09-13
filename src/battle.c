@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include "sst.h"
 
 void doshield(int i) 
