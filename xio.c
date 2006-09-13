@@ -24,7 +24,7 @@ int main (int argc, char **argv)
     quit = XtVaCreateManagedWidget ("quit", commandWidgetClass, form, XtNlabel,
 				    "Quit", NULL);
     text = XtVaCreateManagedWidget ("text", asciiTextWidgetClass, form, 
-				    XtNfromHoriz, quit, XtNresize,
+				    XtNfromVert, quit, XtNresize,
 				    XawtextResizeBoth, XtNresizable, True, NULL);
     XtAddCallback (quit, XtNcallback, quit_proc, NULL);
     if (argc <= 1)
