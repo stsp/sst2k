@@ -7,7 +7,7 @@
 #include <X11/Xaw/AsciiText.h>
 
 XtAppContext app_context;
-Widget toplevel, form, quit, text;
+Widget toplevel, form, buttons, quit, destruct, text;
 
 void quit_proc (Widget w, XtPointer client_data, XtPointer call_data)
 { 
@@ -21,18 +21,22 @@ int main (int argc, char **argv)
 				    argv, NULL, applicationShellWidgetClass,
 				    XtNallowShellResize, True, NULL);
     form = XtVaCreateManagedWidget ("form", formWidgetClass, toplevel, NULL); 
-    quit = XtVaCreateManagedWidget ("quit", commandWidgetClass, form, XtNlabel,
-				    "Quit", NULL);
+    buttons = XtVaCreateManagedWidget ("form", formWidgetClass, form, NULL); 
+    quit     = XtVaCreateManagedWidget("quit", 
+				       commandWidgetClass, buttons, 
+				       XtNlabel, "Quit", NULL);
+    destruct = XtVaCreateManagedWidget("destruct", 
+				       commandWidgetClass, buttons, 
+				       XtNfromHoriz, quit,
+				       XtNlabel, "Destruct", NULL);
     text = XtVaCreateManagedWidget ("text", asciiTextWidgetClass, form, 
-				    XtNfromVert, quit, XtNresize,
+				    XtNfromVert, buttons, XtNresize,
 				    XawtextResizeBoth, XtNresizable, True, NULL);
     XtAddCallback (quit, XtNcallback, quit_proc, NULL);
-    if (argc <= 1)
-	XtVaSetValues (text, XtNtype, XawAsciiString, 
-		       XtNstring, "Fool! You should"
-		       " supply a file name!", NULL); 
-    else
-	XtVaSetValues (text, XtNtype, XawAsciiFile, XtNstring, argv [1], NULL);
+
+    /* sample text so the widget will be identifiable */
+    XtVaSetValues (text, XtNtype, XawAsciiString, 
+		       XtNstring, "Command window", NULL); 
     XtVaSetValues (text, XtNeditType, XawtextRead, XtNdisplayCaret, False, NULL);
     XtRealizeWidget (toplevel);
     XtAppMainLoop (app_context);
