@@ -7,10 +7,19 @@
 #include <X11/Xaw/AsciiText.h>
 
 XtAppContext app_context;
-Widget toplevel, form, buttons, quit, destruct, text;
+Widget toplevel, form, text; 
+Widget buttons, phasers, photons, destruct, quit;
 
 String fallback[] = {
-    "*destruct.fromHoriz: quit",
+    /* button labels */
+    "*phasers.label: Phasers",
+    "*photons.label: Torps",
+    "*destruct.label: Destruct",
+    "*quit.label: Quit",
+    /* layout constraints */
+    "*photons.fromHoriz: phasers",
+    "*destruct.fromHoriz: photons",
+    "*quit.fromHoriz: destruct",
     NULL,
 };
 
@@ -22,20 +31,26 @@ static void quit_proc (Widget w, XtPointer client_data, XtPointer call_data)
 
 int main (int argc, char **argv)
 { 
-    toplevel = XtVaOpenApplication (&app_context, "XThird", NULL, 0, &argc,
+    toplevel = XtVaOpenApplication (&app_context, "sst2k", NULL, 0, &argc,
 				    argv, fallback, 
 				    applicationShellWidgetClass,
 				    XtNallowShellResize, True, NULL);
     form = XtVaCreateManagedWidget ("form", formWidgetClass, toplevel, NULL);
     /* The button panel */
     buttons  = XtVaCreateManagedWidget ("form", formWidgetClass, form, NULL); 
-    quit     = XtVaCreateManagedWidget("quit", 
+    phasers  = XtVaCreateManagedWidget("phasers", 
 				       commandWidgetClass, buttons, 
-				       XtNlabel, "Quit", NULL);
-    XtAddCallback (quit, XtNcallback, quit_proc, NULL);
+				       NULL);
+    photons  = XtVaCreateManagedWidget("photons", 
+				       commandWidgetClass, buttons, 
+				       NULL);
     destruct = XtVaCreateManagedWidget("destruct", 
 				       commandWidgetClass, buttons, 
-				       XtNlabel, "Destruct", NULL);
+				       NULL);
+    quit     = XtVaCreateManagedWidget("quit", 
+				       commandWidgetClass, buttons, 
+				       NULL);
+    XtAddCallback (quit, XtNcallback, quit_proc, NULL);
     /* the command window */
     text = XtVaCreateManagedWidget ("text", asciiTextWidgetClass, form, 
 				    XtNfromVert, buttons, 
