@@ -28,7 +28,7 @@ String fallback[] = {
     "*Shields.fromHoriz: Torpedo",
     "*Damages.fromHoriz: Shields",
     "*Crystals.fromHoriz: Damages",
-    "*Deathray.fromHoriz: Damages",
+    "*Deathray.fromHoriz: Crystals",
     "*Mayday.fromHoriz: Deathray",
     "*Abandon.fromHoriz: Mayday",
     // Planet row
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     /* the command window */
     text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, 
 				    NULL);
-
+    XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
     /* The button panel */
     buttons  = XtVaCreateManagedWidget("form", 
 					formWidgetClass, form, 
@@ -123,10 +123,6 @@ int main(int argc, char **argv)
 	if (cp->callback)
 	    XtAddCallback (cp->widget, XtNcallback, cp->callback, NULL);
     }
-    /* sample text so the widget will be identifiable */
-    XtVaSetValues(text, XtNtype, XawAsciiString, 
-		       XtNstring, "Command window", NULL); 
-    XtVaSetValues(text, XtNeditType, XawtextRead, XtNdisplayCaret, False, NULL);
     XtRealizeWidget(toplevel);
     XtAppMainLoop(app_context);
     /* loop may be interrupted */
