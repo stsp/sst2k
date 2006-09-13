@@ -2,6 +2,7 @@
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
 #include <X11/Shell.h>
+#include <X11/Xaw/Box.h>
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/AsciiText.h>
@@ -10,45 +11,10 @@
 static XtAppContext app_context;
 static Widget toplevel, form, text, buttons; 
 
-String fallback[] = {
+static String fallback[] = {
     /* text window resources */
     "*text.resizable: true",
     "*text.resize: ResizeBoth",
-    /* layout constraints */
-    /* navigation row */
-    //"*Move.fromHoriz:",
-    "*Impulse.fromHoriz: Move",
-    "*Rest.fromHoriz: Impulse",
-    "*Warp.fromHoriz: Rest",
-    "*Dock.fromHoriz: Warp",
-    "*Chart.fromHoriz: Dock",
-    // Weapons row
-    "*Phasers.fromVert: Move",
-    "*Torpedo.fromHoriz: Phasers",
-    "*Shields.fromHoriz: Torpedo",
-    "*Damages.fromHoriz: Shields",
-    "*Crystals.fromHoriz: Damages",
-    "*Deathray.fromHoriz: Crystals",
-    "*Mayday.fromHoriz: Deathray",
-    "*Abandon.fromHoriz: Mayday",
-    // Planet row
-    "*Sensors.fromVert: Phasers",
-    "*Orbit.fromHoriz: Sensors",
-    "*Transport.fromHoriz: Orbit",
-    "*Mine.fromHoriz: Transport",
-    "*Shuttle.fromHoriz: Transport",
-    "*Planets.fromHoriz: Shuttle",
-    // Miscellany row
-    "*Report.fromVert: Sensors",
-    "*Computer.fromHoriz: Report",
-    "*Probe.fromHoriz: Computer",
-    "*Help.fromHoriz: Computer",
-    // Ending it all
-    "*Score.fromVert: Report",
-    "*Destruct.fromHoriz: Score",
-    "*Quit.fromHoriz: Destruct",
-    "*Emexit.fromHoriz: Quit",
-    "*Save.fromHoriz: Emexit",
     NULL,
 };
 
@@ -65,36 +31,42 @@ static void quit_proc(Widget w, XtPointer client_data, XtPointer call_data)
     exit (0);
 }
 
+static void noargs_proc(Widget w, XtPointer client_data, XtPointer call_data)
+/* use this for commands that take no arguments */
+{
+    /* currently a stub */
+}
+
 static struct cmd_t commands[] = {
     {"Phasers",		NULL,		0},
     {"Torpedo",		NULL,		0},
     {"Move",		NULL,		0},
     {"Shields",		NULL,		0},
-    {"Dock",		NULL,		0},
-    {"Damages",		NULL,		0},
-    {"Chart",		NULL,		0},
+    {"Dock",		noargs_proc,	0},
+    {"Damages",		noargs_proc,	0},
+    {"Chart",		noargs_proc,	0},
     {"Impulse",		NULL,		0},
     {"Rest",		NULL,		0},
     {"Warp",		NULL,		0},
-    {"Score",		NULL,		0},
-    {"Sensors",		NULL,		OPTION_PLANETS},
-    {"Orbit",		NULL,		OPTION_PLANETS},
-    {"Transport",	NULL,		OPTION_PLANETS},
-    {"Mine",		NULL,		OPTION_PLANETS},
-    {"Crystals",	NULL,		OPTION_PLANETS},
-    {"Shuttle",		NULL,		OPTION_PLANETS},
-    {"Planets",		NULL,		OPTION_PLANETS},
-    {"Report",		NULL,		0},
-    {"Computer",	NULL,      	0},
-    {"Emexit",		NULL,		0},
+    {"Score",		noargs_proc,	0},
+    {"Sensors",		noargs_proc,	OPTION_PLANETS},
+    {"Orbit",		noargs_proc,	OPTION_PLANETS},
+    {"Transport",	noargs_proc,	OPTION_PLANETS},
+    {"Mine",		noargs_proc,	OPTION_PLANETS},
+    {"Crystals",	noargs_proc,	OPTION_PLANETS},
+    {"Shuttle",		noargs_proc,	OPTION_PLANETS},
+    {"Planets",		noargs_proc,	OPTION_PLANETS},
+    {"Report",		noargs_proc,	0},
+    {"Computer",	noargs_proc,   	0},
+    {"Emexit",		noargs_proc,	0},
     {"Probe",		NULL,		OPTION_PROBE},
     {"Save",		NULL,		0},
-    {"Abandon",		NULL,		0},
-    {"Destruct",	NULL,		0},
-    {"Deathray",	NULL,		0},
-    {"Mayday",		NULL,		0},
+    {"Abandon",		noargs_proc,	0},
+    {"Destruct",	noargs_proc,	0},
+    {"Deathray",	noargs_proc,	0},
+    {"Mayday",		noargs_proc,	0},
     {"Quit",		quit_proc,	0},
-    {"Help",		NULL,		0},
+    {"Help",		noargs_proc,	0},
 };
 
 int main(int argc, char **argv)
@@ -108,13 +80,15 @@ int main(int argc, char **argv)
     form = XtVaCreateManagedWidget("form", formWidgetClass, toplevel, NULL);
     /* the command window */
     text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, 
-				    NULL);
+				   XtNwidth, 400, XtNheight, 200,
+				   NULL);
     XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
     /* The button panel */
     buttons  = XtVaCreateManagedWidget("form", 
-					formWidgetClass, form, 
-					XtNfromVert, text, 
-					NULL); 
+				       boxWidgetClass, form,
+				       XtNfromVert, text, 
+				       XtNorientation, XtorientHorizontal,
+				       NULL); 
     for (cp = commands; cp < commands + sizeof(commands)/sizeof(commands[0]); cp++) {
 	cp->widget = XtVaCreateManagedWidget(cp->name, 
 					     commandWidgetClass, buttons, 
