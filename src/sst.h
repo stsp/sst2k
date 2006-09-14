@@ -144,14 +144,7 @@ typedef struct {
 #define FDSPROB 8   // Move deep space probe
 #define NEVENTS (9)
 
-// Scalar variables that are needed for freezing the game
-// are placed in a structure. #defines are used to access by their
-// original names. Gee, I could have done this with the d structure,
-// but I just didn't think of it back when I started.
-
 #define SSTMAGIC	"SST2.0\n"
-
-extern WINDOW *curwnd;
 
 struct game {
     char magic[sizeof(SSTMAGIC)];
@@ -403,12 +396,13 @@ void enqueue(char *);
 #define SCAN_STATUS		3
 #define SCAN_NO_LEFTSIDE	4
 
-WINDOW *fullscreen_window;
-WINDOW *srscan_window;
-WINDOW *report_window;
-WINDOW *lrscan_window;
-WINDOW *message_window;
-WINDOW *prompt_window;
+extern WINDOW *curwnd;
+extern WINDOW *fullscreen_window;
+extern WINDOW *srscan_window;
+extern WINDOW *report_window;
+extern WINDOW *lrscan_window;
+extern WINDOW *message_window;
+extern WINDOW *prompt_window;
 
 extern void clreol(void);
 extern void clrscr(void);
@@ -420,7 +414,5 @@ enum COLORS {
    BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY,
    DARKGRAY, LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE
 };
-
-#define DAMAGED	128	/* marker for damaged ship in starmap */
 
 #endif

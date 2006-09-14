@@ -11,6 +11,12 @@
 static int rows, linecount;	/* for paging */
 
 WINDOW *curwnd;
+WINDOW *fullscreen_window;
+WINDOW *srscan_window;
+WINDOW *report_window;
+WINDOW *lrscan_window;
+WINDOW *message_window;
+WINDOW *prompt_window;
 
 static void outro(void)
 /* wrap up, either normally or due to signal */
