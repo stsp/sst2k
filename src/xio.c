@@ -39,6 +39,7 @@ static void noargs_proc(Widget w, XtPointer client_data, XtPointer call_data)
 /* use this for commands that take no arguments */
 {
     /* currently a stub */
+    printf("Button %s pressed\n", XtName(w));
 }
 
 static struct cmd_t commands[] = {
@@ -80,7 +81,7 @@ static struct cmd_t commands[] = {
 #define MAXWIDTH	640
 #define TEXTHEIGHT	200
 
-int main(int argc, char **argv)
+static void instantiate_main(int argc, char **argv)
 { 
     struct cmd_t *cp;
 
@@ -158,5 +159,10 @@ int main(int argc, char **argv)
     XtAppMainLoop(app_context);
     /* loop may be interrupted */
     XtDestroyApplicationContext(app_context);
+}
+
+int main(int argc, char **argv)
+{
+    instantiate_main(argc, argv);
     exit(0);
 }
