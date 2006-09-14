@@ -17,6 +17,24 @@ static String fallback[] = {
     /* text window resources */
     "*text.resizable: true",
     "*text.resize: ResizeBoth",
+    "*text.width: 640",
+    "*text.height: 200",
+    "*navigation.fromVert: text",
+    "*navigation.borderWidth: 0",
+    "*navlabel.label: Navigation:   ",
+    "*navlabel.borderWidth: 0",
+    "*weapons.fromVert: navigation",
+    "*weapons.borderWidth: 0",
+    "*weaplabel.label: Weapons:      ",
+    "*weaplabel.borderWidth: 0",
+    "*planets.fromVert: weapons",
+    "*planets.borderWidth: 0",
+    "*planlabel.label: Planets:      ",
+    "*planlabel.borderWidth: 0",
+    "*misc.fromVert: planets",
+    "*misc.borderWidth: 0",
+    "*misclabel.label: Miscellaneos: ",
+    "*misclabel.borderWidth: 0",
     NULL,
 };
 
@@ -76,9 +94,6 @@ static struct cmd_t commands[] = {
     {"Help",		noargs_proc,	&misc,		0},
 };
 
-#define MAXWIDTH	640
-#define TEXTHEIGHT	200
-
 static void instantiate_main(int argc, char **argv)
 { 
     struct cmd_t *cp;
@@ -89,50 +104,37 @@ static void instantiate_main(int argc, char **argv)
 				    XtNallowShellResize, True, NULL);
     form = XtVaCreateManagedWidget("form", formWidgetClass, toplevel, NULL);
     /* the command window */
-    text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, 
-				   XtNwidth, MAXWIDTH, XtNheight, TEXTHEIGHT,
-				   NULL);
+    text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, NULL);
     XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
     /* The button panels */
     navigation  = XtVaCreateManagedWidget("navigation", 
 					  boxWidgetClass, form,
-					  XtNborderWidth, 0,
-					  XtNfromVert, text,
 					  XtNorientation, XtorientHorizontal,
 					  NULL); 
-    navlabel  = XtVaCreateManagedWidget("Navigation:   ", 
+    navlabel  = XtVaCreateManagedWidget("navlabel", 
 					labelWidgetClass, navigation,
-					XtNborderWidth, 0,
 					NULL); 
     weapons  = XtVaCreateManagedWidget("weapons", 
 				       boxWidgetClass, form,
-				       XtNborderWidth, 0,
-				       XtNfromVert, navigation, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
-    weaplabel  = XtVaCreateManagedWidget("Weapons:      ", 
+    weaplabel  = XtVaCreateManagedWidget("weaplabel", 
 					 labelWidgetClass, weapons,
-					 XtNborderWidth, 0,
 					 NULL); 
     planets  = XtVaCreateManagedWidget("planets", 
 				       boxWidgetClass, form,
-				       XtNborderWidth, 0,
-				       XtNfromVert, weapons, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
-    planlabel  = XtVaCreateManagedWidget("Planets:      ", 
+    planlabel  = XtVaCreateManagedWidget("planlabel", 
 					 labelWidgetClass, planets,
 					 XtNborderWidth, 0,
 					 NULL); 
     misc  = XtVaCreateManagedWidget("misc", 
 				       boxWidgetClass, form,
-				       XtNborderWidth, 0,
-				       XtNfromVert, planets, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
-    misclabel  = XtVaCreateManagedWidget("Miscellaneous:", 
+    misclabel  = XtVaCreateManagedWidget("misclabel", 
 					 labelWidgetClass, misc,
-					 XtNborderWidth, 0,
 					 NULL); 
     for (cp = commands; cp < commands + sizeof(commands)/sizeof(commands[0]); cp++) {
 	cp->widget = XtVaCreateManagedWidget(cp->name, 
