@@ -4,8 +4,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 {
     int iqx, iqy, l;
 
-    iqx = quadx+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
-    iqy = quady+(looky+(QUADSIZE-1))/QUADSIZE - 1;
+    iqx = game.quadx+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
+    iqy = game.quady+(looky+(QUADSIZE-1))/QUADSIZE - 1;
     if (!VALID_QUADRANT(iqx,iqy) ||
 	game.state.galaxy[iqx][iqy].supernova ||
 	game.state.galaxy[iqx][iqy].klingons > 8)
@@ -17,7 +17,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 	    for_commanders(l)
 		if (game.state.cx[l]==iqx && game.state.cy[l]==iqy) return 0;
 	    /* refuse to leave if currently attacking starbase */
-	    if (batx==quadx && baty==quady) return 0;
+	    if (game.batx==game.quadx && game.baty==game.quady) return 0;
 	}
 	/* don't leave if over 1000 units of energy */
 	if (game.kpower[loccom] > 1000.) return 0;
@@ -25,29 +25,29 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     /* print escape message and move out of quadrant.
        We know this if either short or long range sensors are working */
     if (game.damage[DSRSENS] == 0.0 || game.damage[DLRSENS] == 0.0 ||
-	condit == IHDOCKED) {
+	game.condit == IHDOCKED) {
 	crmena(1, ienm, 2, game.kx[loccom], game.ky[loccom]);
 	prout(" escapes to %s (and regains strength).",
 	      cramlc(quadrant, iqx, iqy));
     }
     /* handle local matters related to escape */
     game.quad[game.kx[loccom]][game.ky[loccom]] = IHDOT;
-    game.kx[loccom] = game.kx[nenhere];
-    game.ky[loccom] = game.ky[nenhere];
-    game.kavgd[loccom] = game.kavgd[nenhere];
-    game.kpower[loccom] = game.kpower[nenhere];
-    game.kdist[loccom] = game.kdist[nenhere];
-    klhere--;
-    nenhere--;
-    if (condit != IHDOCKED) newcnd();
+    game.kx[loccom] = game.kx[game.nenhere];
+    game.ky[loccom] = game.ky[game.nenhere];
+    game.kavgd[loccom] = game.kavgd[game.nenhere];
+    game.kpower[loccom] = game.kpower[game.nenhere];
+    game.kdist[loccom] = game.kdist[game.nenhere];
+    game.klhere--;
+    game.nenhere--;
+    if (game.condit != IHDOCKED) newcnd();
     /* Handle global matters related to escape */
-    game.state.galaxy[quadx][quady].klingons--;
+    game.state.galaxy[game.quadx][game.quady].klingons--;
     game.state.galaxy[iqx][iqy].klingons++;
     if (ienm==IHS) {
-	ishere=0;
-	iscate=0;
-	ientesc=0;
-	isatb=0;
+	game.ishere=0;
+	game.iscate=0;
+	game.ientesc=0;
+	game.isatb=0;
 	game.future[FSCMOVE]=0.2777+game.state.date;
 	game.future[FSCDBAS]=FOREVER;
 	game.state.isx=iqx;
@@ -55,13 +55,13 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     }
     else {
 	for_commanders(l) {
-	    if (game.state.cx[l]==quadx && game.state.cy[l]==quady) {
+	    if (game.state.cx[l]==game.quadx && game.state.cy[l]==game.quady) {
 		game.state.cx[l]=iqx;
 		game.state.cy[l]=iqy;
 		break;
 	    }
 	}
-	comhere = 0;
+	game.comhere = 0;
     }
     return 1; /* success */
 }
@@ -74,10 +74,10 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
     int krawlx, krawly;
     int success;
     int attempts;
-    /* This should probably be just comhere + ishere */
-    int nbaddys = skill >= SKILL_EXPERT ?
-	(int)((comhere*2 + ishere*2+klhere*1.23+irhere*1.5)/2.0):
-	(comhere + ishere);
+    /* This should probably be just game.comhere + game.ishere */
+    int nbaddys = game.skill >= SKILL_EXPERT ?
+	(int)((game.comhere*2 + game.ishere*2+game.klhere*1.23+game.irhere*1.5)/2.0):
+	(game.comhere + game.ishere);
     double dist1, forces;
 
     dist1 = game.kdist[loccom];
@@ -85,7 +85,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 
     /* If SC, check with spy to see if should hi-tail it */
     if (ienm==IHS &&
-	(game.kpower[loccom] <= 500.0 || (condit==IHDOCKED && game.damage[DPHOTON]==0))) {
+	(game.kpower[loccom] <= 500.0 || (game.condit==IHDOCKED && game.damage[DPHOTON]==0))) {
 	irun = 1;
 	motion = -QUADSIZE;
     }
@@ -123,39 +123,39 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
  advantage with a 650 advantage being to hold ground, 800 to move forward
  1, 950 for two, 150 for back 4, etc. Variance of 100.
 
- If docked, is reduced by roughly 1.75*skill, generally forcing a
+ If docked, is reduced by roughly 1.75*game.skill, generally forcing a
  retreat, especially at high skill levels.
 
  *  Motion is limited to skill level, except for SC hi-tailing it out.
  */
 
-	forces = game.kpower[loccom]+100.0*nenhere+400*(nbaddys-1);
-	if (shldup==0) forces += 1000; /* Good for enemy if shield is down! */
+	forces = game.kpower[loccom]+100.0*game.nenhere+400*(nbaddys-1);
+	if (game.shldup==0) forces += 1000; /* Good for enemy if shield is down! */
 	if (game.damage[DPHASER] == 0.0 || game.damage[DPHOTON] == 0.0) {
 	    if (game.damage[DPHASER] != 0) /* phasers damaged */
 		forces += 300.0;
 	    else
-		forces -= 0.2*(energy - 2500.0);
+		forces -= 0.2*(game.energy - 2500.0);
 	    if (game.damage[DPHOTON] != 0) /* photon torpedoes damaged */
 		forces += 300.0;
 	    else
-		forces -= 50.0*torps;
+		forces -= 50.0*game.torps;
 	}
 	else {
 	    /* phasers and photon tubes both out! */
 	    forces += 1000.0;
 	}
 	motion = 0;
-	if (forces <= 1000.0 && condit != IHDOCKED) /* Typical situation */
+	if (forces <= 1000.0 && game.condit != IHDOCKED) /* Typical situation */
 	    motion = ((forces+200.0*Rand())/150.0) - 5.0;
 	else {
 	    if (forces > 1000.0) /* Very strong -- move in for kill */
 		motion = (1.0-square(Rand()))*dist1 + 1.0;
-	    if (condit==IHDOCKED && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
-		motion -= skill*(2.0-square(Rand()));
+	    if (game.condit==IHDOCKED && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
+		motion -= game.skill*(2.0-square(Rand()));
 	}
 #ifdef DEBUG
-	if (idebug) {
+	if (game.idebug) {
 	    proutn("MOTION = %1.2f", motion);
 	    proutn("  FORCES = %1,2f", forces);
 	}
@@ -163,7 +163,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	/* don't move if no motion */
 	if (motion==0) return;
 	/* Limit motion according to skill */
-	if (abs(motion) > skill) motion = (motion < 0) ? -skill : skill;
+	if (abs(motion) > game.skill) motion = (motion < 0) ? -game.skill : game.skill;
     }
     /* calculate preferred number of steps */
     nsteps = motion < 0 ? -motion : motion;
@@ -171,15 +171,15 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
     if (nsteps > QUADSIZE) nsteps = QUADSIZE; /* This shouldn't be necessary */
     if (nsteps < 1) nsteps = 1; /* This shouldn't be necessary */
 #ifdef DEBUG
-    if (idebug) {
+    if (game.idebug) {
 	prout("NSTEPS = %d", nsteps);
     }
 #endif
     /* Compute preferred values of delta X and Y */
-    mx = sectx - comx;
-    my = secty - comy;
+    mx = game.sectx - comx;
+    my = game.secty - comy;
     if (2.0 * abs(mx) < abs(my)) mx = 0;
-    if (2.0 * abs(my) < abs(sectx-comx)) my = 0;
+    if (2.0 * abs(my) < abs(game.sectx-comx)) my = 0;
     if (mx != 0) mx = mx*motion < 0 ? -1 : 1;
     if (my != 0) my = my*motion < 0 ? -1 : 1;
     nextx = comx;
@@ -187,7 +187,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
     /* main move loop */
     for (ll = 0; ll < nsteps; ll++) {
 #ifdef DEBUG
-	if (idebug) {
+	if (game.idebug) {
 	    prout("%d", ll+1);
 	}
 #endif
@@ -215,7 +215,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	    }
 	    else if ((game.options & OPTION_RAMMING) && game.quad[lookx][looky] != IHDOT) {
 		/* See if we should ram ship */
-		if (game.quad[lookx][looky] == ship &&
+		if (game.quad[lookx][looky] == game.ship &&
 		    (ienm == IHC || ienm == IHS)) {
 		    ram(1, ienm, comx, comy);
 		    return;
@@ -236,7 +236,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	    nextx = lookx;
 	    nexty = looky;
 #ifdef DEBUG
-	    if (idebug) {
+	    if (game.idebug) {
 		prout(cramlc(neither, nextx, nexty));
 	    }
 #endif
@@ -251,8 +251,8 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	game.kx[loccom] = nextx;
 	game.ky[loccom] = nexty;
 	game.kdist[loccom] = game.kavgd[loccom] =
-	    sqrt(square(sectx-nextx)+square(secty-nexty));
-	if (game.damage[DSRSENS] == 0 || condit == IHDOCKED) {
+	    sqrt(square(game.sectx-nextx)+square(game.secty-nexty));
+	if (game.damage[DSRSENS] == 0 || game.condit == IHDOCKED) {
 	    proutn("***");
 	    cramen(ienm);
 	    proutn(" from %s", cramlc(2, comx, comy));
@@ -268,12 +268,12 @@ void movcom(void)
     int ix, iy, i;
 
 #ifdef DEBUG
-    if (idebug) prout("MOVCOM");
+    if (game.idebug) prout("MOVCOM");
 #endif
 
     /* Figure out which Klingon is the commander (or Supercommander)
        and do move */
-    if (comhere) 
+    if (game.comhere) 
 	for_local_enemies(i) {
 	    ix = game.kx[i];
 	    iy = game.ky[i];
@@ -282,7 +282,7 @@ void movcom(void)
 		break;
 	    }
 	}
-    if (ishere) 
+    if (game.ishere) 
 	for_local_enemies(i) {
 	    ix = game.kx[i];
 	    iy = game.ky[i];
@@ -294,7 +294,7 @@ void movcom(void)
     /* if skill level is high, move other Klingons and Romulans too!
        Move these last so they can base their actions on what the
        commander(s) do. */
-    if (skill >= SKILL_EXPERT && (game.options & OPTION_MVBADDY)) 
+    if (game.skill >= SKILL_EXPERT && (game.options & OPTION_MVBADDY)) 
 	for_local_enemies(i) {
 	    ix = game.kx[i];
 	    iy = game.ky[i];
@@ -309,7 +309,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 {
     int i;
 
-    if ((iqx==quadx && iqy==quady) ||
+    if ((iqx==game.quadx && iqy==game.quady) ||
 	!VALID_QUADRANT(iqx, iqy) ||
 	game.state.galaxy[iqx][iqy].supernova ||
 	game.state.galaxy[iqx][iqy].klingons > 8) 
@@ -319,40 +319,40 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	for_starbases(i)
 	    if (game.state.baseqx[i]==iqx && game.state.baseqy[i]==iqy) return 1;
     }
-    if (justin && !iscate) return 1;
+    if (game.justin && !game.iscate) return 1;
     /* do the move */
     game.state.galaxy[game.state.isx][game.state.isy].klingons--;
     game.state.isx = iqx;
     game.state.isy = iqy;
     game.state.galaxy[game.state.isx][game.state.isy].klingons++;
-    if (ishere) {
+    if (game.ishere) {
 	/* SC has scooted, Remove him from current quadrant */
-	iscate=0;
-	isatb=0;
-	ishere=0;
-	ientesc=0;
+	game.iscate=0;
+	game.isatb=0;
+	game.ishere=0;
+	game.ientesc=0;
 	game.future[FSCDBAS]=FOREVER;
 	for_local_enemies(i) 
 	    if (game.quad[game.kx[i]][game.ky[i]] == IHS) break;
 	game.quad[game.kx[i]][game.ky[i]] = IHDOT;
-	game.kx[i] = game.kx[nenhere];
-	game.ky[i] = game.ky[nenhere];
-	game.kdist[i] = game.kdist[nenhere];
-	game.kavgd[i] = game.kavgd[nenhere];
-	game.kpower[i] = game.kpower[nenhere];
-	klhere--;
-	nenhere--;
-	if (condit!=IHDOCKED) newcnd();
+	game.kx[i] = game.kx[game.nenhere];
+	game.ky[i] = game.ky[game.nenhere];
+	game.kdist[i] = game.kdist[game.nenhere];
+	game.kavgd[i] = game.kavgd[game.nenhere];
+	game.kpower[i] = game.kpower[game.nenhere];
+	game.klhere--;
+	game.nenhere--;
+	if (game.condit!=IHDOCKED) newcnd();
 	sortkl();
     }
     /* check for a helpful planet */
-    for (i = 0; i < inplan; i++) {
+    for (i = 0; i < game.inplan; i++) {
 	if (game.state.plnets[i].x==game.state.isx && game.state.plnets[i].y==game.state.isy &&
 	    game.state.plnets[i].crystals == 1) {
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.isx][game.state.isy].planets -= 1;
-	    if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;
 		prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
@@ -375,20 +375,20 @@ void scom(int *ipage)
     double bdist[BASEMAX+1];
     int flag;
 #ifdef DEBUG
-    if (idebug) prout("SCOM");
+    if (game.idebug) prout("SCOM");
 #endif
 
     /* Decide on being active or passive */
-    flag = ((NKILLC+NKILLK)/(game.state.date+0.01-indate) < 0.1*skill*(skill+1.0) ||
-	    (game.state.date-indate) < 3.0);
-    if (iscate==0 && flag) {
+    flag = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
+	    (game.state.date-game.indate) < 3.0);
+    if (game.iscate==0 && flag) {
 	/* compute move away from Enterprise */
-	ideltax = game.state.isx-quadx;
-	ideltay = game.state.isy-quady;
+	ideltax = game.state.isx-game.quadx;
+	ideltay = game.state.isy-game.quady;
 	if (sqrt(ideltax*(double)ideltax+ideltay*(double)ideltay) > 2.0) {
 	    /* circulate in space */
-	    ideltax = game.state.isy-quady;
-	    ideltay = quadx-game.state.isx;
+	    ideltax = game.state.isy-game.quady;
+	    ideltay = game.quadx-game.state.isx;
 	}
     }
     else {
@@ -432,8 +432,8 @@ void scom(int *ipage)
 	    i = basetbl[i2];	/* bug in original had it not finding nearest*/
 	    ibqx = game.state.baseqx[i];
 	    ibqy = game.state.baseqy[i];
-	    if ((ibqx == quadx && ibqy == quady) ||
-		(ibqx == batx && ibqy == baty) ||
+	    if ((ibqx == game.quadx && ibqy == game.quady) ||
+		(ibqx == game.batx && ibqy == game.baty) ||
 		game.state.galaxy[ibqx][ibqy].supernova ||
 		game.state.galaxy[ibqx][ibqy].klingons > 8) 
 		continue;
@@ -504,17 +504,17 @@ void scom(int *ipage)
     else for_starbases(i) {
 	ibqx = game.state.baseqx[i];
 	ibqy = game.state.baseqy[i];
-	if (ibqx==game.state.isx && ibqy == game.state.isy && game.state.isx != batx && game.state.isy != baty) {
+	if (ibqx==game.state.isx && ibqy == game.state.isy && game.state.isx != game.batx && game.state.isy != game.baty) {
 	    /* attack the base */
 	    if (flag) return; /* no, don't attack base! */
-	    iseenit = 0;
-	    isatb=1;
+	    game.iseenit = 0;
+	    game.isatb=1;
 	    game.future[FSCDBAS] = game.state.date + 1.0 +2.0*Rand();
 	    if (game.future[FCDBAS] < FOREVER) game.future[FSCDBAS] +=
 		game.future[FCDBAS]-game.state.date;
-	    if (game.damage[DRADIO] > 0 && condit != IHDOCKED)
+	    if (game.damage[DRADIO] > 0 && game.condit != IHDOCKED)
 		return; /* no warning */
-	    iseenit = 1;
+	    game.iseenit = 1;
 	    if (*ipage == 0)  pause_game(1);
 	    *ipage=1;
 	    proutn("Lt. Uhura-  \"Captain, the starbase in ");
@@ -523,21 +523,21 @@ void scom(int *ipage)
 	    prout("   reports that it is under attack from the Klingon Super-commander.");
 	    proutn("   It can survive until stardate %d.\"",
 		   (int)game.future[FSCDBAS]);
-	    if (resting==0) return;
+	    if (game.resting==0) return;
 	    prout("Mr. Spock-  \"Captain, shall we cancel the rest period?\"");
 	    if (ja()==0) return;
-	    resting = 0;
-	    Time = 0.0; /* actually finished */
+	    game.resting = 0;
+	    game.optime = 0.0; /* actually finished */
 	    return;
 	}
     }
     /* Check for intelligence report */
     if (
 #ifdef DEBUG
-	idebug==0 &&
+	game.idebug==0 &&
 #endif
 	(Rand() > 0.2 ||
-	 (game.damage[DRADIO] > 0.0 && condit != IHDOCKED) ||
+	 (game.damage[DRADIO] > 0.0 && game.condit != IHDOCKED) ||
 	 !game.state.galaxy[game.state.isx][game.state.isy].charted))
 	return;
     if (*ipage==0) pause_game(1);
@@ -553,49 +553,49 @@ void movetho(void)
 {
     int idx, idy, im, i, dum, my;
     /* Move the Tholian */
-    if (ithere==0 || justin == 1) return;
+    if (game.ithere==0 || game.justin == 1) return;
 
-    if (ithx == 1 && ithy == 1) {
+    if (game.ithx == 1 && game.ithy == 1) {
 	idx = 1; idy = QUADSIZE;
     }
-    else if (ithx == 1 && ithy == QUADSIZE) {
+    else if (game.ithx == 1 && game.ithy == QUADSIZE) {
 	idx = QUADSIZE; idy = QUADSIZE;
     }
-    else if (ithx == QUADSIZE && ithy == QUADSIZE) {
+    else if (game.ithx == QUADSIZE && game.ithy == QUADSIZE) {
 	idx = QUADSIZE; idy = 1;
     }
-    else if (ithx == QUADSIZE && ithy == 1) {
+    else if (game.ithx == QUADSIZE && game.ithy == 1) {
 	idx = 1; idy = 1;
     }
     else {
 	/* something is wrong! */
-	ithere = 0;
+	game.ithere = 0;
 	return;
     }
 
     /* Do nothing if we are blocked */
     if (game.quad[idx][idy]!= IHDOT && game.quad[idx][idy]!= IHWEB) return;
-    game.quad[ithx][ithy] = IHWEB;
+    game.quad[game.ithx][game.ithy] = IHWEB;
 
-    if (ithx != idx) {
+    if (game.ithx != idx) {
 	/* move in x axis */
-	im = fabs((double)idx - ithx)/((double)idx - ithx);
-	while (ithx != idx) {
-	    ithx += im;
-	    if (game.quad[ithx][ithy]==IHDOT) game.quad[ithx][ithy] = IHWEB;
+	im = fabs((double)idx - game.ithx)/((double)idx - game.ithx);
+	while (game.ithx != idx) {
+	    game.ithx += im;
+	    if (game.quad[game.ithx][game.ithy]==IHDOT) game.quad[game.ithx][game.ithy] = IHWEB;
 	}
     }
-    else if (ithy != idy) {
+    else if (game.ithy != idy) {
 	/* move in y axis */
-	im = fabs((double)idy - ithy)/((double)idy - ithy);
-	while (ithy != idy) {
-	    ithy += im;
-	    if (game.quad[ithx][ithy]==IHDOT) game.quad[ithx][ithy] = IHWEB;
+	im = fabs((double)idy - game.ithy)/((double)idy - game.ithy);
+	while (game.ithy != idy) {
+	    game.ithy += im;
+	    if (game.quad[game.ithx][game.ithy]==IHDOT) game.quad[game.ithx][game.ithy] = IHWEB;
 	}
     }
-    game.quad[ithx][ithy] = IHT;
-    game.kx[nenhere]=ithx;
-    game.ky[nenhere]=ithy;
+    game.quad[game.ithx][game.ithy] = IHT;
+    game.kx[game.nenhere]=game.ithx;
+    game.ky[game.nenhere]=game.ithy;
 
     /* check to see if all holes plugged */
     for_sectors(i) {
@@ -605,11 +605,11 @@ void movetho(void)
 	if (game.quad[i][QUADSIZE]!=IHWEB && game.quad[i][QUADSIZE]!=IHT) return;
     }
     /* All plugged up -- Tholian splits */
-    game.quad[ithx][ithy]=IHWEB;
+    game.quad[game.ithx][game.ithy]=IHWEB;
     dropin(IHBLANK, &dum, &my);
-    crmena(1,IHT, 2, ithx, ithy);
+    crmena(1,IHT, 2, game.ithx, game.ithy);
     prout(" completes web.");
-    ithere = ithx = ithy = 0;
-    nenhere--;
+    game.ithere = game.ithx = game.ithy = 0;
+    game.nenhere--;
     return;
 }

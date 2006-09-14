@@ -19,3 +19,7 @@ sst_SOURCES = \
 EXTRA_DIST = \
 	sst.h \
 	sstlinux.h
+
+# Experimental XaW code, not yet integrated with the game
+xio: xio.o
+	gcc xio.c -lXaw3d -o xio

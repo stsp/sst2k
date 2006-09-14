@@ -4,11 +4,11 @@
 void events(void) 
 {
     int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
-    double fintim = game.state.date + Time, datemin, xtime, repair, yank=0;
+    double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
     int radio_was_broken;
 
 #ifdef DEBUG
-    if (idebug) prout("EVENTS");
+    if (game.idebug) prout("EVENTS");
 #endif
 
     radio_was_broken = (game.damage[DRADIO] != 0.0);
@@ -16,7 +16,7 @@ void events(void)
     for (;;) {
 	/* Select earliest extraneous event, line==0 if no events */
 	line = FSPY;
-	if (alldone) return;
+	if (game.alldone) return;
 	datemin = fintim;
 	for (l = 1; l < NEVENTS; l++)
 	    if (game.future[l] < datemin) {
@@ -33,17 +33,17 @@ void events(void)
 	    return;
 	}
 	/* Is life support adequate? */
-	if (game.damage[DLIFSUP] && condit != IHDOCKED) {
-	    if (lsupres < xtime && game.damage[DLIFSUP] > lsupres) {
+	if (game.damage[DLIFSUP] && game.condit != IHDOCKED) {
+	    if (game.lsupres < xtime && game.damage[DLIFSUP] > game.lsupres) {
 		finish(FLIFESUP);
 		return;
 	    }
-	    lsupres -= xtime;
-	    if (game.damage[DLIFSUP] <= xtime) lsupres = inlsr;
+	    game.lsupres -= xtime;
+	    if (game.damage[DLIFSUP] <= xtime) game.lsupres = game.inlsr;
 	}
 	/* Fix devices */
 	repair = xtime;
-	if (condit == IHDOCKED) repair /= docfac;
+	if (game.condit == IHDOCKED) repair /= game.docfac;
 	/* Don't fix Deathray here */
 	for (l=0; l<NDEVICES; l++)
 	    if (game.damage[l] > 0.0 && l != DDRAY)
@@ -53,37 +53,37 @@ void events(void)
 	    prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
 	    prout("   surveillance reports are coming in.");
 	    skip(1);
-	    if (iseenit==0) {
+	    if (game.iseenit==0) {
 		attakreport(0);
-		iseenit = 1;
+		game.iseenit = 1;
 	    }
 	    rechart();
 	    prout("   The star chart is now up to date.\"");
 	    skip(1);
 	}
 	/* Cause extraneous event LINE to occur */
-	Time -= xtime;
+	game.optime -= xtime;
 	switch (line) {
 	case FSNOVA: /* Supernova */
 	    if (ipage==0) pause_game(1);
 	    ipage=1;
 	    snova(0,0);
-	    game.future[FSNOVA] = game.state.date + expran(0.5*intime);
-	    if (game.state.galaxy[quadx][quady].supernova) return;
+	    game.future[FSNOVA] = game.state.date + expran(0.5*game.intime);
+	    if (game.state.galaxy[game.quadx][game.quady].supernova) return;
 	    break;
 	case FSPY: /* Check with spy to see if S.C. should tractor beam */
 	    if (game.state.nscrem == 0 ||
 		ictbeam+istract > 0 ||
-		condit==IHDOCKED || isatb==1 || iscate==1) return;
-	    if (ientesc ||
-		(energy < 2000 && torps < 4 && shield < 1250) ||
-		(game.damage[DPHASER]>0 && (game.damage[DPHOTON]>0 || torps < 4)) ||
+		game.condit==IHDOCKED || game.isatb==1 || game.iscate==1) return;
+	    if (game.ientesc ||
+		(game.energy < 2000 && game.torps < 4 && game.shield < 1250) ||
+		(game.damage[DPHASER]>0 && (game.damage[DPHOTON]>0 || game.torps < 4)) ||
 		(game.damage[DSHIELD] > 0 &&
-		 (energy < 2500 || game.damage[DPHASER] > 0) &&
-		 (torps < 5 || game.damage[DPHOTON] > 0))) {
+		 (game.energy < 2500 || game.damage[DPHASER] > 0) &&
+		 (game.torps < 5 || game.damage[DPHOTON] > 0))) {
 		/* Tractor-beam her! */
 		istract=1;
-		yank = square(game.state.isx-quadx) + square(game.state.isy-quady);
+		yank = square(game.state.isx-game.quadx) + square(game.state.isy-game.quady);
 		/********* fall through to FTBEAM code ***********/
 	    }
 	    else return;
@@ -94,11 +94,11 @@ void events(void)
 		    break;
 		}
 		i = Rand()*game.state.remcom+1.0;
-		yank = square(game.state.cx[i]-quadx) + square(game.state.cy[i]-quady);
-		if (istract || condit == IHDOCKED || yank == 0) {
+		yank = square(game.state.cx[i]-game.quadx) + square(game.state.cy[i]-game.quady);
+		if (istract || game.condit == IHDOCKED || yank == 0) {
 		    /* Drats! Have to reschedule */
-		    game.future[FTBEAM] = game.state.date + Time +
-			expran(1.5*intime/game.state.remcom);
+		    game.future[FTBEAM] = game.state.date + game.optime +
+			expran(1.5*game.intime/game.state.remcom);
 		    break;
 		}
 	    }
@@ -106,7 +106,7 @@ void events(void)
 	    yank = sqrt(yank);
 	    if (ipage==0) pause_game(1);
 	    ipage=1;
-	    Time = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
+	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 	    ictbeam = 1;
 	    skip(1);
 	    proutn("***");
@@ -114,60 +114,60 @@ void events(void)
 	    prout(" caught in long range tractor beam--");
 	    /* If Kirk & Co. screwing around on planet, handle */
 	    atover(1); /* atover(1) is Grab */
-	    if (alldone) return;
-	    if (icraft == 1) { /* Caught in Galileo? */
+	    if (game.alldone) return;
+	    if (game.icraft == 1) { /* Caught in Galileo? */
 		finish(FSTRACTOR);
 		return;
 	    }
 	    /* Check to see if shuttle is aboard */
-	    if (iscraft==0) {
+	    if (game.iscraft==0) {
 		skip(1);
 		if (Rand() > 0.5) {
 		    prout("Galileo, left on the planet surface, is captured");
 		    prout("by aliens and made into a flying McDonald's.");
 		    game.damage[DSHUTTL] = -10;
-		    iscraft = -1;
+		    game.iscraft = -1;
 		}
 		else {
 		    prout("Galileo, left on the planet surface, is well hidden.");
 		}
 	    }
 	    if (line==0) {
-		quadx = game.state.isx;
-		quady = game.state.isy;
+		game.quadx = game.state.isx;
+		game.quady = game.state.isy;
 	    }
 	    else {
-		quadx = game.state.cx[i];
-		quady = game.state.cy[i];
+		game.quadx = game.state.cx[i];
+		game.quady = game.state.cy[i];
 	    }
-	    iran(QUADSIZE, &sectx, &secty);
+	    iran(QUADSIZE, &game.sectx, &game.secty);
 	    crmshp();
 	    proutn(" is pulled to ");
-	    proutn(cramlc(quadrant, quadx, quady));
+	    proutn(cramlc(quadrant, game.quadx, game.quady));
 	    proutn(", ");
-	    prout(cramlc(sector, sectx, secty));
-	    if (resting) {
+	    prout(cramlc(sector, game.sectx, game.secty));
+	    if (game.resting) {
 		prout("(Remainder of rest/repair period cancelled.)");
-		resting = 0;
+		game.resting = 0;
 	    }
-	    if (shldup==0) {
-		if (game.damage[DSHIELD]==0 && shield > 0) {
+	    if (game.shldup==0) {
+		if (game.damage[DSHIELD]==0 && game.shield > 0) {
 		    doshield(2); /* Shldsup */
-		    shldchg=0;
+		    game.shldchg=0;
 		}
 		else prout("(Shields not currently useable.)");
 	    }
 	    newqad(0);
 	    /* Adjust finish time to time of tractor beaming */
-	    fintim = game.state.date+Time;
+	    fintim = game.state.date+game.optime;
 	    attack(0);
 	    if (game.state.remcom <= 0) game.future[FTBEAM] = FOREVER;
-	    else game.future[FTBEAM] = game.state.date+Time+expran(1.5*intime/game.state.remcom);
+	    else game.future[FTBEAM] = game.state.date+game.optime+expran(1.5*game.intime/game.state.remcom);
 	    break;
 	case FSNAP: /* Snapshot of the universe (for time warp) */
 	    game.snapsht = game.state;
 	    game.state.snap = 1;
-	    game.future[FSNAP] = game.state.date + expran(0.5 * intime);
+	    game.future[FSNAP] = game.state.date + expran(0.5 * game.intime);
 	    break;
 	case FBATTAK: /* Commander attacks starbase */
 	    if (game.state.remcom==0 || game.state.rembase==0) {
@@ -179,7 +179,7 @@ void events(void)
 	    for_starbases(j) {
 		for_commanders(k)
 		    if (game.state.baseqx[j]==game.state.cx[k] && game.state.baseqy[j]==game.state.cy[k] &&
-			(game.state.baseqx[j]!=quadx || game.state.baseqy[j]!=quady) &&
+			(game.state.baseqx[j]!=game.quadx || game.state.baseqy[j]!=game.quady) &&
 			(game.state.baseqx[j]!=game.state.isx || game.state.baseqy[j]!=game.state.isy)) {
 			i = 1;
 			break;
@@ -188,125 +188,125 @@ void events(void)
 	    }
 	    if (j>game.state.rembase) {
 		/* no match found -- try later */
-		game.future[FBATTAK] = game.state.date + expran(0.3*intime);
+		game.future[FBATTAK] = game.state.date + expran(0.3*game.intime);
 		game.future[FCDBAS] = FOREVER;
 		break;
 	    }
 	    /* commander + starbase combination found -- launch attack */
-	    batx = game.state.baseqx[j];
-	    baty = game.state.baseqy[j];
+	    game.batx = game.state.baseqx[j];
+	    game.baty = game.state.baseqy[j];
 	    game.future[FCDBAS] = game.state.date+1.0+3.0*Rand();
-	    if (isatb) /* extra time if SC already attacking */
+	    if (game.isatb) /* extra time if SC already attacking */
 		game.future[FCDBAS] += game.future[FSCDBAS]-game.state.date;
-	    game.future[FBATTAK] = game.future[FCDBAS] +expran(0.3*intime);
-	    iseenit = 0;
+	    game.future[FBATTAK] = game.future[FCDBAS] +expran(0.3*game.intime);
+	    game.iseenit = 0;
 	    if (game.damage[DRADIO] != 0.0 &&
-		condit != IHDOCKED) break; /* No warning :-( */
-	    iseenit = 1;
+		game.condit != IHDOCKED) break; /* No warning :-( */
+	    game.iseenit = 1;
 	    if (ipage==0) pause_game(1);
 	    ipage = 1;
 	    skip(1);
 	    proutn("Lt. Uhura-  \"Captain, the starbase in ");
-	    prout(cramlc(quadrant, batx, baty));
+	    prout(cramlc(quadrant, game.batx, game.baty));
 	    prout("   reports that it is under attack and that it can");
 	    proutn("   hold out only until stardate %d",
 		   (int)game.future[FCDBAS]);
 	    prout(".\"");
-	    if (resting) {
+	    if (game.resting) {
 		skip(1);
 		proutn("Mr. Spock-  \"Captain, shall we cancel the rest period?\" ");
 		if (ja()) {
-		    resting = 0;
-		    Time = 0.0;
+		    game.resting = 0;
+		    game.optime = 0.0;
 		    return;
 		}
 	    }
 	    break;
 	case FSCDBAS: /* Supercommander destroys base */
 	    game.future[FSCDBAS] = FOREVER;
-	    isatb = 2;
+	    game.isatb = 2;
 	    if (!game.state.galaxy[game.state.isx][game.state.isy].starbase) 
 		break; /* WAS RETURN! */
-	    ixhold = batx;
-	    iyhold = baty;
-	    batx = game.state.isx;
-	    baty = game.state.isy;
+	    ixhold = game.batx;
+	    iyhold = game.baty;
+	    game.batx = game.state.isx;
+	    game.baty = game.state.isy;
 	case FCDBAS: /* Commander succeeds in destroying base */
 	    if (line==FCDBAS) {
 		game.future[FCDBAS] = FOREVER;
 		/* find the lucky pair */
 		for_commanders(i)
-		    if (game.state.cx[i]==batx && game.state.cy[i]==baty) 
+		    if (game.state.cx[i]==game.batx && game.state.cy[i]==game.baty) 
 			break;
 		if (i > game.state.remcom || game.state.rembase == 0 ||
-		    !game.state.galaxy[batx][baty].starbase) {
+		    !game.state.galaxy[game.batx][game.baty].starbase) {
 		    /* No action to take after all */
-		    batx = baty = 0;
+		    game.batx = game.baty = 0;
 		    break;
 		}
 	    }
 	    /* Code merges here for any commander destroying base */
 	    /* Not perfect, but will have to do */
 	    /* Handle case where base is in same quadrant as starship */
-	    if (batx==quadx && baty==quady) {
-		game.state.chart[batx][baty].starbase = FALSE;
-		game.quad[basex][basey]= IHDOT;
-		basex=basey=0;
+	    if (game.batx==game.quadx && game.baty==game.quady) {
+		game.state.chart[game.batx][game.baty].starbase = FALSE;
+		game.quad[game.basex][game.basey]= IHDOT;
+		game.basex=game.basey=0;
 		newcnd();
 		skip(1);
 		prout("Spock-  \"Captain, I believe the starbase has been destroyegame.state.\"");
 	    }
 	    else if (game.state.rembase != 1 &&
-		     (game.damage[DRADIO] <= 0.0 || condit == IHDOCKED)) {
+		     (game.damage[DRADIO] <= 0.0 || game.condit == IHDOCKED)) {
 		/* Get word via subspace radio */
 		if (ipage==0) pause_game(1);
 		ipage = 1;
 		skip(1);
 		prout("Lt. Uhura-  \"Captain, Starfleet Command reports that");
 		proutn("   the starbase in ");
-		proutn(cramlc(quadrant, batx, baty));
+		proutn(cramlc(quadrant, game.batx, game.baty));
 		prout(" has been destroyed by");
-		if (isatb==2) prout("the Klingon Super-Commander");
+		if (game.isatb==2) prout("the Klingon Super-Commander");
 		else prout("a Klingon Commander");
-		game.state.chart[batx][baty].starbase = FALSE;
+		game.state.chart[game.batx][game.baty].starbase = FALSE;
 	    }
 	    /* Remove Starbase from galaxy */
-	    game.state.galaxy[batx][baty].starbase = FALSE;
+	    game.state.galaxy[game.batx][game.baty].starbase = FALSE;
 	    for_starbases(i)
-		if (game.state.baseqx[i]==batx && game.state.baseqy[i]==baty) {
+		if (game.state.baseqx[i]==game.batx && game.state.baseqy[i]==game.baty) {
 		    game.state.baseqx[i]=game.state.baseqx[game.state.rembase];
 		    game.state.baseqy[i]=game.state.baseqy[game.state.rembase];
 		}
 	    game.state.rembase--;
-	    if (isatb == 2) {
+	    if (game.isatb == 2) {
 		/* reinstate a commander's base attack */
-		batx = ixhold;
-		baty = iyhold;
-		isatb = 0;
+		game.batx = ixhold;
+		game.baty = iyhold;
+		game.isatb = 0;
 	    }
 	    else {
-		batx = baty = 0;
+		game.batx = game.baty = 0;
 	    }
 	    break;
 	case FSCMOVE: /* Supercommander moves */
 	    game.future[FSCMOVE] = game.state.date+0.2777;
-	    if (ientesc+istract==0 &&
-		isatb!=1 &&
-		(iscate!=1 || justin==1)) scom(&ipage);
+	    if (game.ientesc+istract==0 &&
+		game.isatb!=1 &&
+		(game.iscate!=1 || game.justin==1)) scom(&ipage);
 	    break;
 	case FDSPROB: /* Move deep space probe */
 	    game.future[FDSPROB] = game.state.date + 0.01;
-	    probex += probeinx;
-	    probey += probeiny;
-	    i = (int)(probex/QUADSIZE +0.05);
-	    j = (int)(probey/QUADSIZE + 0.05);
-	    if (probecx != i || probecy != j) {
-		probecx = i;
-		probecy = j;
+	    game.probex += game.probeinx;
+	    game.probey += game.probeiny;
+	    i = (int)(game.probex/QUADSIZE +0.05);
+	    j = (int)(game.probey/QUADSIZE + 0.05);
+	    if (game.probecx != i || game.probecy != j) {
+		game.probecx = i;
+		game.probecy = j;
 		if (!VALID_QUADRANT(i, j) ||
-		    game.state.galaxy[probecx][probecy].supernova) {
+		    game.state.galaxy[game.probecx][game.probecy].supernova) {
 		    // Left galaxy or ran into supernova
-		    if (game.damage[DRADIO]==0.0 || condit == IHDOCKED) {
+		    if (game.damage[DRADIO]==0.0 || game.condit == IHDOCKED) {
 			if (ipage==0) pause_game(1);
 			ipage = 1;
 			skip(1);
@@ -320,30 +320,30 @@ void events(void)
 		    game.future[FDSPROB] = FOREVER;
 		    break;
 		}
-		if (game.damage[DRADIO]==0.0   || condit == IHDOCKED) {
+		if (game.damage[DRADIO]==0.0   || game.condit == IHDOCKED) {
 		    if (ipage==0) pause_game(1);
 		    ipage = 1;
 		    skip(1);
 		    proutn("Lt. Uhura-  \"The deep space probe is now in ");
-		    proutn(cramlc(quadrant, probecx, probecy));
+		    proutn(cramlc(quadrant, game.probecx, game.probecy));
 		    prout(".\"");
 		}
 	    }
 	    /* Update star chart if Radio is working or have access to
 	       radio. */
-	    if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
-		game.state.chart[probecx][probecy].klingons = game.state.galaxy[probecx][probecy].klingons;
-		game.state.chart[probecx][probecy].starbase = game.state.galaxy[probecx][probecy].starbase;
-		game.state.chart[probecx][probecy].stars = game.state.galaxy[probecx][probecy].stars;
-		game.state.galaxy[probecx][probecy].charted = TRUE;
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
+		game.state.chart[game.probecx][game.probecy].klingons = game.state.galaxy[game.probecx][game.probecy].klingons;
+		game.state.chart[game.probecx][game.probecy].starbase = game.state.galaxy[game.probecx][game.probecy].starbase;
+		game.state.chart[game.probecx][game.probecy].stars = game.state.galaxy[game.probecx][game.probecy].stars;
+		game.state.galaxy[game.probecx][game.probecy].charted = TRUE;
 	    }
-	    proben--; // One less to travel
-	    if (proben == 0 && isarmed &&
-		game.state.galaxy[probecx][probecy].stars) {
+	    game.proben--; // One less to travel
+	    if (game.proben == 0 && game.isarmed &&
+		game.state.galaxy[game.probecx][game.probecy].stars) {
 		/* lets blow the sucker! */
 		snova(1,0);
 		game.future[FDSPROB] = FOREVER;
-		if (game.state.galaxy[quadx][quady].supernova) 
+		if (game.state.galaxy[game.quadx][game.quady].supernova) 
 		    return;
 	    }
 	    break;
@@ -357,7 +357,7 @@ void wait(void)
     int key;
     double temp, delay, origTime;
 
-    ididit = 0;
+    game.ididit = 0;
     for (;;) {
 	key = scan();
 	if (key  != IHEOL) break;
@@ -370,42 +370,42 @@ void wait(void)
     }
     origTime = delay = aaitem;
     if (delay <= 0.0) return;
-    if (delay >= game.state.remtime || nenhere != 0) {
+    if (delay >= game.state.remtime || game.nenhere != 0) {
 	proutn("Are you sure? ");
 	if (ja() == 0) return;
     }
 
     /* Alternate resting periods (events) with attacks */
 
-    resting = 1;
+    game.resting = 1;
     do {
-	if (delay <= 0) resting = 0;
-	if (resting == 0) {
+	if (delay <= 0) game.resting = 0;
+	if (game.resting == 0) {
 	    prout("%d stardates left.", (int)game.state.remtime);
 	    return;
 	}
-	temp = Time = delay;
+	temp = game.optime = delay;
 
-	if (nenhere) {
+	if (game.nenhere) {
 	    double rtime = 1.0 + Rand();
 	    if (rtime < temp) temp = rtime;
-	    Time = temp;
+	    game.optime = temp;
 	}
-	if (Time < delay) attack(0);
-	if (alldone) return;
+	if (game.optime < delay) attack(0);
+	if (game.alldone) return;
 	events();
-	ididit = 1;
-	if (alldone) return;
+	game.ididit = 1;
+	if (game.alldone) return;
 	delay -= temp;
 	/* Repair Deathray if long rest at starbase */
-	if (origTime-delay >= 9.99 && condit == IHDOCKED)
+	if (origTime-delay >= 9.99 && game.condit == IHDOCKED)
 	    game.damage[DDRAY] = 0.0;
     } while 
 	// leave if quadrant supernovas
-	(!game.state.galaxy[quadx][quady].supernova);
+	(!game.state.galaxy[game.quadx][game.quady].supernova);
 
-    resting = 0;
-    Time = 0;
+    game.resting = 0;
+    game.optime = 0;
 }
 
 void nova(int ix, int iy) 
@@ -424,7 +424,7 @@ void nova(int ix, int iy)
     game.quad[ix][iy] = IHDOT;
     crmena(1, IHSTAR, 2, ix, iy);
     prout(" novas.");
-    game.state.galaxy[quadx][quady].stars--;
+    game.state.galaxy[game.quadx][game.quady].stars--;
     game.state.starkl++;
 	
     /* Set up stack to recursively trigger adjacent stars */
@@ -459,34 +459,34 @@ void nova(int ix, int iy)
 			top2++;
 			hits[top2][1]=ii;
 			hits[top2][2]=jj;
-			game.state.galaxy[quadx][quady].stars -= 1;
+			game.state.galaxy[game.quadx][game.quady].stars -= 1;
 			game.state.starkl++;
 			crmena(1, IHSTAR, 2, ii, jj);
 			prout(" novas.");
 			game.quad[ii][jj] = IHDOT;
 			break;
 		    case IHP: /* Destroy planet */
-			game.state.galaxy[quadx][quady].planets -= 1;
+			game.state.galaxy[game.quadx][game.quady].planets -= 1;
 			game.state.nplankl++;
 			crmena(1, IHP, 2, ii, jj);
 			prout(" destroyed.");
-			DESTROY(&game.state.plnets[iplnet]);
-			iplnet = plnetx = plnety = 0;
-			if (landed == 1) {
+			DESTROY(&game.state.plnets[game.iplnet]);
+			game.iplnet = game.plnetx = game.plnety = 0;
+			if (game.landed == 1) {
 			    finish(FPNOVA);
 			    return;
 			}
 			game.quad[ii][jj] = IHDOT;
 			break;
 		    case IHB: /* Destroy base */
-			game.state.galaxy[quadx][quady].starbase = FALSE;
+			game.state.galaxy[game.quadx][game.quady].starbase = FALSE;
 			for_starbases(i)
-			    if (game.state.baseqx[i]==quadx && game.state.baseqy[i]==quady) 
+			    if (game.state.baseqx[i]==game.quadx && game.state.baseqy[i]==game.quady) 
 				break;
 			game.state.baseqx[i] = game.state.baseqx[game.state.rembase];
 			game.state.baseqy[i] = game.state.baseqy[game.state.rembase];
 			game.state.rembase--;
-			basex = basey = 0;
+			game.basex = game.basey = 0;
 			game.state.basekl++;
 			newcnd();
 			crmena(1, IHB, 2, ii, jj);
@@ -496,25 +496,25 @@ void nova(int ix, int iy)
 		    case IHE: /* Buffet ship */
 		    case IHF:
 			prout("***Starship buffeted by nova.");
-			if (shldup) {
-			    if (shield >= 2000.0) shield -= 2000.0;
+			if (game.shldup) {
+			    if (game.shield >= 2000.0) game.shield -= 2000.0;
 			    else {
-				double diff = 2000.0 - shield;
-				energy -= diff;
-				shield = 0.0;
-				shldup = 0;
+				double diff = 2000.0 - game.shield;
+				game.energy -= diff;
+				game.shield = 0.0;
+				game.shldup = 0;
 				prout("***Shields knocked out.");
-				game.damage[DSHIELD] += 0.005*damfac*Rand()*diff;
+				game.damage[DSHIELD] += 0.005*game.damfac*Rand()*diff;
 			    }
 			}
-			else energy -= 2000.0;
-			if (energy <= 0) {
+			else game.energy -= 2000.0;
+			if (game.energy <= 0) {
 			    finish(FNOVA);
 			    return;
 			}
 			/* add in course nova contributes to kicking starship*/
-			icx += sectx-hits[mm][1];
-			icy += secty-hits[mm][2];
+			icx += game.sectx-hits[mm][1];
+			icy += game.secty-hits[mm][2];
 			kount++;
 			break;
 		    case IHK: /* kill klingon */
@@ -558,7 +558,7 @@ void nova(int ix, int iy)
 			game.quad[newcx][newcy] = iquad;
 			game.kx[ll] = newcx;
 			game.ky[ll] = newcy;
-			game.kavgd[ll] = sqrt(square(sectx-newcx)+square(secty-newcy));
+			game.kavgd[ll] = sqrt(square(game.sectx-newcx)+square(game.secty-newcy));
 			game.kdist[ll] = game.kavgd[ll];
 			skip(1);
 			break;
@@ -573,18 +573,18 @@ void nova(int ix, int iy)
 	return;
 
     /* Starship affected by nova -- kick it away. */
-    dist = kount*0.1;
+    game.dist = kount*0.1;
     if (icx) icx = (icx < 0 ? -1 : 1);
     if (icy) icy = (icy < 0 ? -1 : 1);
-    direc = course[3*(icx+1)+icy+2];
-    if (direc == 0.0) dist = 0.0;
-    if (dist == 0.0) return;
-    Time = 10.0*dist/16.0;
+    game.direc = course[3*(icx+1)+icy+2];
+    if (game.direc == 0.0) game.dist = 0.0;
+    if (game.dist == 0.0) return;
+    game.optime = 10.0*game.dist/16.0;
     skip(1);
     prout("Force of nova displaces starship.");
-    iattak=2;	/* Eliminates recursion problem */
+    game.iattak=2;	/* Eliminates recursion problem */
     imove();
-    Time = 10.0*dist/16.0;
+    game.optime = 10.0*game.dist/16.0;
     return;
 }
 	
@@ -601,8 +601,8 @@ void snova(int insx, int insy)
     if (insy== 0) {
 	if (insx == 1) {
 	    /* NOVAMAX being used */
-	    nqx = probecx;
-	    nqy = probecy;
+	    nqx = game.probecx;
+	    nqy = game.probecy;
 	}
 	else {
 	    int stars = 0;
@@ -624,19 +624,19 @@ void snova(int insx, int insy)
 		if (num <=0) break;
 	    }
 #ifdef DEBUG
-	    if (idebug) {
+	    if (game.idebug) {
 		proutn("Super nova here?");
 		if (ja()==1) {
-		    nqx = quadx;
-		    nqy = quady;
+		    nqx = game.quadx;
+		    nqy = game.quady;
 		}
 	    }
 #endif
 	}
 
-	if (nqx != quady || nqy != quady || justin != 0) {
+	if (nqx != game.quady || nqy != game.quady || game.justin != 0) {
 	    /* it isn't here, or we just entered (treat as inroute) */
-	    if (game.damage[DRADIO] == 0.0 || condit == IHDOCKED) {
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
 		skip(1);
 		prout("Message from Starfleet Command       Stardate %.2f", game.state.date);
 		prout("     Supernova in %s; caution advised.",
@@ -667,14 +667,14 @@ void snova(int insx, int insy)
 	prouts("***RED ALERT!  RED ALERT!");
 	skip(1);
 	prout("***Incipient supernova detected at ", cramlc(sector, nsx, nsy));
-	nqx = quadx;
-	nqy = quady;
-	if (square(nsx-sectx) + square(nsy-secty) <= 2.1) {
+	nqx = game.quadx;
+	nqy = game.quady;
+	if (square(nsx-game.sectx) + square(nsy-game.secty) <= 2.1) {
 	    proutn("Emergency override attempts t");
 	    prouts("***************");
 	    skip(1);
 	    stars();
-	    alldone=1;
+	    game.alldone=1;
 	}
     }
     /* destroy any Klingons in supernovaed quadrant */
@@ -683,7 +683,7 @@ void snova(int insx, int insy)
     comdead = iscdead = 0;
     if (nqx==game.state.isx && nqy == game.state.isy) {
 	/* did in the Supercommander! */
-	game.state.nscrem = game.state.isx = game.state.isy = isatb = iscate = 0;
+	game.state.nscrem = game.state.isx = game.state.isy = game.isatb = game.iscate = 0;
 	iscdead = 1;
 	game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
     }
@@ -710,7 +710,7 @@ void snova(int insx, int insy)
     npdead = num - nrmdead*10;
     if (npdead) {
 	int l;
-	for (l = 0; l < inplan; l++)
+	for (l = 0; l < game.inplan; l++)
 	    if (game.state.plnets[l].x == nqx && game.state.plnets[l].y == nqy) {
 		DESTROY(&game.state.plnets[l]);
 	    }
@@ -734,12 +734,12 @@ void snova(int insx, int insy)
 	game.state.nplankl += npdead;
     }
     /* mark supernova in galaxy and in star chart */
-    if ((quadx == nqx && quady == nqy) ||
+    if ((game.quadx == nqx && game.quady == nqy) ||
 	game.damage[DRADIO] == 0 ||
-	condit == IHDOCKED)
+	game.condit == IHDOCKED)
 	game.state.galaxy[nqx][nqy].supernova = TRUE;
     /* If supernova destroys last klingons give special message */
-    if (KLINGREM==0 && (nqx != quadx || nqy != quady)) {
+    if (KLINGREM==0 && (nqx != game.quadx || nqy != game.quady)) {
 	skip(2);
 	if (insx == 0) prout("Lucky you!");
 	proutn("A supernova in %s has just destroyed the last Klingons.",
@@ -748,7 +748,7 @@ void snova(int insx, int insy)
 	return;
     }
     /* if some Klingons remain, continue or die in supernova */
-    if (alldone) finish(FSNOVAED);
+    if (game.alldone) finish(FSNOVAED);
     return;
 }
 		

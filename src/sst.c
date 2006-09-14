@@ -375,8 +375,8 @@ static void makemoves(void)
 	drawmaps(1);
 	while (TRUE)  { /* get a command */
 	    hitme = FALSE;
-	    justin = 0;
-	    Time = 0.0;
+	    game.justin = 0;
+	    game.optime = 0.0;
 	    i = -1;
 	    chew();
 	    setwnd(prompt_window);
@@ -386,7 +386,7 @@ static void makemoves(void)
 		makechart();
 		continue;
 	    }
-	    ididit=0;
+	    game.ididit=0;
 	    clrscr();
 	    setwnd(message_window);
 	    clrscr();
@@ -422,25 +422,25 @@ static void makemoves(void)
 	    break;
 	case PHASERS:			// phasers
 	    phasers();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case TORPEDO:			// photons
 	    photon();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case MOVE:			// move
 	    warp(1);
 	    break;
 	case SHIELDS:			// shields
 	    doshield(1);
-	    if (ididit) {
+	    if (game.ididit) {
 		hitme=TRUE;
-		shldchg = 0;
+		game.shldchg = 0;
 	    }
 	    break;
 	case DOCK:			// dock
 	    dock(1);
-	    if (ididit) attack(0);
+	    if (game.ididit) attack(0);
 	    break;
 	case DAMAGES:			// damages
 	    dreprt();
@@ -453,7 +453,7 @@ static void makemoves(void)
 	    break;
 	case REST:			// rest
 	    wait();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case WARP:			// warp
 	    setwrp();
@@ -466,22 +466,22 @@ static void makemoves(void)
 	    break;
 	case ORBIT:			// orbit
 	    orbit();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case TRANSPORT:			// transport "beam"
 	    beam();
 	    break;
 	case MINE:			// mine
 	    mine();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case CRYSTALS:			// crystals
 	    usecrystals();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case SHUTTLE:			// shuttle
 	    shuttle();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case PLANETS:			// Planet list
 	    preport();
@@ -502,7 +502,7 @@ static void makemoves(void)
 	    break;
 	case PROBE:
 	    probe();			// Launch probe
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case ABANDON:			// Abandon Ship
 	    abandn();
@@ -513,12 +513,12 @@ static void makemoves(void)
 	case SAVE:			// Save Game
 	    freeze(FALSE);
 	    clrscr();
-	    if (skill > SKILL_GOOD)
+	    if (game.skill > SKILL_GOOD)
 		prout("WARNING--Saved games produce no plaques!");
 	    break;
 	case DEATHRAY:			// Try a desparation measure
 	    deathray();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case DEBUGCMD:			// What do we want for debug???
 #ifdef DEBUG
@@ -527,12 +527,12 @@ static void makemoves(void)
 	    break;
 	case MAYDAY:			// Call for help
 	    help();
-	    if (ididit) hitme = TRUE;
+	    if (game.ididit) hitme = TRUE;
 	    break;
 	case QUIT:
-	    alldone = 1;		// quit the game
+	    game.alldone = 1;		// quit the game
 #ifdef DEBUG
-	    if (idebug) score();
+	    if (game.idebug) score();
 #endif
 	    break;
 	case HELP:
@@ -541,22 +541,22 @@ static void makemoves(void)
 	}
 	commandhook(commands[i].name, FALSE);
 	for (;;) {
-	    if (alldone) break;		// Game has ended
+	    if (game.alldone) break;		// Game has ended
 #ifdef DEBUG
-	    if (idebug) prout("2500");
+	    if (game.idebug) prout("2500");
 #endif
-	    if (Time != 0.0) {
+	    if (game.optime != 0.0) {
 		events();
-		if (alldone) break;	// Events did us in
+		if (game.alldone) break;	// Events did us in
 	    }
-	    if (game.state.galaxy[quadx][quady].supernova) { // Galaxy went Nova!
+	    if (game.state.galaxy[game.quadx][game.quady].supernova) { // Galaxy went Nova!
 		atover(0);
 		continue;
 	    }
-	    if (hitme && justin==0) {
+	    if (hitme && game.justin==0) {
 		attack(2);
-		if (alldone) break;
-		if (game.state.galaxy[quadx][quady].supernova) {	// went NOVA! 
+		if (game.alldone) break;
+		if (game.state.galaxy[game.quadx][game.quady].supernova) {	// went NOVA! 
 		    atover(0);
 		    hitme = TRUE;
 		    continue;
@@ -564,7 +564,7 @@ static void makemoves(void)
 	    }
 	    break;
 	}
-	if (alldone) break;
+	if (game.alldone) break;
     }
 }
 
@@ -607,16 +607,16 @@ int main(int argc, char **argv)
 	clrscr();
 	prelim();
 	setup(line[0] == '\0');
-	if (alldone) {
+	if (game.alldone) {
 	    score();
-	    alldone = 0;
+	    game.alldone = 0;
 	}
 	else makemoves();
 	skip(1);
 	stars();
 	skip(1);
 
-	if (tourn && alldone) {
+	if (game.tourn && game.alldone) {
 	    proutn("Do you want your score recorded?");
 	    if (ja()) {
 		chew2();
@@ -675,7 +675,7 @@ void crmena(int i, int enemy, int key, int x, int y)
 void crmshp(void) 
 {
     char *s;
-    switch (ship) {
+    switch (game.ship) {
     case IHE: s = "Enterprise"; break;
     case IHF: s = "Faerie Queene"; break;
     default:  s = "Ship???"; break;
@@ -805,10 +805,10 @@ void debugme(void)
 {
     proutn("Reset levels? ");
     if (ja() != 0) {
-	if (energy < inenrg) energy = inenrg;
-	shield = inshld;
-	torps = intorps;
-	lsupres = inlsr;
+	if (energy < game.inenrg) energy = game.inenrg;
+	shield = game.inshld;
+	torps = game.intorps;
+	game.lsupres = game.inlsr;
     }
     proutn("Reset damage? ");
     if (ja() != 0) {
@@ -817,10 +817,10 @@ void debugme(void)
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
     }
-    proutn("Toggle idebug? ");
+    proutn("Toggle game.idebug? ");
     if (ja() != 0) {
-	idebug = !idebug;
-	if (idebug) prout("Debug output ON");
+	game.idebug = !game.idebug;
+	if (game.idebug) prout("Debug output ON");
 	else prout("Debug output OFF");
     }
     proutn("Cause selective damage? ");
@@ -864,7 +864,7 @@ void debugme(void)
     }
     proutn("Induce supernova here? ");
     if (ja() != 0) {
-	game.state.galaxy[quadx][quady].supernova = TRUE;
+	game.state.galaxy[game.quadx][game.quady].supernova = TRUE;
 	atover(1);
     }
 }

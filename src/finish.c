@@ -48,17 +48,17 @@ void dstrct()
 void kaboom(void) 
 {
     stars();
-    if (ship==IHE) prouts("***");
+    if (game.ship==IHE) prouts("***");
     prouts("********* Entropy of ");
     crmshp();
     prouts(" maximized *********");
     skip(1);
     stars();
     skip(1);
-    if (nenhere != 0) {
-	double whammo = 25.0 * energy;
+    if (game.nenhere != 0) {
+	double whammo = 25.0 * game.energy;
 	int l=1;
-	while (l <= nenhere) {
+	while (l <= game.nenhere) {
 	    if (game.kpower[l]*game.kdist[l] <= whammo) 
 		deadkl(game.kx[l],game.ky[l], game.quad[game.kx[l]][game.ky[l]], game.kx[l], game.ky[l]);
 	    l++;
@@ -71,7 +71,7 @@ void kaboom(void)
 void finish(FINTYPE ifin) 
 {
     int igotit = 0;
-    alldone = 1;
+    game.alldone = 1;
     skip(3);
     prout("It is stardate %.1f.", game.state.date);
     skip(1);
@@ -83,21 +83,21 @@ void finish(FINTYPE ifin)
 
 	prout("You have smashed the Klingon invasion fleet and saved");
 	prout("the Federation.");
-	gamewon=1;
-	if (alive) {
+	game.gamewon=1;
+	if (game.alive) {
 	    double badpt;
-	    badpt = 5.0*game.state.starkl + casual + 10.0*game.state.nplankl +
-		45.*nhelp+100.*game.state.basekl;
-	    if (ship == IHF) badpt += 100.0;
-	    else if (ship == 0) badpt += 200.0;
+	    badpt = 5.0*game.state.starkl + game.casual + 10.0*game.state.nplankl +
+		45.*game.nhelp+100.*game.state.basekl;
+	    if (game.ship == IHF) badpt += 100.0;
+	    else if (game.ship == 0) badpt += 200.0;
 	    if (badpt < 100.0) badpt = 0.0;	// Close enough!
-	    if (game.state.date-indate < 5.0 ||
+	    if (game.state.date-game.indate < 5.0 ||
 		// killsPerDate >= RateMax
-		KLINGKILLED/(game.state.date-indate) >=
-		0.1*skill*(skill+1.0) + 0.1 + 0.008*badpt) {
+		KLINGKILLED/(game.state.date-game.indate) >=
+		0.1*game.skill*(game.skill+1.0) + 0.1 + 0.008*badpt) {
 		skip(1);
 		prout("In fact, you have done so well that Starfleet Command");
-		switch (skill) {
+		switch (game.skill) {
 		case SKILL_NOVICE:
 		    prout("promotes you one step in rank from \"Novice\" to \"Fair\".");
 		    break;
@@ -132,10 +132,10 @@ void finish(FINTYPE ifin)
 		    skip(1);
 		    break;
 		}
-		if (skill >= SKILL_EXPERT) {
-		    if (thawed
+		if (game.skill >= SKILL_EXPERT) {
+		    if (game.thawed
 #ifdef DEBUG
-			&& !idebug
+			&& !game.idebug
 #endif
 			)
 			prout("You cannot get a citation, so...");
@@ -168,7 +168,7 @@ void finish(FINTYPE ifin)
 	else {
 	    prout("found guilty and");
 	    prout("sentenced to death by slow torture.");
-	    alive = 0;
+	    game.alive = 0;
 	}
 	score();
 	return;
@@ -282,12 +282,12 @@ void finish(FINTYPE ifin)
 	prout("You are crushed into extremely dense matter.");
 	break;
     }
-    if (ship==IHF) ship= 0;
-    else if (ship == IHE) ship = IHF;
-    alive = 0;
+    if (game.ship==IHF) game.ship= 0;
+    else if (game.ship == IHE) game.ship = IHF;
+    game.alive = 0;
     if (KLINGREM != 0) {
-	double goodies = game.state.remres/inresor;
-	double baddies = (game.state.remkl + 2.0*game.state.remcom)/(inkling+2.0*incom);
+	double goodies = game.state.remres/game.inresor;
+	double baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom);
 	if (goodies/baddies >= 1.0+0.5*Rand()) {
 	    prout("As a result of your actions, a treaty with the Klingon");
 	    prout("Empire has been signed. The terms of the treaty are");
@@ -307,30 +307,30 @@ void finish(FINTYPE ifin)
 	prout("martyr and a hero. Someday maybe they'll erect a");
 	prout("statue in your memory. Rest in peace, and try not");
 	prout("to think about pigeons.");
-	gamewon = 1;
+	game.gamewon = 1;
     }
     score();
 }
 
 void score(void) 
 {
-    double timused = game.state.date - indate;
+    double timused = game.state.date - game.indate;
     int ithperd, iwon, klship;
 
-    iskill = skill;
+    iskill = game.skill;
     if ((timused == 0 || KLINGREM != 0) && timused < 5.0) timused = 5.0;
     perdate = KLINGKILLED/timused;
     ithperd = 500*perdate + 0.5;
     iwon = 0;
-    if (gamewon) iwon = 100*skill;
-    if (ship == IHE) klship = 0;
-    else if (ship == IHF) klship = 1;
+    if (game.gamewon) iwon = 100*game.skill;
+    if (game.ship == IHE) klship = 0;
+    else if (game.ship == IHF) klship = 1;
     else klship = 2;
-    if (gamewon == 0) game.state.nromrem = 0; // None captured if no win
+    if (game.gamewon == 0) game.state.nromrem = 0; // None captured if no win
     iscore = 10*NKILLK + 50*NKILLC + ithperd + iwon
-	- 100*game.state.basekl - 100*klship - 45*nhelp -5*game.state.starkl - casual
+	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
 	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl + game.state.nromrem;
-    if (alive == 0) iscore -= 200;
+    if (game.alive == 0) iscore -= 200;
     skip(2);
     prout("Your score --");
     if (NKILLROM)
@@ -360,20 +360,20 @@ void score(void)
     if (game.state.basekl)
 	prout("%6d bases destroyed by your action     %5d",
 	      game.state.basekl, -100*game.state.basekl);
-    if (nhelp)
+    if (game.nhelp)
 	prout("%6d calls for help from starbase       %5d",
-	      nhelp, -45*nhelp);
-    if (casual)
+	      game.nhelp, -45*game.nhelp);
+    if (game.casual)
 	prout("%6d casualties incurred                %5d",
-	      casual, -casual);
+	      game.casual, -game.casual);
     if (klship)
 	prout("%6d ship(s) lost or destroyed          %5d",
 	      klship, -100*klship);
-    if (alive==0)
+    if (game.alive==0)
 	prout("Penalty for getting yourself killed        -200");
-    if (gamewon) {
+    if (game.gamewon) {
 	proutn("Bonus for winning ");
-	switch (skill) {
+	switch (game.skill) {
 	case SKILL_NOVICE:   proutn("Novice game  "); break;
 	case SKILL_FAIR:     proutn("Fair game    "); break;
 	case SKILL_GOOD:     proutn("Good game    "); break;

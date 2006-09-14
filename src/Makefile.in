@@ -467,6 +467,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-info-am
 
+
+# Experimental XaW code, not yet integrated with the game
+xio: xio.o
+	gcc xio.c -lXaw3d -o xio
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

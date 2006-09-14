@@ -10,12 +10,12 @@ void imove(void)
         finald, finalx, finaly, stopegy, probf;
     int trbeam = 0, n, l, ix=0, iy=0, kink, kinks, iquad;
 
-    if (inorbit) {
+    if (game.inorbit) {
 	prout("Helmsman Sulu- \"Leaving standard orbit.\"");
-	inorbit = FALSE;
+	game.inorbit = FALSE;
     }
 
-    angle = ((15.0 - direc) * 0.5235988);
+    angle = ((15.0 - game.direc) * 0.5235988);
     deltax = -sin(angle);
     deltay = cos(angle);
     if (fabs(deltax) > fabs(deltay))
@@ -27,17 +27,17 @@ void imove(void)
     deltax /= bigger;
 
     /* If tractor beam is to occur, don't move full distance */
-    if (game.state.date+Time >= game.future[FTBEAM]) {
+    if (game.state.date+game.optime >= game.future[FTBEAM]) {
 	trbeam = 1;
-	condit = IHRED;
-	dist = dist*(game.future[FTBEAM]-game.state.date)/Time + 0.1;
-	Time = game.future[FTBEAM] - game.state.date + 1e-5;
+	game.condit = IHRED;
+	game.dist = game.dist*(game.future[FTBEAM]-game.state.date)/game.optime + 0.1;
+	game.optime = game.future[FTBEAM] - game.state.date + 1e-5;
     }
     /* Move within the quadrant */
-    game.quad[sectx][secty] = IHDOT;
-    x = sectx;
-    y = secty;
-    n = 10.0*dist*bigger+0.5;
+    game.quad[game.sectx][game.secty] = IHDOT;
+    x = game.sectx;
+    y = game.secty;
+    n = 10.0*game.dist*bigger+0.5;
 
     if (n > 0) {
 	for (l = 1; l <= n; l++) {
@@ -46,7 +46,7 @@ void imove(void)
 	    if (!VALID_SECTOR(ix, iy)) {
 		/* Leaving quadrant -- allow final enemy attack */
 		/* Don't do it if being pushed by Nova */
-		if (nenhere != 0 && iattak != 2) {
+		if (game.nenhere != 0 && game.iattak != 2) {
 		    newcnd();
 		    for_local_enemies(l) {
 			finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
@@ -54,19 +54,19 @@ void imove(void)
 			game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
 		    }
 		    /*
-		     * Stas Sergeev added the condition
+		     * Stas Sergeev added the game.condition
 		     * that attacks only happen if Klingons
 		     * are present and your skill is good.
 		     */
-		    if (skill > SKILL_GOOD && klhere > 0 && !game.state.galaxy[quadx][quady].supernova)
+		    if (game.skill > SKILL_GOOD && game.klhere > 0 && !game.state.galaxy[game.quadx][game.quady].supernova)
 			attack(0);
-		    if (alldone) return;
+		    if (game.alldone) return;
 		}
 		/* compute final position -- new quadrant and sector */
-		x = QUADSIZE*(quadx-1)+sectx;
-		y = QUADSIZE*(quady-1)+secty;
-		ix = x+10.0*dist*bigger*deltax+0.5;
-		iy = y+10.0*dist*bigger*deltay+0.5;
+		x = QUADSIZE*(game.quadx-1)+game.sectx;
+		y = QUADSIZE*(game.quady-1)+game.secty;
+		ix = x+10.0*game.dist*bigger*deltax+0.5;
+		iy = y+10.0*game.dist*bigger*deltay+0.5;
 		/* check for edge of galaxy */
 		kinks = 0;
 		do {
@@ -91,8 +91,8 @@ void imove(void)
 		} while (kink);
 
 		if (kinks) {
-		    nkinks += 1;
-		    if (nkinks == 3) {
+		    game.nkinks += 1;
+		    if (game.nkinks == 3) {
 			/* Three strikes -- you're out! */
 			finish(FNEG3);
 			return;
@@ -104,24 +104,24 @@ void imove(void)
 		}
 		/* Compute final position in new quadrant */
 		if (trbeam) return; /* Don't bother if we are to be beamed */
-		quadx = (ix+(QUADSIZE-1))/QUADSIZE;
-		quady = (iy+(QUADSIZE-1))/QUADSIZE;
-		sectx = ix - QUADSIZE*(quadx-1);
-		secty = iy - QUADSIZE*(quady-1);
+		game.quadx = (ix+(QUADSIZE-1))/QUADSIZE;
+		game.quady = (iy+(QUADSIZE-1))/QUADSIZE;
+		game.sectx = ix - QUADSIZE*(game.quadx-1);
+		game.secty = iy - QUADSIZE*(game.quady-1);
 		skip(1);
 		prout("Entering %s.",
-		      cramlc(quadrant, quadx, quady));
-		game.quad[sectx][secty] = ship;
+		      cramlc(quadrant, game.quadx, game.quady));
+		game.quad[game.sectx][game.secty] = game.ship;
 		newqad(0);
-		if (skill>SKILL_NOVICE) attack(0);
+		if (game.skill>SKILL_NOVICE) attack(0);
 		return;
 	    }
 	    iquad = game.quad[ix][iy];
 	    if (iquad != IHDOT) {
 		/* object encountered in flight path */
-		stopegy = 50.0*dist/Time;
-		dist=0.1*sqrt((sectx-ix)*(double)(sectx-ix) +
-			      (secty-iy)*(double)(secty-iy));
+		stopegy = 50.0*game.dist/game.optime;
+		game.dist=0.1*sqrt((game.sectx-ix)*(double)(game.sectx-ix) +
+			      (game.secty-iy)*(double)(game.secty-iy));
 		switch (iquad) {
 		case IHT: /* Ram a Tholian */
 		case IHK: /* Ram enemy ship */
@@ -129,11 +129,11 @@ void imove(void)
 		case IHS:
 		case IHR:
 		case IHQUEST:
-		    sectx = ix;
-		    secty = iy;
-		    ram(0, iquad, sectx, secty);
-		    finalx = sectx;
-		    finaly = secty;
+		    game.sectx = ix;
+		    game.secty = iy;
+		    ram(0, iquad, game.sectx, game.secty);
+		    finalx = game.sectx;
+		    finaly = game.secty;
 		    break;
 		case IHBLANK:
 		    skip(1);
@@ -152,7 +152,7 @@ void imove(void)
 		    for (l=0;l<NDEVICES;l++)
 			if (game.damage[l]>0) 
 			    n++;
-		    probf=pow(1.4,(energy+shield)/5000.0-1.0)*pow(1.3,1.0/(n+1)-1.0);
+		    probf=pow(1.4,(game.energy+game.shield)/5000.0-1.0)*pow(1.3,1.0/(n+1)-1.0);
 		    if ((game.options & OPTION_BLKHOLE) && Rand()>probf) 
 			timwrp();
 		    else 
@@ -170,12 +170,12 @@ void imove(void)
 		    prout(";");
 		    proutn("Emergency stop required ");
 		    prout("%2d units of energy.", (int)stopegy);
-		    energy -= stopegy;
+		    game.energy -= stopegy;
 		    finalx = x-deltax+0.5;
-		    sectx = finalx;
+		    game.sectx = finalx;
 		    finaly = y-deltay+0.5;
-		    secty = finaly;
-		    if (energy <= 0) {
+		    game.secty = finaly;
+		    if (game.energy <= 0) {
 			finish(FNRG);
 			return;
 		    }
@@ -184,17 +184,17 @@ void imove(void)
 		goto no_quad_change;	/* sorry! */
 	    }
 	}
-	dist = 0.1*sqrt((sectx-ix)*(double)(sectx-ix) +
-			(secty-iy)*(double)(secty-iy));
-	sectx = ix;
-	secty = iy;
+	game.dist = 0.1*sqrt((game.sectx-ix)*(double)(game.sectx-ix) +
+			(game.secty-iy)*(double)(game.secty-iy));
+	game.sectx = ix;
+	game.secty = iy;
     }
-    finalx = sectx;
-    finaly = secty;
+    finalx = game.sectx;
+    finaly = game.secty;
 no_quad_change:
     /* No quadrant change -- compute new avg enemy distances */
-    game.quad[sectx][secty] = ship;
-    if (nenhere) {
+    game.quad[game.sectx][game.secty] = game.ship;
+    if (game.nenhere) {
 	for_local_enemies(l) {
 	    finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
 			  (iy-game.ky[l])*(double)(iy-game.ky[l]));
@@ -202,12 +202,12 @@ no_quad_change:
 	    game.kdist[l] = finald;
 	}
 	sortkl();
-	if (!game.state.galaxy[quadx][quady].supernova && iattak == 0)
+	if (!game.state.galaxy[game.quadx][game.quady].supernova && game.iattak == 0)
 	    attack(0);
 	for_local_enemies(l) game.kavgd[l] = game.kdist[l];
     }
     newcnd();
-    iattak = 0;
+    game.iattak = 0;
     drawmaps(0);
     setwnd(message_window);
     return;
@@ -216,32 +216,32 @@ no_quad_change:
 void dock(int l) 
 {
     chew();
-    if (condit == IHDOCKED && l) {
+    if (game.condit == IHDOCKED && l) {
 	prout("Already docked.");
 	return;
     }
-    if (inorbit) {
+    if (game.inorbit) {
 	prout("You must first leave standard orbit.");
 	return;
     }
-    if (basex==0 || abs(sectx-basex) > 1 || abs(secty-basey) > 1) {
+    if (game.basex==0 || abs(game.sectx-game.basex) > 1 || abs(game.secty-game.basey) > 1) {
 	crmshp();
 	prout(" not adjacent to base.");
 	return;
     }
-    condit = IHDOCKED;
+    game.condit = IHDOCKED;
     if (l) prout("Docked.");
-    ididit=1;
-    if (energy < inenrg) energy = inenrg;
-    shield = inshld;
-    torps = intorps;
-    lsupres = inlsr;
+    game.ididit=1;
+    if (game.energy < game.inenrg) game.energy = game.inenrg;
+    game.shield = game.inshld;
+    game.torps = game.intorps;
+    game.lsupres = game.inlsr;
     if (game.damage[DRADIO] == 0.0 &&
-	(game.future[FCDBAS] < FOREVER || isatb == 1) && iseenit == 0) {
+	(game.future[FCDBAS] < FOREVER || game.isatb == 1) && game.iseenit == 0) {
 	/* get attack report from base */
 	prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
 	attakreport(0);
-	iseenit = 1;
+	game.iseenit = 1;
     }
 }
 
@@ -255,7 +255,7 @@ static void getcd(int isprobe, int akey) {
 	   are always displayed y - x, where +y is downward! */
 
 	
-        int irowq=quadx, icolq=quady, irows, icols, itemp=0, iprompt=0, key=0;
+        int irowq=game.quadx, icolq=game.quady, irows, icols, itemp=0, iprompt=0, key=0;
 	double xi, xj, xk, xl;
 	double deltax, deltay;
 	int automatic = -1;
@@ -263,9 +263,9 @@ static void getcd(int isprobe, int akey) {
 	/* Get course direction and distance. If user types bad values, return
 	   with DIREC = -1.0. */
 
-	direc = -1.0;
+	game.direc = -1.0;
 	
-	if (landed == 1 && !isprobe) {
+	if (game.landed == 1 && !isprobe) {
 		prout("Dummy! You can't leave standard orbit until you");
 		proutn("are back aboard the ");
 		crmshp();
@@ -389,8 +389,8 @@ static void getcd(int isprobe, int akey) {
 			}
 			else prout("Ensign Chekov- \"Course laid in, Captain.\"");
 		}
-		deltax = icolq - quady + 0.1*(icols-secty);
-		deltay = quadx - irowq + 0.1*(sectx-irows);
+		deltax = icolq - game.quady + 0.1*(icols-game.secty);
+		deltay = game.quadx - irowq + 0.1*(game.sectx-irows);
 	}
 	else { /* manual */
 		while (key == IHEOL) {
@@ -421,9 +421,9 @@ static void getcd(int isprobe, int akey) {
 		skip(1);
 		prout("Helmsman Sulu- \"Aye, Sir.\"");
 	}
-	dist = sqrt(deltax*deltax + deltay*deltay);
-	direc = atan2(deltax, deltay)*1.90985932;
-	if (direc < 0.0) direc += 12.0;
+	game.dist = sqrt(deltax*deltax + deltay*deltay);
+	game.direc = atan2(deltax, deltay)*1.90985932;
+	if (game.direc < 0.0) game.direc += 12.0;
 	chew();
 	return;
 
@@ -435,7 +435,7 @@ void impuls(void)
 {
     double power;
 
-    ididit = 0;
+    game.ididit = 0;
     if (game.damage[DIMPULS]) {
 	chew();
 	skip(1);
@@ -443,22 +443,22 @@ void impuls(void)
 	return;
     }
 
-    if (energy > 30.0) {
+    if (game.energy > 30.0) {
 	getcd(FALSE, 0);
-	if (direc == -1.0) return;
-	power = 20.0 + 100.0*dist;
+	if (game.direc == -1.0) return;
+	power = 20.0 + 100.0*game.dist;
     }
     else
 	power = 30.0;
 
-    if (power >= energy) {
+    if (power >= game.energy) {
 	/* Insufficient power for trip */
 	skip(1);
 	prout("First Officer Spock- \"Captain, the impulse engines");
 	prout("require 20.0 units to engage, plus 100.0 units per");
-	if (energy > 30) {
+	if (game.energy > 30) {
 	    proutn("quadrant.  We can go, therefore, a maximum of %d", 
-		   (int)(0.01 * (energy-20.0)-0.05));
+		   (int)(0.01 * (game.energy-20.0)-0.05));
 	    prout(" quadrants.\"");
 	}
 	else {
@@ -468,8 +468,8 @@ void impuls(void)
 	return;
     }
     /* Make sure enough time is left for the trip */
-    Time = dist/0.095;
-    if (Time >= game.state.remtime) {
+    game.optime = game.dist/0.095;
+    if (game.optime >= game.state.remtime) {
 	prout("First Officer Spock- \"Captain, our speed under impulse");
 	prout("power is only 0.95 sectors per stardate. Are you sure");
 	proutn("we dare spend the time?\" ");
@@ -477,12 +477,12 @@ void impuls(void)
     }
     /* Activate impulse engines and pay the cost */
     imove();
-    ididit = 1;
-    if (alldone) return;
-    power = 20.0 + 100.0*dist;
-    energy -= power;
-    Time = dist/0.095;
-    if (energy <= 0) finish(FNRG);
+    game.ididit = 1;
+    if (game.alldone) return;
+    power = 20.0 + 100.0*game.dist;
+    game.energy -= power;
+    game.optime = game.dist/0.095;
+    if (game.energy <= 0) finish(FNRG);
     return;
 }
 
@@ -493,14 +493,14 @@ void warp(int i)
     double power;
 
     if (i!=2) { /* Not WARPX entry */
-	ididit = 0;
+	game.ididit = 0;
 	if (game.damage[DWARPEN] > 10.0) {
 	    chew();
 	    skip(1);
 	    prout("Engineer Scott- \"The impulse engines are damaged, Sir.\"");
 	    return;
 	}
-	if (game.damage[DWARPEN] > 0.0 && warpfac > 4.0) {
+	if (game.damage[DWARPEN] > 0.0 && game.warpfac > 4.0) {
 	    chew();
 	    skip(1);
 	    prout("Engineer Scott- \"Sorry, Captain. Until this damage");
@@ -510,25 +510,25 @@ void warp(int i)
 			
 	/* Read in course and distance */
 	getcd(FALSE, 0);
-	if (direc == -1.0) return;
+	if (game.direc == -1.0) return;
 
 	/* Make sure starship has enough energy for the trip */
-	power = (dist+0.05)*warpfac*warpfac*warpfac*(shldup+1);
+	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1);
 
 
-	if (power >= energy) {
+	if (power >= game.energy) {
 	    /* Insufficient power for trip */
-	    ididit = 0;
+	    game.ididit = 0;
 	    skip(1);
 	    prout("Engineering to bridge--");
-	    if (shldup==0 || 0.5*power > energy) {
-		iwarp = pow((energy/(dist+0.05)), 0.333333333);
+	    if (game.shldup==0 || 0.5*power > game.energy) {
+		iwarp = pow((game.energy/(game.dist+0.05)), 0.333333333);
 		if (iwarp <= 0) {
 		    prout("We can't do it, Captain. We haven't the energy.");
 		}
 		else {
 		    proutn("We haven't the energy, but we could do it at warp %d", iwarp);
-		    if (shldup) {
+		    if (game.shldup) {
 			prout(",");
 			prout("if you'll lower the shields.");
 		    }
@@ -542,29 +542,29 @@ void warp(int i)
 	}
 						
 	/* Make sure enough time is left for the trip */
-	Time = 10.0*dist/wfacsq;
-	if (Time >= 0.8*game.state.remtime) {
+	game.optime = 10.0*game.dist/game.wfacsq;
+	if (game.optime >= 0.8*game.state.remtime) {
 	    skip(1);
 	    prout("First Officer Spock- \"Captain, I compute that such");
 	    proutn("  a trip would require approximately %2.0f",
-		   100.0*Time/game.state.remtime);
+		   100.0*game.optime/game.state.remtime);
 	    prout(" percent of our");
 	    proutn("  remaining time.  Are you sure this is wise?\" ");
-	    if (ja() == 0) { ididit = 0; Time=0; return;}
+	    if (ja() == 0) { game.ididit = 0; game.optime=0; return;}
 	}
     }
     /* Entry WARPX */
-    if (warpfac > 6.0) {
+    if (game.warpfac > 6.0) {
 	/* Decide if engine damage will occur */
-	double prob = dist*(6.0-warpfac)*(6.0-warpfac)/66.666666666;
+	double prob = game.dist*(6.0-game.warpfac)*(6.0-game.warpfac)/66.666666666;
 	if (prob > Rand()) {
 	    blooey = 1;
-	    dist = Rand()*dist;
+	    game.dist = Rand()*game.dist;
 	}
 	/* Decide if time warp will occur */
-	if (0.5*dist*pow(7.0,warpfac-10.0) > Rand()) twarp=1;
+	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand()) twarp=1;
 #ifdef DEBUG
-	if (idebug &&warpfac==10 && twarp==0) {
+	if (game.idebug &&game.warpfac==10 && twarp==0) {
 	    blooey=0;
 	    proutn("Force time warp? ");
 	    if (ja()==1) twarp=1;
@@ -573,7 +573,7 @@ void warp(int i)
 	if (blooey || twarp) {
 	    /* If time warp or engine damage, check path */
 	    /* If it is obstructed, don't do warp or damage */
-	    double angle = ((15.0-direc)*0.5235998);
+	    double angle = ((15.0-game.direc)*0.5235998);
 	    double deltax = -sin(angle);
 	    double deltay = cos(angle);
 	    double bigger, x, y;
@@ -585,9 +585,9 @@ void warp(int i)
 			
 	    deltax /= bigger;
 	    deltay /= bigger;
-	    n = 10.0 * dist * bigger +0.5;
-	    x = sectx;
-	    y = secty;
+	    n = 10.0 * game.dist * bigger +0.5;
+	    x = game.sectx;
+	    y = game.secty;
 	    for (l = 1; l <= n; l++) {
 		x += deltax;
 		ix = x + 0.5;
@@ -605,19 +605,19 @@ void warp(int i)
 
     /* Activate Warp Engines and pay the cost */
     imove();
-    if (alldone) return;
-    energy -= dist*warpfac*warpfac*warpfac*(shldup+1);
-    if (energy <= 0) finish(FNRG);
-    Time = 10.0*dist/wfacsq;
+    if (game.alldone) return;
+    game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1);
+    if (game.energy <= 0) finish(FNRG);
+    game.optime = 10.0*game.dist/game.wfacsq;
     if (twarp) timwrp();
     if (blooey) {
-	game.damage[DWARPEN] = damfac*(3.0*Rand()+1.0);
+	game.damage[DWARPEN] = game.damfac*(3.0*Rand()+1.0);
 	skip(1);
 	prout("Engineering to bridge--");
 	prout("  Scott here.  The warp engines are damaged.");
 	prout("  We'll have to reduce speed to warp 4.");
     }
-    ididit = 1;
+    game.ididit = 1;
     return;
 }
 
@@ -654,19 +654,19 @@ void setwrp(void)
 	prout("Helmsman Sulu- \"We can't go below warp 1, Captain.\"");
 	return;
     }
-    oldfac = warpfac;
-    warpfac = aaitem;
-    wfacsq=warpfac*warpfac;
-    if (warpfac <= oldfac || warpfac <= 6.0) {
+    oldfac = game.warpfac;
+    game.warpfac = aaitem;
+    game.wfacsq=game.warpfac*game.warpfac;
+    if (game.warpfac <= oldfac || game.warpfac <= 6.0) {
 	proutn("Helmsman Sulu- \"Warp factor %d, Captain.\"", 
-	       (int)warpfac);
+	       (int)game.warpfac);
 	return;
     }
-    if (warpfac < 8.00) {
+    if (game.warpfac < 8.00) {
 	prout("Engineer Scott- \"Aye, but our maximum safe speed is warp 6.\"");
 	return;
     }
-    if (warpfac == 10.0) {
+    if (game.warpfac == 10.0) {
 	prout("Engineer Scott- \"Aye, Captain, we'll try it.\"");
 	return;
     }
@@ -680,13 +680,13 @@ void atover(int igrab)
 
     chew();
     /* is captain on planet? */
-    if (landed==1) {
+    if (game.landed==1) {
 	if (game.damage[DTRANSP]) {
 	    finish(FPNOVA);
 	    return;
 	}
 	prout("Scotty rushes to the transporter controls.");
-	if (shldup) {
+	if (game.shldup) {
 	    prout("But with the shields up it's hopeless.");
 	    finish(FPNOVA);
 	}
@@ -697,28 +697,28 @@ void atover(int igrab)
 	    return;
 	}
 	prout("SUCCEEDS!");
-	if (imine) {
-	    imine = 0;
+	if (game.imine) {
+	    game.imine = 0;
 	    proutn("The crystals mined were ");
 	    if (Rand() <= 0.25) {
 		prout("lost.");
 	    }
 	    else {
 		prout("saved.");
-		icrystl = 1;
+		game.icrystl = 1;
 	    }
 	}
     }
     if (igrab) return;
 
     /* Check to see if captain in shuttle craft */
-    if (icraft) finish(FSTRACTOR);
-    if (alldone) return;
+    if (game.icraft) finish(FSTRACTOR);
+    if (game.alldone) return;
 
     /* Inform captain of attempt to reach safety */
     skip(1);
     do {
-	if (justin) {
+	if (game.justin) {
 	    prouts("***RED ALERT!  READ ALERT!");
 	    skip(1);
 	    proutn("The ");
@@ -732,7 +732,7 @@ void atover(int igrab)
 	skip(1);
 	prout("safely out of quadrant.");
 	if (game.damage[DRADIO] == 0.0)
-	    game.state.galaxy[quadx][quady].charted = TRUE;
+	    game.state.galaxy[game.quadx][game.quady].charted = TRUE;
 	/* Try to use warp engines */
 	if (game.damage[DWARPEN]) {
 	    skip(1);
@@ -740,21 +740,21 @@ void atover(int igrab)
 	    finish(FSNOVAED);
 	    return;
 	}
-	warpfac = 6.0+2.0*Rand();
-	wfacsq = warpfac * warpfac;
-	prout("Warp factor set to %d", (int)warpfac);
-	power = 0.75*energy;
-	dist = power/(warpfac*warpfac*warpfac*(shldup+1));
+	game.warpfac = 6.0+2.0*Rand();
+	game.wfacsq = game.warpfac * game.warpfac;
+	prout("Warp factor set to %d", (int)game.warpfac);
+	power = 0.75*game.energy;
+	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1));
 	distreq = 1.4142+Rand();
-	if (distreq < dist) dist = distreq;
-	Time = 10.0*dist/wfacsq;
-	direc = 12.0*Rand();	/* How dumb! */
-	justin = 0;
-	inorbit = 0;
+	if (distreq < game.dist) game.dist = distreq;
+	game.optime = 10.0*game.dist/game.wfacsq;
+	game.direc = 12.0*Rand();	/* How dumb! */
+	game.justin = 0;
+	game.inorbit = 0;
 	warp(2);
-	if (justin == 0) {
+	if (game.justin == 0) {
 	    /* This is bad news, we didn't leave quadrant. */
-	    if (alldone) return;
+	    if (game.alldone) return;
 	    skip(1);
 	    prout("Insufficient energy to leave quadrant.");
 	    finish(FSNOVAED);
@@ -762,7 +762,7 @@ void atover(int igrab)
 	}
     } while 
 	/* Repeat if another snova */
-	(game.state.galaxy[quadx][quady].supernova);
+	(game.state.galaxy[game.quadx][game.quady].supernova);
     if (KLINGREM==0) 
 	finish(FWON); /* Snova killed remaining enemy. */
 }
@@ -778,34 +778,34 @@ void timwrp()
 	game.state = game.snapsht;
 	game.state.snap = 0;
 	if (game.state.remcom) {
-	    game.future[FTBEAM] = game.state.date + expran(intime/game.state.remcom);
-	    game.future[FBATTAK] = game.state.date + expran(0.3*intime);
+	    game.future[FTBEAM] = game.state.date + expran(game.intime/game.state.remcom);
+	    game.future[FBATTAK] = game.state.date + expran(0.3*game.intime);
 	}
-	game.future[FSNOVA] = game.state.date + expran(0.5*intime);
+	game.future[FSNOVA] = game.state.date + expran(0.5*game.intime);
 	game.future[FSNAP] = game.state.date +expran(0.25*game.state.remtime); /* next snapshot will
 										  be sooner */
 	if (game.state.nscrem) game.future[FSCMOVE] = 0.2777;
-	isatb = 0;
+	game.isatb = 0;
 	game.future[FCDBAS] = game.future[FSCDBAS] = FOREVER;
-	batx = baty = 0;
+	game.batx = game.baty = 0;
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
 	   when on planet, which would give us two Galileos! */
 	gotit = 0;
-	for (l = 0; l < inplan; l++) {
+	for (l = 0; l < game.inplan; l++) {
 	    if (game.state.plnets[l].known == shuttle_down) {
 		gotit = 1;
-		if (iscraft==1 && ship==IHE) {
+		if (game.iscraft==1 && game.ship==IHE) {
 		    prout("Checkov-  \"Security reports the Galileo has disappeared, Sir!");
-		    iscraft = 0;
+		    game.iscraft = 0;
 		}
 	    }
 	}
 	/* Likewise, if in the original time the Galileo was abandoned, but
 	   was on ship earlier, it would have vanished -- lets restore it */
-	if (iscraft==0 && gotit==0 && game.damage[DSHUTTL] >= 0.0) {
+	if (game.iscraft==0 && gotit==0 && game.damage[DSHUTTL] >= 0.0) {
 	    prout("Checkov-  \"Security reports the Galileo has reappeared in the dock!\"");
-	    iscraft = 1;
+	    game.iscraft = 1;
 	}
 	/* 
 	 * There used to be code to do the actual reconstrction here,
@@ -815,11 +815,11 @@ void timwrp()
     }
     else {
 	/* Go forward in time */
-	Time = -0.5*intime*log(Rand());
-	prout("You are traveling forward in time %d stardates.", (int)Time);
+	game.optime = -0.5*game.intime*log(Rand());
+	prout("You are traveling forward in time %d stardates.", (int)game.optime);
 	/* cheat to make sure no tractor beams occur during time warp */
-	game.future[FTBEAM] += Time;
-	game.damage[DRADIO] += Time;
+	game.future[FTBEAM] += game.optime;
+	game.damage[DRADIO] += game.optime;
     }
     newqad(0);
     events();	/* Stas Sergeev added this -- do pending events */
@@ -830,10 +830,10 @@ void probe(void)
     double angle, bigger;
     int key;
     /* New code to launch a deep space probe */
-    if (nprobes == 0) {
+    if (game.nprobes == 0) {
 	chew();
 	skip(1);
-	if (ship == IHE) 
+	if (game.ship == IHE) 
 	    prout("Engineer Scott- \"We have no more deep space probes, Sir.\"");
 	else
 	    prout("Ye Faerie Queene has no deep space probes.");
@@ -848,7 +848,7 @@ void probe(void)
     if (game.future[FDSPROB] != FOREVER) {
 	chew();
 	skip(1);
-	if (game.damage[DRADIO] != 0 && condit != IHDOCKED) {
+	if (game.damage[DRADIO] != 0 && game.condit != IHDOCKED) {
 	    prout("Spock-  \"Records show the previous probe has not yet");
 	    prout("   reached its destination.\"");
 	}
@@ -860,41 +860,41 @@ void probe(void)
 
     if (key == IHEOL) {
 	/* slow mode, so let Kirk know how many probes there are left */
-	prout(nprobes==1 ? "%d probe left." : "%d probes left.", nprobes);
+	prout(game.nprobes==1 ? "%d probe left." : "%d probes left.", game.nprobes);
 	proutn("Are you sure you want to fire a probe? ");
 	if (ja()==0) return;
     }
 
-    isarmed = FALSE;
+    game.isarmed = FALSE;
     if (key == IHALPHA && strcmp(citem,"armed") == 0) {
-	isarmed = TRUE;
+	game.isarmed = TRUE;
 	key = scan();
     }
     else if (key == IHEOL) {
 	proutn("Arm NOVAMAX warhead? ");
-	isarmed = ja();
+	game.isarmed = ja();
     }
     getcd(TRUE, key);
-    if (direc == -1.0) return;
-    nprobes--;
-    angle = ((15.0 - direc) * 0.5235988);
-    probeinx = -sin(angle);
-    probeiny = cos(angle);
-    if (fabs(probeinx) > fabs(probeiny))
-	bigger = fabs(probeinx);
+    if (game.direc == -1.0) return;
+    game.nprobes--;
+    angle = ((15.0 - game.direc) * 0.5235988);
+    game.probeinx = -sin(angle);
+    game.probeiny = cos(angle);
+    if (fabs(game.probeinx) > fabs(game.probeiny))
+	bigger = fabs(game.probeinx);
     else
-	bigger = fabs(probeiny);
+	bigger = fabs(game.probeiny);
 		
-    probeiny /= bigger;
-    probeinx /= bigger;
-    proben = 10.0*dist*bigger +0.5;
-    probex = quadx*QUADSIZE + sectx - 1;	// We will use better packing than original
-    probey = quady*QUADSIZE + secty - 1;
-    probecx = quadx;
-    probecy = quady;
+    game.probeiny /= bigger;
+    game.probeinx /= bigger;
+    game.proben = 10.0*game.dist*bigger +0.5;
+    game.probex = game.quadx*QUADSIZE + game.sectx - 1;	// We will use better packing than original
+    game.probey = game.quady*QUADSIZE + game.secty - 1;
+    game.probecx = game.quadx;
+    game.probecy = game.quady;
     game.future[FDSPROB] = game.state.date + 0.01; // Time to move one sector
     prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
-    ididit = 1;
+    game.ididit = 1;
     return;
 }
 
@@ -905,8 +905,8 @@ void help(void)
     int line = 0, l, ix, iy;
 
     chew();
-    /* Test for conditions which prevent calling for help */
-    if (condit == IHDOCKED) {
+    /* Test for game.conditions which prevent calling for help */
+    if (game.condit == IHDOCKED) {
 	prout("Lt. Uhura-  \"But Captain, we're already docked.\"");
 	return;
     }
@@ -918,50 +918,50 @@ void help(void)
 	prout("Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\"");
 	return;
     }
-    if (landed == 1) {
+    if (game.landed == 1) {
 	proutn("You must be aboard the ");
 	crmshp();
 	prout(".");
 	return;
     }
     /* OK -- call for help from nearest starbase */
-    nhelp++;
-    if (basex!=0) {
+    game.nhelp++;
+    if (game.basex!=0) {
 	/* There's one in this quadrant */
-	ddist = sqrt(square(basex-sectx)+square(basey-secty));
+	ddist = sqrt(square(game.basex-game.sectx)+square(game.basey-game.secty));
     }
     else {
 	ddist = FOREVER;
 	for_starbases(l) {
-	    xdist=10.0*sqrt(square(game.state.baseqx[l]-quadx)+square(game.state.baseqy[l]-quady));
+	    xdist=10.0*sqrt(square(game.state.baseqx[l]-game.quadx)+square(game.state.baseqy[l]-game.quady));
 	    if (xdist < ddist) {
 		ddist = xdist;
 		line = l;
 	    }
 	}
 	/* Since starbase not in quadrant, set up new quadrant */
-	quadx = game.state.baseqx[line];
-	quady = game.state.baseqy[line];
+	game.quadx = game.state.baseqx[line];
+	game.quady = game.state.baseqy[line];
 	newqad(1);
     }
     /* dematerialize starship */
-    game.quad[sectx][secty]=IHDOT;
-    proutn("Starbase in %s responds--", cramlc(quadrant, quadx, quady));
+    game.quad[game.sectx][game.secty]=IHDOT;
+    proutn("Starbase in %s responds--", cramlc(quadrant, game.quadx, game.quady));
     proutn("");
     crmshp();
     prout(" dematerializes.");
-    sectx=0;
+    game.sectx=0;
     for (l = 1; l <= 5; l++) {
-	ix = basex+3.0*Rand()-1;
-	iy = basey+3.0*Rand()-1;
+	ix = game.basex+3.0*Rand()-1;
+	iy = game.basey+3.0*Rand()-1;
 	if (VALID_SECTOR(ix,iy) && game.quad[ix][iy]==IHDOT) {
 	    /* found one -- finish up */
-	    sectx=ix;
-	    secty=iy;
+	    game.sectx=ix;
+	    game.secty=iy;
 	    break;
 	}
     }
-    if (sectx==0){
+    if (game.sectx==0){
 	prout("You have been lost in space...");
 	finish(FMATERIALIZE);
 	return;
@@ -993,13 +993,13 @@ void help(void)
     }
     if (l > 3) {
 	game.quad[ix][iy]=IHQUEST;
-	alive = 0;
+	game.alive = 0;
 	drawmaps(1);
 	setwnd(message_window);
 	finish(FMATERIALIZE);
 	return;
     }
-    game.quad[ix][iy]=ship;
+    game.quad[ix][iy]=game.ship;
     textcolor(GREEN);
     prout("succeeds.");
     textcolor(DEFAULT);

@@ -81,13 +81,13 @@ void pause_game(int i)
     char *prompt;
     char buf[BUFSIZ];
     if (i==1) {
-	if (skill > SKILL_FAIR)
+	if (game.skill > SKILL_FAIR)
 	    prompt = "[ANOUNCEMENT ARRIVING...]";
 	else
 	    prompt = "[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]";
     }
     else {
-	if (skill > SKILL_FAIR)
+	if (game.skill > SKILL_FAIR)
 	    prompt = "[CONTINUE?]";
 	else
 	    prompt = "[PRESS ENTER TO CONTINUE]";
@@ -383,7 +383,7 @@ void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
 	    skip(1);
 	proutn("%d - %d   ", ix, iy);
     } else {
-	if (game.damage[DSRSENS]==0 || condit==IHDOCKED) {
+	if (game.damage[DSRSENS]==0 || game.condit==IHDOCKED) {
 	    if (i != 1 && l == 1) {
 		drawmaps(2);
 		delay(400);

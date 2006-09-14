@@ -8,8 +8,6 @@
 #include <X11/Xaw/AsciiText.h>
 #include "sst.h"
 
-#undef length	/* ugh -- must get rid of ugly #defines */
-
 static XtAppContext app_context;
 static Widget toplevel, text, form; 
 static Widget navigation, weapons, planets, misc; 
