@@ -14,7 +14,6 @@ static Widget navigation, weapons, planets, misc;
 static Widget navlabel, weaplabel, planlabel, misclabel;
 
 static String fallback[] = {
-    /* text window resources */
     "*text.resizable: true",
     "*text.resize: ResizeBoth",
     "*text.width: 640",
@@ -33,7 +32,7 @@ static String fallback[] = {
     "*planlabel.borderWidth: 0",
     "*misc.fromVert: planets",
     "*misc.borderWidth: 0",
-    "*misclabel.label: Miscellaneos: ",
+    "*misclabel.label: Miscellaneous:",
     "*misclabel.borderWidth: 0",
     NULL,
 };
@@ -104,8 +103,11 @@ static void instantiate_main(int argc, char **argv)
 				    XtNallowShellResize, True, NULL);
     form = XtVaCreateManagedWidget("form", formWidgetClass, toplevel, NULL);
     /* the command window */
-    text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, NULL);
-    XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
+    text = XtVaCreateManagedWidget("text", 
+				   asciiTextWidgetClass, form,
+				   XtNeditType, XawtextEdit,
+				   XtNdisplayCaret,False,
+				   NULL);
     /* The button panels */
     navigation  = XtVaCreateManagedWidget("navigation", 
 					  boxWidgetClass, form,
