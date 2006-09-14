@@ -1,3 +1,20 @@
+/*
+ * Problems with this code:
+ *   1. The text window behaves like it's only a few lines high, 
+ *      scrolling in response to Return when the insertion point 
+ *      is nowhere near the last line.
+ *   2. The attempt to insert text with XawTextReplace() core dumps.
+ *   3. I haven't found a way to write a callback that triggers on Return 
+ *      and yields the line before the return.  The explanation at
+ *      http://www.linuxjunkies.org/programming/GUI/xwindow/x11/text.html
+ *      hints that this may be difficult.
+ *
+ * The functional goal is this:
+ *    1. Button pushes should be able to insert commands at the buffer's
+ *       current insertion point.
+ *    2. When a user finishes a command with Return, a callback should
+ *       receive the line of input types.
+ */
 #include <stdlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
