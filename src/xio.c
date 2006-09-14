@@ -10,8 +10,8 @@
 
 static XtAppContext app_context;
 static Widget toplevel, text, form; 
-static Widget navigation, weapons, status, planets, misc; 
-static Widget navlabel, weaplabel, statlabel, planlabel, misclabel;
+static Widget navigation, weapons, planets, misc; 
+static Widget navlabel, weaplabel, planlabel, misclabel;
 
 static String fallback[] = {
     /* text window resources */
@@ -60,10 +60,6 @@ static struct cmd_t commands[] = {
     {"Deathray",	noargs_proc,	&weapons,	0},
     {"Mayday",		noargs_proc,	&weapons,	0},
 
-    {"Score",		noargs_proc,	&status,	0},
-    {"Report",		noargs_proc,	&status,	0},
-    {"Computer",	noargs_proc,   	&status,	0},
-
     {"Sensors",		noargs_proc,	&planets,	OPTION_PLANETS},
     {"Orbit",		noargs_proc,	&planets,	OPTION_PLANETS},
     {"Transport",	noargs_proc,	&planets,	OPTION_PLANETS},
@@ -72,7 +68,9 @@ static struct cmd_t commands[] = {
     {"Shuttle",		noargs_proc,	&planets,	OPTION_PLANETS},
     {"Planets",		noargs_proc,	&planets,	OPTION_PLANETS},
 
-    {"Emexit",		noargs_proc,	&misc,		0},
+    {"Score",		noargs_proc,	&misc,		0},
+    {"Report",		noargs_proc,	&misc,		0},
+    {"Computer",	noargs_proc,   	&misc,		0},
     {"Save",		NULL,		&misc,		0},
     {"Quit",		quit_proc,	&misc,		0},
     {"Help",		noargs_proc,	&misc,		0},
@@ -116,20 +114,10 @@ static void instantiate_main(int argc, char **argv)
 					 labelWidgetClass, weapons,
 					 XtNborderWidth, 0,
 					 NULL); 
-    status   = XtVaCreateManagedWidget("status", 
-				       boxWidgetClass, form,
-				       XtNborderWidth, 0,
-				       XtNfromVert, weapons, 
-				       XtNorientation, XtorientHorizontal,
-				       NULL); 
-    statlabel  = XtVaCreateManagedWidget("Status:       ", 
-					 labelWidgetClass, status,
-					 XtNborderWidth, 0,
-					 NULL); 
     planets  = XtVaCreateManagedWidget("planets", 
 				       boxWidgetClass, form,
 				       XtNborderWidth, 0,
-				       XtNfromVert, status, 
+				       XtNfromVert, weapons, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
     planlabel  = XtVaCreateManagedWidget("Planets:      ", 
