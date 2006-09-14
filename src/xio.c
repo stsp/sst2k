@@ -18,6 +18,10 @@ static String fallback[] = {
     "*text.resize: ResizeBoth",
     "*text.width: 640",
     "*text.height: 200",
+    "*text.autoFill: True",
+    "*text.scrollVertical: Always",
+    "*text.scrollHorizontal: WhenNeeded",
+    "*text.displayCaret: True",
     "*navigation.fromVert: text",
     "*navigation.borderWidth: 0",
     "*navlabel.label: Navigation:   ",
@@ -106,7 +110,6 @@ static void instantiate_main(int argc, char **argv)
     text = XtVaCreateManagedWidget("text", 
 				   asciiTextWidgetClass, form,
 				   XtNeditType, XawtextEdit,
-				   XtNdisplayCaret,False,
 				   NULL);
     /* The button panels */
     navigation  = XtVaCreateManagedWidget("navigation", 
