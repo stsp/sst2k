@@ -77,6 +77,9 @@ static struct cmd_t commands[] = {
     {"Help",		noargs_proc,	&misc,		0},
 };
 
+#define MAXWIDTH	640
+#define TEXTHEIGHT	200
+
 int main(int argc, char **argv)
 { 
     struct cmd_t *cp;
@@ -88,21 +91,23 @@ int main(int argc, char **argv)
     form = XtVaCreateManagedWidget("form", formWidgetClass, toplevel, NULL);
     /* the command window */
     text = XtVaCreateManagedWidget("text", asciiTextWidgetClass, form, 
-				   XtNwidth, 400, XtNheight, 200,
+				   XtNwidth, MAXWIDTH, XtNheight, TEXTHEIGHT,
 				   NULL);
     XtVaSetValues(text, XtNeditType,XawtextRead, XtNdisplayCaret,False, NULL);
     /* The button panels */
     navigation  = XtVaCreateManagedWidget("navigation", 
-				       boxWidgetClass, form,
-				       XtNfromVert, text, 
-				       XtNorientation, XtorientHorizontal,
-				       NULL); 
+					  boxWidgetClass, form,
+					  XtNborderWidth, 0,
+					  XtNfromVert, text,
+					  XtNorientation, XtorientHorizontal,
+					  NULL); 
     navlabel  = XtVaCreateManagedWidget("Navigation:   ", 
 					labelWidgetClass, navigation,
 					XtNborderWidth, 0,
 					NULL); 
     weapons  = XtVaCreateManagedWidget("weapons", 
 				       boxWidgetClass, form,
+				       XtNborderWidth, 0,
 				       XtNfromVert, navigation, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
@@ -112,6 +117,7 @@ int main(int argc, char **argv)
 					 NULL); 
     status   = XtVaCreateManagedWidget("status", 
 				       boxWidgetClass, form,
+				       XtNborderWidth, 0,
 				       XtNfromVert, weapons, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
@@ -121,6 +127,7 @@ int main(int argc, char **argv)
 					 NULL); 
     planets  = XtVaCreateManagedWidget("planets", 
 				       boxWidgetClass, form,
+				       XtNborderWidth, 0,
 				       XtNfromVert, status, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
@@ -130,6 +137,7 @@ int main(int argc, char **argv)
 					 NULL); 
     misc  = XtVaCreateManagedWidget("misc", 
 				       boxWidgetClass, form,
+				       XtNborderWidth, 0,
 				       XtNfromVert, planets, 
 				       XtNorientation, XtorientHorizontal,
 				       NULL); 
