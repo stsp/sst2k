@@ -231,6 +231,7 @@ and start a new game.</para>
 
 </chapter>
 <chapter><title>Starting the Game</title>
+<!-- This chapter is new in SST 2K --> 
 
 <para>The program will ask you some setup questions.  You can give it 
 command-line arguments that will be treated as answers.  Any token
@@ -328,7 +329,7 @@ abandon ship) must be written out in full.  Also, in a few cases two
 or more commands begin with the same letter, and in this case that
 letter refers to a particular one of the commands; to get the other,
 your abbreviation must be two or more characters long.  This sounds
-complicated, but you will learn the abbreviations qGuickly enough.</para>
+complicated, but you will learn the abbreviations quickly enough.</para>
 
 <para>What this all boils down to is:</para>
 
@@ -460,12 +461,12 @@ starship as follows:</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>LIFE SUPPOR</term>
+<term>LIFE SUPPORT</term>
 <listitem>
 <para>If <quote>ACTIVE</quote> then life support systems are functioning
 normally. If on <quote>RESERVES</quote> the number is how many stardates your
 reserve food, air, etc. will last&mdash;you must get repairs made or get to
-starbase before your reserves run out.</para>
+a starbase before your reserves run out.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -1029,7 +1030,7 @@ star chart if your ask for it while docked and your own radio is dead.</para>
 <literallayout>
 Mnemonic:  REST
 Shortest abbreviation:  R
-Full command:  REST &lt;NUMBER OF STARDATES&gt;
+Full command:  REST &lt;NUMBER-OF-STARDATES&gt;
 </literallayout>
 
 <para>This command simply allows the specified number of stardates to go
@@ -1037,7 +1038,7 @@ by.  This is useful if you have suffered damages and wish to wait
 until repairs are made before you go back into battle.</para>
 
 <para>It is not generally advisable to rest while you are under attack by
-Klingons.</para>
+Klingons or Romulans.</para>
 
 </sect1>
 <sect1><title>Call Starbase for Help</title>
@@ -1048,7 +1049,7 @@ Mnemonic:  MAYDAY
 </literallayout>
 
 <para>[Originally, this command was called <quote>HELP</quote>, but
-these days that might be misconstrued as an attempt to browae built-in
+these days that might be misconstrued as an attempt to browse built-in
 documentation! In some later versions it was CALL.]</para>
 
 <para>When you get into serious trouble, you may call a starbase for
