@@ -8,6 +8,8 @@
 #include <X11/Xaw/AsciiText.h>
 #include "sst.h"
 
+#undef length	/* ugh -- must get rid of ugly #defines */
+
 static XtAppContext app_context;
 static Widget toplevel, text, form; 
 static Widget navigation, weapons, planets, misc; 
@@ -56,10 +58,25 @@ static void quit_proc(Widget w, XtPointer client_data, XtPointer call_data)
     exit (0);
 }
 
+static void text_append_to(Widget w, String str)
+/* append text to a specified text widget */
+{
+    XawTextBlock txtblk;
+    XawTextPosition textend = XawTextGetInsertionPoint(w);
+
+    txtblk.ptr = str;
+    txtblk.length = strlen(str);
+    txtblk.firstPos = 0;
+    txtblk.format = FMT8BIT;
+
+    XawTextReplace(w, textend, textend, &txtblk);
+}
+
 static void noargs_proc(Widget w, XtPointer client_data, XtPointer call_data)
 /* use this for commands that take no arguments */
 {
     /* currently a stub */
+    text_append_to(w, XtName(w));
     printf("Button %s pressed\n", XtName(w));
 }
 
