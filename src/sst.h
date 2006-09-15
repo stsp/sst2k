@@ -285,6 +285,7 @@ enum loctype {neither, quadrant, sector};
 #define IHS 'S'
 #define IHSTAR '*'
 #define IHP 'P'
+#define IHW '@'
 #define IHB 'B'
 #define IHBLANK ' '
 #define IHDOT '.'

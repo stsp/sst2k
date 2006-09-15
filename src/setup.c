@@ -479,12 +479,12 @@ int choose(int needprompt)
     }
     if (isit("plain")) {
 	// Approximates the UT FORTRAN version.
-	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE);
+	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS);
 	game.options |= OPTION_PLAIN;
     } 
     else if (isit("almy")) {
 	// Approximates Tom Almy's version.
-	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE);
+	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS);
 	game.options |= OPTION_ALMY;
     }
     else if (isit("fancy"))
@@ -623,7 +623,10 @@ void newqad(int shutup)
     planhere = game.state.galaxy[game.quadx][game.quady].planet;
     if (planhere) {
 	game.iplnet = planhere - game.state.plnets;
-	dropin(IHP, &game.plnetx, &game.plnety);
+	if (planhere->inhabited == UNINHABITED)
+	    dropin(IHP, &game.plnetx, &game.plnety);
+	else
+	    dropin(IHW, &game.plnetx, &game.plnety);
     }
     // Check for game.condition
     newcnd();

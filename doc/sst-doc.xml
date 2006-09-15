@@ -253,13 +253,14 @@ The Emeritus game is strictly for masochists.</para>
 
 <para>The fourth question, new in SST2K, sets your game options.  A
 blank answer or 'fancy' enables all SST2K features.  The option
-'plain' disables a number of features (Tholians, planets &amp;
-dilithium, Thingies shooting back, deep-space-probes, Klingon ramming
-and movement, time-warping through black holes, death-ray upgrade),
-approximating the original CDC 6600 FORTRAN game from UT Austin.  The
-option 'almy' approximates Tom Almy's C translation from 1979,
-disabling Thingies shooting back, base shields, and time-warping
-through black holes.</para>
+'plain' approximated the original CDC 6600 FORTRAN game from UT Austin
+and disables a number of features: Tholians, planets &amp; dilithium,
+Thingies shooting back, deep-space-probes, Klingon ramming and
+movement, time-warping through black holes, death-ray
+upgrade. inhabited worlds.  The option 'almy' approximates Tom Almy's
+C translation from 1979, disabling Thingies shooting back, base
+shields, time-warping through black holes, and inhabited
+worlds.</para>
 
 </chapter>
 <chapter><title>How To Issue Commands</title>
@@ -387,7 +388,8 @@ described by an example.</para>
 There are ordinary Klingons (K) at sectors 5 - 8 and 6 - 2, and a
 Klingon Commander (C) at 9 - 9.  The (GULP)
 <quote>Super-commander</quote> (S) is occupies sector 4 - 4, and a
-Romulan (R) is at 1 - 6.  A planet (P) is at sector 7 - 6.  There are
+Romulan (R) is at 1 - 6.  An uninhabited planet (P) is at sector 7 - 6
+(if it were inhabited, it would display as a '@').  There are
 also a large number of stars (*). The periods (.) are just empty
 space&mdash;they are printed to help you get your bearings.  Sector 6
 - 4 contains a black hole ( ).</para>

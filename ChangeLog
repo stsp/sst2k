@@ -1,3 +1,26 @@
+2006-09-15  Eric S. Raymond  <esr@snark.thyrsus.com>
+
+	* TODO: Fixed these bug items from the TO-DO list:
+	
+	* Bring the online help in sync with our commands changes
+	
+	* Find out why the online help contains the escape sequences like
+	~@~T (Eric?)
+	
+	The first was due to bugs in some macro definitions in sst.c, now
+	fixed.  The second was from escape sequences generated into
+	sst.doc by xmlto for left-and right-quotes, dashes, and no-break
+	spaces; that is fixed by an additional translation step in
+	makehelp.py.
+	
+	xmlto still generates line-drawing characters for the tables in
+	the LRSCAN and REPORT help items, but those look OK on an xterm in
+	text mode and their help items are suppressed (along with their
+	commands) in curses mode.
+	
+	This is not a completely satisfactory solution, but it will do
+	until a design change makes those help items visible again.
+
 2006-09-12  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.am (SUBDIRS): Add po.
