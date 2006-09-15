@@ -34,7 +34,7 @@ while True:
         if line.find(endmarker2) > -1:
             state = 0
     if state:
-        savetext += line
+        savetext += line.replace("%", "%%")
 
 # Remove the section titles
 savetext = re.sub("\n+.*\n*Mnemonic:\\s*", "\n********\n%% ", savetext)
