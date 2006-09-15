@@ -110,7 +110,7 @@ void abandn(void)
 	    return;
 	}
 	if (game.damage[DSHUTTL]<0) {
-	    prout("Shuttle craft now serving Big Mac's.");
+	    prout("Shuttle craft now serving Big Macs.");
 	    return;
 	}
 	if (game.damage[DSHUTTL]>0) {
@@ -135,7 +135,7 @@ void abandn(void)
 	prout("Remainder of ship's complement beam down");
 	prout("to nearest habitable planet.");
 	if (game.state.rembase==0) {
-	    /* Ops! no place to go... */
+	    /* Oops! no place to go... */
 	    finish(FABANDN);
 	    return;
 	}

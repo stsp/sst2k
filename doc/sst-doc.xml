@@ -95,7 +95,7 @@ respect the copyrights of the originators of Star Trek.</para>
 			  Curses Interface By
                               Stas Sergeev 
 
-		SST 2K polishing and historical research by
+		SST2K polishing and historical research by
 			     Eric S. Raymond
 </literallayout>
 </dedication>
@@ -221,7 +221,7 @@ important, and the detailed command descriptions which follow will be
 a lot more meaningful to you.</para>
 
 <para>You have weapons: phasers and photon torpedoes. You have a defense:
-deflector shields.  You can look at things: long-range scaners,
+deflector shields.  You can look at things: long-range scanners,
 short-range scanners, and a star chart.  You can move about, under
 warp drive or impulse power.  You can also dock at a starbase, rest
 while repairs are being made, abandon ship, self destruct, or give up
@@ -605,7 +605,7 @@ Shortest abbreviation:  C
 </literallayout>
 
 <para>As you proceed in the game, you learn more and more about what things
-are where in the galaxy. When ever you first do a scan in a quadrant,
+are where in the galaxy. Whenever you first do a scan in a quadrant,
 telemetry sensors are ejected which will report any changes in the
 quadrant(s) back to your ship, providing the sub-space radio is
 working. Spock will enter this information in the chart. If the radio
@@ -1523,11 +1523,11 @@ Emeritus.</para>
 promotion available if you go beyond the <quote>Expert</quote> range.
 You can also have a certificate of merit printed with your name, date,
 and Klingon kill rate, provided you are promoted from either the
-<quote>Expert</quote> or <quote>Emeritus</quote> levels. This
-<quote>plaque</quote> requires a 132 column printer. You may need
+<quote>Expert</quote> or <quote>Emeritus</quote> levels. You may need
 print the certificate to a file, import it into your word processor,
 selecting Courier 8pt font, and then print in <quote>landscape
 orientation</quote>.</para>
+<!-- The plaque used to require an 132 column printer. Stas changed that. -->
 
 </chapter>
 <chapter><title>Handy Reference Page</title>
