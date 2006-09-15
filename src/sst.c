@@ -152,6 +152,12 @@ for a lot of magic numbers and refactored the heck out of it.
 
    4. Added game option selection so you can play a close (but not bug-for-
       bug identical) approximation of older versions.
+
+   5. Half the quadrants now have inhabited planets, from which one 
+      cannot mine dilithium (there will still be the same additional number
+      of dilithium-bearing planets).  Right now this is just color, but
+      eventually we'll fold in BSD-Trek-like logic for Klingons to attack
+      and enslave inhabited worlds.
 */
 
 /* the input queue */

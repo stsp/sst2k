@@ -466,7 +466,7 @@ void nova(int ix, int iy)
 			game.quad[ii][jj] = IHDOT;
 			break;
 		    case IHP: /* Destroy planet */
-			game.state.galaxy[game.quadx][game.quady].planets -= 1;
+			game.state.galaxy[game.quadx][game.quady].planet = NULL;
 			game.state.nplankl++;
 			crmena(1, IHP, 2, ii, jj);
 			prout(" destroyed.");

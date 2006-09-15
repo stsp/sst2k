@@ -313,6 +313,16 @@ static void status(int req)
 	proutn("Klingons Left %d", KLINGREM);
 	break;
     case 10:
+	if (game.options & OPTION_WORLDS) {
+	    planet *here = game.state.galaxy[game.quadx][game.quady].planet;
+	    if (here && here->inhabited != UNINHABITED)
+		proutn("Major system  %s", systemname(here));
+	    else
+		proutn("Sector is uninhabited");
+	}
+
+	break;
+    case 11:
 	attakreport(1);
 	break;
     }
@@ -320,8 +330,9 @@ static void status(int req)
 		
 int srscan(int l) 
 {
+    /* the "sy" request is undocumented */
     static char requests[][3] =
-	{"","da","co","po","ls","wa","en","to","sh","kl","ti"};
+	{"","da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
     int leftside=TRUE, rightside=TRUE, i, j, jj, req=0, nn=FALSE;
     int goodScan=TRUE;
     switch (l) {
@@ -358,7 +369,7 @@ int srscan(int l)
 	if (req > sizeof(requests)/sizeof(requests[0])) {
 	    prout("UNRECOGNIZED REQUEST. Legal requests are:");
 	    prout("  date, condition, position, lsupport, warpfactor,");
-	    prout("  energy, torpedoes, shields, klingons, time, bases.");
+	    prout("  energy, torpedoes, shields, klingons, time, system, bases.");
 	    return FALSE;
 	}
 	// no break

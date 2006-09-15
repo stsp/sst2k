@@ -229,7 +229,7 @@ void setup(int needprompt)
     for_quadrants(i)
 	for_quadrants(j) {
 	    game.state.galaxy[i][j].charted = 0;
-	    game.state.galaxy[i][j].planets = 0;
+	    game.state.galaxy[i][j].planet = NULL;
 	    game.state.galaxy[i][j].romulans = 0;
 	    game.state.galaxy[i][j].klingons = 0;
 	    game.state.galaxy[i][j].starbase = 0;
@@ -328,13 +328,22 @@ void setup(int needprompt)
     }
     // Locate planets in galaxy
     for (i = 0; i < game.inplan; i++) {
-	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planets);
-	game.state.galaxy[ix][iy].planets = 1;
+	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planet);
 	game.state.plnets[i].x = ix;
 	game.state.plnets[i].y = iy;
-	game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
-	game.state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
-	game.state.plnets[i].known = unknown;
+	if (i < NINHAB) {
+	    game.state.plnets[i].pclass = M;	// All inhabited planets are class M
+	    game.state.plnets[i].crystals = 0;
+	    game.state.plnets[i].known = known;
+	    game.state.plnets[i].inhabited = i;
+	} else {
+	    game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
+	    game.state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
+	    game.state.plnets[i].known = unknown;
+	    game.state.plnets[i].inhabited = UNINHABITED;
+	}
+	if ((game.options & OPTION_WORLDS) || i >= NINHAB)
+	    game.state.galaxy[ix][iy].planet = game.state.plnets + i;
     }
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
@@ -495,7 +504,7 @@ int choose(int needprompt)
     game.state.rembase = 2.0 + Rand()*(BASEMAX-2.0);
     game.inbase = game.state.rembase;
     if (game.options & OPTION_PLANETS)
-	game.inplan = (PLNETMAX/2) + (PLNETMAX/2+1)*Rand();
+	game.inplan = NINHAB + (MAXUNINHAB/2) + (MAXUNINHAB/2+1)*Rand();
     game.state.nromrem = game.inrom = (2.0+Rand())*game.skill;
     game.state.nscrem = game.inscom = (game.skill > SKILL_FAIR ? 1 : 0);
     game.state.remtime = 7.0 * game.length;
@@ -531,7 +540,8 @@ void newcnd(void)
 
 void newqad(int shutup) 
 {
-    int i, j, ix, iy, nplan;
+    int i, j, ix, iy;
+    planet *planhere;
 
     game.iattak = 1;
     game.justin = 1;
@@ -565,7 +575,6 @@ void newqad(int shutup)
 	return;
     game.klhere = game.state.galaxy[game.quadx][game.quady].klingons;
     game.irhere = game.state.galaxy[game.quadx][game.quady].romulans;
-    nplan  = game.state.galaxy[game.quadx][game.quady].planets;
     game.nenhere = game.klhere + game.irhere;
 
     // Position Starship
@@ -610,14 +619,11 @@ void newqad(int shutup)
     if (game.state.galaxy[game.quadx][game.quady].starbase)
 	dropin(IHB, &game.basex, &game.basey);
 	
-    if (nplan) {
-	// If quadrant needs a planet, put it in
-	for (i=0; i < game.inplan; i++)
-	    if (game.state.plnets[i].x == game.quadx && game.state.plnets[i].y == game.quady) break;
-	if (i < game.inplan) {
-	    game.iplnet = i;
-	    dropin(IHP, &game.plnetx, &game.plnety);
-	}
+    // If quadrant needs a planet, put it in
+    planhere = game.state.galaxy[game.quadx][game.quady].planet;
+    if (planhere) {
+	game.iplnet = planhere - game.state.plnets;
+	dropin(IHP, &game.plnetx, &game.plnety);
     }
     // Check for game.condition
     newcnd();
@@ -626,7 +632,7 @@ void newqad(int shutup)
 	dropin(IHSTAR, &ix, &iy);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0) {
+    if (game.irhere > 0 && game.klhere == 0 && (!planhere || planhere->inhabited == UNINHABITED)) {
 	game.neutz = 1;
 	if (game.damage[DRADIO] <= 0.0) {
 	    skip(1);

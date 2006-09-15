@@ -33,7 +33,8 @@ void preport(void)
     prout("Spock-  \"Planet report follows, Captain.\"");
     skip(1);
     for (i = 0; i < game.inplan; i++) {
-	if (game.state.plnets[i].known != unknown
+	if ((game.state.plnets[i].known != unknown
+	    && game.state.plnets[i].crystals != 0)
 #ifdef DEBUG
 	    || ( game.idebug && game.state.plnets[i].x !=0)
 #endif
@@ -46,7 +47,7 @@ void preport(void)
 	    proutn("   class ");
 	    proutn(classes[game.state.plnets[i].pclass]);
 	    proutn("   ");
-	    if (game.state.plnets[i].crystals == 0) proutn("no ");
+	    if (game.state.plnets[i].crystals <= 0) proutn("no ");
 	    prout("dilithium crystals present.");
 	    if (game.state.plnets[i].known==shuttle_down) 
 		prout("    Shuttle Craft Galileo on surface.");
@@ -206,7 +207,11 @@ void mine(void)
 	prout("Mining party not on planet.");
 	return;
     }
-    if (game.state.plnets[game.iplnet].crystals == 0) {
+    if (game.state.plnets[game.iplnet].crystals == MINED) {
+	prout("This planet has already been strip-mined for dilithium.");
+	return;
+    }
+    else if (game.state.plnets[game.iplnet].crystals == 0) {
 	prout("No dilithium crystals on this planet.");
 	return;
     }
@@ -224,6 +229,7 @@ void mine(void)
     game.optime = (0.1+0.2*Rand())*game.state.plnets[game.iplnet].pclass;
     if (consumeTime()) return;
     prout("Mining operation complete.");
+    game.state.plnets[game.iplnet].crystals = MINED;
     game.imine = 1;
     game.ididit=1;
 }
@@ -503,4 +509,80 @@ void deathray(void)
     prout("  in Engineering, we can't move for 'em, Captain.\"");
     finish(FTRIBBLE);
     return;
+}
+
+char *systemname(planet *planet)
+{
+    static char	*names[NINHAB] =
+    {
+	/*
+	 * This started out life as the BSD Trek inhabited-planets list,
+	 * but I used <http://www.memory-alpha.org> to weed out planets
+	 * with no references in ST:TOS and to fill it out again to the
+	 * required length from "The Worlds of The Federation" list,
+	 * <http://memory-alpha.org/en/wiki/The_Worlds_of_the_Federation>.
+	 * Some misspellings have been silently corrected.  (To be
+	 * fair, there was no Web when Eric Allman did his list.)
+	 *
+	 * Some planets marked Class G and P here will be displayed as class M
+	 * because of the way planets are generated. This is a known bug.
+	 */
+	"ERROR",
+	// Added Federation Worlds
+	"Deneva",		/* TOS: "Operation -- Annihilate!" */
+	"Eminiar VII",		/* TOS: "A Taste of Armageddon" */
+	"Hansen's Planet",	/* TOS: "The Galileo Seven" */
+	"Taurus IV",		/* TOS: "The Galileo Seven" (class G) */
+	"Aldebaran III",	/* TOS: "The Deadly Years" */
+	"Vulcan (T'Khasi)",	/* many episodes */
+	"Tellar Prime (Miracht)",	/* TOS: "Journey to Babel" */
+	"Andoria (Fesoan)",	/* several episodes */
+	"Antos IV (Doraphane)",	/* TOS: "Whom Gods Destroy", "Who Mourns for Adonais?" */
+	"Catulla (Cendo-Prae)",	/* TOS: "The Way to Eden" */
+	"Izar",			/* TOS: "Whom Gods Destroy" */
+	"Tiburon",		/* TOS: "The Way to Eden" */
+	"Merak II",		/* TOS: "The Cloud Minders" */
+	"Argelius II (Nelphia)",	/* TOS: "Wolf in the Fold" ("IV" in BSD) */
+	"Daran V",		/* TOS: "For the World is Hollow and I Have Touched the Sky" */
+	"Medusa",		/* TOS: "Is There in Truth No Beauty?" */
+	"Coridan (Desotriana)",	/* TOS: "Journey to Babel" */
+	"Berengaria IV",	/* TOS: "This Side of Paradise" */
+	"Capella IV (Kohath)",	/* TOS: "Friday's Child" (Class G) */
+	"Gideon",		/* TOS: "The Mark of Gideon" */
+	"Iotia",		/* TOS: "A Piece of the Action" */
+	/* Worlds from BSD Trek */
+	//"Talos IV",		/* TOS: "The Cage" (interdicted world) */
+	"Rigel II",		/* TOS: "Shore Leave" ("III" in BSD) */
+	"Deneb II",		/* TOS: "Wolf in the Fold" ("IV" in BSD) */
+	//"Canopus V",		/* noncanonical */
+	//"Icarus I",		/* noncanonical */
+	//"Prometheus II",	/* noncanonical */
+	//"Omega VII",		/* noncanonical */
+	//"Elysium I",		/* noncanonical */
+	"Scalos IV",		/* TOS: "Wink of an Eye" */
+	//"Procyon IV",		/* noncanonical */
+	//"Arachnid I",		/* noncanonical */
+	//"Argo VIII",		/* noncanonical */
+	//"Triad III",		/* noncanonical */
+	//"Echo IV",		/* noncanonical */
+	//"Nimrod III",		/* noncanonical */
+	//"Nemisis IV",		/* noncanonical */
+	//"Centarurus I",	/* noncanonical */
+	//"Kronos III",		/* noncanonical */
+	//"Spectros V",		/* noncanonical */
+	"Beta III",		/* TOS: "The Return of the Archons" */
+	"Gamma Tranguli VI (Vaalel)",	/* TOS: "The Apple" */
+	"Pyris VII",		/* TOS: "Catspaw" ("III" in BSD) */
+	"Triacus",		/* TOS: "And the Children Shall Lead", */
+	"Marcos XII",		/* TOS: "And the Children Shall Lead", */
+	//"Kaland",		/* noncanonical */
+	"Ardana",		/* TOS: "The Cloud Minders" */
+	//"Stratos",		/* noncanonical */
+	//"Eden",		/* TOS: "The Way to Eden" (in Romulan space) */
+	//"Arrikis",		/* noncanonical */
+	//"Epsilon Eridani IV",	/* noncanonical */
+	"Exo III",		/* TOS: "What Are Little Girls Made Of?" (Class P) */
+    };
+
+    return names[planet->inhabited];
 }

@@ -18,8 +18,10 @@
 // #define DEBUG
 
 #define PHASEFAC (2.0)
-#define PLNETMAX (10)
 #define GALSIZE	(8)
+#define NINHAB (GALSIZE * GALSIZE / 2)
+#define MAXUNINHAB (10)
+#define PLNETMAX (NINHAB + MAXUNINHAB)
 #define QUADSIZE (10)
 #define BASEMAX	(5)
 
@@ -39,7 +41,10 @@ typedef struct {
     int x;	/* Quadrant location of planet */
     int y;
     enum {M=0, N=1, O=2} pclass;
+    int inhabited;	/* if NZ, an index into a name array */
+#define UNINHABITED	-1
     int crystals; /* has crystals */
+#define MINED	-1	/* used to have crystals, but they were mined out */
     enum {unknown, known, shuttle_down} known;
 } planet;
 
@@ -65,7 +70,7 @@ typedef struct {
 	    remtime;		// remaining time
     struct {
 	int stars;
-	int planets;
+	planet *planet;
 	int starbase;
 	int klingons;
 	int romulans;
@@ -108,6 +113,7 @@ typedef struct {
 #define OPTION_MVBADDY	0x00000100	/* more enemies can move */
 #define OPTION_BLKHOLE	0x00000200	/* black hole may timewarp you */
 #define OPTION_BASE	0x00000400	/* bases have good shields */
+#define OPTION_WORLDS	0x00000800	/* logic for inhabited worlds */
 #define OPTION_PLAIN	0x01000000	/* user chose plain game */
 #define OPTION_ALMY	0x02000000	/* user chose Almy variant */
 
@@ -389,6 +395,7 @@ void setpassword(void);
 void commandhook(char *, int);
 void makechart(void);
 void enqueue(char *);
+char *systemname(planet *);
 
 /* mode arguments for srscan() */
 #define SCAN_FULL		1

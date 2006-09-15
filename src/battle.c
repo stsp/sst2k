@@ -316,7 +316,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmena(1, iquad, 2, ix, iy);
 	    prout(" destroyed.");
 	    game.state.nplankl++;
-	    game.state.galaxy[game.quadx][game.quady].planets--;
+	    game.state.galaxy[game.quadx][game.quady].planet = NULL;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
 	    game.plnetx = game.plnety = 0;
