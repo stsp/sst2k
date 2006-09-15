@@ -13,9 +13,14 @@
  *    1. Button pushes should be able to insert commands at the buffer's
  *       current insertion point.
  *    2. When a user finishes a command with Return, a callback should
- *       receive the line of input types.
+ *       receive the line of input typed.
+ * 
+ * All the input passed to the game in back of this will be lines full
+ * of commands generated either by typing into the text buffer directly 
+ * or by button presses that generate text unto the buffer.
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
 #include <X11/Shell.h>
@@ -23,7 +28,9 @@
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/AsciiText.h>
-#include "sst.h"
+//#include "sst.h"
+#define OPTION_PLANETS	1
+#define OPTION_PROBE	2
 
 static XtAppContext app_context;
 static Widget toplevel, text, form; 
