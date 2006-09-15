@@ -37,6 +37,10 @@ while True:
         line = line.replace("%", "%%")
         # Hack Unicode non-breaking spaces into ordinary spaces
         line = line.replace("\xc2\xa0", " ").replace("\240", "")
+        # Hack right and left quotes into regular ASCII quotes
+        line = line.replace("\xe2\x80\x9c", '"').replace("\xe2\x80\x9d", '"')
+        # Hack dashes and bullets (Hmmm...might want to handle this in curses)
+        line = line.replace("\xe2\x80\x94", "-").replace("\xe2\x97\x8f", "*");
         if line.startswith("Mnemonic:"):
             while not savetext[-1].strip():
                 savetext.pop()

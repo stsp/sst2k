@@ -898,7 +898,7 @@ void probe(void)
     return;
 }
 
-void help(void) 
+void mayday(void) 
 {
     /* There's more than one way to move in this game! */
     double ddist, xdist, probf;

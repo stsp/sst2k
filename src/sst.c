@@ -208,66 +208,66 @@ commands[] = {
 #define TORPEDO	5
         {"TORPEDO",	TORPEDO,	0},
 	{"PHOTONS",	TORPEDO,	0},
-#define MOVE	6
+#define MOVE	7
 	{"MOVE",	MOVE,		0},
-#define SHIELDS	7
+#define SHIELDS	8
 	{"SHIELDS",	SHIELDS,	0},
-#define DOCK	8
+#define DOCK	9
 	{"DOCK",	DOCK,		0},
-#define DAMAGES	9
+#define DAMAGES	10
 	{"DAMAGES",	DAMAGES,	0},
-#define CHART	10
+#define CHART	11
 	{"CHART",	CHART,		0},
-#define IMPULSE	11
+#define IMPULSE	12
 	{"IMPULSE",	IMPULSE,	0},
-#define REST	12
+#define REST	13
 	{"REST",	REST,		0},
-#define WARP	13
+#define WARP	14
 	{"WARP",	WARP,		0},
-#define SCORE	14
+#define SCORE	15
 	{"SCORE",	SCORE,		0},
-#define SENSORS	15
+#define SENSORS	16
 	{"SENSORS",	SENSORS,	OPTION_PLANETS},
-#define ORBIT	16
+#define ORBIT	17
 	{"ORBIT",	ORBIT,		OPTION_PLANETS},
-#define TRANSPORT	17
+#define TRANSPORT	18
 	{"TRANSPORT",	TRANSPORT,	OPTION_PLANETS},
-#define MINE	18
+#define MINE	19
 	{"MINE",	MINE,		OPTION_PLANETS},
-#define CRYSTALS	19
+#define CRYSTALS	20
 	{"CRYSTALS",	CRYSTALS,	OPTION_PLANETS},
-#define SHUTTLE	20
+#define SHUTTLE	21
 	{"SHUTTLE",	SHUTTLE,	OPTION_PLANETS},
-#define PLANETS	21
+#define PLANETS	22
 	{"PLANETS",	PLANETS,	OPTION_PLANETS},
-#define REPORT	22
+#define REPORT	23
 	{"REPORT",	REPORT,		0},
-#define COMPUTER	23
+#define COMPUTER	24
 	{"COMPUTER",	COMPUTER,      	0},
-#define COMMANDS	24
+#define COMMANDS	25
 	{"COMMANDS",	COMMANDS,      	0},
-#define EMEXIT	25
+#define EMEXIT	26
 	{"EMEXIT",	EMEXIT,		0},
-#define PROBE	26
+#define PROBE	27
 	{"PROBE",	PROBE,		OPTION_PROBE},
-#define SAVE	27
+#define SAVE	28
 	{"SAVE",	SAVE,		0},
 	{"FREEZE",	SAVE,		0},
-#define ABANDON	28
+#define ABANDON	30
 	{"ABANDON",	ABANDON,	0},
-#define DESTRUCT	29
+#define DESTRUCT	31
 	{"DESTRUCT",	DESTRUCT,	0},
-#define DEATHRAY	30
+#define DEATHRAY	32
 	{"DEATHRAY",	DEATHRAY,	0},
-#define DEBUGCMD	31
+#define DEBUGCMD	33
 	{"DEBUG",	DEBUGCMD,	0},
-#define MAYDAY	32
+#define MAYDAY	34
 	{"MAYDAY",	MAYDAY,		0},
 	//{"SOS",		MAYDAY,		0},
 	//{"CALL",	MAYDAY,		0},
-#define QUIT	33
+#define QUIT	35
 	{"QUIT",	QUIT,		0},
-#define HELP	34
+#define HELP	36
 	{"HELP",	HELP,		0},
 };
 
@@ -532,7 +532,7 @@ static void makemoves(void)
 #endif
 	    break;
 	case MAYDAY:			// Call for help
-	    help();
+	    mayday();
 	    if (game.ididit) hitme = TRUE;
 	    break;
 	case QUIT:

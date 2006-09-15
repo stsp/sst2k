@@ -407,6 +407,7 @@ short-range scan anytime you like.</para>
 
 <para>If your short-range sensors are damaged, this command will only show
 the contents of adjacent sectors.</para>
+
 </sect1>
 <sect1><title>Status Report</title>
 
@@ -596,6 +597,7 @@ galaxy, which you are not permitted to cross.</para>
 
 <para>Long-range scans are free.  They use up no energy or time, and can be
 done safely regardless of battle conditions.</para>
+
 </sect1>
 <sect1><title>Star Chart</title>
 

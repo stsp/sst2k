@@ -326,7 +326,7 @@ void setwrp(void);
 void events(void);
 void report(void);
 void eta(void);
-void help(void);
+void mayday(void);
 void abandn(void);
 void finish(FINTYPE);
 void dstrct(void);
