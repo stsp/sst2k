@@ -357,7 +357,7 @@ int srscan(int l)
 		break;
 	if (req > sizeof(requests)/sizeof(requests[0])) {
 	    prout("UNRECOGNIZED REQUEST. Legal requests are:");
-	    prout("  date, game.condition, position, lsupport, game.warpfactor,");
+	    prout("  date, condition, position, lsupport, warpfactor,");
 	    prout("  energy, torpedoes, shields, klingons, time, bases.");
 	    return FALSE;
 	}
