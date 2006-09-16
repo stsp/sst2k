@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <libintl.h>
 #include <curses.h>
 
 #ifdef DATA_DIR
@@ -11,6 +13,8 @@
 #else
 #define SSTDOC DOC_NAME
 #endif
+
+#define _(str) gettext(str)
 
 #define min(x, y)	((x)<(y)?(x):(y))
 #define max(x, y)	((x)>(y)?(x):(y))

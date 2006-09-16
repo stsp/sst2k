@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <curses.h>
-#include <signal.h>
-#include <ctype.h>
-#include <stdarg.h>
 
+#include "config.h"
 #include "sst.h"
 #include "sstlinux.h"
 
@@ -34,6 +31,11 @@ static void outro(void)
 
 void iostart(void) 
 {
+    setlocale(LC_ALL, "");
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
+    gettext("");
+
     if (!(game.options & OPTION_CURSES)) {
 	rows = atoi(getenv("LINES"));
     } else {

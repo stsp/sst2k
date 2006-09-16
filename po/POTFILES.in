@@ -1,1 +1,5 @@
 # List of source files which contain translatable strings.
+src/ai.c
+src/battle.c
+src/events.c
+src/finish.c

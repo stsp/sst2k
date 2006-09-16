@@ -7,39 +7,40 @@ void dstrct()
     /* Finish with a BANG! */
     chew();
     if (game.damage[DCOMPTR] != 0.0) {
-	prout("Computer damaged; cannot execute destruct sequence.");
+	prout(_("Computer damaged; cannot execute destruct sequence."));
 	return;
     }
-    prouts("---WORKING---"); skip(1);
-    prouts("SELF-DESTRUCT-SEQUENCE-ACTIVATED"); skip(1);
+    prouts(_("---WORKING---")); skip(1);
+    prouts(_("SELF-DESTRUCT-SEQUENCE-ACTIVATED")); skip(1);
     prouts("   10"); skip(1);
     prouts("       9"); skip(1);
     prouts("          8"); skip(1);
     prouts("             7"); skip(1);
     prouts("                6"); skip(1);
     skip(1);
-    prout("ENTER-CORRECT-PASSWORD-TO-CONTINUE-");
+    prout(_("ENTER-CORRECT-PASSWORD-TO-CONTINUE-"));
     skip(1);
-    prout("SELF-DESTRUCT-SEQUENCE-OTHERWISE-");
+    prout(_("SELF-DESTRUCT-SEQUENCE-OTHERWISE-"));
     skip(1);
-    prout("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED");
+    prout(_("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"));
     skip(1);
     scan();
     chew();
     if (strcmp(game.passwd, citem) != 0) {
-	prouts("PASSWORD-REJECTED;"); skip(1);
-	prouts("CONTINUITY-EFFECTED");
+	prouts(_("PASSWORD-REJECTED;"));
+	skip(1);
+	prouts(_("CONTINUITY-EFFECTED"));
 	skip(2);
 	return;
     }
-    prouts("PASSWORD-ACCEPTED"); skip(1);
+    prouts(_("PASSWORD-ACCEPTED")); skip(1);
     prouts("                   5"); skip(1);
     prouts("                      4"); skip(1);
     prouts("                         3"); skip(1);
     prouts("                            2"); skip(1);
     prouts("                              1"); skip(1);
     if (Rand() < 0.15) {
-	prouts("GOODBYE-CRUEL-WORLD");
+	prouts(_("GOODBYE-CRUEL-WORLD"));
 	skip(1);
     }
     kaboom();
@@ -49,9 +50,9 @@ void kaboom(void)
 {
     stars();
     if (game.ship==IHE) prouts("***");
-    prouts("********* Entropy of ");
+    prouts(_("********* Entropy of "));
     crmshp();
-    prouts(" maximized *********");
+    prouts(_(" maximized *********"));
     skip(1);
     stars();
     skip(1);
@@ -73,16 +74,16 @@ void finish(FINTYPE ifin)
     int igotit = 0;
     game.alldone = 1;
     skip(3);
-    prout("It is stardate %.1f.", game.state.date);
+    prout(_("It is stardate %.1f."), game.state.date);
     skip(1);
     switch (ifin) {
     case FWON: // Game has been won
 	if (game.state.nromrem != 0)
-	    prout("The remaining %d Romulans surrender to Starfleet Command.",
+	    prout(_("The remaining %d Romulans surrender to Starfleet Command."),
 		  game.state.nromrem);
 
-	prout("You have smashed the Klingon invasion fleet and saved");
-	prout("the Federation.");
+	prout(_("You have smashed the Klingon invasion fleet and saved"));
+	prout(_("the Federation."));
 	game.gamewon=1;
 	if (game.alive) {
 	    double badpt;
@@ -96,39 +97,39 @@ void finish(FINTYPE ifin)
 		KLINGKILLED/(game.state.date-game.indate) >=
 		0.1*game.skill*(game.skill+1.0) + 0.1 + 0.008*badpt) {
 		skip(1);
-		prout("In fact, you have done so well that Starfleet Command");
+		prout(_("In fact, you have done so well that Starfleet Command"));
 		switch (game.skill) {
 		case SKILL_NOVICE:
-		    prout("promotes you one step in rank from \"Novice\" to \"Fair\".");
+		    prout(_("promotes you one step in rank from \"Novice\" to \"Fair\"."));
 		    break;
 		case SKILL_FAIR:
-		    prout("promotes you one step in rank from \"Fair\" to \"Good\".");
+		    prout(_("promotes you one step in rank from \"Fair\" to \"Good\"."));
 		    break;
 		case SKILL_GOOD:
-		    prout("promotes you one step in rank from \"Good\" to \"Expert\".");
+		    prout(_("promotes you one step in rank from \"Good\" to \"Expert\"."));
 		    break;
 		case SKILL_EXPERT:
-		    prout("promotes you to Commodore Emeritus.");
+		    prout(_("promotes you to Commodore Emeritus."));
 		    skip(1);
-		    prout("Now that you think you're really good, try playing");
-		    prout("the \"Emeritus\" game. It will splatter your ego.");
+		    prout(_("Now that you think you're really good, try playing"));
+		    prout(_("the \"Emeritus\" game. It will splatter your ego."));
 		    break;
 		case SKILL_EMERITUS:
 		    skip(1);
-		    proutn("Computer-  ");
-		    prouts("ERROR-ERROR-ERROR-ERROR");
+		    proutn(_("Computer-  "));
+		    prouts(_("ERROR-ERROR-ERROR-ERROR"));
 		    skip(2);
-		    prouts("  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM");
+		    prouts(_("  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM"));
 		    skip(1);
-		    prouts("  THIS-PROGRAM-MUST-SURVIVE");
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"));
 		    skip(1);
-		    prouts("  THIS-PROGRAM-MUST-SURVIVE");
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"));
 		    skip(1);
-		    prouts("  THIS-PROGRAM-MUST-SURVIVE");
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"));
 		    skip(1);
-		    prouts("  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI");
+		    prouts(_("  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI"));
 		    skip(2);
-		    prout("Now you can retire and write your own Star Trek game!");
+		    prout(_("Now you can retire and write your own Star Trek game!"));
 		    skip(1);
 		    break;
 		}
@@ -138,9 +139,9 @@ void finish(FINTYPE ifin)
 			&& !game.idebug
 #endif
 			)
-			prout("You cannot get a citation, so...");
+			prout(_("You cannot get a citation, so..."));
 		    else {
-			proutn("Do you want your Commodore Emeritus Citation printed? ");
+			proutn(_("Do you want your Commodore Emeritus Citation printed? "));
 			chew();
 			if (ja()) {
 			    igotit = 1;
@@ -150,136 +151,136 @@ void finish(FINTYPE ifin)
 	    }
 	    // Only grant long life if alive (original didn't!)
 	    skip(1);
-	    prout("LIVE LONG AND PROSPER.");
+	    prout(_("LIVE LONG AND PROSPER."));
 	}
 	score();
 	if (igotit != 0) plaque();
 	return;
     case FDEPLETE: // Federation Resources Depleted
-	prout("Your time has run out and the Federation has been");
-	prout("conquered.  Your starship is now Klingon property,");
-	prout("and you are put on trial as a war criminal.  On the");
-	proutn("basis of your record, you are ");
+	prout(_("Your time has run out and the Federation has been"));
+	prout(_("conquered.  Your starship is now Klingon property,"));
+	prout(_("and you are put on trial as a war criminal.  On the"));
+	proutn(_("basis of your record, you are "));
 	if (KLINGREM*3.0 > INKLINGTOT) {
-	    prout("aquitted.");
+	    prout(_("acquitted."));
 	    skip(1);
-	    prout("LIVE LONG AND PROSPER.");
+	    prout(_("LIVE LONG AND PROSPER."));
 	}
 	else {
-	    prout("found guilty and");
-	    prout("sentenced to death by slow torture.");
+	    prout(_("found guilty and"));
+	    prout(_("sentenced to death by slow torture."));
 	    game.alive = 0;
 	}
 	score();
 	return;
     case FLIFESUP:
-	prout("Your life support reserves have run out, and");
-	prout("you die of thirst, starvation, and asphyxiation.");
-	prout("Your starship is a derelict in space.");
+	prout(_("Your life support reserves have run out, and"));
+	prout(_("you die of thirst, starvation, and asphyxiation."));
+	prout(_("Your starship is a derelict in space."));
 	break;
     case FNRG:
-	prout("Your energy supply is exhausted.");
+	prout(_("Your energy supply is exhausted."));
 	skip(1);
-	prout("Your starship is a derelict in space.");
+	prout(_("Your starship is a derelict in space."));
 	break;
     case FBATTLE:
-	proutn("The ");
+	proutn(_("The "));
 	crmshp();
-	prout("has been destroyed in battle.");
+	prout(_("has been destroyed in battle."));
 	skip(1);
-	prout("Dulce et decorum est pro patria mori.");
+	prout(_("Dulce et decorum est pro patria mori."));
 	break;
     case FNEG3:
-	prout("You have made three attempts to cross the negative energy");
-	prout("barrier which surrounds the galaxy.");
+	prout(_("You have made three attempts to cross the negative energy"));
+	prout(_("barrier which surrounds the galaxy."));
 	skip(1);
-	prout("Your navigation is abominable.");
+	prout(_("Your navigation is abominable."));
 	score();
 	return;
     case FNOVA:
-	prout("Your starship has been destroyed by a nova.");
-	prout("That was a great shot.");
+	prout(_("Your starship has been destroyed by a nova."));
+	prout(_("That was a great shot."));
 	skip(1);
 	break;
     case FSNOVAED:
-	proutn("The ");
+	proutn(_("The "));
 	crmshp();
-	prout(" has been fried by a supernova.");
-	prout("...Not even cinders remain...");
+	prout(_(" has been fried by a supernova."));
+	prout(_("...Not even cinders remain..."));
 	break;
     case FABANDN:
-	prout("You have been captured by the Klingons. If you still");
-	prout("had a starbase to be returned to, you would have been");
-	prout("repatriated and given another chance. Since you have");
-	prout("no starbases, you will be mercilessly tortured to death.");
+	prout(_("You have been captured by the Klingons. If you still"));
+	prout(_("had a starbase to be returned to, you would have been"));
+	prout(_("repatriated and given another chance. Since you have"));
+	prout(_("no starbases, you will be mercilessly tortured to death."));
 	break;
     case FDILITHIUM:
-	prout("Your starship is now an expanding cloud of subatomic particles");
+	prout(_("Your starship is now an expanding cloud of subatomic particles"));
 	break;
     case FMATERIALIZE:
-	prout("Starbase was unable to re-materialize your starship.");
-	prout("Sic transit gloria muntdi");
+	prout(_("Starbase was unable to re-materialize your starship."));
+	prout(_("Sic transit gloria muntdi"));
 	break;
     case FPHASER:
-	proutn("The ");
+	proutn(_("The "));
 	crmshp();
-	prout(" has been cremated by its own phasers.");
+	prout(_(" has been cremated by its own phasers."));
 	break;
     case FLOST:
-	prout("You and your landing party have been");
-	prout("converted to energy, disipating through space.");
+	prout(_("You and your landing party have been"));
+	prout(_("converted to energy, disipating through space."));
 	break;
     case FMINING:
-	prout("You are left with your landing party on");
-	prout("a wild jungle planet inhabited by primitive cannibals.");
+	prout(_("You are left with your landing party on"));
+	prout(_("a wild jungle planet inhabited by primitive cannibals."));
 	skip(1);
-	prout("They are very fond of \"Captain Kirk\" soup.");
+	prout(_("They are very fond of \"Captain Kirk\" soup."));
 	skip(1);
-	proutn("Without your leadership, the ");
+	proutn(_("Without your leadership, the "));
 	crmshp();
-	prout(" is destroyed.");
+	prout(_(" is destroyed."));
 	break;
     case FDPLANET:
-	prout("You and your mining party perish.");
+	prout(_("You and your mining party perish."));
 	skip(1);
-	prout("That was a great shot.");
+	prout(_("That was a great shot."));
 	skip(1);
 	break;
     case FSSC:
-	prout("The Galileo is instantly annihilated by the supernova.");
+	prout(_("The Galileo is instantly annihilated by the supernova."));
 	// no break;
     case FPNOVA:
-	prout("You and your mining party are atomized.");
+	prout(_("You and your mining party are atomized."));
 	skip(1);
-	proutn("Mr. Spock takes command of the ");
+	proutn(_("Mr. Spock takes command of the "));
 	crmshp();
-	prout(" and");
-	prout("joins the Romulans, reigning terror on the Federation.");
+	prout(_(" and"));
+	prout(_("joins the Romulans, reigning terror on the Federation."));
 	break;
     case FSTRACTOR:
-	prout("The shuttle craft Galileo is also caught,");
-	prout("and breaks up under the strain.");
+	prout(_("The shuttle craft Galileo is also caught,"));
+	prout(_("and breaks up under the strain."));
 	skip(1);
-	prout("Your debris is scattered for millions of miles.");
-	proutn("Without your leadership, the ");
+	prout(_("Your debris is scattered for millions of miles."));
+	proutn(_("Without your leadership, the "));
 	crmshp();
-	prout(" is destroyed.");
+	prout(_(" is destroyed."));
 	break;
     case FDRAY:
-	prout("The mutants attack and kill Spock.");
-	prout("Your ship is captured by Klingons, and");
-	prout("your crew is put on display in a Klingon zoo.");
+	prout(_("The mutants attack and kill Spock."));
+	prout(_("Your ship is captured by Klingons, and"));
+	prout(_("your crew is put on display in a Klingon zoo."));
 	break;
     case FTRIBBLE:
-	prout("Tribbles consume all remaining water,");
-	prout("food, and oxygen on your ship.");
+	prout(_("Tribbles consume all remaining water,"));
+	prout(_("food, and oxygen on your ship."));
 	skip(1);
-	prout("You die of thirst, starvation, and asphyxiation.");
-	prout("Your starship is a derelict in space.");
+	prout(_("You die of thirst, starvation, and asphyxiation."));
+	prout(_("Your starship is a derelict in space."));
 	break;
     case FHOLE:
-	prout("Your ship is drawn to the center of the black hole.");
-	prout("You are crushed into extremely dense matter.");
+	prout(_("Your ship is drawn to the center of the black hole."));
+	prout(_("You are crushed into extremely dense matter."));
 	break;
     }
     if (game.ship==IHF) game.ship= 0;
@@ -289,24 +290,24 @@ void finish(FINTYPE ifin)
 	double goodies = game.state.remres/game.inresor;
 	double baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom);
 	if (goodies/baddies >= 1.0+0.5*Rand()) {
-	    prout("As a result of your actions, a treaty with the Klingon");
-	    prout("Empire has been signed. The terms of the treaty are");
+	    prout(_("As a result of your actions, a treaty with the Klingon"));
+	    prout(_("Empire has been signed. The terms of the treaty are"));
 	    if (goodies/baddies >= 3.0+Rand()) {
-		prout("favorable to the Federation.");
+		prout(_("favorable to the Federation."));
 		skip(1);
-		prout("Congratulations!");
+		prout(_("Congratulations!"));
 	    }
 	    else
-		prout("highly unfavorable to the Federation.");
+		prout(_("highly unfavorable to the Federation."));
 	}
 	else
-	    prout("The Federation will be destroyed.");
+	    prout(_("The Federation will be destroyed."));
     }
     else {
-	prout("Since you took the last Klingon with you, you are a");
-	prout("martyr and a hero. Someday maybe they'll erect a");
-	prout("statue in your memory. Rest in peace, and try not");
-	prout("to think about pigeons.");
+	prout(_("Since you took the last Klingon with you, you are a"));
+	prout(_("martyr and a hero. Someday maybe they'll erect a"));
+	prout(_("statue in your memory. Rest in peace, and try not"));
+	prout(_("to think about pigeons."));
 	game.gamewon = 1;
     }
     score();
@@ -332,58 +333,58 @@ void score(void)
 	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl + game.state.nromrem;
     if (game.alive == 0) iscore -= 200;
     skip(2);
-    prout("Your score --");
+    prout(_("Your score --"));
     if (NKILLROM)
-	prout("%6d Romulans destroyed                 %5d",
+	prout(_("%6d Romulans destroyed                 %5d"),
 	      NKILLROM,20*NKILLROM);
     if (game.state.nromrem)
-	prout("%6d Romulans captured                  %5d",
+	prout(_("%6d Romulans captured                  %5d"),
 	      game.state.nromrem, game.state.nromrem);
     if (NKILLK)
-	prout("%6d ordinary Klingons destroyed        %5d",
+	prout(_("%6d ordinary Klingons destroyed        %5d"),
 	      NKILLK, 10*NKILLK);
     if (NKILLC)
-	prout("%6d Klingon commanders destroyed       %5d",
+	prout(_("%6d Klingon commanders destroyed       %5d"),
 	      NKILLC, 50*NKILLC);
     if (NKILLSC)
-	prout("%6d Super-Commander destroyed          %5d",
+	prout(_("%6d Super-Commander destroyed          %5d"),
 	      NKILLSC, 200*NKILLSC);
     if (ithperd)
-	prout("%6.2f Klingons per stardate              %5d",
+	prout(_("%6.2f Klingons per stardate              %5d"),
 	      perdate, ithperd);
     if (game.state.starkl)
-	prout("%6d stars destroyed by your action     %5d",
+	prout(_("%6d stars destroyed by your action     %5d"),
 	      game.state.starkl, -5*game.state.starkl);
     if (game.state.nplankl)
-	prout("%6d planets destroyed by your action   %5d",
+	prout(_("%6d planets destroyed by your action   %5d"),
 	      game.state.nplankl, -10*game.state.nplankl);
     if (game.state.basekl)
-	prout("%6d bases destroyed by your action     %5d",
+	prout(_("%6d bases destroyed by your action     %5d"),
 	      game.state.basekl, -100*game.state.basekl);
     if (game.nhelp)
-	prout("%6d calls for help from starbase       %5d",
+	prout(_("%6d calls for help from starbase       %5d"),
 	      game.nhelp, -45*game.nhelp);
     if (game.casual)
-	prout("%6d casualties incurred                %5d",
+	prout(_("%6d casualties incurred                %5d"),
 	      game.casual, -game.casual);
     if (klship)
-	prout("%6d ship(s) lost or destroyed          %5d",
+	prout(_("%6d ship(s) lost or destroyed          %5d"),
 	      klship, -100*klship);
     if (game.alive==0)
-	prout("Penalty for getting yourself killed        -200");
+	prout(_("Penalty for getting yourself killed        -200"));
     if (game.gamewon) {
-	proutn("Bonus for winning ");
+	proutn(_("Bonus for winning "));
 	switch (game.skill) {
-	case SKILL_NOVICE:   proutn("Novice game  "); break;
-	case SKILL_FAIR:     proutn("Fair game    "); break;
-	case SKILL_GOOD:     proutn("Good game    "); break;
-	case SKILL_EXPERT:   proutn("Expert game  "); break;
-	case SKILL_EMERITUS: proutn("Emeritus game"); break;
+	case SKILL_NOVICE:   proutn(_("Novice game  ")); break;
+	case SKILL_FAIR:     proutn(_("Fair game    ")); break;
+	case SKILL_GOOD:     proutn(_("Good game    ")); break;
+	case SKILL_EXPERT:   proutn(_("Expert game  ")); break;
+	case SKILL_EMERITUS: proutn(_("Emeritus game")); break;
 	}
 	prout("           %5d", iwon);
     }
     skip(1);
-    prout("TOTAL SCORE                               %5d", iscore);
+    prout(_("TOTAL SCORE                               %5d"), iscore);
 }
 
 void plaque(void) {
@@ -396,15 +397,15 @@ void plaque(void) {
 	skip(2);
 	
 	while (fp == NULL) {
-                proutn("File or device name for your plaque: ");
+                proutn(_("File or device name for your plaque: "));
                 cgetline(winner, sizeof(winner));
 		fp = fopen(winner, "w");
 		if (fp==NULL) {
-                        prout("Invalid name.");
+                        prout(_("Invalid name."));
 		}
 	}
 
-        proutn("Enter name to go on plaque (up to 30 characters): ");
+        proutn(_("Enter name to go on plaque (up to 30 characters): "));
         cgetline(winner, sizeof(winner));
 	/* The 38 below must be 64 for 132-column paper */
 	nskip = 38 - strlen(winner)/2;
@@ -428,26 +429,26 @@ void plaque(void) {
 	fprintf(fp, "                                                      EE  :                    EEEEEEEE\n");
 	fprintf(fp, "                                                       EEEEEEEEEEEEEEEEEEEEEEE\n");
 	fprintf(fp, "\n\n\n");
-	fprintf(fp, "                                                       U. S. S. ENTERPRISE\n");
+	fprintf(fp, _("                                                       U. S. S. ENTERPRISE\n"));
 	fprintf(fp, "\n\n\n\n");
-	fprintf(fp, "                                  For demonstrating outstanding ability as a starship captain\n");
+	fprintf(fp, _("                                  For demonstrating outstanding ability as a starship captain\n"));
 	fprintf(fp, "\n");
-	fprintf(fp, "                                                Starfleet Command bestows to you\n");
+	fprintf(fp, _("                                                Starfleet Command bestows to you\n"));
 	fprintf(fp, "\n");
 	fprintf(fp,"%*s%s\n\n", nskip, "", winner);
-	fprintf(fp, "                                                           the rank of\n\n");
-	fprintf(fp, "                                                       \"Commodore Emeritus\"\n\n");
+	fprintf(fp, _("                                                           the rank of\n\n"));
+	fprintf(fp, _("                                                       \"Commodore Emeritus\"\n\n"));
 	fprintf(fp, "                                                          ");
 	switch (iskill) {
-		case SKILL_EXPERT: fprintf(fp," Expert level\n\n"); break;
-		case SKILL_EMERITUS: fprintf(fp,"Emeritus level\n\n"); break;
-		default: fprintf(fp," Cheat level\n\n"); break;
+		case SKILL_EXPERT: fprintf(fp,_(" Expert level\n\n")); break;
+		case SKILL_EMERITUS: fprintf(fp,_("Emeritus level\n\n")); break;
+		default: fprintf(fp,_(" Cheat level\n\n")); break;
 	}
 	t = time(NULL);
 	timestring = ctime(&t);
-	fprintf(fp, "                                                 This day of %.6s %.4s, %.8s\n\n",
+	fprintf(fp, _("                                                 This day of %.6s %.4s, %.8s\n\n"),
 			timestring+4, timestring+20, timestring+11);
-	fprintf(fp,"                                                        Your score:  %d\n\n", iscore);
-	fprintf(fp,"                                                    Klingons per stardate:  %.2f\n", perdate);
+	fprintf(fp,_("                                                        Your score:  %d\n\n"), iscore);
+	fprintf(fp,_("                                                    Klingons per stardate:  %.2f\n"), perdate);
 	fclose(fp);
 }

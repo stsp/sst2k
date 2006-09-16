@@ -170,7 +170,9 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CFLAGS = -Wall -Wimplicit -Wunused -Wmissing-prototypes \
-    -Wuninitialized -fno-inline -O1 -DDATA_DIR=\"$(pkgdatadir)\" @CFLAGS@
+    -Wuninitialized -fno-inline -O1 -DDATA_DIR=\"$(pkgdatadir)\" \
+    -DLOCALEDIR=\"$(datadir)/locale\" \
+    @CFLAGS@
 
 sst_SOURCES = \
 	ai.c \

@@ -50,15 +50,15 @@ void events(void)
 		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 	/* If radio repaired, update star chart and attack reports */
 	if (radio_was_broken && game.damage[DRADIO] == 0.0) {
-	    prout("Lt. Uhura- \"Captain, the sub-space radio is working and");
-	    prout("   surveillance reports are coming in.");
+	    prout(_("Lt. Uhura- \"Captain, the sub-space radio is working and"));
+	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
 	    if (game.iseenit==0) {
 		attakreport(0);
 		game.iseenit = 1;
 	    }
 	    rechart();
-	    prout("   The star chart is now up to date.\"");
+	    prout(_("   The star chart is now up to date.\""));
 	    skip(1);
 	}
 	/* Cause extraneous event LINE to occur */
@@ -111,7 +111,7 @@ void events(void)
 	    skip(1);
 	    proutn("***");
 	    crmshp();
-	    prout(" caught in long range tractor beam--");
+	    prout(_(" caught in long range tractor beam--"));
 	    /* If Kirk & Co. screwing around on planet, handle */
 	    atover(1); /* atover(1) is Grab */
 	    if (game.alldone) return;
@@ -123,13 +123,13 @@ void events(void)
 	    if (game.iscraft==0) {
 		skip(1);
 		if (Rand() > 0.5) {
-		    prout("Galileo, left on the planet surface, is captured");
-		    prout("by aliens and made into a flying McDonald's.");
+		    prout(_("Galileo, left on the planet surface, is captured"));
+		    prout(_("by aliens and made into a flying McDonald's."));
 		    game.damage[DSHUTTL] = -10;
 		    game.iscraft = -1;
 		}
 		else {
-		    prout("Galileo, left on the planet surface, is well hidden.");
+		    prout(_("Galileo, left on the planet surface, is well hidden."));
 		}
 	    }
 	    if (line==0) {
@@ -142,12 +142,12 @@ void events(void)
 	    }
 	    iran(QUADSIZE, &game.sectx, &game.secty);
 	    crmshp();
-	    proutn(" is pulled to ");
+	    proutn(_(" is pulled to "));
 	    proutn(cramlc(quadrant, game.quadx, game.quady));
 	    proutn(", ");
 	    prout(cramlc(sector, game.sectx, game.secty));
 	    if (game.resting) {
-		prout("(Remainder of rest/repair period cancelled.)");
+		prout(_("(Remainder of rest/repair period cancelled.)"));
 		game.resting = 0;
 	    }
 	    if (game.shldup==0) {
@@ -155,7 +155,7 @@ void events(void)
 		    doshield(2); /* Shldsup */
 		    game.shldchg=0;
 		}
-		else prout("(Shields not currently useable.)");
+		else prout(_("(Shields not currently useable.)"));
 	    }
 	    newqad(0);
 	    /* Adjust finish time to time of tractor beaming */
@@ -206,15 +206,15 @@ void events(void)
 	    if (ipage==0) pause_game(1);
 	    ipage = 1;
 	    skip(1);
-	    proutn("Lt. Uhura-  \"Captain, the starbase in ");
+	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    prout(cramlc(quadrant, game.batx, game.baty));
-	    prout("   reports that it is under attack and that it can");
-	    proutn("   hold out only until stardate %d",
+	    prout(_("   reports that it is under attack and that it can"));
+	    proutn(_("   hold out only until stardate %d"),
 		   (int)game.future[FCDBAS]);
 	    prout(".\"");
 	    if (game.resting) {
 		skip(1);
-		proutn("Mr. Spock-  \"Captain, shall we cancel the rest period?\" ");
+		proutn(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
 		if (ja()) {
 		    game.resting = 0;
 		    game.optime = 0.0;
@@ -254,7 +254,7 @@ void events(void)
 		game.basex=game.basey=0;
 		newcnd();
 		skip(1);
-		prout("Spock-  \"Captain, I believe the starbase has been destroyegame.state.\"");
+		prout(_("Spock-  \"Captain, I believe the starbase has been destroyed.\""));
 	    }
 	    else if (game.state.rembase != 1 &&
 		     (game.damage[DRADIO] <= 0.0 || game.condit == IHDOCKED)) {
@@ -262,12 +262,12 @@ void events(void)
 		if (ipage==0) pause_game(1);
 		ipage = 1;
 		skip(1);
-		prout("Lt. Uhura-  \"Captain, Starfleet Command reports that");
-		proutn("   the starbase in ");
+		prout(_("Lt. Uhura-  \"Captain, Starfleet Command reports that"));
+		proutn(_("   the starbase in "));
 		proutn(cramlc(quadrant, game.batx, game.baty));
-		prout(" has been destroyed by");
-		if (game.isatb==2) prout("the Klingon Super-Commander");
-		else prout("a Klingon Commander");
+		prout(_(" has been destroyed by"));
+		if (game.isatb==2) prout(_("the Klingon Super-Commander"));
+		else prout(_("a Klingon Commander"));
 		game.state.chart[game.batx][game.baty].starbase = FALSE;
 	    }
 	    /* Remove Starbase from galaxy */
@@ -310,11 +310,11 @@ void events(void)
 			if (ipage==0) pause_game(1);
 			ipage = 1;
 			skip(1);
-			proutn("Lt. Uhura-  \"The deep space probe ");
+			proutn(_("Lt. Uhura-  \"The deep space probe "));
 			if (!VALID_QUADRANT(j, i))
-			    proutn("has left the galaxy");
+			    proutn(_("has left the galaxy"));
 			else
-			    proutn("is no longer transmitting");
+			    proutn(_("is no longer transmitting"));
 			prout(".\"");
 		    }
 		    game.future[FDSPROB] = FOREVER;
@@ -324,7 +324,7 @@ void events(void)
 		    if (ipage==0) pause_game(1);
 		    ipage = 1;
 		    skip(1);
-		    proutn("Lt. Uhura-  \"The deep space probe is now in ");
+		    proutn(_("Lt. Uhura-  \"The deep space probe is now in "));
 		    proutn(cramlc(quadrant, game.probecx, game.probecy));
 		    prout(".\"");
 		}
@@ -361,7 +361,7 @@ void wait(void)
     for (;;) {
 	key = scan();
 	if (key  != IHEOL) break;
-	proutn("How long? ");
+	proutn(_("How long? "));
     }
     chew();
     if (key != IHREAL) {
@@ -371,7 +371,7 @@ void wait(void)
     origTime = delay = aaitem;
     if (delay <= 0.0) return;
     if (delay >= game.state.remtime || game.nenhere != 0) {
-	proutn("Are you sure? ");
+	proutn(_("Are you sure? "));
 	if (ja() == 0) return;
     }
 
@@ -381,7 +381,7 @@ void wait(void)
     do {
 	if (delay <= 0) game.resting = 0;
 	if (game.resting == 0) {
-	    prout("%d stardates left.", (int)game.state.remtime);
+	    prout(_("%d stardates left."), (int)game.state.remtime);
 	    return;
 	}
 	temp = game.optime = delay;
@@ -423,7 +423,7 @@ void nova(int ix, int iy)
     /* handle initial nova */
     game.quad[ix][iy] = IHDOT;
     crmena(1, IHSTAR, 2, ix, iy);
-    prout(" novas.");
+    prout(_(" novas."));
     game.state.galaxy[game.quadx][game.quady].stars--;
     game.state.starkl++;
 	
@@ -462,14 +462,14 @@ void nova(int ix, int iy)
 			game.state.galaxy[game.quadx][game.quady].stars -= 1;
 			game.state.starkl++;
 			crmena(1, IHSTAR, 2, ii, jj);
-			prout(" novas.");
+			prout(_(" novas."));
 			game.quad[ii][jj] = IHDOT;
 			break;
 		    case IHP: /* Destroy planet */
 			game.state.galaxy[game.quadx][game.quady].planet = NULL;
 			game.state.nplankl++;
 			crmena(1, IHP, 2, ii, jj);
-			prout(" destroyed.");
+			prout(_(" destroyed."));
 			DESTROY(&game.state.plnets[game.iplnet]);
 			game.iplnet = game.plnetx = game.plnety = 0;
 			if (game.landed == 1) {
@@ -490,12 +490,12 @@ void nova(int ix, int iy)
 			game.state.basekl++;
 			newcnd();
 			crmena(1, IHB, 2, ii, jj);
-			prout(" destroyed.");
+			prout(_(" destroyed."));
 			game.quad[ii][jj] = IHDOT;
 			break;
 		    case IHE: /* Buffet ship */
 		    case IHF:
-			prout("***Starship buffeted by nova.");
+			prout(_("***Starship buffeted by nova."));
 			if (game.shldup) {
 			    if (game.shield >= 2000.0) game.shield -= 2000.0;
 			    else {
@@ -503,7 +503,7 @@ void nova(int ix, int iy)
 				game.energy -= diff;
 				game.shield = 0.0;
 				game.shldup = 0;
-				prout("***Shields knocked out.");
+				prout(_("***Shields knocked out."));
 				game.damage[DSHIELD] += 0.005*game.damfac*Rand()*diff;
 			    }
 			}
@@ -533,7 +533,7 @@ void nova(int ix, int iy)
 			newcx = ii + ii - hits[mm][1];
 			newcy = jj + jj - hits[mm][2];
 			crmena(1, iquad, 2, ii, jj);
-			proutn(" damaged");
+			proutn(_(" damaged"));
 			if (!VALID_SECTOR(newcx, newcy)) {
 			    /* can't leave quadrant */
 			    skip(1);
@@ -541,7 +541,7 @@ void nova(int ix, int iy)
 			}
 			iquad1 = game.quad[newcx][newcy];
 			if (iquad1 == IHBLANK) {
-			    proutn(", blasted into ");
+			    proutn(_(", blasted into "));
 			    crmena(0, IHBLANK, 2, newcx, newcy);
 			    skip(1);
 			    deadkl(ii, jj, iquad, newcx, newcy);
@@ -552,7 +552,7 @@ void nova(int ix, int iy)
 			    skip(1);
 			    break;
 			}
-			proutn(", buffeted to ");
+			proutn(_(", buffeted to "));
 			proutn(cramlc(sector, newcx, newcy));
 			game.quad[ii][jj] = IHDOT;
 			game.quad[newcx][newcy] = iquad;
@@ -581,7 +581,7 @@ void nova(int ix, int iy)
     if (game.dist == 0.0) return;
     game.optime = 10.0*game.dist/16.0;
     skip(1);
-    prout("Force of nova displaces starship.");
+    prout(_("Force of nova displaces starship."));
     game.iattak=2;	/* Eliminates recursion problem */
     imove();
     game.optime = 10.0*game.dist/16.0;
@@ -638,8 +638,8 @@ void snova(int insx, int insy)
 	    /* it isn't here, or we just entered (treat as inroute) */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
 		skip(1);
-		prout("Message from Starfleet Command       Stardate %.2f", game.state.date);
-		prout("     Supernova in %s; caution advised.",
+		prout(_("Message from Starfleet Command       Stardate %.2f"), game.state.date);
+		prout(_("     Supernova in %s; caution advised."),
 		      cramlc(quadrant, nqx, nqy));
 	    }
 	}
@@ -664,13 +664,13 @@ void snova(int insx, int insy)
 
     if (incipient) {
 	skip(1);
-	prouts("***RED ALERT!  RED ALERT!");
+	prouts(_("***RED ALERT!  RED ALERT!"));
 	skip(1);
-	prout("***Incipient supernova detected at ", cramlc(sector, nsx, nsy));
+	prout(_("***Incipient supernova detected at "), cramlc(sector, nsx, nsy));
 	nqx = game.quadx;
 	nqy = game.quady;
 	if (square(nsx-game.sectx) + square(nsy-game.secty) <= 2.1) {
-	    proutn("Emergency override attempts t");
+	    proutn(_("Emergency override attempts t"));
 	    prouts("***************");
 	    skip(1);
 	    stars();
@@ -741,8 +741,8 @@ void snova(int insx, int insy)
     /* If supernova destroys last klingons give special message */
     if (KLINGREM==0 && (nqx != game.quadx || nqy != game.quady)) {
 	skip(2);
-	if (insx == 0) prout("Lucky you!");
-	proutn("A supernova in %s has just destroyed the last Klingons.",
+	if (insx == 0) prout(_("Lucky you!"));
+	proutn(_("A supernova in %s has just destroyed the last Klingons."),
 	       cramlc(quadrant, nqx, nqy));
 	finish(FWON);
 	return;

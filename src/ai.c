@@ -27,7 +27,7 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     if (game.damage[DSRSENS] == 0.0 || game.damage[DLRSENS] == 0.0 ||
 	game.condit == IHDOCKED) {
 	crmena(1, ienm, 2, game.kx[loccom], game.ky[loccom]);
-	prout(" escapes to %s (and regains strength).",
+	prout(_(" escapes to %s (and regains strength)."),
 	      cramlc(quadrant, iqx, iqy));
     }
     /* handle local matters related to escape */
@@ -157,7 +157,7 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 #ifdef DEBUG
 	if (game.idebug) {
 	    proutn("MOTION = %1.2f", motion);
-	    proutn("  FORCES = %1,2f", forces);
+	    proutn("  FORCES = %1.2f", forces);
 	}
 #endif
 	/* don't move if no motion */
@@ -255,9 +255,9 @@ static void movebaddy(int comx, int comy, int loccom, int ienm)
 	if (game.damage[DSRSENS] == 0 || game.condit == IHDOCKED) {
 	    proutn("***");
 	    cramen(ienm);
-	    proutn(" from %s", cramlc(2, comx, comy));
-	    if (game.kdist[loccom] < dist1) proutn(" advances to ");
-	    else proutn(" retreats to ");
+	    proutn(_(" from %s"), cramlc(2, comx, comy));
+	    if (game.kdist[loccom] < dist1) proutn(_(" advances to "));
+	    else proutn(_(" retreats to "));
 	    prout(cramlc(sector, nextx, nexty));
 	}
     }
@@ -355,11 +355,11 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;
-		prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
-		proutn("   a planet in ");
+		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
+		proutn(_("   a planet in "));
 		proutn(cramlc(quadrant, game.state.isx, game.state.isy));
-		prout(" has been destroyed");
-		prout("   by the Super-commander.\"");
+		prout(_(" has been destroyed"));
+		prout(_("   by the Super-commander.\""));
 	    }
 	    break;
 	}
@@ -517,14 +517,14 @@ void scom(int *ipage)
 	    game.iseenit = 1;
 	    if (*ipage == 0)  pause_game(1);
 	    *ipage=1;
-	    proutn("Lt. Uhura-  \"Captain, the starbase in ");
+	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    proutn(cramlc(quadrant, game.state.isx, game.state.isy));
 	    skip(1);
-	    prout("   reports that it is under attack from the Klingon Super-commander.");
-	    proutn("   It can survive until stardate %d.\"",
+	    prout(_("   reports that it is under attack from the Klingon Super-commander."));
+	    proutn(_("   It can survive until stardate %d.\""),
 		   (int)game.future[FSCDBAS]);
 	    if (game.resting==0) return;
-	    prout("Mr. Spock-  \"Captain, shall we cancel the rest period?\"");
+	    prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
 	    if (ja()==0) return;
 	    game.resting = 0;
 	    game.optime = 0.0; /* actually finished */
@@ -542,8 +542,8 @@ void scom(int *ipage)
 	return;
     if (*ipage==0) pause_game(1);
     *ipage = 1;
-    prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports");
-    proutn("   the Super-commander is in ");
+    prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
+    proutn(_("   the Super-commander is in "));
     proutn(cramlc(quadrant, game.state.isx, game.state. isy));
     prout(".\"");
     return;
@@ -608,7 +608,7 @@ void movetho(void)
     game.quad[game.ithx][game.ithy]=IHWEB;
     dropin(IHBLANK, &dum, &my);
     crmena(1,IHT, 2, game.ithx, game.ithy);
-    prout(" completes web.");
+    prout(_(" completes web."));
     game.ithere = game.ithx = game.ithy = 0;
     game.nenhere--;
     return;

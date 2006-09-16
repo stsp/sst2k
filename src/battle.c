@@ -16,7 +16,7 @@ void doshield(int i)
 	    else {
 		chew();
 		if (game.damage[DSHIELD]) {
-		    prout("Shields damaged and down.");
+		    prout(_("Shields damaged and down."));
 		    return;
 		}
 		if (isit("up"))
@@ -26,17 +26,17 @@ void doshield(int i)
 	    }
 	}
 	if (action==NONE) {
-	    proutn("Do you wish to change shield energy? ");
+	    proutn(_("Do you wish to change shield energy? "));
 	    if (ja()) {
-		proutn("Energy to transfer to shields- ");
+		proutn(_("Energy to transfer to shields- "));
 		action = NRG;
 	    }
 	    else if (game.damage[DSHIELD]) {
-		prout("Shields damaged and down.");
+		prout(_("Shields damaged and down."));
 		return;
 	    }
 	    else if (game.shldup) {
-		proutn("Shields are up. Do you want them down? ");
+		proutn(_("Shields are up. Do you want them down? "));
 		if (ja()) action = SHDN;
 		else {
 		    chew();
@@ -44,7 +44,7 @@ void doshield(int i)
 		}
 	    }
 	    else {
-		proutn("Shields are down. Do you want them up? ");
+		proutn(_("Shields are down. Do you want them up? "));
 		if (ja()) action = SHUP;
 		else {
 		    chew();
@@ -56,16 +56,16 @@ void doshield(int i)
     switch (action) {
     case SHUP: /* raise shields */
 	if (game.shldup) {
-	    prout("Shields already up.");
+	    prout(_("Shields already up."));
 	    return;
 	}
 	game.shldup = 1;
 	game.shldchg = 1;
 	if (game.condit != IHDOCKED) game.energy -= 50.0;
-	prout("Shields raised.");
+	prout(_("Shields raised."));
 	if (game.energy <= 0) {
 	    skip(1);
-	    prout("Shields raising uses up last of energy.");
+	    prout(_("Shields raising uses up last of energy."));
 	    finish(FNRG);
 	    return;
 	}
@@ -73,30 +73,30 @@ void doshield(int i)
 	return;
     case SHDN:
 	if (game.shldup==0) {
-	    prout("Shields already down.");
+	    prout(_("Shields already down."));
 	    return;
 	}
 	game.shldup=0;
 	game.shldchg=1;
-	prout("Shields lowered.");
+	prout(_("Shields lowered."));
 	game.ididit=1;
 	return;
     case NRG:
 	while (scan() != IHREAL) {
 	    chew();
-	    proutn("Energy to transfer to shields- ");
+	    proutn(_("Energy to transfer to shields- "));
 	}
 	chew();
 	if (aaitem==0) return;
 	if (aaitem > game.energy) {
-	    prout("Insufficient ship energy.");
+	    prout(_("Insufficient ship energy."));
 	    return;
 	}
 	game.ididit = 1;
 	if (game.shield+aaitem >= game.inshld) {
-	    prout("Shield energy maximized.");
+	    prout(_("Shield energy maximized."));
 	    if (game.shield+aaitem > game.inshld) {
-		prout("Excess energy requested returned to ship energy");
+		prout(_("Excess energy requested returned to ship energy"));
 	    }
 	    game.energy -= game.inshld-game.shield;
 	    game.shield = game.inshld;
@@ -105,23 +105,23 @@ void doshield(int i)
 	if (aaitem < 0.0 && game.energy-aaitem > game.inenrg) {
 	    /* Prevent shield drain loophole */
 	    skip(1);
-	    prout("Engineering to bridge--");
-	    prout("  Scott here. Power circuit problem, Captain.");
-	    prout("  I can't drain the shields.");
+	    prout(_("Engineering to bridge--"));
+	    prout(_("  Scott here. Power circuit problem, Captain."));
+	    prout(_("  I can't drain the shields."));
 	    game.ididit = 0;
 	    return;
 	}
 	if (game.shield+aaitem < 0) {
-	    prout("All shield energy transferred to ship.");
+	    prout(_("All shield energy transferred to ship."));
 	    game.energy += game.shield;
 	    game.shield = 0.0;
 	    return;
 	}
-	proutn("Scotty- \"");
+	proutn(_("Scotty- \""));
 	if (aaitem > 0)
-	    prout("Transferring energy to shields.\"");
+	    prout(_("Transferring energy to shields.\""));
 	else
-	    prout("Draining energy from shields.\"");
+	    prout(_("Draining energy from shields.\""));
 	game.shield += aaitem;
 	game.energy -= aaitem;
 	return;
@@ -134,9 +134,9 @@ void ram(int ibumpd, int ienm, int ix, int iy)
     double type = 1.0, extradm;
     int icas, l;
 	
-    prouts("***RED ALERT!  RED ALERT!");
+    prouts(_("***RED ALERT!  RED ALERT!"));
     skip(1);
-    prout("***COLLISION IMMINENT.");
+    prout(_("***COLLISION IMMINENT."));
     skip(2);
     proutn("***");
     crmshp();
@@ -147,16 +147,16 @@ void ram(int ibumpd, int ienm, int ix, int iy)
     case IHT: type = 0.5; break;
     case IHQUEST: type = 4.0; break;
     }
-    proutn(ibumpd ? " rammed by " : " rams ");
+    proutn(ibumpd ? _(" rammed by ") : _(" rams "));
     crmena(0, ienm, 2, ix, iy);
-    if (ibumpd) proutn(" (original position)");
+    if (ibumpd) proutn(_(" (original position)"));
     skip(1);
     deadkl(ix, iy, ienm, game.sectx, game.secty);
     proutn("***");
     crmshp();
-    prout(" heavily damaged.");
+    prout(_(" heavily damaged."));
     icas = 10.0+20.0*Rand();
-    prout("***Sickbay reports %d casualties", icas);
+    prout(_("***Sickbay reports %d casualties"), icas);
     game.casual += icas;
     for (l=0; l < NDEVICES; l++) {
 	if (l == DDRAY) 
@@ -210,7 +210,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHE: /* Hit our ship */
 	case IHF:
 	    skip(1);
-	    proutn("Torpedo hits ");
+	    proutn(_("Torpedo hits "));
 	    crmshp();
 	    prout(".");
 	    *hit = 700.0 + 100.0*Rand() -
@@ -246,8 +246,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHS:
 	    if (Rand() <= 0.05) {
 		crmena(1, iquad, 2, ix, iy);
-		prout(" uses anti-photon device;");
-		prout("   torpedo neutralized.");
+		prout(_(" uses anti-photon device;"));
+		prout(_("   torpedo neutralized."));
 		return;
 	    }
 	case IHR: /* Hit a regular enemy */
@@ -276,27 +276,27 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    jx=ix+xx+0.5;
 	    jy=iy+yy+0.5;
 	    if (!VALID_SECTOR(jx, jy)) {
-		prout(" damaged but not destroyed.");
+		prout(_(" damaged but not destroyed."));
 		return;
 	    }
 	    if (game.quad[jx][jy]==IHBLANK) {
-		prout(" buffeted into black hole.");
+		prout(_(" buffeted into black hole."));
 		deadkl(ix, iy, iquad, jx, jy);
 		return;
 	    }
 	    if (game.quad[jx][jy]!=IHDOT) {
 		/* can't move into object */
-		prout(" damaged but not destroyed.");
+		prout(_(" damaged but not destroyed."));
 		return;
 	    }
-	    proutn(" damaged--");
+	    proutn(_(" damaged--"));
 	    game.kx[ll] = jx;
 	    game.ky[ll] = jy;
 	    shoved = 1;
 	    break;
 	case IHB: /* Hit a base */
 	    skip(1);
-	    prout("***STARBASE DESTROYED..");
+	    prout(_("***STARBASE DESTROYED.."));
 	    for_starbases(ll) {
 		if (game.state.baseqx[ll]==game.quadx && game.state.baseqy[ll]==game.quady) {
 		    game.state.baseqx[ll]=game.state.baseqx[game.state.rembase];
@@ -314,7 +314,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHP: /* Hit a planet */
 	    crmena(1, iquad, 2, ix, iy);
-	    prout(" destroyed.");
+	    prout(_(" destroyed."));
 	    game.state.nplankl++;
 	    game.state.galaxy[game.quadx][game.quady].planet = NULL;
 	    DESTROY(&game.state.plnets[game.iplnet]);
@@ -332,17 +332,17 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		return;
 	    }
 	    crmena(1, IHSTAR, 2, ix, iy);
-	    prout(" unaffected by photon blast.");
+	    prout(_(" unaffected by photon blast."));
 	    return;
 	case IHQUEST: /* Hit a thingy */
 	    if (!(game.options & OPTION_THINGY) || Rand()>0.7) {
 		skip(1);
-		prouts("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!");
+		prouts(_("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!"));
 		skip(1);
-		prouts("    HACK!     HACK!    HACK!        *CHOKE!*  ");
+		prouts(_("    HACK!     HACK!    HACK!        *CHOKE!*  "));
 		skip(1);
-		proutn("Mr. Spock-");
-		prouts("  \"Fascinating!\"");
+		proutn(_("Mr. Spock-"));
+		prouts(_("  \"Fascinating!\""));
 		skip(1);
 		deadkl(ix, iy, iquad, ix, iy);
 	    } else {
@@ -358,11 +358,11 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHBLANK: /* Black hole */
 	    skip(1);
 	    crmena(1, IHBLANK, 2, ix, iy);
-	    prout(" swallows torpedo.");
+	    prout(_(" swallows torpedo."));
 	    return;
 	case IHWEB: /* hit the web */
 	    skip(1);
-	    prout("***Torpedo absorbed by Tholian web.");
+	    prout(_("***Torpedo absorbed by Tholian web."));
 	    return;
 	case IHT:  /* Hit a Tholian */
 	    h1 = 700.0 + 100.0*Rand() -
@@ -379,10 +379,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    skip(1);
 	    crmena(1, IHT, 2, ix, iy);
 	    if (Rand() > 0.05) {
-		prout(" survives photon blast.");
+		prout(_(" survives photon blast."));
 		return;
 	    }
-	    prout(" disappears.");
+	    prout(_(" disappears."));
 	    game.quad[ix][iy] = IHWEB;
 	    game.ithere = game.ithx = game.ithy = 0;
 	    game.nenhere--;
@@ -407,14 +407,14 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     if (shoved) {
 	game.quad[jx][jy]=iquad;
 	game.quad[ix][iy]=IHDOT;
-	prout(" displaced by blast to %s ", cramlc(sector, jx, jy));
+	prout(_(" displaced by blast to %s "), cramlc(sector, jx, jy));
 	for_local_enemies(ll)
 	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(game.sectx-game.kx[ll])+square(game.secty-game.ky[ll]));
 	sortkl();
 	return;
     }
     skip(1);
-    prout("Torpedo missed.");
+    prout(_("Torpedo missed."));
     return;
 }
 
@@ -427,7 +427,7 @@ static void fry(double hit)
     if (hit < (275.0-25.0*game.skill)*(1.0+0.5*Rand())) return;
 
     ncrit = 1.0 + hit/(500.0+100.0*Rand());
-    proutn("***CRITICAL HIT--");
+    proutn(_("***CRITICAL HIT--"));
     /* Select devices and cause damage */
     for (l = 0; l < ncrit && 0 < NDEVICES; l++) {
 	do {
@@ -443,13 +443,13 @@ static void fry(double hit)
 	    if (ll<=l) continue;
 	    ktr += 1;
 	    if (ktr==3) skip(1);
-	    proutn(" and ");
+	    proutn(_(" and "));
 	}
 	proutn(device[j]);
     }
-    prout(" damaged.");
+    prout(_(" damaged."));
     if (game.damage[DSHIELD] && game.shldup) {
-	prout("***Shields knocked down.");
+	prout(_("***Shields knocked down."));
 	game.shldup=0;
     }
 }
@@ -507,9 +507,9 @@ void attack(int torps_ok)
 	else { /* Enemy used photon torpedo */
 	    double course = 1.90985*atan2((double)game.secty-jy, (double)jx-game.sectx);
 	    hit = 0;
-	    proutn("***TORPEDO INCOMING");
+	    proutn(_("***TORPEDO INCOMING"));
 	    if (game.damage[DSRSENS] <= 0.0) {
-		proutn(" From ");
+		proutn(_(" From "));
 		crmena(0, iquad, i, jx, jy);
 	    }
 	    attempt = 1;
@@ -541,13 +541,13 @@ void attack(int torps_ok)
 		       shields were down for some strange reason. This
 		       doesn't make any sense, so I've fixed it */
 	ihurt = 1;
-	proutn("%d unit hit", (int)hit);
+	proutn(_("%d unit hit"), (int)hit);
 	if ((game.damage[DSRSENS] > 0 && itflag) || game.skill<=SKILL_FAIR) {
-	    proutn(" on the ");
+	    proutn(_(" on the "));
 	    crmshp();
 	}
 	if (game.damage[DSRSENS] <= 0.0 && itflag) {
-	    proutn(" from ");
+	    proutn(_(" from "));
 	    crmena(0, iquad, i, jx, jy);
 	}
 	skip(1);
@@ -555,7 +555,6 @@ void attack(int torps_ok)
 	if (hit > hitmax) hitmax = hit;
 	hittot += hit;
 	fry(hit);
-	prout("Hit %g energy %g", hit, game.energy);
 	game.energy -= hit;
 	if (game.condit==IHDOCKED) 
 	    dock(0);
@@ -566,29 +565,29 @@ void attack(int torps_ok)
 	return;
     }
     if (attempt == 0 && game.condit == IHDOCKED)
-	prout("***Enemies decide against attacking your ship.");
+	prout(_("***Enemies decide against attacking your ship."));
     if (atackd == 0) return;
     percent = 100.0*pfac*game.shield+0.5;
     if (ihurt==0) {
 	/* Shields fully protect ship */
-	proutn("Enemy attack reduces shield strength to ");
+	proutn(_("Enemy attack reduces shield strength to "));
     }
     else {
 	/* Print message if starship suffered hit(s) */
 	skip(1);
-	proutn("Energy left %2d    shields ", (int)game.energy);
-	if (game.shldup) proutn("up ");
-	else if (game.damage[DSHIELD] == 0) proutn("down ");
-	else proutn("damaged, ");
+	proutn(_("Energy left %2d    shields "), (int)game.energy);
+	if (game.shldup) proutn(_("up "));
+	else if (game.damage[DSHIELD] == 0) proutn(_("down "));
+	else proutn(_("damaged, "));
     }
-    prout("%d%%,   torpedoes left %d", percent, game.torps);
+    prout(_("%d%%,   torpedoes left %d"), percent, game.torps);
     /* Check if anyone was hurt */
     if (hitmax >= 200 || hittot >= 500) {
 	int icas= hittot*Rand()*0.015;
 	if (icas >= 2) {
 	    skip(1);
-	    prout("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties", icas);
-	    prout("   in that last attack.\"");
+	    prout(_("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties"), icas);
+	    prout(_("   in that last attack.\""));
 	    game.casual += icas;
 	}
     }
@@ -652,7 +651,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     }
 
     /* For each kind of enemy, finish message to player */
-    prout(" destroyed.");
+    prout(_(" destroyed."));
     game.quad[ix][iy] = IHDOT;
     if (KLINGREM==0) return;
 
@@ -692,9 +691,9 @@ static int targetcheck(double x, double y, double *course)
     delty = 0.1*(game.sectx - x);
     if (deltx==0 && delty== 0) {
 	skip(1);
-	prout("Spock-  \"Bridge to sickbay.  Dr. McCoy,");
-	prout("  I recommend an immediate review of");
-	prout("  the Captain's psychological profile.\"");
+	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"));
+	prout(_("  I recommend an immediate review of"));
+	prout(_("  the Captain's psychological profile.\""));
 	chew();
 	return 1;
     }
@@ -711,12 +710,12 @@ void photon(void)
     game.ididit = 0;
 
     if (game.damage[DPHOTON]) {
-	prout("Photon tubes damaged.");
+	prout(_("Photon tubes damaged."));
 	chew();
 	return;
     }
     if (game.torps == 0) {
-	prout("No torpedoes left.");
+	prout(_("No torpedoes left."));
 	chew();
 	return;
     }
@@ -727,8 +726,8 @@ void photon(void)
 	    return;
 	}
 	else if (key == IHEOL) {
-	    prout("%d torpedoes left.", game.torps);
-	    proutn("Number of torpedoes to fire- ");
+	    prout(_("%d torpedoes left."), game.torps);
+	    proutn(_("Number of torpedoes to fire- "));
 	    key = scan();
 	}
 	else /* key == IHREAL */ {
@@ -739,7 +738,7 @@ void photon(void)
 	    }
 	    if (n > 3) {
 		chew();
-		prout("Maximum of 3 torpedoes per burst.");
+		prout(_("Maximum of 3 torpedoes per burst."));
 		key = IHEOL;
 		return;
 	    }
@@ -780,7 +779,7 @@ void photon(void)
     if (i == 1 && key == IHEOL) {
 	/* prompt for each one */
 	for (i = 1; i <= n; i++) {
-	    proutn("Target sector for torpedo number %d- ", i);
+	    proutn(_("Target sector for torpedo number %d- "), i);
 	    key = scan();
 	    if (key != IHREAL) {
 		huh();
@@ -807,15 +806,15 @@ void photon(void)
 	    /* misfire! */
 	    r = (Rand()+1.2) * r;
 	    if (n>1) {
-		prouts("***TORPEDO NUMBER %d MISFIRES", i);
+		prouts(_("***TORPEDO NUMBER %d MISFIRES"), i);
 	    }
-	    else prouts("***TORPEDO MISFIRES.");
+	    else prouts(_("***TORPEDO MISFIRES."));
 	    skip(1);
 	    if (i < n)
-		prout("  Remainder of burst aborted.");
+		prout(_("  Remainder of burst aborted."));
 	    osuabor=1;
 	    if (Rand() <= 0.2) {
-		prout("***Photon tubes damaged by misfire.");
+		prout(_("***Photon tubes damaged by misfire."));
 		game.damage[DPHOTON] = game.damfac*(1.0+2.0*Rand());
 		break;
 	    }
@@ -836,7 +835,7 @@ static void overheat(double rpow)
     if (rpow > 1500) {
 	double chekbrn = (rpow-1500.)*0.00038;
 	if (Rand() <= chekbrn) {
-	    prout("Weapons officer Sulu-  \"Phasers overheated, sir.\"");
+	    prout(_("Weapons officer Sulu-  \"Phasers overheated, sir.\""));
 	    game.damage[DPHASER] = game.damfac*(1.0 + Rand()) * (1.0+chekbrn);
 	}
     }
@@ -849,37 +848,37 @@ static int checkshctrl(double rpow)
 	
     skip(1);
     if (Rand() < .998) {
-	prout("Shields lowered.");
+	prout(_("Shields lowered."));
 	return 0;
     }
     /* Something bad has happened */
-    prouts("***RED ALERT!  RED ALERT!");
+    prouts(_("***RED ALERT!  RED ALERT!"));
     skip(2);
     hit = rpow*game.shield/game.inshld;
     game.energy -= rpow+hit*0.8;
     game.shield -= hit*0.2;
     if (game.energy <= 0.0) {
-	prouts("Sulu-  \"Captain! Shield malf***********************\"");
+	prouts(_("Sulu-  \"Captain! Shield malf***********************\""));
 	skip(1);
 	stars();
 	finish(FPHASER);
 	return 1;
     }
-    prouts("Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\"");
+    prouts(_("Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""));
     skip(2);
-    prout("Lt. Uhura-  \"Sir, all decks reporting damage.\"");
+    prout(_("Lt. Uhura-  \"Sir, all decks reporting damage.\""));
     icas = hit*Rand()*0.012;
     skip(1);
     fry(0.8*hit);
     if (icas) {
 	skip(1);
-	prout("McCoy to bridge- \"Severe radiation burns, Jim.");
-	prout("  %d casualties so far.\"", icas);
+	prout(_("McCoy to bridge- \"Severe radiation burns, Jim."));
+	prout(_("  %d casualties so far.\""), icas);
 	game.casual -= icas;
     }
     skip(1);
-    prout("Phaser energy dispersed by shields.");
-    prout("Enemy unaffected.");
+    prout(_("Phaser energy dispersed by shields."));
+    prout(_("Enemy unaffected."));
     overheat(rpow);
     return 1;
 }
@@ -897,27 +896,27 @@ void phasers(void)
     /* SR sensors and Computer */
     if (game.damage[DSRSENS]+game.damage[DCOMPTR] > 0) ipoop = 0;
     if (game.condit == IHDOCKED) {
-	prout("Phasers can't be fired through base shields.");
+	prout(_("Phasers can't be fired through base shields."));
 	chew();
 	return;
     }
     if (game.damage[DPHASER] != 0) {
-	prout("Phaser control damaged.");
+	prout(_("Phaser control damaged."));
 	chew();
 	return;
     }
     if (game.shldup) {
 	if (game.damage[DSHCTRL]) {
-	    prout("High speed shield control damaged.");
+	    prout(_("High speed shield control damaged."));
 	    chew();
 	    return;
 	}
 	if (game.energy <= 200.0) {
-	    prout("Insufficient energy to activate high-speed shield control.");
+	    prout(_("Insufficient energy to activate high-speed shield control."));
 	    chew();
 	    return;
 	}
-	prout("Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\"");
+	prout(_("Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""));
 	ifast = 1;
 		
     }
@@ -927,7 +926,7 @@ void phasers(void)
 	if (key == IHALPHA) {
 	    if (isit("manual")) {
 		if (game.nenhere==0) {
-		    prout("There is no enemy present to select.");
+		    prout(_("There is no enemy present to select."));
 		    chew();
 		    key = IHEOL;
 		    automode=AUTOMATIC;
@@ -943,7 +942,7 @@ void phasers(void)
 		}
 		else {
 		    if (game.nenhere==0)
-			prout("Energy will be expended into space.");
+			prout(_("Energy will be expended into space."));
 		    automode = AUTOMATIC;
 		    key = scan();
 		}
@@ -958,7 +957,7 @@ void phasers(void)
 	}
 	else if (key == IHREAL) {
 	    if (game.nenhere==0) {
-		prout("Energy will be expended into space.");
+		prout(_("Energy will be expended into space."));
 		automode = AUTOMATIC;
 	    }
 	    else if (!ipoop)
@@ -969,13 +968,13 @@ void phasers(void)
 	else {
 	    /* IHEOL */
 	    if (game.nenhere==0) {
-		prout("Energy will be expended into space.");
+		prout(_("Energy will be expended into space."));
 		automode = AUTOMATIC;
 	    }
 	    else if (!ipoop)
 		automode = FORCEMAN;
 	    else 
-		proutn("Manual or automatic? ");
+		proutn(_("Manual or automatic? "));
 	}
     }
 				
@@ -986,7 +985,7 @@ void phasers(void)
 	    key = scan();
 	}
 	if (key != IHREAL && game.nenhere != 0) {
-	    prout("Phasers locked on target. Energy available: %.2f",
+	    prout(_("Phasers locked on target. Energy available: %.2f"),
 		  ifast?game.energy-200.0:game.energy,1,2);
 	}
 	irec=0;
@@ -996,14 +995,14 @@ void phasers(void)
 		irec+=fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
 		    (1.01+0.05*Rand()) + 1.0;
 	    kz=1;
-	    proutn("(%d) units required. ", irec);
+	    proutn(_("(%d) units required. "), irec);
 	    chew();
-	    proutn("Units to fire= ");
+	    proutn(_("Units to fire= "));
 	    key = scan();
 	    if (key!=IHREAL) return;
 	    rpow = aaitem;
 	    if (rpow > (ifast?game.energy-200:game.energy)) {
-		proutn("Energy available= %.2f",
+		proutn(_("Energy available= %.2f"),
 		       ifast?game.energy-200:game.energy);
 		skip(1);
 		key = IHEOL;
@@ -1044,12 +1043,12 @@ void phasers(void)
 	}
 	if (extra > 0 && game.alldone == 0) {
 	    if (game.ithere) {
-		proutn("*** Tholian web absorbs ");
-		if (game.nenhere>0) proutn("excess ");
-		prout("phaser energy.");
+		proutn(_("*** Tholian web absorbs "));
+		if (game.nenhere>0) proutn(_("excess "));
+		prout(_("phaser energy."));
 	    }
 	    else {
-		prout("%d expended on empty space.", (int)extra);
+		prout(_("%d expended on empty space."), (int)extra);
 	    }
 	}
 	break;
@@ -1058,14 +1057,14 @@ void phasers(void)
 	chew();
 	key = IHEOL;
 	if (game.damage[DCOMPTR]!=0)
-	    prout("Battle comuter damaged, manual file only.");
+	    prout(_("Battle comuter damaged, manual file only."));
 	else {
 	    skip(1);
-	    prouts("---WORKING---");
+	    prouts(_("---WORKING---"));
 	    skip(1);
-	    prout("Short-range-sensors-damaged");
-	    prout("Insufficient-data-for-automatic-phaser-fire");
-	    prout("Manual-fire-must-be-used");
+	    prout(_("Short-range-sensors-damaged"));
+	    prout(_("Insufficient-data-for-automatic-phaser-fire"));
+	    prout(_("Manual-fire-must-be-used"));
 	    skip(1);
 	}
     case MANUAL:
@@ -1074,7 +1073,7 @@ void phasers(void)
 	    int ii = game.kx[k], jj = game.ky[k];
 	    int ienm = game.quad[ii][jj];
 	    if (msgflag) {
-		proutn("Energy available= %.2f",
+		proutn(_("Energy available= %.2f"),
 		       game.energy-.006-(ifast?200:0));
 		skip(1);
 		msgflag = 0;
@@ -1083,7 +1082,7 @@ void phasers(void)
 	    if (game.damage[DSRSENS] && !(abs(game.sectx-ii) < 2 && abs(game.secty-jj) < 2) &&
 		(ienm == IHC || ienm == IHS)) {
 		cramen(ienm);
-		prout(" can't be located without short range scan.");
+		prout(_(" can't be located without short range scan."));
 		chew();
 		key = IHEOL;
 		hits[k] = 0; /* prevent overflow -- thanks to Alexei Voitenko */
@@ -1100,7 +1099,7 @@ void phasers(void)
 		if (game.damage[DCOMPTR]==0) proutn("%d", irec);
 		else proutn("??");
 		proutn(")  ");
-		proutn("units to fire at ");
+		proutn(_("units to fire at "));
 		crmena(0, ienm, 2, ii, jj);
 		proutn("-  ");
 		key = scan();
@@ -1130,7 +1129,7 @@ void phasers(void)
 	    /* If total requested is too much, inform and start over */
 				
 	    if (rpow > (ifast?game.energy-200:game.energy)) {
-		prout("Available energy exceeded -- try again.");
+		prout(_("Available energy exceeded -- try again."));
 		chew();
 		return;
 	    }
@@ -1162,13 +1161,13 @@ void phasers(void)
 	skip(1);
 	if (no == 0) {
 	    if (Rand() >= 0.99) {
-		prout("Sulu-  \"Sir, the high-speed shield control has malfunctioned . . .");
-		prouts("         CLICK   CLICK   POP  . . .");
-		prout(" No  response, sir!");
+		prout(_("Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."));
+		prouts(_("         CLICK   CLICK   POP  . . ."));
+		prout(_(" No response, sir!"));
 		game.shldup = 0;
 	    }
 	    else
-		prout("Shields raised.");
+		prout(_("Shields raised."));
 	}
 	else
 	    game.shldup = 0;
@@ -1197,10 +1196,10 @@ void hittem(double *hits)
 	if (hit > 0.005) {
 	    if (game.damage[DSRSENS]==0)
 		boom(ii, jj);
-	    proutn("%d unit hit on ", (int)hit);
+	    proutn(_("%d unit hit on "), (int)hit);
 	}
 	else
-	    proutn("Very small hit on ");
+	    proutn(_("Very small hit on "));
 	ienm = game.quad[ii][jj];
 	if (ienm==IHQUEST) iqengry=1;
 	crmena(0,ienm,2,ii,jj);
@@ -1214,9 +1213,9 @@ void hittem(double *hits)
 	else /* decide whether or not to emasculate klingon */
 	    if (kpow > 0 && Rand() >= 0.9 &&
 		kpow <= ((0.4 + 0.4*Rand())*kpini)) {
-		prout("***Mr. Spock-  \"Captain, the vessel at ",
+		prout(_("***Mr. Spock-  \"Captain, the vessel at "),
 		      cramlc(sector,ii,jj));
-		prout("   has just lost its firepower.\"");
+		prout(_("   has just lost its firepower.\""));
 		game.kpower[kk] = -kpow;
 	    }
     }

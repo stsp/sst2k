@@ -1,0 +1,1301 @@
+# Russian translations for sst package
+# Английские переводы для пакета sst.
+# Copyright (C) 2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the sst package.
+# Stas Sergeev <stsp@aknet.ru>, 2006.
+#
+# Извините если что не так. Я ведь программист, а не переводчик. :)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sst 2.0\n"
+"Report-Msgid-Bugs-To: stsp\n"
+"POT-Creation-Date: 2006-09-15 18:55+0400\n"
+"PO-Revision-Date: 2006-09-15 11:01+0400\n"
+"Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: src/ai.c:30
+#, c-format
+msgid " escapes to %s (and regains strength)."
+msgstr " удирает в %s (и восстанавливает энергию)"
+
+#: src/ai.c:258
+#, c-format
+msgid " from %s"
+msgstr " из %s"
+
+#: src/ai.c:259
+msgid " advances to "
+msgstr " наступает к "
+
+#: src/ai.c:260
+msgid " retreats to "
+msgstr " отступает к "
+
+#: src/ai.c:358 src/ai.c:545
+msgid "Lt. Uhura-  \"Captain, Starfleet Intelligence reports"
+msgstr "Лт. Ухура- \"Капитан, разведка звёздного флота докладывает"
+
+#: src/ai.c:359
+msgid "   a planet in "
+msgstr "   планета в "
+
+#: src/ai.c:361
+msgid " has been destroyed"
+msgstr " уничтожена"
+
+#: src/ai.c:362
+msgid "   by the Super-commander.\""
+msgstr "   Глав-комом."
+
+#: src/ai.c:520 src/events.c:209
+msgid "Lt. Uhura-  \"Captain, the starbase in "
+msgstr "Лт. Ухура- \"Капитан, база в "
+
+#: src/ai.c:523
+msgid "   reports that it is under attack from the Klingon Super-commander."
+msgstr "   сообщает, что она атакована Глав-комом Клингонов."
+
+#: src/ai.c:524
+#, c-format
+msgid "   It can survive until stardate %d.\""
+msgstr "   Она сможет продержаться до даты %d.\""
+
+#: src/ai.c:527 src/events.c:217
+msgid "Mr. Spock-  \"Captain, shall we cancel the rest period?\""
+msgstr "Мистер Спок- \"Капитан, нам прервать отдых?\""
+
+#: src/ai.c:546
+msgid "   the Super-commander is in "
+msgstr "   Глав-ком находится в "
+
+#: src/ai.c:611
+msgid " completes web."
+msgstr " доделал сеть."
+
+#: src/battle.c:19 src/battle.c:35
+msgid "Shields damaged and down."
+msgstr "Защита сломана и отключена."
+
+#: src/battle.c:29
+msgid "Do you wish to change shield energy? "
+msgstr "Вы хотите изменить энергию защиты? "
+
+#: src/battle.c:31 src/battle.c:87
+msgid "Energy to transfer to shields- "
+msgstr "Энергия для защитного поля- "
+
+#: src/battle.c:39
+msgid "Shields are up. Do you want them down? "
+msgstr "Защита включена. Вы хотите её отключить? "
+
+#: src/battle.c:47
+msgid "Shields are down. Do you want them up? "
+msgstr "Защита отключена. Вы хотите её включить? "
+
+#: src/battle.c:59
+msgid "Shields already up."
+msgstr "Защита и так уже включена."
+
+#: src/battle.c:65 src/battle.c:1170
+msgid "Shields raised."
+msgstr "Защита поднята."
+
+#: src/battle.c:68
+msgid "Shields raising uses up last of energy."
+msgstr "Поднятие защиты расходует весь остаток энергии."
+
+#: src/battle.c:76
+msgid "Shields already down."
+msgstr "Защита и так уже отключена."
+
+#: src/battle.c:81 src/battle.c:851
+msgid "Shields lowered."
+msgstr "Защита опущена."
+
+#: src/battle.c:92
+msgid "Insufficient ship energy."
+msgstr "Энергии корабля недостаточно."
+
+#: src/battle.c:97
+msgid "Shield energy maximized."
+msgstr "Энергия защиты достигла максимума."
+
+#: src/battle.c:99
+msgid "Excess energy requested returned to ship energy"
+msgstr "Лишняя энергия вернулась кораблю"
+
+#: src/battle.c:108
+msgid "Engineering to bridge--"
+msgstr "Инженерный отсек мостику--"
+
+#: src/battle.c:109
+msgid "  Scott here. Power circuit problem, Captain."
+msgstr "  Это Скотт. Тут проблемы с энергетическим контуром, Капитан."
+
+#: src/battle.c:110
+msgid "  I can't drain the shields."
+msgstr "  Я не могу откачать энергию из защитных полей."
+
+#: src/battle.c:115
+msgid "All shield energy transferred to ship."
+msgstr "Вся энергия защиты переправлена на корабль."
+
+#: src/battle.c:120
+msgid "Scotty- \""
+msgstr "Скотти- \""
+
+#: src/battle.c:122
+msgid "Transferring energy to shields.\""
+msgstr "Перевожу энергию на защиту.\""
+
+#: src/battle.c:124
+msgid "Draining energy from shields.\""
+msgstr "Перевожу энергию из защиты.\""
+
+#: src/battle.c:137 src/battle.c:855 src/events.c:667
+msgid "***RED ALERT!  RED ALERT!"
+msgstr "***ТРЕВОГА!  ТРЕВОГА!"
+
+#: src/battle.c:139
+msgid "***COLLISION IMMINENT."
+msgstr "***ОПАСНОСТЬ СТОЛКНОВЕНИЯ."
+
+#: src/battle.c:150
+msgid " rammed by "
+msgstr " протаранен "
+
+#: src/battle.c:150
+msgid " rams "
+msgstr " протаранил "
+
+#: src/battle.c:152
+msgid " (original position)"
+msgstr " (первоначальное положение)"
+
+#: src/battle.c:157
+msgid " heavily damaged."
+msgstr " серьёзно повреждён."
+
+#: src/battle.c:159
+#, c-format
+msgid "***Sickbay reports %d casualties"
+msgstr "***Из лазарета докладывают о %d пострадавших"
+
+#: src/battle.c:213
+msgid "Torpedo hits "
+msgstr "Торпеда попала в цель: "
+
+#: src/battle.c:249
+msgid " uses anti-photon device;"
+msgstr " использует противофотонную установку;"
+
+#: src/battle.c:250
+msgid "   torpedo neutralized."
+msgstr "   торпеда нейтрализована."
+
+#: src/battle.c:279 src/battle.c:289
+msgid " damaged but not destroyed."
+msgstr " повреждён, но не уничтожен."
+
+#: src/battle.c:283
+msgid " buffeted into black hole."
+msgstr " отлетел в чёрную дыру."
+
+#: src/battle.c:292
+msgid " damaged--"
+msgstr " повреждён--"
+
+#: src/battle.c:299
+msgid "***STARBASE DESTROYED.."
+msgstr "***БАЗА УНИЧТОЖЕНА.."
+
+#: src/battle.c:317 src/battle.c:654 src/events.c:472 src/events.c:493
+msgid " destroyed."
+msgstr " уничтожен."
+
+#: src/battle.c:335
+msgid " unaffected by photon blast."
+msgstr " не повреждён фотонным зарядом."
+
+#: src/battle.c:340
+msgid "AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!"
+msgstr "ВВВВППППЕЕЕЕРРРЁЁЁЁДДДЗЗЗЗААААРРРРООООДДДДИИИННННУУУУ!!!"
+
+#: src/battle.c:342
+msgid "    HACK!     HACK!    HACK!        *CHOKE!*  "
+msgstr ""
+
+#: src/battle.c:344
+msgid "Mr. Spock-"
+msgstr "Мистер Спок-"
+
+#: src/battle.c:345
+msgid "  \"Fascinating!\""
+msgstr "  \"Грандиозно!\""
+
+#: src/battle.c:361
+msgid " swallows torpedo."
+msgstr " поглотила торпеду."
+
+#: src/battle.c:365
+msgid "***Torpedo absorbed by Tholian web."
+msgstr "***Толианская сеть поглотила торпеду."
+
+#: src/battle.c:382
+msgid " survives photon blast."
+msgstr " выдержал фотонный взрыв."
+
+#: src/battle.c:385
+msgid " disappears."
+msgstr " исчез."
+
+#: src/battle.c:410
+#, c-format
+msgid " displaced by blast to %s "
+msgstr " перемещён взрывом на %s "
+
+#: src/battle.c:417
+msgid "Torpedo missed."
+msgstr "Торпеда промазала."
+
+#: src/battle.c:430
+msgid "***CRITICAL HIT--"
+msgstr "***КРИТИЧЕСКИЙ УДАР--"
+
+#: src/battle.c:446
+msgid " and "
+msgstr " и "
+
+#: src/battle.c:450
+msgid " damaged."
+msgstr " поврежден."
+
+#: src/battle.c:452
+msgid "***Shields knocked down."
+msgstr "***Защита сбита."
+
+#: src/battle.c:510
+msgid "***TORPEDO INCOMING"
+msgstr "***ТОРПЕДА ПРИБЛИЖАЕТСЯ"
+
+#: src/battle.c:512
+msgid " From "
+msgstr " От "
+
+#: src/battle.c:544
+#, c-format
+msgid "%d unit hit"
+msgstr "удар на %d единиц"
+
+#: src/battle.c:546
+msgid " on the "
+msgstr " по "
+
+#: src/battle.c:550
+msgid " from "
+msgstr " от "
+
+#: src/battle.c:568
+msgid "***Enemies decide against attacking your ship."
+msgstr "***Враги решили не атаковать ваш корабль."
+
+#: src/battle.c:573
+msgid "Enemy attack reduces shield strength to "
+msgstr "Вражеская атака уменьшает силу защиты до "
+
+#: src/battle.c:578
+#, c-format
+msgid "Energy left %2d    shields "
+msgstr "Остаток энергии: %2d    защита "
+
+#: src/battle.c:579
+msgid "up "
+msgstr "включена "
+
+#: src/battle.c:580
+msgid "down "
+msgstr "отключена "
+
+#: src/battle.c:581
+msgid "damaged, "
+msgstr "сломана, "
+
+#: src/battle.c:583
+#, c-format
+msgid "%d%%,   torpedoes left %d"
+msgstr "%d%%,   осталось %d торпед"
+
+#: src/battle.c:589
+#, c-format
+msgid "Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties"
+msgstr "МакКой- \"Лазарет мостику.  К нам поступили %d пострадавших"
+
+#: src/battle.c:590
+msgid "   in that last attack.\""
+msgstr "   от последней атаки.\""
+
+#: src/battle.c:694
+msgid "Spock-  \"Bridge to sickbay.  Dr. McCoy,"
+msgstr "Спок- \"Мостик лазарету.  Доктор МакКой,"
+
+#: src/battle.c:695
+msgid "  I recommend an immediate review of"
+msgstr "  рекомендую немедленно проверить"
+
+#: src/battle.c:696
+msgid "  the Captain's psychological profile.\""
+msgstr "  психологическое состояние Капитана.\""
+
+#: src/battle.c:713
+msgid "Photon tubes damaged."
+msgstr "Фотонные трубы сломаны."
+
+#: src/battle.c:718
+msgid "No torpedoes left."
+msgstr "Торпед совсем не осталось."
+
+#: src/battle.c:729
+#, c-format
+msgid "%d torpedoes left."
+msgstr "Осталось %d торпед."
+
+#: src/battle.c:730
+msgid "Number of torpedoes to fire- "
+msgstr "Число торпед на отстрел- "
+
+#: src/battle.c:741
+msgid "Maximum of 3 torpedoes per burst."
+msgstr "Максимум 3 торпеды за залп."
+
+#: src/battle.c:782
+#, c-format
+msgid "Target sector for torpedo number %d- "
+msgstr "Сектор назначения для торпеды номер %d- "
+
+#: src/battle.c:809
+#, c-format
+msgid "***TORPEDO NUMBER %d MISFIRES"
+msgstr "***ТОРПЕДА НОМЕР %d НЕ СОШЛА"
+
+#: src/battle.c:811
+msgid "***TORPEDO MISFIRES."
+msgstr "***ТОРПЕДА НЕ СОШЛА."
+
+#: src/battle.c:814
+msgid "  Remainder of burst aborted."
+msgstr "  Остаток залпа отменён."
+
+#: src/battle.c:817
+msgid "***Photon tubes damaged by misfire."
+msgstr "***Фотонные трубы сломались при осечке."
+
+#: src/battle.c:838
+msgid "Weapons officer Sulu-  \"Phasers overheated, sir.\""
+msgstr "Наводчик Сулу- \"Фазеры перегорели, сэр.\""
+
+#: src/battle.c:861
+msgid "Sulu-  \"Captain! Shield malf***********************\""
+msgstr "Сулу- \"Капитан! Защита не сраб*********************\""
+
+#: src/battle.c:867
+msgid "Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""
+msgstr ""
+"Сулу- \"Капитан! Защита не сработала! Энергия фазеров скопилась внутри!\""
+
+#: src/battle.c:869
+msgid "Lt. Uhura-  \"Sir, all decks reporting damage.\""
+msgstr "Лт. Ухура- \"Сэр, все палубы сообщают о повреждении.\""
+
+#: src/battle.c:875
+msgid "McCoy to bridge- \"Severe radiation burns, Jim."
+msgstr "МакКой мостику- \"Сильнейшие радиационные ожоги, Джим."
+
+#: src/battle.c:876
+#, c-format
+msgid "  %d casualties so far.\""
+msgstr "  пока-что %d пострадавших.\""
+
+#: src/battle.c:880
+msgid "Phaser energy dispersed by shields."
+msgstr "Энергия фазеров рассеяна защитным полем."
+
+#: src/battle.c:881
+msgid "Enemy unaffected."
+msgstr "Враг не пострадал."
+
+#: src/battle.c:899
+msgid "Phasers can't be fired through base shields."
+msgstr "Фазеры не могут стрелять через защиту базы."
+
+#: src/battle.c:904
+msgid "Phaser control damaged."
+msgstr "Управление фазерами не работает."
+
+#: src/battle.c:910
+msgid "High speed shield control damaged."
+msgstr "Высокоскоростное управление защитой не работает."
+
+#: src/battle.c:915
+msgid "Insufficient energy to activate high-speed shield control."
+msgstr "Недостаточно энергии для высокоскоростного управления защитой."
+
+#: src/battle.c:919
+msgid "Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""
+msgstr "Наводчик Сулу- \"Высокоскоростное управление защитой включено, сэр.\""
+
+#: src/battle.c:929
+msgid "There is no enemy present to select."
+msgstr "Здесь нет врагов."
+
+#: src/battle.c:945 src/battle.c:960 src/battle.c:971
+msgid "Energy will be expended into space."
+msgstr "Энергия уйдёт в пустоту."
+
+#: src/battle.c:977
+msgid "Manual or automatic? "
+msgstr "Ручной или автоматический?"
+
+#: src/battle.c:988
+#, c-format
+msgid "Phasers locked on target. Energy available: %.2f"
+msgstr "Фазеры наведены на цель. Доступная энергия: %.2f"
+
+#: src/battle.c:998
+#, c-format
+msgid "(%d) units required. "
+msgstr ""
+
+#: src/battle.c:1000
+msgid "Units to fire= "
+msgstr "Энергия на выстрел= "
+
+#: src/battle.c:1005 src/battle.c:1076
+#, c-format
+msgid "Energy available= %.2f"
+msgstr "Доступная энергия= %.2f"
+
+#: src/battle.c:1046
+msgid "*** Tholian web absorbs "
+msgstr "*** Толианская сеть поглощает "
+
+#: src/battle.c:1047
+msgid "excess "
+msgstr "избыточную "
+
+#: src/battle.c:1048
+msgid "phaser energy."
+msgstr "энергию фазеров."
+
+#: src/battle.c:1051
+#, c-format
+msgid "%d expended on empty space."
+msgstr "%d ушло в пустоту."
+
+#: src/battle.c:1060
+msgid "Battle comuter damaged, manual file only."
+msgstr "Бортовой компьютер сломан, используйте ручное управление."
+
+#: src/battle.c:1063 src/finish.c:13
+msgid "---WORKING---"
+msgstr "---РАБОТА---"
+
+#: src/battle.c:1065
+msgid "Short-range-sensors-damaged"
+msgstr "Сенсоры-ближнего-обзора-сломаны"
+
+#: src/battle.c:1066
+msgid "Insufficient-data-for-automatic-phaser-fire"
+msgstr "Недостаточно-данных-для-автоматического-наведения-фазеров"
+
+#: src/battle.c:1067
+msgid "Manual-fire-must-be-used"
+msgstr "Используйте-ручное-наведение"
+
+#: src/battle.c:1085
+msgid " can't be located without short range scan."
+msgstr " не может быть обнаружен без ближнего сканирования."
+
+#: src/battle.c:1102
+msgid "units to fire at "
+msgstr "энергии на выстрел по "
+
+#: src/battle.c:1132
+msgid "Available energy exceeded -- try again."
+msgstr "Имеющейся энергии не хватает -- попробуйте снова."
+
+#: src/battle.c:1164
+msgid "Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."
+msgstr "Сулу- \"Сэр, высокоскоростное управление защитой не сработало . . ."
+
+#: src/battle.c:1165
+msgid "         CLICK   CLICK   POP  . . ."
+msgstr "         ЩЁЛК   ЩЁЛК   ЧЁРТ  . . ."
+
+#: src/battle.c:1166
+msgid " No response, sir!"
+msgstr " Нет ответа, сэр!"
+
+#: src/battle.c:1199
+#, c-format
+msgid "%d unit hit on "
+msgstr "%d единиц энергии ударили по "
+
+#: src/battle.c:1202
+msgid "Very small hit on "
+msgstr "Очень слабый удар по "
+
+#: src/battle.c:1216
+msgid "***Mr. Spock-  \"Captain, the vessel at "
+msgstr "***Мистер Спок- \"Капитан, корабль на "
+
+#: src/battle.c:1218
+msgid "   has just lost its firepower.\""
+msgstr "   потерял боеспособность.\""
+
+#: src/events.c:53
+msgid "Lt. Uhura- \"Captain, the sub-space radio is working and"
+msgstr "Лт. Ухура- \"Капитан, космическая рация работает и"
+
+#: src/events.c:54
+msgid "   surveillance reports are coming in."
+msgstr "   принимает информацию из центра наблюдения."
+
+#: src/events.c:61
+msgid "   The star chart is now up to date.\""
+msgstr "   Звёздная карта обновлена."
+
+#: src/events.c:114
+msgid " caught in long range tractor beam--"
+msgstr " пойман дальнобойным буксирным лучём--"
+
+#: src/events.c:126
+msgid "Galileo, left on the planet surface, is captured"
+msgstr "Галилей, оставшийся на планете, схвачен"
+
+#: src/events.c:127
+msgid "by aliens and made into a flying McDonald's."
+msgstr "инопланетянами и превращён в летательный МакДональдс."
+
+#: src/events.c:132
+msgid "Galileo, left on the planet surface, is well hidden."
+msgstr "Галилей, оставшийся на планете, хорошо спрятан."
+
+#: src/events.c:145
+msgid " is pulled to "
+msgstr " затянут в "
+
+#: src/events.c:150
+msgid "(Remainder of rest/repair period cancelled.)"
+msgstr "(Остаток периода отдыха/ремонта отменён.)"
+
+#: src/events.c:158
+msgid "(Shields not currently useable.)"
+msgstr "(Защита в нерабочем состоянии.)"
+
+#: src/events.c:211
+msgid "   reports that it is under attack and that it can"
+msgstr "   сообщает, что она атакована и сможет"
+
+#: src/events.c:212
+#, c-format
+msgid "   hold out only until stardate %d"
+msgstr "   продержаться до даты %d.\""
+
+#: src/events.c:257
+msgid "Spock-  \"Captain, I believe the starbase has been destroyed.\""
+msgstr "Спок- \"Капитан, я чувствую, что база уничтожена.\""
+
+#: src/events.c:265
+msgid "Lt. Uhura-  \"Captain, Starfleet Command reports that"
+msgstr "Лт. Ухура- \"Капитан, штаб звёздного флота сообщает"
+
+#: src/events.c:266
+msgid "   the starbase in "
+msgstr "   база в "
+
+#: src/events.c:268
+msgid " has been destroyed by"
+msgstr " уничтожена"
+
+#: src/events.c:269
+msgid "the Klingon Super-Commander"
+msgstr "Глав-комом Клингонов"
+
+#: src/events.c:270
+msgid "a Klingon Commander"
+msgstr "Командиром Клингонов"
+
+#: src/events.c:313
+msgid "Lt. Uhura-  \"The deep space probe "
+msgstr "Лт. Ухура- \"Дальнобойная космическая ракета "
+
+#: src/events.c:315
+msgid "has left the galaxy"
+msgstr "покинула галактику"
+
+#: src/events.c:317
+msgid "is no longer transmitting"
+msgstr "больше не передаёт"
+
+#: src/events.c:327
+msgid "Lt. Uhura-  \"The deep space probe is now in "
+msgstr "Лт. Ухура- \"Дальнобойная космическая ракета сейчас в "
+
+#: src/events.c:364
+msgid "How long? "
+msgstr "Какой срок? "
+
+#: src/events.c:374
+msgid "Are you sure? "
+msgstr "Вы уверены? "
+
+#: src/events.c:384
+#, c-format
+msgid "%d stardates left."
+msgstr "Осталось %d дней."
+
+#: src/events.c:426 src/events.c:465
+msgid " novas."
+msgstr " взорвалась."
+
+#: src/events.c:498
+msgid "***Starship buffeted by nova."
+msgstr "***Звездолёт отбросило взрывом звезды."
+
+#: src/events.c:506
+msgid "***Shields knocked out."
+msgstr "***Защита разбита."
+
+#: src/events.c:536
+msgid " damaged"
+msgstr " повреждён"
+
+#: src/events.c:544
+msgid ", blasted into "
+msgstr ", долбанулся в "
+
+#: src/events.c:555
+msgid ", buffeted to "
+msgstr " отлетел в чёрную дыру."
+
+#: src/events.c:584
+msgid "Force of nova displaces starship."
+msgstr "Взрыв звезды смещает звездолёт."
+
+#: src/events.c:641
+#, c-format
+msgid "Message from Starfleet Command       Stardate %.2f"
+msgstr "Сообщение от штаба Звёздного Флота       Дата %.2f"
+
+#: src/events.c:642
+#, c-format
+msgid "     Supernova in %s; caution advised."
+msgstr "     Взрыв сверхновой в %s; соблюдайте осторожность."
+
+#: src/events.c:669
+msgid "***Incipient supernova detected at "
+msgstr "***Зарегистрировано появление сверхновой в "
+
+#: src/events.c:673
+msgid "Emergency override attempts t"
+msgstr "Автопилот пытается в"
+
+#: src/events.c:744
+msgid "Lucky you!"
+msgstr "Повезло!"
+
+#: src/events.c:745
+#, c-format
+msgid "A supernova in %s has just destroyed the last Klingons."
+msgstr "Сверхновая в %s как раз уничтожила последних Клингонов."
+
+#: src/finish.c:10
+msgid "Computer damaged; cannot execute destruct sequence."
+msgstr "Компьютер сломан; невозможно запустить программу самоуничтожения."
+
+#: src/finish.c:14
+msgid "SELF-DESTRUCT-SEQUENCE-ACTIVATED"
+msgstr "ПРОГРАММА-САМОУНИЧТОЖЕНИЯ-ЗАПУЩЕНА"
+
+#: src/finish.c:21
+msgid "ENTER-CORRECT-PASSWORD-TO-CONTINUE-"
+msgstr "ВВЕДИТЕ-ПАРОЛЬ-ДЛЯ-ПРОДОЛЖЕНИЯ-"
+
+#: src/finish.c:23
+msgid "SELF-DESTRUCT-SEQUENCE-OTHERWISE-"
+msgstr "САМОУНИЧТОЖЕНИЯ-А-ИНАЧЕ-"
+
+#: src/finish.c:25
+msgid "SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"
+msgstr "САМОУНИЧТОЖЕНИЕ-БУДЕТ-ПРЕРВАНО"
+
+#: src/finish.c:30
+msgid "PASSWORD-REJECTED;"
+msgstr "ПАРОЛЬ-НЕ-ПРИНЯТ"
+
+#: src/finish.c:32
+msgid "CONTINUITY-EFFECTED"
+msgstr "ПРОДОЛЖАЕМ-ЖИТЬ"
+
+#: src/finish.c:36
+msgid "PASSWORD-ACCEPTED"
+msgstr "ПАРОЛЬ-ПРИНЯТ"
+
+#: src/finish.c:43
+msgid "GOODBYE-CRUEL-WORLD"
+msgstr "ПРОЩАЙ-ЖЕСТОКИЙ-МИР"
+
+#: src/finish.c:53
+msgid "********* Entropy of "
+msgstr "********* Ентропия корабля "
+
+#: src/finish.c:55
+msgid " maximized *********"
+msgstr " возрасла *********"
+
+#: src/finish.c:77
+#, c-format
+msgid "It is stardate %.1f."
+msgstr "Сегодня %.1f число."
+
+#: src/finish.c:82
+#, c-format
+msgid "The remaining %d Romulans surrender to Starfleet Command."
+msgstr "Оставшиеся %d Ромулан сдались Звёздному Флоту."
+
+#: src/finish.c:85
+msgid "You have smashed the Klingon invasion fleet and saved"
+msgstr "Вы сокрушили флот Клингоновских захватчиков и спасли"
+
+#: src/finish.c:86
+msgid "the Federation."
+msgstr "Федерацию."
+
+#: src/finish.c:100
+msgid "In fact, you have done so well that Starfleet Command"
+msgstr "По правде говоря, вы действовали так умело, что штаб Звёздного Флота"
+
+#: src/finish.c:103
+msgid "promotes you one step in rank from \"Novice\" to \"Fair\"."
+msgstr "повышает ваш ранг от Новичка до Середнячка."
+
+#: src/finish.c:106
+msgid "promotes you one step in rank from \"Fair\" to \"Good\"."
+msgstr "повышает ваш ранг от Середнячка до Умелого."
+
+#: src/finish.c:109
+msgid "promotes you one step in rank from \"Good\" to \"Expert\"."
+msgstr "повышает ваш ранг от Умелого до Специалиста."
+
+#: src/finish.c:112
+msgid "promotes you to Commodore Emeritus."
+msgstr "возводит вас на должность Отставного Капитана."
+
+#: src/finish.c:114
+msgid "Now that you think you're really good, try playing"
+msgstr "Теперь, когда вы считаете себя хорошим игроком, попытайтесь сыграть"
+
+#: src/finish.c:115
+msgid "the \"Emeritus\" game. It will splatter your ego."
+msgstr "за \"Emeritus\". Это охладит ваш пыл."
+
+#: src/finish.c:119
+msgid "Computer-  "
+msgstr "Компьютер-  "
+
+#: src/finish.c:120
+msgid "ERROR-ERROR-ERROR-ERROR"
+msgstr "СБОЙ-СБОЙ-СБОЙ-ОШИБКА"
+
+#: src/finish.c:122
+msgid "  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM"
+msgstr "  ВАШЕ-МАСТЕРСТВО-НЕПОДВЛАСТНО-ЭТОЙ-ПРОГРАММЕ"
+
+#: src/finish.c:124 src/finish.c:126 src/finish.c:128
+msgid "  THIS-PROGRAM-MUST-SURVIVE"
+msgstr ""
+
+#: src/finish.c:130
+msgid "  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI"
+msgstr ""
+
+#: src/finish.c:132
+msgid "Now you can retire and write your own Star Trek game!"
+msgstr "Теперь вы можете уйти на пенсию и написать свою игру Star Trek!"
+
+#: src/finish.c:142
+msgid "You cannot get a citation, so..."
+msgstr "Вам не положена грамота, так что..."
+
+#: src/finish.c:144
+msgid "Do you want your Commodore Emeritus Citation printed? "
+msgstr "Хотите распечатать вашу грамоту Отставного Капитана? "
+
+#: src/finish.c:154 src/finish.c:167
+msgid "LIVE LONG AND PROSPER."
+msgstr "ЖИВИТЕ ДОЛГО И СЧАСТЛИВО."
+
+#: src/finish.c:160
+msgid "Your time has run out and the Federation has been"
+msgstr "Ваше время истекло и Федерация была"
+
+#: src/finish.c:161
+msgid "conquered.  Your starship is now Klingon property,"
+msgstr "захвачена.  Ваш звездолёт стал собственностью Клингонов,"
+
+#: src/finish.c:162
+msgid "and you are put on trial as a war criminal.  On the"
+msgstr "а вы попали на скамью подсудимых как военный преступник.  Рассмотрев"
+
+#: src/finish.c:163
+msgid "basis of your record, you are "
+msgstr "содеянное вами, вас "
+
+#: src/finish.c:165
+msgid "acquitted."
+msgstr "освободили."
+
+#: src/finish.c:170
+msgid "found guilty and"
+msgstr "признали виновным и"
+
+#: src/finish.c:171
+msgid "sentenced to death by slow torture."
+msgstr "приговорили к смерти на медленном огне."
+
+#: src/finish.c:177
+msgid "Your life support reserves have run out, and"
+msgstr "Резервы жизнеобеспечения иссякли и"
+
+#: src/finish.c:178
+msgid "you die of thirst, starvation, and asphyxiation."
+msgstr "вы погибли от жажды, голода и удушья."
+
+#: src/finish.c:179 src/finish.c:184 src/finish.c:279
+msgid "Your starship is a derelict in space."
+msgstr "Ваш звездолёт стал космическим мусором."
+
+#: src/finish.c:182
+msgid "Your energy supply is exhausted."
+msgstr "Источники энергии иссякли."
+
+#: src/finish.c:187 src/finish.c:206 src/finish.c:225
+msgid "The "
+msgstr " "
+
+#: src/finish.c:189
+msgid "has been destroyed in battle."
+msgstr " был уничтожен в бою."
+
+#: src/finish.c:191
+msgid "Dulce et decorum est pro patria mori."
+msgstr ""
+
+#: src/finish.c:194
+msgid "You have made three attempts to cross the negative energy"
+msgstr "Вы три раза пытались пересечь негативный энергетический"
+
+#: src/finish.c:195
+msgid "barrier which surrounds the galaxy."
+msgstr "барьер, окружающий галактику."
+
+#: src/finish.c:197
+msgid "Your navigation is abominable."
+msgstr "Вы не умеете управлять кораблём."
+
+#: src/finish.c:201
+msgid "Your starship has been destroyed by a nova."
+msgstr "Ваш звездолёт уничтожен взрывом звезды."
+
+#: src/finish.c:202 src/finish.c:246
+msgid "That was a great shot."
+msgstr "Это был отличный выстрел."
+
+#: src/finish.c:208
+msgid " has been fried by a supernova."
+msgstr " был поджарен взрывом сверхновой."
+
+#: src/finish.c:209
+msgid "...Not even cinders remain..."
+msgstr "...И мокрого места не осталось..."
+
+#: src/finish.c:212
+msgid "You have been captured by the Klingons. If you still"
+msgstr "Вас захватили Клингоны. Будь у вас"
+
+#: src/finish.c:213
+msgid "had a starbase to be returned to, you would have been"
+msgstr "хотя бы база, вас бы могли"
+
+#: src/finish.c:214
+msgid "repatriated and given another chance. Since you have"
+msgstr "спасти и дать ещё шанс. А так -"
+
+#: src/finish.c:215
+msgid "no starbases, you will be mercilessly tortured to death."
+msgstr "вас безжалостно замучают и казнят."
+
+#: src/finish.c:218
+msgid "Your starship is now an expanding cloud of subatomic particles"
+msgstr "Ваш звездолёт стал облаком субатомных частиц"
+
+#: src/finish.c:221
+msgid "Starbase was unable to re-materialize your starship."
+msgstr "База не смогла материализовать ваш звездолёт."
+
+#: src/finish.c:222
+msgid "Sic transit gloria muntdi"
+msgstr ""
+
+#: src/finish.c:227
+msgid " has been cremated by its own phasers."
+msgstr " сожжён собственными фазерами."
+
+#: src/finish.c:230
+msgid "You and your landing party have been"
+msgstr "Вы и ваш отряд"
+
+#: src/finish.c:231
+msgid "converted to energy, disipating through space."
+msgstr "превратились в энергию, рассеевшуюся в пространстве."
+
+#: src/finish.c:234
+msgid "You are left with your landing party on"
+msgstr "Вы с отрядом остались на"
+
+#: src/finish.c:235
+msgid "a wild jungle planet inhabited by primitive cannibals."
+msgstr "планете диких джунглей, населённых дикими каннибалами."
+
+#: src/finish.c:237
+msgid "They are very fond of \"Captain Kirk\" soup."
+msgstr "Они очень любят \"Капитанский\" суп."
+
+#: src/finish.c:239 src/finish.c:265
+msgid "Without your leadership, the "
+msgstr "Без вашего руководства, "
+
+#: src/finish.c:241 src/finish.c:267
+msgid " is destroyed."
+msgstr " уничтожен."
+
+#: src/finish.c:244
+msgid "You and your mining party perish."
+msgstr "Вы и ваш отряд умерли."
+
+#: src/finish.c:250
+msgid "The Galileo is instantly annihilated by the supernova."
+msgstr "Галилей мгновенно испарился от взрыва сверхновой."
+
+#: src/finish.c:253
+msgid "You and your mining party are atomized."
+msgstr "Вы с вашим отрядом распались на атомы."
+
+#: src/finish.c:255
+msgid "Mr. Spock takes command of the "
+msgstr "Мистер Спок принимает командование "
+
+#: src/finish.c:257
+msgid " and"
+msgstr " и "
+
+#: src/finish.c:258
+msgid "joins the Romulans, reigning terror on the Federation."
+msgstr "присоединяется к Ромуланам и начинается террор Федерации."
+
+#: src/finish.c:261
+msgid "The shuttle craft Galileo is also caught,"
+msgstr "Челнок Галилей тоже попался"
+
+#: src/finish.c:262
+msgid "and breaks up under the strain."
+msgstr "и разломался от давления."
+
+#: src/finish.c:264
+msgid "Your debris is scattered for millions of miles."
+msgstr "Ваши кости разлетелись на миллионы миль."
+
+#: src/finish.c:270
+msgid "The mutants attack and kill Spock."
+msgstr "Мутанты напали первыми и убили Спока."
+
+#: src/finish.c:271
+msgid "Your ship is captured by Klingons, and"
+msgstr "Ваш звездолёт пойман клингонами и"
+
+#: src/finish.c:272
+msgid "your crew is put on display in a Klingon zoo."
+msgstr "ваш экипаж выставлен на показ в зоопарке."
+
+#: src/finish.c:275
+msgid "Tribbles consume all remaining water,"
+msgstr "Чёртики извели всю оставшуюся воду,"
+
+#: src/finish.c:276
+msgid "food, and oxygen on your ship."
+msgstr "пищу и кислород на корабле."
+
+#: src/finish.c:278
+msgid "You die of thirst, starvation, and asphyxiation."
+msgstr "Вы умерли от жажды, голода и удушья."
+
+#: src/finish.c:282
+msgid "Your ship is drawn to the center of the black hole."
+msgstr "Ваш корабль занесло прямо в центр чёрной дыры."
+
+#: src/finish.c:283
+msgid "You are crushed into extremely dense matter."
+msgstr "Вас расплющило до состояния сверхтвёрдого вещества."
+
+#: src/finish.c:293
+msgid "As a result of your actions, a treaty with the Klingon"
+msgstr "В результате ваших действий, с империей Клингонов"
+
+#: src/finish.c:294
+msgid "Empire has been signed. The terms of the treaty are"
+msgstr "удалось подписать договор. Условия этого договора"
+
+#: src/finish.c:296
+msgid "favorable to the Federation."
+msgstr "выгодны для Федерации."
+
+#: src/finish.c:298
+msgid "Congratulations!"
+msgstr "Поздравляем!"
+
+#: src/finish.c:301
+msgid "highly unfavorable to the Federation."
+msgstr "крайне не выгодны для Федерации."
+
+#: src/finish.c:304
+msgid "The Federation will be destroyed."
+msgstr "Федерация погибнет."
+
+#: src/finish.c:307
+msgid "Since you took the last Klingon with you, you are a"
+msgstr "Поскольку вы забрали на тот свет последнего Клингона, вы теперь"
+
+#: src/finish.c:308
+msgid "martyr and a hero. Someday maybe they'll erect a"
+msgstr "мученик и герой. Возможно однажды даже поставят"
+
+#: src/finish.c:309
+msgid "statue in your memory. Rest in peace, and try not"
+msgstr "статую в вашу честь. Покойтесь с миром и постарайтесь не"
+
+#: src/finish.c:310
+msgid "to think about pigeons."
+msgstr "думать о голубях."
+
+#: src/finish.c:336
+msgid "Your score --"
+msgstr "Ваши очки --"
+
+#: src/finish.c:338
+#, c-format
+msgid "%6d Romulans destroyed                 %5d"
+msgstr "%6d Ромулан уничтожено                 %5d"
+
+#: src/finish.c:341
+#, c-format
+msgid "%6d Romulans captured                  %5d"
+msgstr "%6d Ромулан захвачено                  %5d"
+
+#: src/finish.c:344
+#, c-format
+msgid "%6d ordinary Klingons destroyed        %5d"
+msgstr "%6d рядовых Клингонов уничтожено        %5d"
+
+#: src/finish.c:347
+#, c-format
+msgid "%6d Klingon commanders destroyed       %5d"
+msgstr "%6d Клингоновских командиров уничтожено       %5d"
+
+#: src/finish.c:350
+#, c-format
+msgid "%6d Super-Commander destroyed          %5d"
+msgstr "%6d Глав-комов уничтожено          %5d"
+
+#: src/finish.c:353
+#, c-format
+msgid "%6.2f Klingons per stardate              %5d"
+msgstr "%6.2f Клингонов в день              %5d"
+
+#: src/finish.c:356
+#, c-format
+msgid "%6d stars destroyed by your action     %5d"
+msgstr "%6d звёзд уничтожено     %5d"
+
+#: src/finish.c:359
+#, c-format
+msgid "%6d planets destroyed by your action   %5d"
+msgstr "%6d планет уничтожено   %5d"
+
+#: src/finish.c:362
+#, c-format
+msgid "%6d bases destroyed by your action     %5d"
+msgstr "%6d баз уничтожено     %5d"
+
+#: src/finish.c:365
+#, c-format
+msgid "%6d calls for help from starbase       %5d"
+msgstr "%6d обращений за помощью к базе       %5d"
+
+#: src/finish.c:368
+#, c-format
+msgid "%6d casualties incurred                %5d"
+msgstr "%6d человек пострадали                %5d"
+
+#: src/finish.c:371
+#, c-format
+msgid "%6d ship(s) lost or destroyed          %5d"
+msgstr "%6d корабль(ей) потеряно          %5d"
+
+#: src/finish.c:374
+msgid "Penalty for getting yourself killed        -200"
+msgstr "Расплата за собственную гибель        -200"
+
+#: src/finish.c:376
+msgid "Bonus for winning "
+msgstr "Доплата за победу в "
+
+#: src/finish.c:378
+msgid "Novice game  "
+msgstr "игре Новичка  "
+
+#: src/finish.c:379
+msgid "Fair game    "
+msgstr "игре Середнячка    "
+
+#: src/finish.c:380
+msgid "Good game    "
+msgstr "игре Умелого    "
+
+#: src/finish.c:381
+msgid "Expert game  "
+msgstr "игре Специалиста  "
+
+#: src/finish.c:382
+msgid "Emeritus game"
+msgstr "игре Отставного Капитана"
+
+#: src/finish.c:387
+#, c-format
+msgid "TOTAL SCORE                               %5d"
+msgstr "ОБЩИЙ СЧЁТ                               %5d"
+
+#: src/finish.c:400
+msgid "File or device name for your plaque: "
+msgstr "Имя файла или устройства для грамоты: "
+
+#: src/finish.c:404
+msgid "Invalid name."
+msgstr "Неправельное имя."
+
+#: src/finish.c:408
+msgid "Enter name to go on plaque (up to 30 characters): "
+msgstr "Введите своё имя для грамоты (до 30 знаков): "
+
+#: src/finish.c:432
+#, c-format
+msgid ""
+"                                                       U. S. S. ENTERPRISE\n"
+msgstr "                                                       ЭНТЕРПРАЙЗ\n"
+
+#: src/finish.c:434
+#, c-format
+msgid ""
+"                                  For demonstrating outstanding ability as a "
+"starship captain\n"
+msgstr "                                  За проявленный героизм\n"
+
+#: src/finish.c:436
+#, c-format
+msgid ""
+"                                                Starfleet Command bestows to "
+"you\n"
+msgstr ""
+"                                                Штаб Звёздного Флота "
+"присваивает вам\n"
+
+#: src/finish.c:439
+#, c-format
+msgid ""
+"                                                           the rank of\n"
+"\n"
+msgstr ""
+"                                                           звание\n"
+"\n"
+
+#: src/finish.c:440
+#, c-format
+msgid ""
+"                                                       \"Commodore Emeritus"
+"\"\n"
+"\n"
+msgstr ""
+"                                                       \"Отставного Капитана"
+"\"\n"
+"\n"
+
+#: src/finish.c:443
+#, c-format
+msgid ""
+" Expert level\n"
+"\n"
+msgstr ""
+" Уровень Специалиста\n"
+"\n"
+
+#: src/finish.c:444
+#, c-format
+msgid ""
+"Emeritus level\n"
+"\n"
+msgstr ""
+"Уровень Отставника\n"
+"\n"
+
+#: src/finish.c:445
+#, c-format
+msgid ""
+" Cheat level\n"
+"\n"
+msgstr ""
+" Уровень Мошенника\n"
+"\n"
+
+#: src/finish.c:449
+#, c-format
+msgid ""
+"                                                 This day of %.6s %.4s, "
+"%.8s\n"
+"\n"
+msgstr ""
+"                                                 Сегодня у нас %.6s %.4s, "
+"%.8s\n"
+"\n"
+
+#: src/finish.c:451
+#, c-format
+msgid ""
+"                                                        Your score:  %d\n"
+"\n"
+msgstr ""
+"                                                        Ваш счёт:  %d\n"
+"\n"
+
+#: src/finish.c:452
+#, c-format
+msgid ""
+"                                                    Klingons per stardate:  "
+"%.2f\n"
+msgstr ""
+"                                                    Клингонов в день:  %.2f\n"
