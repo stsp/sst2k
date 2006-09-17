@@ -227,6 +227,7 @@ void chart(int nn)
 	proutn("  |");
 	if (i<GALSIZE) skip(1);
     }
+    prout("");
 }
 
 static void sectscan(int goodScan, int i, int j) 
