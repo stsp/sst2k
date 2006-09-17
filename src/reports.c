@@ -526,7 +526,7 @@ void eta(void)
 	    prout("Unfortunately, the Federation will be destroyed by then.");
 	if (twarp > 6.0)
 	    prout("You'll be taking risks at that speed, Captain");
-	if ((game.isatb==1 && game.state.isy == ix1 && game.state.isx == iy1 &&
+	if ((game.isatb==1 && game.state.isy == iy1 && game.state.isx == ix1 &&
 	     game.future[FSCDBAS]< ttime+game.state.date)||
 	    (game.future[FCDBAS]<ttime+game.state.date && game.baty==ix1 && game.batx == iy1))
 	    prout("The starbase there will be destroyed by then.");
