@@ -718,8 +718,9 @@ the current quadrant, the shortest command would be</para>
 <para>and it will be done.  In automatic mode, either two or four numbers
 must be supplied.</para>
 
-<para>Automatic mode utilizes the ship's <quote>battle computer.</quote>  If the
-computer is damaged, manual movement must be used.</para>
+<para>Automatic mode utilizes the ship's <quote>battle
+computer.</quote> If the computer is damaged, manual movement must be
+used.</para>
 
 <para>If warp engines are damaged less than 10 stardates (undocked) you can
 still go warp 4.</para>
@@ -1646,14 +1647,21 @@ SST2K website.</para>
 <para>Dave Matuszek, Paul Reynolds et. al. at UT Austin played the
 Hicks version on a CDC6600, but disliked the long load time and
 extreme slowness of the BASIC program. (David Matuszek notes that the
-Hicks version he played had a habit of throwing long
-quotes from Marcus Aurelius at the users, a feature he found
-intolerable on a TTY at 110 baud.  It must, therefore, have been
-rather longer than  the one we have.)  The Austin crew proceeded to
-write their own Trek game, loosely based on the Hicks version, in
-CDC6600 FORTRAN.  At that time, it was just called "Star Trek"; the
-"Super" was added by later developers. In the rest of this history
-we'll call it the "UT FORTRAN" version.</para>
+Hicks version he played had a habit of throwing long quotes from
+Marcus Aurelius at the users, a feature he found intolerable on a TTY
+at 110 baud.  It must, therefore, have been rather longer than the one
+we have.)</para>
+
+<para>The Austin crew proceeded to write their own Trek game, loosely
+based on the Hicks version, in CDC6600 FORTRAN.  Most of the code was
+written in 1973-1974. At that time, the game was just called "Star
+Trek"; the "Super" was added by later developers. In the rest of this
+history we'll call it the "UT FORTRAN" version.</para>
+
+<para>Dave Matuszek reports that the UT FORTRAN codebase he worked on
+in 1973-1974 was like Mayfield's original and most later versions in
+BASIC, in that it used used polar coordinates (a clockface angle
+and a distance) for manual navigation.</para>
 
 <para>At the time the UT FORTRAN source was last translated to C it emitted
 the message "Latest update-21 Sept 78".  Thus, it actually predated
@@ -1661,13 +1669,13 @@ the message "Latest update-21 Sept 78".  Thus, it actually predated
 Star Trek" published by David Ahl in his November 1978 sequel
 <citetitle>BASIC Computer Games</citetitle>.</para>
 
-<para>This 1978 "Super Star Trek" had been reworked by Robert Leedom and
-friends from (according to Leedom) Mayfield's HP port. There is
+<para>This 1978 "Super Star Trek" had been reworked by Robert Leedom
+and friends from (according to Leedom) Mayfield's HP port. There is
 internal evidence to suggest that at least some features of Leedom's
 SST may have derived from the UT FORTRAN version.  In particular, Dave
 Matuszek recalls implementing command words to replace the original
-numeric command codes, a feature Leedom's SST also had but the
-1973 and 1975 SPACWRs did not.</para>
+numeric command codes during 1973-1974, a feature Leedom's SST also
+had but the 1973 and 1975 SPACWRs did not.</para>
 
 <para>One signature trait of the UT FORTRAN game and its descendants
 is that the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's
@@ -1675,9 +1683,6 @@ is that the sectors are 10x10 (rather than the 8x8 in Mike Mayfield's
 preserves the original numbered quadrants rather than the
 astronomically-named quadrants introduced in Ahl's SST and its
 descendants.</para>
-
-<!-- Dave thinks his Fortran Star Trek used the clockface for quadrant -->
-<!-- navigation. -->
 
 <para>Eric Allman's BSD Trek game is one of these, also descended from
 the UT FORTRAN version via translation to C.  However, the mainline version
@@ -1853,7 +1858,7 @@ to filter that flat-text form into an sst.doc that's easy to parse for
 command descriptions, and changed some logic in sst.c to match.
 </para></listitem>
 <listitem><para>
-I've cleaned up a lot of grubby FORTRANisms in the code internals --
+I've cleaned up a lot of grubby FORTRANisms in the code internals &mdash;
 used sizeof(), replaced magic numeric constants with #defines,
 that sort of thing.
 </para></listitem>
