@@ -11,15 +11,15 @@ static int consumeTime(void)
     game.ididit = 1;
 #if 0
     /* Don't worry about this */
-    if (future[FTBEAM] <= game.state.date+game.optime && game.state.remcom != 0 && game.condit != IHDOCKED) {
+    if (scheduled(FTBEAM) <= game.state.date+game.optime && game.state.remcom != 0 && game.condit != IHDOCKED) {
 	/* We are about to be tractor beamed -- operation fails */
 	return 1;
     }
 #endif
-//	asave = future[FSNOVA];
-//	future[FSNOVA] = FOREVER; /* defer supernovas */
-    events();	/* Used to avoid if future[FSCMOVE] within time */
-//	future[FSNOVA] = asave;
+//	asave = scheduled(FSNOVA);
+//	unschedule(FSNOVA); /* defer supernovas */
+    events();	/* Used to avoid if FSCMOVE is scheduled within time */
+//	schedule(FSNOVA, asave-game.state.time);
     /*fails if game over, quadrant super-novas or we've moved to new quadrant*/
     if (game.alldone || game.state.galaxy[game.quadx][game.quady].supernova || game.justin != 0) return 1;
     return 0;

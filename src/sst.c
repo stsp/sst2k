@@ -848,7 +848,7 @@ void debugme(void)
 	int i;
 	for (i = 1; i < NEVENTS; i++) {
 	    int key;
-	    if (game.future[i] == FOREVER) continue;
+	    if (!is_scheduled(i)) continue;
 	    switch (i) {
 	    case FSNOVA:  proutn("Supernova       "); break;
 	    case FTBEAM:  proutn("T Beam          "); break;
@@ -858,12 +858,12 @@ void debugme(void)
 	    case FSCMOVE: proutn("SC Move         "); break;
 	    case FSCDBAS: proutn("SC Base Destroy "); break;
 	    }
-	    proutn("%.2f", game.future[i]-game.state.date);
+	    proutn("%.2f", scheduled(i)-game.state.date);
 	    chew();
 	    proutn("  ?");
 	    key = scan();
 	    if (key == IHREAL) {
-		game.future[i] = game.state.date + aaitem;
+		schedule(i, aaitem);
 	    }
 	}
 	chew();

@@ -48,8 +48,8 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 	game.iscate=0;
 	game.ientesc=0;
 	game.isatb=0;
-	game.future[FSCMOVE]=0.2777+game.state.date;
-	game.future[FSCDBAS]=FOREVER;
+	schedule(FSCMOVE, 0.2777);
+	unschedule(FSCDBAS);
 	game.state.isx=iqx;
 	game.state.isy=iqy;
     }
@@ -331,7 +331,7 @@ static int movescom(int iqx, int iqy, int flag, int *ipage)
 	game.isatb=0;
 	game.ishere=0;
 	game.ientesc=0;
-	game.future[FSCDBAS]=FOREVER;
+	unschedule(FSCDBAS);
 	for_local_enemies(i) 
 	    if (game.quad[game.kx[i]][game.ky[i]] == IHS) break;
 	game.quad[game.kx[i]][game.ky[i]] = IHDOT;
@@ -395,7 +395,7 @@ void scom(int *ipage)
 	/* compute distances to starbases */
 	if (game.state.rembase <= 0) {
 	    /* nothing left to do */
-	    game.future[FSCMOVE] = FOREVER;
+	    unschedule(FSCMOVE);
 	    return;
 	}
 	sx = game.state.isx;
@@ -499,7 +499,7 @@ void scom(int *ipage)
     }
     /* check for a base */
     if (game.state.rembase == 0) {
-	game.future[FSCMOVE] = FOREVER;
+	unschedule(FSCMOVE);
     }
     else for_starbases(i) {
 	ibqx = game.state.baseqx[i];
@@ -509,9 +509,9 @@ void scom(int *ipage)
 	    if (flag) return; /* no, don't attack base! */
 	    game.iseenit = 0;
 	    game.isatb=1;
-	    game.future[FSCDBAS] = game.state.date + 1.0 +2.0*Rand();
-	    if (game.future[FCDBAS] < FOREVER) game.future[FSCDBAS] +=
-		game.future[FCDBAS]-game.state.date;
+	    schedule(FSCDBAS, 1.0 +2.0*Rand());
+	    if (is_scheduled(FCDBAS)) 
+		postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
 	    if (game.damage[DRADIO] > 0 && game.condit != IHDOCKED)
 		return; /* no warning */
 	    game.iseenit = 1;
@@ -522,7 +522,7 @@ void scom(int *ipage)
 	    skip(1);
 	    prout(_("   reports that it is under attack from the Klingon Super-commander."));
 	    proutn(_("   It can survive until stardate %d.\""),
-		   (int)game.future[FSCDBAS]);
+		   (int)scheduled(FSCDBAS));
 	    if (game.resting==0) return;
 	    prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
 	    if (ja()==0) return;

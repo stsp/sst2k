@@ -635,9 +635,9 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	    game.state.cx[game.state.remcom] = 0;
 	    game.state.cy[game.state.remcom] = 0;
 	    game.state.remcom--;
-	    game.future[FTBEAM] = FOREVER;
+	    unschedule(FTBEAM);
 	    if (game.state.remcom != 0)
-		game.future[FTBEAM] = game.state.date + expran(1.0*game.incom/game.state.remcom);
+		schedule(FTBEAM, expran(1.0*game.incom/game.state.remcom));
 	    break;
 	case IHK:
 	    game.state.remkl--;
@@ -645,7 +645,8 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	case IHS:
 	    game.state.nscrem--;
 	    game.ishere = game.state.isx = game.state.isy = game.isatb = game.iscate = 0;
-	    game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
+	    unschedule(FSCMOVE);
+	    unschedule(FSCDBAS);
 	    break;
 	}
     }
@@ -658,8 +659,8 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
     /* Remove enemy ship from arrays describing local game.conditions */
-    if (game.future[FCDBAS] < FOREVER && game.batx==game.quadx && game.baty==game.quady && type==IHC)
-	game.future[FCDBAS] = FOREVER;
+    if (is_scheduled(FCDBAS) && game.batx==game.quadx && game.baty==game.quady && type==IHC)
+	unschedule(FCDBAS);
     for_local_enemies(i)
 	if (game.kx[i]==ix && game.ky[i]==iy) break;
     game.nenhere--;

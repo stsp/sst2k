@@ -6,23 +6,23 @@
 void attakreport(int curt) 
 {
     if (!curt) {
-	if (game.future[FCDBAS] < FOREVER) {
+	if (is_scheduled(FCDBAS)) {
 	    prout("Starbase in %s is currently under Commander attack.",
 		  cramlc(quadrant, game.batx, game.baty));
 	    prout("It can hold out until Stardate %d.", 
-		  (int)game.future[FCDBAS]);
+		  (int)scheduled(FCDBAS));
 	}
 	if (game.isatb == 1) {
 	    prout("Starbase in %s is under Super-commander attack.",
 		  cramlc(quadrant, game.state.isx, game.state.isy));
 	    prout("It can hold out until Stardate %d.", 
-		  (int)game.future[FSCDBAS]);
+		  (int)scheduled(FSCDBAS));
 	}
     } else {
-        if (game.future[FCDBAS] < FOREVER)
-	    proutn("Base in %i - %i attacked by C. Alive until %.1f", game.batx, game.baty, game.future[FCDBAS]);
+        if (is_scheduled(FCDBAS))
+	    proutn("Base in %i - %i attacked by C. Alive until %.1f", game.batx, game.baty, scheduled(FCDBAS));
         if (game.isatb == 1)
-	    proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, game.future[FSCDBAS]);
+	    proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, scheduled(FSCDBAS));
     }
     clreol();
 }
@@ -87,8 +87,8 @@ void report(void)
 	if (game.nprobes!=1) proutn("s");
 	prout(".");
     }
-    if ((game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)&&
-	game.future[FDSPROB] != FOREVER) {
+    if ((game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+		&& is_scheduled(FDSPROB)) {
 	if (game.isarmed) 
 	    proutn("An armed deep space probe is in");
 	else
@@ -527,8 +527,8 @@ void eta(void)
 	if (twarp > 6.0)
 	    prout("You'll be taking risks at that speed, Captain");
 	if ((game.isatb==1 && game.state.isy == iy1 && game.state.isx == ix1 &&
-	     game.future[FSCDBAS]< ttime+game.state.date)||
-	    (game.future[FCDBAS]<ttime+game.state.date && game.baty==iy1 && game.baty == iy1))
+	     scheduled(FSCDBAS)< ttime+game.state.date)||
+	    (scheduled(FCDBAS)<ttime+game.state.date && game.baty==iy1 && game.batx == ix1))
 	    prout("The starbase there will be destroyed by then.");
 	proutn("New warp factor to try? ");
 	if (scan() == IHREAL) {

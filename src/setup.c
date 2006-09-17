@@ -240,20 +240,22 @@ void setup(int needprompt)
 #endif /* EXPERIMENTAL */
 	}
     // Initialize times for extraneous events
-    game.future[FSNOVA] = game.state.date + expran(0.5 * game.intime);
-    game.future[FTBEAM] = game.state.date + expran(1.5 * (game.intime / game.state.remcom));
-    game.future[FSNAP] = game.state.date + 1.0 + Rand(); // Force an early snapshot
-    game.future[FBATTAK] = game.state.date + expran(0.3*game.intime);
-    game.future[FCDBAS] = FOREVER;
-    game.future[FSCMOVE] = game.state.nscrem ? game.state.date+0.2777 : FOREVER;
-    game.future[FSCDBAS] = FOREVER;
-    game.future[FDSPROB] = FOREVER;
+    schedule(FSNOVA, expran(0.5 * game.intime));
+    schedule(FTBEAM, expran(1.5 * (game.intime / game.state.remcom)));
+    schedule(FSNAP, 1.0 + Rand()); // Force an early snapshot
+    schedule(FBATTAK, expran(0.3*game.intime));
+    unschedule(FCDBAS);
+    if (game.state.nscrem)
+	schedule(FSCMOVE, 0.2777);
+    else
+	unschedule(FSCMOVE);
+    unschedule(FSCDBAS);
+    unschedule(FDSPROB);
 #ifdef EXPERIMENTAL
     if (game.options & OPTION_WORLDS)
-	/* in BSD-Trek, this is a fixed one stardate in the future */
-	game.future[FDISTR] = game.state.date + 1.0 + Rand();
-    game.future[FENSLV] = FOREVER;
-    game.future[FREPRO] = FOREVER;
+	schedule(FDISTR, expran(1.0 + game.intime));
+    unschedule(FENSLV);
+    unschedule(FREPRO);
 #endif /* EXPERIMENTAL */
     // Starchart is functional but we've never seen it
     game.lastchart = FOREVER;

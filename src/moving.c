@@ -27,11 +27,11 @@ void imove(void)
     deltax /= bigger;
 
     /* If tractor beam is to occur, don't move full distance */
-    if (game.state.date+game.optime >= game.future[FTBEAM]) {
+    if (game.state.date+game.optime >= scheduled(FTBEAM)) {
 	trbeam = 1;
 	game.condit = IHRED;
-	game.dist = game.dist*(game.future[FTBEAM]-game.state.date)/game.optime + 0.1;
-	game.optime = game.future[FTBEAM] - game.state.date + 1e-5;
+	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1;
+	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5;
     }
     /* Move within the quadrant */
     game.quad[game.sectx][game.secty] = IHDOT;
@@ -237,7 +237,7 @@ void dock(int l)
     game.torps = game.intorps;
     game.lsupres = game.inlsr;
     if (game.damage[DRADIO] == 0.0 &&
-	(game.future[FCDBAS] < FOREVER || game.isatb == 1) && game.iseenit == 0) {
+	(is_scheduled(FCDBAS) || game.isatb == 1) && game.iseenit == 0) {
 	/* get attack report from base */
 	prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
 	attakreport(0);
@@ -778,15 +778,17 @@ void timwrp()
 	game.state = game.snapsht;
 	game.state.snap = 0;
 	if (game.state.remcom) {
-	    game.future[FTBEAM] = game.state.date + expran(game.intime/game.state.remcom);
-	    game.future[FBATTAK] = game.state.date + expran(0.3*game.intime);
+	    schedule(FTBEAM, expran(game.intime/game.state.remcom));
+	    schedule(FBATTAK, expran(0.3*game.intime));
 	}
-	game.future[FSNOVA] = game.state.date + expran(0.5*game.intime);
-	game.future[FSNAP] = game.state.date +expran(0.25*game.state.remtime); /* next snapshot will
-										  be sooner */
-	if (game.state.nscrem) game.future[FSCMOVE] = 0.2777;
+	schedule(FSNOVA, expran(0.5*game.intime));
+	/* next snapshot will be sooner */
+	schedule(FSNAP, expran(0.25*game.state.remtime));
+				
+	if (game.state.nscrem) schedule(FSCMOVE, 0.2777);
 	game.isatb = 0;
-	game.future[FCDBAS] = game.future[FSCDBAS] = FOREVER;
+	unschedule(FCDBAS);
+	unschedule(FSCDBAS);
 	game.batx = game.baty = 0;
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
@@ -818,7 +820,7 @@ void timwrp()
 	game.optime = -0.5*game.intime*log(Rand());
 	prout("You are traveling forward in time %d stardates.", (int)game.optime);
 	/* cheat to make sure no tractor beams occur during time warp */
-	game.future[FTBEAM] += game.optime;
+	postpone(FTBEAM, game.optime);
 	game.damage[DRADIO] += game.optime;
     }
     newqad(0);
@@ -845,7 +847,7 @@ void probe(void)
 	prout("Engineer Scott- \"The probe launcher is damaged, Sir.\"");
 	return;
     }
-    if (game.future[FDSPROB] != FOREVER) {
+    if (is_scheduled(FDSPROB)) {
 	chew();
 	skip(1);
 	if (game.damage[DRADIO] != 0 && game.condit != IHDOCKED) {
@@ -892,7 +894,7 @@ void probe(void)
     game.probey = game.quady*QUADSIZE + game.secty - 1;
     game.probecx = game.quadx;
     game.probecy = game.quady;
-    game.future[FDSPROB] = game.state.date + 0.01; // Time to move one sector
+    schedule(FDSPROB, 0.01); // Time to move one sector
     prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
     game.ididit = 1;
     return;

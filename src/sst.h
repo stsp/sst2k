@@ -164,6 +164,16 @@ typedef struct {
 #define NEVENTS (12)
 #endif /* EXPERIMENTAL */
 
+/*
+ * abstract out the event handling -- underlying data structures will change
+ * when we implement stateful events
+ */
+extern void unschedule(int);
+extern int is_scheduled(int);
+extern void schedule(int, double);
+extern void postpone(int, double);
+extern double scheduled(int);
+
 #ifdef EXPERIMENTAL
 #define	MAXDISTR	5	/* maximum concurrent distress calls */
 #endif /* EXPERIMENTAL */

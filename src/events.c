@@ -1,6 +1,36 @@
 #include "sst.h"
 #include <math.h>
 
+void unschedule(int evtype)
+/* remove an event from the schedule */
+{
+    game.future[evtype] = FOREVER;
+}
+
+int is_scheduled(int evtype)
+/* is an event of specified type scheduled */
+{
+    return game.future[evtype] != FOREVER;
+}
+
+extern double scheduled(int evtype)
+/* when will this event happen? */
+{
+    return game.future[evtype];
+}
+
+void schedule(int evtype, double offset)
+/* schedule an event of specified type */
+{
+    game.future[evtype] = game.state.date + offset;
+}
+
+void postpone(int evtype, double offset)
+/* poistpone a scheduled event */
+{
+    game.future[evtype] += offset;
+}
+
 void events(void) 
 {
     int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
@@ -68,7 +98,7 @@ void events(void)
 	    if (ipage==0) pause_game(1);
 	    ipage=1;
 	    snova(0,0);
-	    game.future[FSNOVA] = game.state.date + expran(0.5*game.intime);
+	    schedule(FSNOVA, expran(0.5*game.intime));
 	    if (game.state.galaxy[game.quadx][game.quady].supernova) return;
 	    break;
 	case FSPY: /* Check with spy to see if S.C. should tractor beam */
@@ -90,15 +120,15 @@ void events(void)
 	case FTBEAM: /* Tractor beam */
 	    if (line==FTBEAM) {
 		if (game.state.remcom == 0) {
-		    game.future[FTBEAM] = FOREVER;
+		    unschedule(FTBEAM);
 		    break;
 		}
 		i = Rand()*game.state.remcom+1.0;
 		yank = square(game.state.cx[i]-game.quadx) + square(game.state.cy[i]-game.quady);
 		if (istract || game.condit == IHDOCKED || yank == 0) {
 		    /* Drats! Have to reschedule */
-		    game.future[FTBEAM] = game.state.date + game.optime +
-			expran(1.5*game.intime/game.state.remcom);
+		    schedule(FTBEAM, 
+			     game.optime + expran(1.5*game.intime/game.state.remcom));
 		    break;
 		}
 	    }
@@ -161,18 +191,19 @@ void events(void)
 	    /* Adjust finish time to time of tractor beaming */
 	    fintim = game.state.date+game.optime;
 	    attack(0);
-	    if (game.state.remcom <= 0) game.future[FTBEAM] = FOREVER;
-	    else game.future[FTBEAM] = game.state.date+game.optime+expran(1.5*game.intime/game.state.remcom);
+	    if (game.state.remcom <= 0) unschedule(FTBEAM);
+	    else schedule(FTBEAM, game.optime+expran(1.5*game.intime/game.state.remcom));
 	    break;
 	case FSNAP: /* Snapshot of the universe (for time warp) */
 	    game.snapsht = game.state;
 	    game.state.snap = 1;
-	    game.future[FSNAP] = game.state.date + expran(0.5 * game.intime);
+	    schedule(FSNAP, expran(0.5 * game.intime));
 	    break;
 	case FBATTAK: /* Commander attacks starbase */
 	    if (game.state.remcom==0 || game.state.rembase==0) {
 		/* no can do */
-		game.future[FBATTAK] = game.future[FCDBAS] = FOREVER;
+		unschedule(FBATTAK);
+		unschedule(FCDBAS);
 		break;
 	    }
 	    i = 0;
@@ -188,16 +219,16 @@ void events(void)
 	    }
 	    if (j>game.state.rembase) {
 		/* no match found -- try later */
-		game.future[FBATTAK] = game.state.date + expran(0.3*game.intime);
-		game.future[FCDBAS] = FOREVER;
+		schedule(FBATTAK, expran(0.3*game.intime));
+		unschedule(FCDBAS);
 		break;
 	    }
 	    /* commander + starbase combination found -- launch attack */
 	    game.batx = game.state.baseqx[j];
 	    game.baty = game.state.baseqy[j];
-	    game.future[FCDBAS] = game.state.date+1.0+3.0*Rand();
+	    schedule(FCDBAS, 1.0+3.0*Rand());
 	    if (game.isatb) /* extra time if SC already attacking */
-		game.future[FCDBAS] += game.future[FSCDBAS]-game.state.date;
+		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date);
 	    game.future[FBATTAK] = game.future[FCDBAS] +expran(0.3*game.intime);
 	    game.iseenit = 0;
 	    if (game.damage[DRADIO] != 0.0 &&
@@ -210,7 +241,7 @@ void events(void)
 	    prout(cramlc(quadrant, game.batx, game.baty));
 	    prout(_("   reports that it is under attack and that it can"));
 	    proutn(_("   hold out only until stardate %d"),
-		   (int)game.future[FCDBAS]);
+		   (int)scheduled(FCDBAS));
 	    prout(".\"");
 	    if (game.resting) {
 		skip(1);
@@ -223,7 +254,7 @@ void events(void)
 	    }
 	    break;
 	case FSCDBAS: /* Supercommander destroys base */
-	    game.future[FSCDBAS] = FOREVER;
+	    unschedule(FSCDBAS);
 	    game.isatb = 2;
 	    if (!game.state.galaxy[game.state.isx][game.state.isy].starbase) 
 		break; /* WAS RETURN! */
@@ -233,7 +264,7 @@ void events(void)
 	    game.baty = game.state.isy;
 	case FCDBAS: /* Commander succeeds in destroying base */
 	    if (line==FCDBAS) {
-		game.future[FCDBAS] = FOREVER;
+		unschedule(FCDBAS);
 		/* find the lucky pair */
 		for_commanders(i)
 		    if (game.state.cx[i]==game.batx && game.state.cy[i]==game.baty) 
@@ -289,13 +320,13 @@ void events(void)
 	    }
 	    break;
 	case FSCMOVE: /* Supercommander moves */
-	    game.future[FSCMOVE] = game.state.date+0.2777;
+	    schedule(FSCMOVE, 0.2777);
 	    if (game.ientesc+istract==0 &&
 		game.isatb!=1 &&
 		(game.iscate!=1 || game.justin==1)) scom(&ipage);
 	    break;
 	case FDSPROB: /* Move deep space probe */
-	    game.future[FDSPROB] = game.state.date + 0.01;
+	    schedule(FDSPROB, 0.01);
 	    game.probex += game.probeinx;
 	    game.probey += game.probeiny;
 	    i = (int)(game.probex/QUADSIZE +0.05);
@@ -317,7 +348,7 @@ void events(void)
 			    proutn(_("is no longer transmitting"));
 			prout(".\"");
 		    }
-		    game.future[FDSPROB] = FOREVER;
+		    unschedule(FDSPROB);
 		    break;
 		}
 		if (game.damage[DRADIO]==0.0   || game.condit == IHDOCKED) {
@@ -342,7 +373,7 @@ void events(void)
 		game.state.galaxy[game.probecx][game.probecy].stars) {
 		/* lets blow the sucker! */
 		snova(1,0);
-		game.future[FDSPROB] = FOREVER;
+		unschedule(FDSPROB);
 		if (game.state.galaxy[game.quadx][game.quady].supernova) 
 		    return;
 	    }
@@ -350,7 +381,7 @@ void events(void)
 #ifdef EXPERIMENTAL
 	case FDISTR: /* inhabited system issues distress call */
 	    /* in BSD Trek this is a straight 1 stardate ahead */ 
-	    game.future[FDISTR] =  game.state.date + 1.0 + Rand();
+	    schedule(FDISTR, 1.0 + Rand());
 	    /* if we already have too many, throw this one away */
 	    if (game.ndistr >= MAXDISTR)
 		break;
@@ -801,7 +832,8 @@ void snova(int insx, int insy)
 	/* did in the Supercommander! */
 	game.state.nscrem = game.state.isx = game.state.isy = game.isatb = game.iscate = 0;
 	iscdead = 1;
-	game.future[FSCMOVE] = game.future[FSCDBAS] = FOREVER;
+	unschedule(FSCMOVE);
+	unschedule(FSCDBAS);
     }
     if (game.state.remcom) {
 	int maxloop = game.state.remcom, l;
@@ -813,7 +845,7 @@ void snova(int insx, int insy)
 		game.state.remcom--;
 		kldead--;
 		comdead++;
-		if (game.state.remcom==0) game.future[FTBEAM] = FOREVER;
+		if (game.state.remcom==0) unschedule(FTBEAM);
 		break;
 	    }
 	}
