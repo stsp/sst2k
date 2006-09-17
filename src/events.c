@@ -347,6 +347,122 @@ void events(void)
 		    return;
 	    }
 	    break;
+#ifdef EXPERIMENTAL
+	case FDISTR: /* inhabited system issues distress call */
+	    /* in BSD Trek this is a straight 1 stardate ahead */ 
+	    game.future[FDISTR] =  game.state.date + 1.0 + Rand();
+	    /* if we already have too many, throw this one away */
+	    if (game.ndistr >= MAXDISTR)
+		break;
+	    /* try a whole bunch of times to find something suitable */
+	    for (i = 0; i < 100; i++) {
+		struct quadrant *q;
+		iran(GALSIZE, &ix, &iy);
+		q = &game.state.galaxy[game.quadx][game.quady];
+		/* need a quadrant which is not the current one,
+		   which has some stars which are inhabited and
+		   not already under attack, which is not
+		   supernova'ed, and which has some Klingons in it */
+		if (!((ix == game.quadx && iy == game.quady) || q->stars<=0 ||
+		      (q->qsystemname & Q_DISTRESSED) ||
+		      (q->qsystemname & Q_SYSTEM) == 0 || q->klings <= 0))
+		    break;
+	    }
+	    if (i >= 100)
+		/* can't seem to find one; ignore this call */
+		break;
+
+	    /* got one!!  Schedule its enslavement */
+	    game.ndistr++;
+	    e = xsched(E_ENSLV, 1, ix, iy, q->qsystemname);
+	    q->qsystemname = (e - Event) | Q_DISTRESSED;
+
+	    /* tell the captain about it if we can */
+	    if (game.damage[DRADIO] == 0.0)
+	    {
+		printf("\nUhura: Captain, starsystem %s in quadrant %d,%d is under attack\n",
+		       Systemname[e->systemname], ix, iy);
+		restcancel++;
+	    }
+	    else
+		/* if we can't tell him, make it invisible */
+		e->evcode |= E_HIDDEN;
+	    break;
+      case FENSLV:		/* starsystem is enslaved */
+	    unschedule(e);
+	    /* see if current distress call still active */
+	    q = &Quad[e->x][e->y];
+	    if (q->klings <= 0)
+	    {
+		/* no Klingons, clean up */
+		/* restore the system name */
+		q->qsystemname = e->systemname;
+		break;
+	    }
+
+	    /* play stork and schedule the first baby */
+	    e = schedule(E_REPRO, Param.eventdly[E_REPRO] * franf(), e->x, e->y, e->systemname);
+
+	    /* report the disaster if we can */
+	    if (game.damage[DRADIO] == 0.0)
+	    {
+		printf("\nUhura:  We've lost contact with starsystem %s\n",
+		       Systemname[e->systemname]);
+		printf("  in quadrant %d,%d.\n", e->x, e->y);
+	    }
+	    else
+		e->evcode |= E_HIDDEN;
+	    break;
+      case FREPRO:		/* Klingon reproduces */
+	    /* see if distress call is still active */
+	    q = &Quad[e->x][e->y];
+	    if (q->klings <= 0)
+	    {
+		unschedule(e);
+		q->qsystemname = e->systemname;
+		break;
+	    }
+	    xresched(e, E_REPRO, 1);
+	    /* reproduce one Klingon */
+	    ix = e->x;
+	    iy = e->y;
+	    if (Now.klings == 127)
+		break;		/* full right now */
+	    if (q->klings >= MAXKLQUAD)
+	    {
+		/* this quadrant not ok, pick an adjacent one */
+		for (i = ix - 1; i <= ix + 1; i++)
+		{
+		    if (!VALID_QUADRANT(i))
+			continue;
+		    for (j = iy - 1; j <= iy + 1; j++)
+		    {
+			if (!VALID_QUADRANT(j))
+			    continue;
+			q = &Quad[i][j];
+			/* check for this quad ok (not full & no snova) */
+			if (q->klings >= MAXKLQUAD || q->stars < 0)
+			    continue;
+			break;
+		    }
+		    if (j <= iy + 1)
+			break;
+		}
+		if (j > iy + 1)
+		    /* cannot create another yet */
+		    break;
+		ix = i;
+		iy = j;
+	    }
+	    /* deliver the child */
+	    game.remkl++;
+	    if (ix == game.quadx && iy == game.quady)
+		newkling(++game.klhere, &ixhold, &iyhold);
+
+	    /* recompute time left */
+	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
+	    break;
+#endif /* EXPERIMENTAL */
 	}
     }
 }

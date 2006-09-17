@@ -72,7 +72,7 @@ typedef struct {
 	double date,		// stardate
 	    remres,		// remaining resources
 	    remtime;		// remaining time
-    struct {
+    struct quadrant {
 	int stars;
 	planet *planet;
 	int starbase;
@@ -80,6 +80,9 @@ typedef struct {
 	int romulans;
 	int supernova;
 	int charted;
+#ifdef EXPERIMENTAL
+	enum {secure, distressed, enslaved} status;
+#endif /* EXPERIMENTAL */
     } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
     struct {
 	int stars;
@@ -152,7 +155,18 @@ typedef struct {
 #define FSCMOVE 6   // Supercommander moves (might attack base)
 #define FSCDBAS 7   // Supercommander destroys base
 #define FDSPROB 8   // Move deep space probe
+#ifndef EXPERIMENTAL
 #define NEVENTS (9)
+#else /* EXPERIMENTAL */
+#define FDISTR	9   // Emit distress call from an inhabited world 
+#define FENSLV	10  // Inhabited word is enslaved */
+#define FREPRO	11  // Klingons build a ship in an enslaved system
+#define NEVENTS (12)
+#endif /* EXPERIMENTAL */
+
+#ifdef EXPERIMENTAL
+#define	MAXDISTR	5	/* maximum concurrent distress calls */
+#endif /* EXPERIMENTAL */
 
 #define SSTMAGIC	"SST2.0\n"
 
@@ -228,6 +242,9 @@ struct game {
 	ithx,		// coordinates of Tholian
 	ithy,		//
 	iseenit,	// seen base attack report
+#ifdef EXPERIMENTAL
+	ndistr,		//* count of distress calls */ 
+#endif /* EXPERIMENTAL */
 	probecx,	// current probe quadrant
 	probecy,	//
 	proben,		// number of moves for probe
@@ -401,6 +418,7 @@ void commandhook(char *, int);
 void makechart(void);
 void enqueue(char *);
 char *systemname(planet *);
+void newkling(int, int *, int *);
 
 /* mode arguments for srscan() */
 #define SCAN_FULL		1

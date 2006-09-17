@@ -228,12 +228,16 @@ void setup(int needprompt)
     game.docfac = 0.25;
     for_quadrants(i)
 	for_quadrants(j) {
-	    game.state.galaxy[i][j].charted = 0;
-	    game.state.galaxy[i][j].planet = NULL;
-	    game.state.galaxy[i][j].romulans = 0;
-	    game.state.galaxy[i][j].klingons = 0;
-	    game.state.galaxy[i][j].starbase = 0;
-	    game.state.galaxy[i][j].supernova = 0;
+	struct quadrant *quad = &game.state.galaxy[i][j];
+	    quad->charted = 0;
+	    quad->planet = NULL;
+	    quad->romulans = 0;
+	    quad->klingons = 0;
+	    quad->starbase = 0;
+	    quad->supernova = 0;
+#ifdef EXPERIMENTAL
+	    quad->status = secure;
+#endif /* EXPERIMENTAL */
 	}
     // Initialize times for extraneous events
     game.future[FSNOVA] = game.state.date + expran(0.5 * game.intime);
@@ -244,6 +248,13 @@ void setup(int needprompt)
     game.future[FSCMOVE] = game.state.nscrem ? game.state.date+0.2777 : FOREVER;
     game.future[FSCDBAS] = FOREVER;
     game.future[FDSPROB] = FOREVER;
+#ifdef EXPERIMENTAL
+    if (game.options & OPTION_WORLDS)
+	/* in BSD-Trek, this is a fixed one stardate in the future */
+	game.future[FDISTR] = game.state.date + 1.0 + Rand();
+    game.future[FENSLV] = FOREVER;
+    game.future[FREPRO] = FOREVER;
+#endif /* EXPERIMENTAL */
     // Starchart is functional but we've never seen it
     game.lastchart = FOREVER;
     // Put stars in the galaxy
@@ -537,11 +548,20 @@ void newcnd(void)
     if (!game.alive) game.condit=IHDEAD;
 }
 
+void newkling(int i, int *pix, int *piy)
+/* drop new Klingon into current quadrant */
+{
+    dropin(IHK, pix, piy);
+    game.kx[i] = *pix;
+    game.ky[i] = *piy;
+    game.kdist[i] = game.kavgd[i] = sqrt(square(game.sectx-*pix) + square(game.secty-*piy));
+    game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill;
+}
 
 void newqad(int shutup) 
 {
     int i, j, ix, iy;
-    planet *planhere;
+    struct quadrant *here;
 
     game.iattak = 1;
     game.justin = 1;
@@ -570,25 +590,21 @@ void newqad(int shutup)
     for_sectors(i)
 	for_sectors(j) 
 	    game.quad[i][j] = IHDOT;
+    here = &game.state.galaxy[game.quadx][game.quady];
     // cope with supernova
-    if (game.state.galaxy[game.quadx][game.quady].supernova)
+    if (here->supernova)
 	return;
-    game.klhere = game.state.galaxy[game.quadx][game.quady].klingons;
-    game.irhere = game.state.galaxy[game.quadx][game.quady].romulans;
+    game.klhere = here->klingons;
+    game.irhere = here->romulans;
     game.nenhere = game.klhere + game.irhere;
 
     // Position Starship
     game.quad[game.sectx][game.secty] = game.ship;
 
-    if (game.state.galaxy[game.quadx][game.quady].klingons) {
+    if (here->klingons) {
 	// Position ordinary Klingons
-	for (i = 1; i <= game.klhere; i++) {
-	    dropin(IHK, &ix, &iy);
-	    game.kx[i] = ix;
-	    game.ky[i] = iy;
-	    game.kdist[i] = game.kavgd[i] = sqrt(square(game.sectx-ix) + square(game.secty-iy));
-	    game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill;
-	}
+	for (i = 1; i <= game.klhere; i++)
+	    newkling(i, &ix, &iy);
 	// If we need a commander, promote a Klingon
 	for_commanders(i)
 	    if (game.state.cx[i]==game.quadx && game.state.cy[i]==game.quady) break;
@@ -616,14 +632,13 @@ void newqad(int shutup)
 	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*game.skill;
     }
     // If quadrant needs a starbase, put it in
-    if (game.state.galaxy[game.quadx][game.quady].starbase)
+    if (here->starbase)
 	dropin(IHB, &game.basex, &game.basey);
 	
     // If quadrant needs a planet, put it in
-    planhere = game.state.galaxy[game.quadx][game.quady].planet;
-    if (planhere) {
-	game.iplnet = planhere - game.state.plnets;
-	if (planhere->inhabited == UNINHABITED)
+    if (here->planet) {
+	game.iplnet = here->planet - game.state.plnets;
+	if (here->planet->inhabited == UNINHABITED)
 	    dropin(IHP, &game.plnetx, &game.plnety);
 	else
 	    dropin(IHW, &game.plnetx, &game.plnety);
@@ -631,11 +646,11 @@ void newqad(int shutup)
     // Check for game.condition
     newcnd();
     // And finally the stars
-    for (i = 1; i <= game.state.galaxy[game.quadx][game.quady].stars; i++) 
+    for (i = 1; i <= here->stars; i++) 
 	dropin(IHSTAR, &ix, &iy);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0 && (!planhere || planhere->inhabited == UNINHABITED)) {
+    if (game.irhere > 0 && game.klhere == 0 && (!here->planet || here->planet->inhabited == UNINHABITED)) {
 	game.neutz = 1;
 	if (game.damage[DRADIO] <= 0.0) {
 	    skip(1);
