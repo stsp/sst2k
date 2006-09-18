@@ -208,10 +208,8 @@ struct game {
 	justin,		// just entered quadrant
 	alldone,	// game is now finished
 	neutz,		// Romulan Neutral Zone
-	isatb,		// =1 if super commander is attacking base
 	isarmed,	// probe is armed
-	thawed,		// thawed game
-	iscate;		// super commander is here
+	thawed;		// thawed game
     int inkling,	// Initial number of klingons
 	inbase,		// Initial number of bases
 	incom,		// Initial number of commanders
@@ -241,6 +239,8 @@ struct game {
 	icraft,		// Kirk in Galileo
 	ientesc,	// attempted escape from supercommander
 	iscraft,	// =1 if craft on ship, -1 if removed from game
+	isatb,		// =1 if super commander is attacking base
+	iscate,		// super commander is here
 #ifdef DEBUG
 	idebug,		// debug mode
 #endif

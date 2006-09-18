@@ -220,8 +220,7 @@ void setup(int needprompt)
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.resting = game.casual = 0;
-    game.isatb = game.iscate = true;
-    game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
+    game.isatb = game.iscate = game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     game.iscraft = 1;
     game.landed = -1;
