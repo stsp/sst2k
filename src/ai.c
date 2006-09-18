@@ -334,7 +334,7 @@ static bool movescom(coord iq, int flag, int *ipage)
 	    game.state.plnets[i].crystals == 1) {
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
-	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NULL;
+	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;

@@ -318,7 +318,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmena(1, iquad, 2, w);
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NULL;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
 	    game.plnet.x = game.plnet.y = 0;
@@ -327,6 +327,22 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		/* captain perishes on planet */
 		finish(FDPLANET);
 	    }
+	    return;
+	case IHW: /* Hit an inhabited world -- very bad! */
+	    crmena(1, iquad, 2, w);
+	    prout(_(" destroyed."));
+	    game.state.nworldkl++;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
+	    DESTROY(&game.state.plnets[game.iplnet]);
+	    game.iplnet = 0;
+	    game.plnet.x = game.plnet.y = 0;
+	    game.quad[w.x][w.y] = IHDOT;
+	    if (game.landed==1) {
+		/* captain perishes on planet */
+		finish(FDPLANET);
+	    }
+	    prout("You have just destroyed an inhabited planet.");
+	    prout("Celebratory rallies are being held on the Klingon homeworld.");
 	    return;
 	case IHSTAR: /* Hit a star */
 	    if (Rand() > 0.10) {

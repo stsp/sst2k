@@ -1,34 +1,51 @@
 #include "sst.h"
 #include <math.h>
 
-void unschedule(int evtype)
+event *unschedule(int evtype)
 /* remove an event from the schedule */
 {
-    game.future[evtype] = FOREVER;
+    game.future[evtype].date = FOREVER;
+    return &game.future[evtype];
 }
 
 int is_scheduled(int evtype)
 /* is an event of specified type scheduled */
 {
-    return game.future[evtype] != FOREVER;
+    return game.future[evtype].date != FOREVER;
 }
 
 extern double scheduled(int evtype)
 /* when will this event happen? */
 {
-    return game.future[evtype];
+    return game.future[evtype].date;
 }
 
-void schedule(int evtype, double offset)
+event *schedule(int evtype, double offset)
 /* schedule an event of specified type */
 {
-    game.future[evtype] = game.state.date + offset;
+    game.future[evtype].date = game.state.date + offset;
+    return &game.future[evtype];
 }
 
 void postpone(int evtype, double offset)
 /* poistpone a scheduled event */
 {
-    game.future[evtype] += offset;
+    game.future[evtype].date += offset;
+}
+
+static bool cancelrest(void)
+{
+    if (game.resting) {
+	skip(1);
+	proutn(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
+	if (ja()) {
+	    game.resting = 0;
+	    game.optime = 0.0;
+	    return true;
+	}
+    }
+
+    return false;
 }
 
 void events(void) 
@@ -36,7 +53,9 @@ void events(void)
     int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
     int radio_was_broken;
-    struct quadrant *pdest;
+    struct quadrant *pdest, *q;
+    coord w, hold;
+    event *ev;
 
     if (idebug) prout("=== EVENTS");
 
@@ -48,9 +67,9 @@ void events(void)
 	if (game.alldone) return;
 	datemin = fintim;
 	for (l = 1; l < NEVENTS; l++)
-	    if (game.future[l] < datemin) {
+	    if (game.future[l].date < datemin) {
 		line = l;
-		datemin = game.future[l];
+		datemin = game.future[l].date;
 	    }
 	xtime = datemin-game.state.date;
 	game.state.date = datemin;
@@ -228,10 +247,10 @@ void events(void)
 	    schedule(FCDBAS, 1.0+3.0*Rand());
 	    if (game.isatb) /* extra time if SC already attacking */
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date);
-	    game.future[FBATTAK] = game.future[FCDBAS] +expran(0.3*game.intime);
+	    game.future[FBATTAK].date = game.future[FCDBAS].date + expran(0.3*game.intime);
 	    game.iseenit = 0;
-	    if (game.damage[DRADIO] != 0.0 &&
-		game.condit != IHDOCKED) break; /* No warning :-( */
+	    if (game.damage[DRADIO] != 0.0 && game.condit != IHDOCKED) 
+		break; /* No warning :-( */
 	    game.iseenit = 1;
 	    if (ipage==0) pause_game(1);
 	    ipage = 1;
@@ -242,15 +261,8 @@ void events(void)
 	    proutn(_("   hold out only until stardate %d"),
 		   (int)scheduled(FCDBAS));
 	    prout(".\"");
-	    if (game.resting) {
-		skip(1);
-		proutn(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
-		if (ja()) {
-		    game.resting = 0;
-		    game.optime = 0.0;
-		    return;
-		}
-	    }
+	    if (cancelrest())
+		return;
 	    break;
 	case FSCDBAS: /* Supercommander destroys base */
 	    unschedule(FSCDBAS);
@@ -380,25 +392,18 @@ void events(void)
 		    return;
 	    }
 	    break;
-#ifdef EXPERIMENTAL
 	case FDISTR: /* inhabited system issues distress call */
-	    /* in BSD Trek this is a straight 1 stardate ahead */ 
-	    schedule(FDISTR, 1.0 + Rand());
-	    /* if we already have too many, throw this one away */
-	    if (game.ndistr >= MAXDISTR)
-		break;
+	    schedule(FDISTR, expran(0.5*game.intime));
 	    /* try a whole bunch of times to find something suitable */
 	    for (i = 0; i < 100; i++) {
-		struct quadrant *q;
-		iran(GALSIZE, &ix, &iy);
+		iran(GALSIZE, &w.x, &w.y);
 		q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
 		/* need a quadrant which is not the current one,
 		   which has some stars which are inhabited and
 		   not already under attack, which is not
 		   supernova'ed, and which has some Klingons in it */
-		if (!((ix == game.quadrant.x && iy == game.quadrant.y) || q->stars<=0 ||
-		      (q->qsystemname & Q_DISTRESSED) ||
-		      (q->qsystemname & Q_SYSTEM) == 0 || q->klings <= 0))
+		if (!(same(game.quadrant, w) || q->stars<=0 ||
+		      q->supernova || q->status != secure || q->klingons <= 0))
 		    break;
 	    }
 	    if (i >= 100)
@@ -406,96 +411,78 @@ void events(void)
 		break;
 
 	    /* got one!!  Schedule its enslavement */
-	    game.ndistr++;
-	    e = xsched(E_ENSLV, 1, ix, iy, q->qsystemname);
-	    q->qsystemname = (e - Event) | Q_DISTRESSED;
+	    ev = schedule(FENSLV, expran(game.intime));
+	    ev->quadrant = w;
+	    q->status = distressed;
 
 	    /* tell the captain about it if we can */
-	    if (game.damage[DRADIO] == 0.0)
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
 	    {
-		printf("\nUhura: Captain, starsystem %s in quadrant %d,%d is under attack\n",
-		       Systemname[e->systemname], ix, iy);
-		restcancel++;
+		prout("Uhura: Captain, starsystem %s in quadrant %d - %d is under attack.",
+		      systemname(q->planet), w.x, w.y);
+		if (cancelrest())
+		    return;
 	    }
-	    else
-		/* if we can't tell him, make it invisible */
-		e->evcode |= E_HIDDEN;
 	    break;
       case FENSLV:		/* starsystem is enslaved */
-	    unschedule(e);
+	    ev = unschedule(FENSLV);
 	    /* see if current distress call still active */
-	    q = &Quad[e->x][e->y];
-	    if (q->klings <= 0)
-	    {
-		/* no Klingons, clean up */
-		/* restore the system name */
-		q->qsystemname = e->systemname;
+	    q = &game.state.galaxy[ev->quadrant.x][ev->quadrant.y];
+	    if (q->klingons <= 0) {
+		q->status = secure;
 		break;
 	    }
+	    q->status = enslaved;
 
 	    /* play stork and schedule the first baby */
-	    e = schedule(E_REPRO, Param.eventdly[E_REPRO] * franf(), e->x, e->y, e->systemname);
+	    ev = schedule(FREPRO, expran(2.0 * game.intime));
 
 	    /* report the disaster if we can */
-	    if (game.damage[DRADIO] == 0.0)
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
 	    {
-		printf("\nUhura:  We've lost contact with starsystem %s\n",
-		       Systemname[e->systemname]);
-		printf("  in quadrant %d,%d.\n", e->x, e->y);
+		prout("\nUhura:  We've lost contact with starsystem %s\n",
+		      systemname(q->planet));
+		prout("  in quadrant %d,%d.\n", ev->quadrant.x,ev->quadrant.y);
 	    }
-	    else
-		e->evcode |= E_HIDDEN;
-	    break;
       case FREPRO:		/* Klingon reproduces */
-	    /* see if distress call is still active */
-	    q = &Quad[e->x][e->y];
-	    if (q->klings <= 0)
-	    {
-		unschedule(e);
-		q->qsystemname = e->systemname;
+	    ev = schedule(FREPRO, expran(1.0 * game.intime));
+	    /* see if current distress call still active */
+	    q = &game.state.galaxy[ev->quadrant.x][ev->quadrant.y];
+	    if (q->klingons <= 0) {
+		q->status = secure;
 		break;
 	    }
-	    xresched(e, E_REPRO, 1);
 	    /* reproduce one Klingon */
-	    ix = e->x;
-	    iy = e->y;
-	    if (Now.klings == 127)
+	    w = ev->quadrant;
+	    if (game.state.remkl >=MAXKLGAME)
 		break;		/* full right now */
-	    if (q->klings >= MAXKLQUAD)
+	    /* this quadrant not ok, pick an adjacent one */
+	    for (i = w.x - 1; i <= w.x + 1; i++)
 	    {
-		/* this quadrant not ok, pick an adjacent one */
-		for (i = ix - 1; i <= ix + 1; i++)
+		for (j = w.y - 1; j <= w.y + 1; j++)
 		{
-		    if (!VALID_QUADRANT(i))
+		    if (!VALID_QUADRANT(i, j))
 			continue;
-		    for (j = iy - 1; j <= iy + 1; j++)
-		    {
-			if (!VALID_QUADRANT(j))
-			    continue;
-			q = &Quad[i][j];
-			/* check for this quad ok (not full & no snova) */
-			if (q->klings >= MAXKLQUAD || q->stars < 0)
-			    continue;
-			break;
-		    }
-		    if (j <= iy + 1)
-			break;
+		    q = &game.state.galaxy[w.x][w.y];
+		    /* check for this quad ok (not full & no snova) */
+		    if (q->klingons >= MAXKLQUAD || q->stars < 0)
+			continue;
+		    goto foundit;
 		}
-		if (j > iy + 1)
-		    /* cannot create another yet */
-		    break;
-		ix = i;
-		iy = j;
 	    }
+	    break;	/* search for eligible quadrant failed */
+	foundit:
+	    w.x = i;
+	    w.y = j;
+
 	    /* deliver the child */
-	    game.remkl++;
-	    if (ix == game.quadrant.x && iy == game.quadrant.y)
-		newkling(++game.klhere, &ixhold, &iyhold);
+	    game.state.remkl++;
+	    if (same(game.quadrant, w))
+		newkling(++game.klhere, &hold);
 
 	    /* recompute time left */
 	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
 	    break;
-#endif /* EXPERIMENTAL */
 	}
     }
 }
@@ -618,7 +605,7 @@ void nova(int ix, int iy)
 			game.quad[scratch.x][scratch.y] = IHDOT;
 			break;
 		    case IHP: /* Destroy planet */
-			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NULL;
+			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
 			game.state.nplankl++;
 			crmena(1, IHP, 2, scratch);
 			prout(_(" destroyed."));

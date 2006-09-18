@@ -155,9 +155,13 @@ for a lot of magic numbers and refactored the heck out of it.
 
    5. Half the quadrants now have inhabited planets, from which one 
       cannot mine dilithium (there will still be the same additional number
-      of dilithium-bearing planets).  Right now this is just color, but
-      eventually we'll fold in BSD-Trek-like logic for Klingons to attack
-      and enslave inhabited worlds.
+      of dilithium-bearing planets).  Torpedoing an inhabited world is *bad*.
+      There is BSD-Trek-like logic for Klingons to attack and enslave 
+      inhabited worlds, producing more ships (only is skill is 'good' or 
+      better). (Controlled by OPTION_WORLDS and turned off if game 
+      type is "plain" or "almy".)
+
+   6. User input is now logged so we can do regression testing.
 */
 
 /* the input queue */
@@ -274,6 +278,8 @@ commands[] = {
 	{"QUIT",	QUIT,		0},
 #define HELP	36
 	{"HELP",	HELP,		0},
+#define SEED	37
+	{"SEED",	SEED,		0},
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
@@ -379,7 +385,7 @@ void enqueue(char *s)
 
 static void makemoves(void) 
 {
-    int i, v = 0;
+    int key, i, v = 0;
     bool hitme;
     clrscr();
     setwnd(message_window);
@@ -441,7 +447,7 @@ static void makemoves(void)
 	    if (game.ididit) hitme = true;
 	    break;
 	case MOVE:			// move
-	    warp(1);
+	    warp(false);
 	    break;
 	case SHIELDS:			// shields
 	    doshield(1);
@@ -543,7 +549,12 @@ static void makemoves(void)
 	    game.alldone = 1;		// quit the game
 	    break;
 	case HELP:
-	    helpme();	// get help
+	    helpme();			// get help
+	    break;
+	case SEED:			// set random-number seed
+	    key = scan();
+	    if (key == IHREAL)
+		seed = (int)aaitem;
 	    break;
 	}
 	commandhook(commands[i].name, false);
@@ -598,6 +609,9 @@ int main(int argc, char **argv)
 	    exit(0);
 	}
     }
+    /* where to save the input in case of bugs */
+    logfp = fopen("sst-input.log", "w");
+    setlinebuf(logfp);
 
     randomize();
     iostart();
@@ -704,7 +718,7 @@ double Rand(void)
     if (!randready) {
 	if (seed == 0)
 	    seed = (unsigned)time(NULL);
-	if (idebug)
+	if (logfp)
 	    fprintf(logfp, "seed %d\n", seed);
 	srand(seed);
 	randready = true;
@@ -830,7 +844,7 @@ void debugme(void)
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
     }
-    proutn("Toggle game.idebug? ");
+    proutn("Toggle debug flag? ");
     if (ja() != 0) {
 	idebug = !idebug;
 	if (idebug) prout("Debug output ON");
@@ -852,6 +866,8 @@ void debugme(void)
     }
     proutn("Examine/change events? ");
     if (ja() != 0) {
+	event *ev;
+	coord w;
 	int i;
 	for (i = 1; i < NEVENTS; i++) {
 	    int key;
@@ -864,13 +880,36 @@ void debugme(void)
 	    case FCDBAS:  proutn("Base Destroy    "); break;
 	    case FSCMOVE: proutn("SC Move         "); break;
 	    case FSCDBAS: proutn("SC Base Destroy "); break;
+	    //case FDSPROB:proutn("Probe Move      "); break;
+	    case FDISTR:  proutn("Distress Call   "); break;
+	    case FENSLV:  proutn("Enlavement      "); break;
+	    case FREPRO:  proutn("Klingon Build   "); break;
 	    }
 	    proutn("%.2f", scheduled(i)-game.state.date);
 	    chew();
 	    proutn("  ?");
 	    key = scan();
 	    if (key == IHREAL) {
-		schedule(i, aaitem);
+		ev = schedule(i, aaitem);
+		if (i == FENSLV || i == FREPRO) {
+		    chew();
+		    proutn("In quadrant- ");
+		    key = scan();
+		    if (key != IHREAL) {
+			prout("Event %d canceled, no y coordinate.", i);
+			unschedule(i);
+			continue;
+		    }
+		    w.y = (int)aaitem;
+		    key = scan();
+		    if (key != IHREAL) {
+			prout("Event %d canceled, no x coordinate.", i);
+			unschedule(i);
+			continue;
+		    }
+		    w.x = (int)aaitem;
+		    ev->quadrant = w;
+		}
 	    }
 	}
 	chew();

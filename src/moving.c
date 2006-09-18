@@ -489,12 +489,12 @@ void impuls(void)
 }
 
 
-void warp(int i) 
+void warp(bool timewarp) 
 {
     int blooey=0, twarp=0, iwarp;
     double power;
 
-    if (i!=2) { /* Not WARPX entry */
+    if (!timewarp) { /* Not WARPX entry */
 	game.ididit = 0;
 	if (game.damage[DWARPEN] > 10.0) {
 	    chew();
@@ -749,10 +749,10 @@ void atover(int igrab)
 	if (distreq < game.dist) game.dist = distreq;
 	game.optime = 10.0*game.dist/game.wfacsq;
 	game.direc = 12.0*Rand();	/* How dumb! */
-	game.justin = 0;
-	game.inorbit = 0;
-	warp(2);
-	if (game.justin == 0) {
+	game.justin = false;
+	game.inorbit = false;
+	warp(true);
+	if (!game.justin) {
 	    /* This is bad news, we didn't leave quadrant. */
 	    if (game.alldone) return;
 	    skip(1);

@@ -326,7 +326,7 @@ void score(void)
     if (game.gamewon == 0) game.state.nromrem = 0; // None captured if no win
     iscore = 10*NKILLK + 50*NKILLC + ithperd + iwon
 	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
-	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl + game.state.nromrem;
+	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
     if (game.alive == 0) iscore -= 200;
     skip(2);
     prout(_("Your score --"));
@@ -354,6 +354,9 @@ void score(void)
     if (game.state.nplankl)
 	prout(_("%6d planets destroyed by your action   %5d"),
 	      game.state.nplankl, -10*game.state.nplankl);
+    if ((game.options & OPTION_WORLDS) && game.state.nworldkl)
+	prout(_("%6d inhabited planets destroyed by your action   %5d"),
+	      game.state.nplankl, -300*game.state.nworldkl);
     if (game.state.basekl)
 	prout(_("%6d bases destroyed by your action     %5d"),
 	      game.state.basekl, -100*game.state.basekl);

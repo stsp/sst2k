@@ -316,8 +316,8 @@ static void status(int req)
 	break;
     case 10:
 	if (game.options & OPTION_WORLDS) {
-	    planet *here = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
-	    if (here && here->inhabited != UNINHABITED)
+	    int here = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
+	    if (here != NOPLANET && game.state.plnets[here].inhabited != UNINHABITED)
 		proutn("Major system  %s", systemname(here));
 	    else
 		proutn("Sector is uninhabited");

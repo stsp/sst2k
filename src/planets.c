@@ -58,7 +58,7 @@ void orbit(void)
 {
     skip(1);
     chew();
-    if (game.inorbit!=0) {
+    if (game.inorbit) {
 	prout("Already in standard orbit.");
 	return;
     }
@@ -78,8 +78,8 @@ void orbit(void)
     if (consumeTime()) return;
     game.height = (1400.0+7200.0*Rand());
     prout("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"", game.height);
-    game.inorbit = 1;
-    game.ididit=1;
+    game.inorbit = true;
+    game.ididit = true;
 }
 
 void sensor(void) 
@@ -122,7 +122,7 @@ void beam(void)
 	}
 	return;
     }
-    if (game.inorbit==0) {
+    if (!game.inorbit) {
 	crmshp();
 	prout(" not in standard orbit.");
 	return;
@@ -299,7 +299,7 @@ void shuttle(void)
 	else prout("Shuttle craft is now serving Big Macs.");
 	return;
     }
-    if (game.inorbit==0) {
+    if (!game.inorbit) {
 	crmshp();
 	prout(" not in standard orbit.");
 	return;
@@ -509,7 +509,7 @@ void deathray(void)
     return;
 }
 
-char *systemname(planet *planet)
+char *systemname(int pindx)
 {
     static char	*names[NINHAB] =
     {
@@ -582,5 +582,5 @@ char *systemname(planet *planet)
 	"Exo III",		/* TOS: "What Are Little Girls Made Of?" (Class P) */
     };
 
-    return names[planet->inhabited];
+    return names[pindx];
 }

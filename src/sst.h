@@ -65,25 +65,25 @@ typedef struct {
 	starkl,			// destroyed stars
 	basekl,			// destroyed bases
 	nromrem,		// Romulans remaining
-	nplankl;		// destroyed planets
-	planet plnets[PLNETMAX];  // Planet information
-	double date,		// stardate
-	    remres,		// remaining resources
-	    remtime;		// remaining time
+	nplankl,		// destroyed uninhabited planets
+	nworldkl;		// destroyed inhabited planets
+    planet plnets[PLNETMAX];  // Planet information
+    double date,		// stardate
+	remres,		// remaining resources
+	remtime;		// remaining time
     coord baseq[BASEMAX+1];	// Base quadrant coordinates
     coord kcmdr[QUADSIZE+1];	// Commander quadrant coordinates
     coord kscmdr;		// Supercommander quadrant coordinates
     struct quadrant {
 	int stars;
-	planet *planet;
+	int planet;
+#define NOPLANET	-1
 	bool starbase;
 	int klingons;
 	int romulans;
 	bool supernova;
 	bool charted;
-#ifdef EXPERIMENTAL
 	enum {secure, distressed, enslaved} status;
-#endif /* EXPERIMENTAL */
     } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
     struct page {
 	int stars;
@@ -91,6 +91,9 @@ typedef struct {
 	int klingons;
     } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
+
+#define MAXKLGAME	127
+#define MAXKLQUAD	9
 
 #define NKILLK (game.inkling - game.state.remkl)
 #define NKILLC (game.incom - game.state.remcom)
@@ -156,28 +159,25 @@ typedef struct {
 #define FSCMOVE 6   // Supercommander moves (might attack base)
 #define FSCDBAS 7   // Supercommander destroys base
 #define FDSPROB 8   // Move deep space probe
-#ifndef EXPERIMENTAL
-#define NEVENTS (9)
-#else /* EXPERIMENTAL */
 #define FDISTR	9   // Emit distress call from an inhabited world 
 #define FENSLV	10  // Inhabited word is enslaved */
 #define FREPRO	11  // Klingons build a ship in an enslaved system
 #define NEVENTS (12)
-#endif /* EXPERIMENTAL */
+
+typedef struct {
+    double date;
+    coord quadrant;
+} event;
 
 /*
  * abstract out the event handling -- underlying data structures will change
  * when we implement stateful events
  */
-extern void unschedule(int);
+extern event *unschedule(int);
 extern int is_scheduled(int);
-extern void schedule(int, double);
+extern event *schedule(int, double);
 extern void postpone(int, double);
 extern double scheduled(int);
-
-#ifdef EXPERIMENTAL
-#define	MAXDISTR	5	/* maximum concurrent distress calls */
-#endif /* EXPERIMENTAL */
 
 #define SSTMAGIC	"SST2.0\n"
 
@@ -191,7 +191,7 @@ struct game {
     double kdist[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy distances
     double kavgd[(QUADSIZE+1)*(QUADSIZE+1)];		// average distances
     double damage[NDEVICES];	// damage encountered
-    double future[NEVENTS];	// future events
+    event future[NEVENTS];	// future events
     char passwd[10];		// Self Destruct password
     coord ks[(QUADSIZE+1)*(QUADSIZE+1)];	// enemy sector locations
     coord quadrant, sector;	// where we are
@@ -201,23 +201,24 @@ struct game {
     coord plnet;		// location of planet in quadrant
     coord probec;	// current probe quadrant
     bool gamewon,	// Finished!
-	ididit,		// Action taken -- allows enemy to attack
-	alive,		// We are alive (not killed)
+	ididit,		// action taken -- allows enemy to attack
+	alive,		// we are alive (not killed)
 	justin,		// just entered quadrant
 	alldone,	// game is now finished
 	neutz,		// Romulan Neutral Zone
 	isarmed,	// probe is armed
+	inorbit,	// orbiting a planet
 	thawed;		// thawed game
-    int inkling,	// Initial number of klingons
-	inbase,		// Initial number of bases
-	incom,		// Initial number of commanders
-	inscom,		// Initial number of commanders
-	inrom,		// Initial number of commanders
-	instar,		// Initial stars
-	intorps,	// Initial/Max torpedoes
-	condit,		// Condition (red/yellow/green/docked)
+    int inkling,	// initial number of klingons
+	inbase,		// initial number of bases
+	incom,		// initial number of commanders
+	inscom,		// initial number of commanders
+	inrom,		// initial number of commanders
+	instar,		// initial stars
+	intorps,	// initial/Max torpedoes
+	condit,		// condition (red/yellow/green/docked)
 	torps,		// number of torpedoes
-	ship,		// Ship type -- 'E' is Enterprise
+	ship,		// ship type -- 'E' is Enterprise
 	length,		// length of game
 	skill,		// skill level
 	klhere,		// klingons here
@@ -226,7 +227,6 @@ struct game {
 	nhelp,		// calls for help
 	nkinks,		// count of energy-barrier crossings
 	shldchg,	// shield is changing (affects efficiency)
-	inorbit,	// orbiting
 	landed,		// party on planet (1), on ship (-1)
 	iplnet,		// planet # in quadrant
 	imine,		// mining
@@ -244,9 +244,6 @@ struct game {
 	tourn,		// tournament number
 	ithere,		// Tholian is here 
 	iseenit,	// seen base attack report
-#ifdef EXPERIMENTAL
-	ndistr,		//* count of distress calls */ 
-#endif /* EXPERIMENTAL */
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available
     double inresor,	// initial resources
@@ -335,7 +332,7 @@ int srscan(int);
 void lrscan(void);
 void phasers(void);
 void photon(void);
-void warp(int);
+void warp(bool);
 void doshield(int);
 void dock(int);
 void dreprt(void);
@@ -416,7 +413,7 @@ void setpassword(void);
 void commandhook(char *, bool);
 void makechart(void);
 void enqueue(char *);
-char *systemname(planet *);
+char *systemname(int);
 void newkling(int, coord *);
 
 /* mode arguments for srscan() */

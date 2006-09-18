@@ -227,14 +227,12 @@ void setup(int needprompt)
 	for_quadrants(j) {
 	struct quadrant *quad = &game.state.galaxy[i][j];
 	    quad->charted = 0;
-	    quad->planet = NULL;
+	    quad->planet = NOPLANET;
 	    quad->romulans = 0;
 	    quad->klingons = 0;
 	    quad->starbase = 0;
 	    quad->supernova = 0;
-#ifdef EXPERIMENTAL
 	    quad->status = secure;
-#endif /* EXPERIMENTAL */
 	}
     // Initialize times for extraneous events
     schedule(FSNOVA, expran(0.5 * game.intime));
@@ -248,12 +246,10 @@ void setup(int needprompt)
 	unschedule(FSCMOVE);
     unschedule(FSCDBAS);
     unschedule(FDSPROB);
-#ifdef EXPERIMENTAL
-    if (game.options & OPTION_WORLDS)
+    if ((game.options & OPTION_WORLDS) && game.skill >= SKILL_GOOD)
 	schedule(FDISTR, expran(1.0 + game.intime));
     unschedule(FENSLV);
     unschedule(FREPRO);
-#endif /* EXPERIMENTAL */
     // Starchart is functional but we've never seen it
     game.lastchart = FOREVER;
     // Put stars in the galaxy
@@ -295,8 +291,8 @@ void setup(int needprompt)
     // Position ordinary Klingon Battle Cruisers
     krem = game.inkling;
     klumper = 0.25*game.skill*(9.0-game.length)+1.0;
-    if (klumper > 9) 
-	klumper = 9; // Can't have more than 9 in quadrant
+    if (klumper > MAXKLQUAD) 
+	klumper = MAXKLQUAD;
     do {
 	double r = Rand();
 	int klump = (1.0 - r*r)*klumper;
@@ -337,7 +333,7 @@ void setup(int needprompt)
     }
     // Locate planets in galaxy
     for (i = 0; i < game.inplan; i++) {
-	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planet);
+	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planet != NOPLANET);
 	game.state.plnets[i].w.x = ix;
 	game.state.plnets[i].w.y = iy;
 	if (i < NINHAB) {
@@ -352,7 +348,7 @@ void setup(int needprompt)
 	    game.state.plnets[i].inhabited = UNINHABITED;
 	}
 	if ((game.options & OPTION_WORLDS) || i >= NINHAB)
-	    game.state.galaxy[ix][iy].planet = game.state.plnets + i;
+	    game.state.galaxy[ix][iy].planet = i;
     }
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
@@ -506,7 +502,6 @@ bool choose(bool needprompt)
     setpassword();
     if (strcmp(game.passwd, "debug")==0) {
 	idebug = true;
-	logfp = fopen("sst-input.log", "w");
 	fputs("=== Debug mode enabled\n", stdout);
     }
 
@@ -564,7 +559,7 @@ void newqad(int shutup)
     struct quadrant *here;
 
     game.iattak = 1;
-    game.justin = 1;
+    game.justin = true;
     game.base.x = game.base.y = 0;
     game.klhere = 0;
     game.comhere = 0;
@@ -573,8 +568,8 @@ void newqad(int shutup)
     game.irhere = 0;
     game.iplnet = 0;
     game.nenhere = 0;
-    game.neutz = 0;
-    game.inorbit = 0;
+    game.neutz = false;
+    game.inorbit = false;
     game.landed = -1;
     game.ientesc = 0;
     game.ithere = 0;
@@ -635,9 +630,9 @@ void newqad(int shutup)
 	dropin(IHB, &game.base);
 	
     // If quadrant needs a planet, put it in
-    if (here->planet) {
-	game.iplnet = here->planet - game.state.plnets;
-	if (here->planet->inhabited == UNINHABITED)
+    if (here->planet != NOPLANET) {
+	game.iplnet = here->planet;
+	if (game.state.plnets[here->planet].inhabited == UNINHABITED)
 	    dropin(IHP, &game.plnet);
 	else
 	    dropin(IHW, &game.plnet);
@@ -649,7 +644,7 @@ void newqad(int shutup)
 	dropin(IHSTAR, &w);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0 && (!here->planet || here->planet->inhabited == UNINHABITED)) {
+    if (game.irhere > 0 && game.klhere == 0 && (here->planet == NOPLANET || game.state.plnets[here->planet].inhabited == UNINHABITED)) {
 	game.neutz = 1;
 	if (game.damage[DRADIO] <= 0.0) {
 	    skip(1);
