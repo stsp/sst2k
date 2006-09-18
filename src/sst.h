@@ -41,9 +41,12 @@
 #define for_local_enemies(i)	for (i = 1; i <= game.nenhere; i++)
 #define for_starbases(i)	for (i = 1; i <= game.state.rembase; i++)
 
+typedef struct {int x; int y;} coord;
+
+#define same(c1, c2)	(c1.x == c2.x && c1.y == c2.y)
+
 typedef struct {
-    int x;	/* Quadrant location of planet */
-    int y;
+    coord w;
     enum {M=0, N=1, O=2} pclass;
     int inhabited;	/* if NZ, an index into a name array */
 #define UNINHABITED	-1
@@ -62,16 +65,15 @@ typedef struct {
 	rembase,		// remaining bases
 	starkl,			// destroyed stars
 	basekl,			// destroyed bases
-	cx[QUADSIZE+1],cy[QUADSIZE+1],	// Commander quadrant coordinates
-	baseqx[BASEMAX+1],		// Base quadrant X
-	baseqy[BASEMAX+1],		// Base quadrant Y
-	isx, isy,		// Coordinate of Super Commander
 	nromrem,		// Romulans remaining
 	nplankl;		// destroyed planets
 	planet plnets[PLNETMAX];  // Planet information
 	double date,		// stardate
 	    remres,		// remaining resources
 	    remtime;		// remaining time
+    coord baseq[BASEMAX+1];	// Base quadrant coordinates
+    coord kcmdr[QUADSIZE+1];	// Commander quadrant coordinates
+    coord kscmdr;		// Supercommander quadrant coordinates
     struct quadrant {
 	int stars;
 	planet *planet;
@@ -192,8 +194,13 @@ struct game {
     double damage[NDEVICES];	// damage encountered
     double future[NEVENTS];	// future events
     char passwd[10];		// Self Destruct password
-    int kx[(QUADSIZE+1)*(QUADSIZE+1)];			// enemy sector locations
-    int ky[(QUADSIZE+1)*(QUADSIZE+1)];
+    coord ks[(QUADSIZE+1)*(QUADSIZE+1)];	// enemy sector locations
+    coord quadrant, sector;	// where we are
+    coord tholian;		// coordinates of Tholian
+    coord base;			// position of base in current quadrant
+    coord battle;		// base coordinates being attacked
+    coord plnet;		// location of planet in quadrant
+    coord probec;	// current probe quadrant
     int inkling,	// Initial number of klingons
 	inbase,		// Initial number of bases
 	incom,		// Initial number of commanders
@@ -204,14 +211,8 @@ struct game {
 	condit,		// Condition (red/yellow/green/docked)
 	torps,		// number of torpedoes
 	ship,		// Ship type -- 'E' is Enterprise
-	quadx,		// where we are
-	quady,		//
-	sectx,		// where we are
-	secty,		//
 	length,		// length of game
 	skill,		// skill level
-	basex,		// position of base in current quadrant
-	basey,		//
 	klhere,		// klingons here
 	comhere,	// commanders here
 	casual,		// causalties
@@ -223,8 +224,6 @@ struct game {
 	justin,		// just entered quadrant
 	alldone,	// game is now finished
 	shldchg,	// shield is changing (affects efficiency)
-	plnetx,		// location of planet in quadrant
-	plnety,		//
 	inorbit,	// orbiting
 	landed,		// party on planet (1), on ship (-1)
 	iplnet,		// planet # in quadrant
@@ -246,17 +245,11 @@ struct game {
 	icrystl,	// dilithium crystals aboard
 	tourn,		// tournament number
 	thawed,		// thawed game
-	batx,		// base coordinates being attacked
-	baty,		//
 	ithere,		// Tholian is here 
-	ithx,		// coordinates of Tholian
-	ithy,		//
 	iseenit,	// seen base attack report
 #ifdef EXPERIMENTAL
 	ndistr,		//* count of distress calls */ 
 #endif /* EXPERIMENTAL */
-	probecx,	// current probe quadrant
-	probecy,	//
 	proben,		// number of moves for probe
 	isarmed,	// probe is armed
 	nprobes;	// number of probes available
@@ -296,7 +289,8 @@ extern double aaitem;
 extern char citem[10];
 
 /* the Space Thingy's global state should *not* be saved! */
-extern int thingx, thingy, iqhere, iqengry;
+extern coord thing;
+extern int iqhere, iqengry;
 
 typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
@@ -380,17 +374,17 @@ void newqad(int);
 int ja(void);
 void cramen(int);
 void crmshp(void);
-char *cramlc(enum loctype, int, int);
+char *cramlc(enum loctype, coord w);
 double expran(double);
 double Rand(void);
 void iran(int, int *, int *);
 #define square(i) ((i)*(i))
-void dropin(int, int*, int*);
+void dropin(int, coord*);
 void newcnd(void);
 void sortkl(void);
 void imove(void);
-void ram(int, int, int, int);
-void crmena(int, int, int, int, int);
+void ram(int, int, coord);
+void crmena(int, int, int, coord w);
 void deadkl(int, int, int, int, int);
 void timwrp(void);
 void movcom(void);
@@ -428,7 +422,7 @@ void commandhook(char *, int);
 void makechart(void);
 void enqueue(char *);
 char *systemname(planet *);
-void newkling(int, int *, int *);
+void newkling(int, coord *);
 
 /* mode arguments for srscan() */
 #define SCAN_FULL		1

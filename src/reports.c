@@ -8,21 +8,21 @@ void attakreport(int curt)
     if (!curt) {
 	if (is_scheduled(FCDBAS)) {
 	    prout("Starbase in %s is currently under Commander attack.",
-		  cramlc(quadrant, game.batx, game.baty));
+		  cramlc(quadrant, game.battle));
 	    prout("It can hold out until Stardate %d.", 
 		  (int)scheduled(FCDBAS));
 	}
 	if (game.isatb == 1) {
 	    prout("Starbase in %s is under Super-commander attack.",
-		  cramlc(quadrant, game.state.isx, game.state.isy));
+		  cramlc(quadrant, game.state.kscmdr));
 	    prout("It can hold out until Stardate %d.", 
 		  (int)scheduled(FSCDBAS));
 	}
     } else {
         if (is_scheduled(FCDBAS))
-	    proutn("Base in %i - %i attacked by C. Alive until %.1f", game.batx, game.baty, scheduled(FCDBAS));
+	    proutn("Base in %i - %i attacked by C. Alive until %.1f", game.battle.x, game.battle.y, scheduled(FCDBAS));
         if (game.isatb == 1)
-	    proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.isx, game.state.isy, scheduled(FSCDBAS));
+	    proutn("Base in %i - %i attacked by S. Alive until %.1f", game.state.kscmdr.x, game.state.kscmdr.y, scheduled(FSCDBAS));
     }
     clreol();
 }
@@ -93,7 +93,7 @@ void report(void)
 	    proutn("An armed deep space probe is in");
 	else
 	    proutn("A deep space probe is in");
-	proutn(cramlc(quadrant, game.probecx, game.probecy));
+	proutn(cramlc(quadrant, game.probec));
 	prout(".");
     }
     if (game.icrystl) {
@@ -128,9 +128,9 @@ void lrscan(void)
     else {
 	prout("Long-range scan");
     }
-    for (x = game.quadx-1; x <= game.quadx+1; x++) {
+    for (x = game.quadrant.x-1; x <= game.quadrant.x+1; x++) {
 	proutn(" ");
-	for (y = game.quady-1; y <= game.quady+1; y++) {
+	for (y = game.quadrant.y-1; y <= game.quadrant.y+1; y++) {
 	    if (!VALID_QUADRANT(x, y))
 		proutn("  -1");
 	    else {
@@ -206,7 +206,7 @@ void chart(int nn)
 	proutn("%d |", i);
 	for_quadrants(j) {
 	    char buf[4];
-	    if ((game.options & OPTION_SHOWME) && i == game.quadx && j == game.quady)
+	    if ((game.options & OPTION_SHOWME) && i == game.quadrant.x && j == game.quadrant.y)
 		proutn("<");
 	    else
 		proutn(" ");
@@ -219,7 +219,7 @@ void chart(int nn)
 	    else
 		strcpy(buf, "...");
 	    proutn(buf);
-	    if ((game.options & OPTION_SHOWME) && i == game.quadx && j == game.quady)
+	    if ((game.options & OPTION_SHOWME) && i == game.quadrant.x && j == game.quadrant.y)
 		proutn(">");
 	    else
 		proutn(" ");
@@ -232,7 +232,7 @@ void chart(int nn)
 
 static void sectscan(int goodScan, int i, int j) 
 {
-    if (goodScan || (abs(i-game.sectx)<= 1 && abs(j-game.secty) <= 1)){
+    if (goodScan || (abs(i-game.sector.x)<= 1 && abs(j-game.sector.y) <= 1)){
 	if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
 	    switch (game.condit) {
 	    case IHRED: textcolor(RED); break;
@@ -275,7 +275,7 @@ static void status(int req)
 	break;
     case 3:
 	proutn("Position      %d - %d , %d - %d",
-	       game.quadx, game.quady, game.sectx, game.secty);
+	       game.quadrant.x, game.quadrant.y, game.sector.x, game.sector.y);
 	break;
     case 4:
 	proutn("Life Support  ");
@@ -315,7 +315,7 @@ static void status(int req)
 	break;
     case 10:
 	if (game.options & OPTION_WORLDS) {
-	    planet *here = game.state.galaxy[game.quadx][game.quady].planet;
+	    planet *here = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
 	    if (here && here->inhabited != UNINHABITED)
 		proutn("Major system  %s", systemname(here));
 	    else
@@ -349,10 +349,10 @@ int srscan(int l)
 	}
 	else prout("     Short-range scan");
 	if (goodScan && !game.damage[DRADIO]) { 
-	    game.state.chart[game.quadx][game.quady].klingons = game.state.galaxy[game.quadx][game.quady].klingons;
-	    game.state.chart[game.quadx][game.quady].starbase = game.state.galaxy[game.quadx][game.quady].starbase;
-	    game.state.chart[game.quadx][game.quady].stars = game.state.galaxy[game.quadx][game.quady].stars;
-	    game.state.galaxy[game.quadx][game.quady].charted = TRUE;
+	    game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
+	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
+	    game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = TRUE;
 	}
 	scan();
 	if (isit("chart")) nn = TRUE;
@@ -437,9 +437,9 @@ void eta(void)
 	ix2 = aaitem + 0.5;
     }
     else {
-	if (game.quady>ix1) ix2 = 1;
+	if (game.quadrant.y>ix1) ix2 = 1;
 	else ix2=QUADSIZE;
-	if (game.quadx>iy1) iy2 = 1;
+	if (game.quadrant.x>iy1) iy2 = 1;
 	else iy2=QUADSIZE;
     }
 
@@ -447,8 +447,8 @@ void eta(void)
 	huh();
 	return;
     }
-    game.dist = sqrt(square(iy1-game.quadx+0.1*(iy2-game.sectx))+
-		square(ix1-game.quady+0.1*(ix2-game.secty)));
+    game.dist = sqrt(square(iy1-game.quadrant.x+0.1*(iy2-game.sector.x))+
+		square(ix1-game.quadrant.y+0.1*(ix2-game.sector.y)));
     wfl = FALSE;
 
     if (prompt) prout("Answer \"no\" if you don't know the value:");
@@ -526,9 +526,9 @@ void eta(void)
 	    prout("Unfortunately, the Federation will be destroyed by then.");
 	if (twarp > 6.0)
 	    prout("You'll be taking risks at that speed, Captain");
-	if ((game.isatb==1 && game.state.isy == iy1 && game.state.isx == ix1 &&
+	if ((game.isatb==1 && game.state.kscmdr.y == iy1 && game.state.kscmdr.x == ix1 &&
 	     scheduled(FSCDBAS)< ttime+game.state.date)||
-	    (scheduled(FCDBAS)<ttime+game.state.date && game.baty==iy1 && game.batx == ix1))
+	    (scheduled(FCDBAS)<ttime+game.state.date && game.battle.y==iy1 && game.battle.x == ix1))
 	    prout("The starbase there will be destroyed by then.");
 	proutn("New warp factor to try? ");
 	if (scan() == IHREAL) {

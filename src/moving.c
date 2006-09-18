@@ -8,8 +8,10 @@ void imove(void)
 {
     double angle, deltax, deltay, bigger, x, y,
         finald, finalx, finaly, stopegy, probf;
-    int trbeam = 0, n, l, ix=0, iy=0, kink, kinks, iquad;
+    int trbeam = 0, n, l, kink, kinks, iquad;
+    coord w;
 
+    w.x = w.y = 0;
     if (game.inorbit) {
 	prout("Helmsman Sulu- \"Leaving standard orbit.\"");
 	game.inorbit = FALSE;
@@ -34,23 +36,23 @@ void imove(void)
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5;
     }
     /* Move within the quadrant */
-    game.quad[game.sectx][game.secty] = IHDOT;
-    x = game.sectx;
-    y = game.secty;
+    game.quad[game.sector.x][game.sector.y] = IHDOT;
+    x = game.sector.x;
+    y = game.sector.y;
     n = 10.0*game.dist*bigger+0.5;
 
     if (n > 0) {
 	for (l = 1; l <= n; l++) {
-	    ix = (x += deltax) + 0.5;
-	    iy = (y += deltay) + 0.5;
-	    if (!VALID_SECTOR(ix, iy)) {
+	    w.x = (x += deltax) + 0.5;
+	    w.y = (y += deltay) + 0.5;
+	    if (!VALID_SECTOR(w.x, w.y)) {
 		/* Leaving quadrant -- allow final enemy attack */
 		/* Don't do it if being pushed by Nova */
 		if (game.nenhere != 0 && game.iattak != 2) {
 		    newcnd();
 		    for_local_enemies(l) {
-			finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
-				      (iy-game.ky[l])*(double)(iy-game.ky[l]));
+			finald = sqrt((w.x-game.ks[l].x)*(double)(w.x-game.ks[l].x) +
+				      (w.y-game.ks[l].y)*(double)(w.y-game.ks[l].y));
 			game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
 		    }
 		    /*
@@ -58,33 +60,33 @@ void imove(void)
 		     * that attacks only happen if Klingons
 		     * are present and your skill is good.
 		     */
-		    if (game.skill > SKILL_GOOD && game.klhere > 0 && !game.state.galaxy[game.quadx][game.quady].supernova)
+		    if (game.skill > SKILL_GOOD && game.klhere > 0 && !game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 			attack(0);
 		    if (game.alldone) return;
 		}
 		/* compute final position -- new quadrant and sector */
-		x = QUADSIZE*(game.quadx-1)+game.sectx;
-		y = QUADSIZE*(game.quady-1)+game.secty;
-		ix = x+10.0*game.dist*bigger*deltax+0.5;
-		iy = y+10.0*game.dist*bigger*deltay+0.5;
+		x = QUADSIZE*(game.quadrant.x-1)+game.sector.x;
+		y = QUADSIZE*(game.quadrant.y-1)+game.sector.y;
+		w.x = x+10.0*game.dist*bigger*deltax+0.5;
+		w.y = y+10.0*game.dist*bigger*deltay+0.5;
 		/* check for edge of galaxy */
 		kinks = 0;
 		do {
 		    kink = 0;
-		    if (ix <= 0) {
-			ix = -ix + 1;
+		    if (w.x <= 0) {
+			w.x = -w.x + 1;
 			kink = 1;
 		    }
-		    if (iy <= 0) {
-			iy = -iy + 1;
+		    if (w.y <= 0) {
+			w.y = -w.y + 1;
 			kink = 1;
 		    }
-		    if (ix > GALSIZE*QUADSIZE) {
-			ix = (GALSIZE*QUADSIZE*2)+1 - ix;
+		    if (w.x > GALSIZE*QUADSIZE) {
+			w.x = (GALSIZE*QUADSIZE*2)+1 - w.x;
 			kink = 1;
 		    }
-		    if (iy > GALSIZE*QUADSIZE) {
-			iy = (GALSIZE*QUADSIZE*2)+1 - iy;
+		    if (w.y > GALSIZE*QUADSIZE) {
+			w.y = (GALSIZE*QUADSIZE*2)+1 - w.y;
 			kink = 1;
 		    }
 		    if (kink) kinks = 1;
@@ -104,24 +106,23 @@ void imove(void)
 		}
 		/* Compute final position in new quadrant */
 		if (trbeam) return; /* Don't bother if we are to be beamed */
-		game.quadx = (ix+(QUADSIZE-1))/QUADSIZE;
-		game.quady = (iy+(QUADSIZE-1))/QUADSIZE;
-		game.sectx = ix - QUADSIZE*(game.quadx-1);
-		game.secty = iy - QUADSIZE*(game.quady-1);
+		game.quadrant.x = (w.x+(QUADSIZE-1))/QUADSIZE;
+		game.quadrant.y = (w.y+(QUADSIZE-1))/QUADSIZE;
+		game.sector.x = w.x - QUADSIZE*(game.quadrant.x-1);
+		game.sector.y = w.y - QUADSIZE*(game.quadrant.y-1);
 		skip(1);
-		prout("Entering %s.",
-		      cramlc(quadrant, game.quadx, game.quady));
-		game.quad[game.sectx][game.secty] = game.ship;
+		prout("Entering %s.", cramlc(quadrant, game.quadrant));
+		game.quad[game.sector.x][game.sector.y] = game.ship;
 		newqad(0);
 		if (game.skill>SKILL_NOVICE) attack(0);
 		return;
 	    }
-	    iquad = game.quad[ix][iy];
+	    iquad = game.quad[w.x][w.y];
 	    if (iquad != IHDOT) {
 		/* object encountered in flight path */
 		stopegy = 50.0*game.dist/game.optime;
-		game.dist=0.1*sqrt((game.sectx-ix)*(double)(game.sectx-ix) +
-			      (game.secty-iy)*(double)(game.secty-iy));
+		game.dist=0.1*sqrt((game.sector.x-w.x)*(double)(game.sector.x-w.x) +
+			      (game.sector.y-w.y)*(double)(game.sector.y-w.y));
 		switch (iquad) {
 		case IHT: /* Ram a Tholian */
 		case IHK: /* Ram enemy ship */
@@ -129,11 +130,11 @@ void imove(void)
 		case IHS:
 		case IHR:
 		case IHQUEST:
-		    game.sectx = ix;
-		    game.secty = iy;
-		    ram(0, iquad, game.sectx, game.secty);
-		    finalx = game.sectx;
-		    finaly = game.secty;
+		    game.sector.x = w.x;
+		    game.sector.y = w.y;
+		    ram(0, iquad, game.sector);
+		    finalx = game.sector.x;
+		    finaly = game.sector.y;
 		    break;
 		case IHBLANK:
 		    skip(1);
@@ -142,7 +143,7 @@ void imove(void)
 		    proutn("***");
 		    crmshp();
 		    proutn(" pulled into black hole at ");
-		    prout(cramlc(sector, ix, iy));
+		    prout(cramlc(sector, w));
 		    /*
 		     * Getting pulled into a black hole was certain
 		     * death in Almy's original.  Stas Sergeev added a
@@ -166,15 +167,15 @@ void imove(void)
 			proutn(" encounters Tholian web at ");
 		    else
 			proutn(" blocked by object at ");
-		    proutn(cramlc(sector, ix,iy));
+		    proutn(cramlc(sector, w));
 		    prout(";");
 		    proutn("Emergency stop required ");
 		    prout("%2d units of energy.", (int)stopegy);
 		    game.energy -= stopegy;
 		    finalx = x-deltax+0.5;
-		    game.sectx = finalx;
+		    game.sector.x = finalx;
 		    finaly = y-deltay+0.5;
-		    game.secty = finaly;
+		    game.sector.y = finaly;
 		    if (game.energy <= 0) {
 			finish(FNRG);
 			return;
@@ -184,25 +185,25 @@ void imove(void)
 		goto no_quad_change;	/* sorry! */
 	    }
 	}
-	game.dist = 0.1*sqrt((game.sectx-ix)*(double)(game.sectx-ix) +
-			(game.secty-iy)*(double)(game.secty-iy));
-	game.sectx = ix;
-	game.secty = iy;
+	game.dist = 0.1*sqrt((game.sector.x-w.x)*(double)(game.sector.x-w.x) +
+			(game.sector.y-w.y)*(double)(game.sector.y-w.y));
+	game.sector.x = w.x;
+	game.sector.y = w.y;
     }
-    finalx = game.sectx;
-    finaly = game.secty;
+    finalx = game.sector.x;
+    finaly = game.sector.y;
 no_quad_change:
     /* No quadrant change -- compute new avg enemy distances */
-    game.quad[game.sectx][game.secty] = game.ship;
+    game.quad[game.sector.x][game.sector.y] = game.ship;
     if (game.nenhere) {
 	for_local_enemies(l) {
-	    finald = sqrt((ix-game.kx[l])*(double)(ix-game.kx[l]) +
-			  (iy-game.ky[l])*(double)(iy-game.ky[l]));
+	    finald = sqrt((w.x-game.ks[l].x)*(double)(w.x-game.ks[l].x) +
+			  (w.y-game.ks[l].y)*(double)(w.y-game.ks[l].y));
 	    game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
 	    game.kdist[l] = finald;
 	}
 	sortkl();
-	if (!game.state.galaxy[game.quadx][game.quady].supernova && game.iattak == 0)
+	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova && game.iattak == 0)
 	    attack(0);
 	for_local_enemies(l) game.kavgd[l] = game.kdist[l];
     }
@@ -224,7 +225,7 @@ void dock(int l)
 	prout("You must first leave standard orbit.");
 	return;
     }
-    if (game.basex==0 || abs(game.sectx-game.basex) > 1 || abs(game.secty-game.basey) > 1) {
+    if (game.base.x==0 || abs(game.sector.x-game.base.x) > 1 || abs(game.sector.y-game.base.y) > 1) {
 	crmshp();
 	prout(" not adjacent to base.");
 	return;
@@ -255,10 +256,11 @@ static void getcd(int isprobe, int akey) {
 	   are always displayed y - x, where +y is downward! */
 
 	
-        int irowq=game.quadx, icolq=game.quady, irows, icols, itemp=0, iprompt=0, key=0;
+        int irowq=game.quadrant.x, icolq=game.quadrant.y, itemp=0, iprompt=0, key=0;
 	double xi, xj, xk, xl;
 	double deltax, deltay;
 	int automatic = -1;
+	coord incr;
 
 	/* Get course direction and distance. If user types bad values, return
 	   with DIREC = -1.0. */
@@ -359,23 +361,23 @@ static void getcd(int isprobe, int akey) {
 
 			irowq = xi + 0.5;
 			icolq = xj + 0.5;
-			irows = xk + 0.5;
-			icols = xl + 0.5;
+			incr.y = xk + 0.5;
+			incr.x = xl + 0.5;
 		}
 		else {
 			if (isprobe) {
 				/* only quadrant specified -- go to center of dest quad */
 				irowq = xi + 0.5;
 				icolq = xj + 0.5;
-				irows = icols = 5;
+				incr.y = incr.x = 5;
 			}
 			else {
-				irows = xi + 0.5;
-				icols = xj + 0.5;
+				incr.y = xi + 0.5;
+				incr.x = xj + 0.5;
 			}
 			itemp = 1;
 		}
-		if (!VALID_QUADRANT(icolq,irowq)||!VALID_SECTOR(icols,irows)) {
+		if (!VALID_QUADRANT(icolq,irowq)||!VALID_SECTOR(incr.x,incr.y)) {
 		    huh();
 		    return;
 		}
@@ -384,13 +386,13 @@ static void getcd(int isprobe, int akey) {
 			if (itemp) {
 				if (iprompt) {
 					prout("Helmsman Sulu- \"Course locked in for %s.\"",
-						cramlc(sector, irows, icols));
+						cramlc(sector, incr));
 				}
 			}
 			else prout("Ensign Chekov- \"Course laid in, Captain.\"");
 		}
-		deltax = icolq - game.quady + 0.1*(icols-game.secty);
-		deltay = game.quadx - irowq + 0.1*(game.sectx-irows);
+		deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y);
+		deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y);
 	}
 	else { /* manual */
 		while (key == IHEOL) {
@@ -586,8 +588,8 @@ void warp(int i)
 	    deltax /= bigger;
 	    deltay /= bigger;
 	    n = 10.0 * game.dist * bigger +0.5;
-	    x = game.sectx;
-	    y = game.secty;
+	    x = game.sector.x;
+	    y = game.sector.y;
 	    for (l = 1; l <= n; l++) {
 		x += deltax;
 		ix = x + 0.5;
@@ -732,7 +734,7 @@ void atover(int igrab)
 	skip(1);
 	prout("safely out of quadrant.");
 	if (game.damage[DRADIO] == 0.0)
-	    game.state.galaxy[game.quadx][game.quady].charted = TRUE;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = TRUE;
 	/* Try to use warp engines */
 	if (game.damage[DWARPEN]) {
 	    skip(1);
@@ -762,7 +764,7 @@ void atover(int igrab)
 	}
     } while 
 	/* Repeat if another snova */
-	(game.state.galaxy[game.quadx][game.quady].supernova);
+	(game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova);
     if (KLINGREM==0) 
 	finish(FWON); /* Snova killed remaining enemy. */
 }
@@ -789,7 +791,7 @@ void timwrp()
 	game.isatb = 0;
 	unschedule(FCDBAS);
 	unschedule(FSCDBAS);
-	game.batx = game.baty = 0;
+	game.battle.x = game.battle.y = 0;
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
 	   when on planet, which would give us two Galileos! */
@@ -890,10 +892,9 @@ void probe(void)
     game.probeiny /= bigger;
     game.probeinx /= bigger;
     game.proben = 10.0*game.dist*bigger +0.5;
-    game.probex = game.quadx*QUADSIZE + game.sectx - 1;	// We will use better packing than original
-    game.probey = game.quady*QUADSIZE + game.secty - 1;
-    game.probecx = game.quadx;
-    game.probecy = game.quady;
+    game.probex = game.quadrant.x*QUADSIZE + game.sector.x - 1;	// We will use better packing than original
+    game.probey = game.quadrant.y*QUADSIZE + game.sector.y - 1;
+    game.probec = game.quadrant;
     schedule(FDSPROB, 0.01); // Time to move one sector
     prout("Ensign Chekov-  \"The deep space probe is launched, Captain.\"");
     game.ididit = 1;
@@ -928,42 +929,42 @@ void mayday(void)
     }
     /* OK -- call for help from nearest starbase */
     game.nhelp++;
-    if (game.basex!=0) {
+    if (game.base.x!=0) {
 	/* There's one in this quadrant */
-	ddist = sqrt(square(game.basex-game.sectx)+square(game.basey-game.secty));
+	ddist = sqrt(square(game.base.x-game.sector.x)+square(game.base.y-game.sector.y));
     }
     else {
 	ddist = FOREVER;
 	for_starbases(l) {
-	    xdist=10.0*sqrt(square(game.state.baseqx[l]-game.quadx)+square(game.state.baseqy[l]-game.quady));
+	    xdist=10.0*sqrt(square(game.state.baseq[l].x-game.quadrant.x)+square(game.state.baseq[l].y-game.quadrant.y));
 	    if (xdist < ddist) {
 		ddist = xdist;
 		line = l;
 	    }
 	}
 	/* Since starbase not in quadrant, set up new quadrant */
-	game.quadx = game.state.baseqx[line];
-	game.quady = game.state.baseqy[line];
+	game.quadrant.x = game.state.baseq[line].x;
+	game.quadrant.y = game.state.baseq[line].y;
 	newqad(1);
     }
     /* dematerialize starship */
-    game.quad[game.sectx][game.secty]=IHDOT;
-    proutn("Starbase in %s responds--", cramlc(quadrant, game.quadx, game.quady));
+    game.quad[game.sector.x][game.sector.y]=IHDOT;
+    proutn("Starbase in %s responds--", cramlc(quadrant, game.quadrant));
     proutn("");
     crmshp();
     prout(" dematerializes.");
-    game.sectx=0;
+    game.sector.x=0;
     for (l = 1; l <= 5; l++) {
-	ix = game.basex+3.0*Rand()-1;
-	iy = game.basey+3.0*Rand()-1;
+	ix = game.base.x+3.0*Rand()-1;
+	iy = game.base.y+3.0*Rand()-1;
 	if (VALID_SECTOR(ix,iy) && game.quad[ix][iy]==IHDOT) {
 	    /* found one -- finish up */
-	    game.sectx=ix;
-	    game.secty=iy;
+	    game.sector.x=ix;
+	    game.sector.y=iy;
 	    break;
 	}
     }
-    if (game.sectx==0){
+    if (game.sector.x==0){
 	prout("You have been lost in space...");
 	finish(FMATERIALIZE);
 	return;

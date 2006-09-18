@@ -21,7 +21,7 @@ static int consumeTime(void)
     events();	/* Used to avoid if FSCMOVE is scheduled within time */
 //	schedule(FSNOVA, asave-game.state.time);
     /*fails if game over, quadrant super-novas or we've moved to new quadrant*/
-    if (game.alldone || game.state.galaxy[game.quadx][game.quady].supernova || game.justin != 0) return 1;
+    if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.justin != 0) return 1;
     return 0;
 }
 
@@ -43,7 +43,7 @@ void preport(void)
 #ifdef DEBUG
 	    if (game.idebug && game.state.plnets[i].known==unknown) proutn("(Unknown) ");
 #endif
-	    proutn(cramlc(quadrant, game.state.plnets[i].x, game.state.plnets[i].y));
+	    proutn(cramlc(quadrant, game.state.plnets[i].w));
 	    proutn("   class ");
 	    proutn(classes[game.state.plnets[i].pclass]);
 	    proutn("   ");
@@ -68,7 +68,7 @@ void orbit(void)
 	prout("Both warp and impulse engines damaged.");
 	return;
     }
-    if (game.plnetx == 0 || abs(game.sectx-game.plnetx) > 1 || abs(game.secty-game.plnety) > 1) {
+    if (game.plnet.x == 0 || abs(game.sector.x-game.plnet.x) > 1 || abs(game.sector.y-game.plnet.y) > 1) {
 	crmshp();
 	prout(" not adjacent to planet.");
 	skip(1);
@@ -92,15 +92,15 @@ void sensor(void)
 	prout("Short range sensors damaged.");
 	return;
     }
-    if (!game.plnetx && (game.options & OPTION_TTY)) {
+    if (!game.plnet.x && (game.options & OPTION_TTY)) {
 	prout("Spock- \"No planet in this quadrant, Captain.\"");
 	return;
     }
-    if ((game.plnetx != 0)&& (game.state.plnets[game.iplnet].known == unknown)) {
-	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, game.quadx, game.quady));
+    if ((game.plnet.x != 0)&& (game.state.plnets[game.iplnet].known == unknown)) {
+	prout("Spock-  \"Sensor scan for %s-", cramlc(quadrant, game.quadrant));
 	skip(1);
-	prout("         Planet at %s is of class %s.", 
-	      cramlc(sector, game.plnetx, game.plnety),
+	prout("         Planet at %s is of class %s.",
+	      cramlc(sector,game.plnet),
 	      classes[game.state.plnets[game.iplnet].pclass]);
 	if (game.state.plnets[game.iplnet].known==shuttle_down) 
 	    prout("         Sensors show Galileo still on surface.");
@@ -443,7 +443,7 @@ void deathray(void)
 	prouts("Sulu- \"Captain!  It's working!\"");
 	skip(2);
 	while (game.nenhere > 0)
-	    deadkl(game.kx[1],game.ky[1],game.quad[game.kx[1]][game.ky[1]],game.kx[1],game.ky[1]);
+	    deadkl(game.ks[1].x,game.ks[1].y,game.quad[game.ks[1].x][game.ks[1].y],game.ks[1].x,game.ks[1].y);
 	prout("Ensign Chekov-  \"Congratulations, Captain!\"");
 	if (KLINGREM == 0) finish(FWON);
 	if ((game.options & OPTION_PLAIN) == 0) {

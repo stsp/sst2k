@@ -147,29 +147,29 @@ void abandn(void)
 	prout("the Federation in a prisoner-of-war exchange.");
 	nb = Rand()*game.state.rembase+1;
 	/* Set up quadrant and position FQ adjacient to base */
-	if (game.quadx!=game.state.baseqx[nb] || game.quady!=game.state.baseqy[nb]) {
-	    game.quadx = game.state.baseqx[nb];
-	    game.quady = game.state.baseqy[nb];
-	    game.sectx = game.secty = 5;
+	if (game.quadrant.x!=game.state.baseq[nb].x || game.quadrant.y!=game.state.baseq[nb].y) {
+	    game.quadrant.x = game.state.baseq[nb].x;
+	    game.quadrant.y = game.state.baseq[nb].y;
+	    game.sector.x = game.sector.y = 5;
 	    newqad(1);
 	}
 	for (;;) {
 	    /* position next to base by trial and error */
-	    game.quad[game.sectx][game.secty] = IHDOT;
+	    game.quad[game.sector.x][game.sector.y] = IHDOT;
 	    for_sectors(l) {
-		game.sectx = 3.0*Rand() - 1.0 + game.basex;
-		game.secty = 3.0*Rand() - 1.0 + game.basey;
-		if (VALID_SECTOR(game.sectx, game.secty) &&
-		    game.quad[game.sectx][game.secty] == IHDOT) break;
+		game.sector.x = 3.0*Rand() - 1.0 + game.base.x;
+		game.sector.y = 3.0*Rand() - 1.0 + game.base.y;
+		if (VALID_SECTOR(game.sector.x, game.sector.y) &&
+		    game.quad[game.sector.x][game.sector.y] == IHDOT) break;
 	    }
 	    if (l < QUADSIZE+1) break; /* found a spot */
-	    game.sectx=QUADSIZE/2;
-	    game.secty=QUADSIZE/2;
+	    game.sector.x=QUADSIZE/2;
+	    game.sector.y=QUADSIZE/2;
 	    newqad(1);
 	}
     }
     /* Get new commission */
-    game.quad[game.sectx][game.secty] = game.ship = IHF;
+    game.quad[game.sector.x][game.sector.y] = game.ship = IHF;
     prout("Starfleet puts you in command of another ship,");
     prout("the Faerie Queene, which is antiquated but,");
     prout("still useable.");
@@ -208,8 +208,8 @@ void setup(int needprompt)
     game.shldchg = game.shldup = 0;
     game.inlsr = 4.0;
     game.lsupres = 4.0;
-    iran(GALSIZE, &game.quadx, &game.quady);
-    iran(QUADSIZE, &game.sectx, &game.secty);
+    iran(GALSIZE, &game.quadrant.x, &game.quadrant.y);
+    iran(QUADSIZE, &game.sector.x, &game.sector.y);
     game.torps = game.intorps = 10;
     game.nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
     game.warpfac = 5.0;
@@ -217,7 +217,7 @@ void setup(int needprompt)
     for (i=0; i < NDEVICES; i++) 
 	game.damage[i] = 0.0;
     // Set up assorted game parameters
-    game.batx = game.baty = 0;
+    game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.resting = game.casual = 0;
     game.isatb = game.iscate = game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
@@ -276,7 +276,7 @@ void setup(int needprompt)
 	    contflag = FALSE;
 	    for (j = i-1; j > 0; j--) {
 		/* Improved placement algorithm to spread out bases */
-		double distq = square(ix-game.state.baseqx[j]) + square(iy-game.state.baseqy[j]);
+		double distq = square(ix-game.state.baseq[j].x) + square(iy-game.state.baseq[j].y);
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
 		    contflag = TRUE;
 #ifdef DEBUG
@@ -292,8 +292,8 @@ void setup(int needprompt)
 	    }
 	} while (contflag);
 			
-	game.state.baseqx[i] = ix;
-	game.state.baseqy[i] = iy;
+	game.state.baseq[i].x = ix;
+	game.state.baseq[i].y = iy;
 	game.state.galaxy[ix][iy].starbase = 1;
 	game.state.chart[ix][iy].starbase = 1;
     }
@@ -320,8 +320,8 @@ void setup(int needprompt)
 	    do { /* IF debugging, put commanders by bases, always! */
 #ifdef DEBUG
 		if (game.idebug && klumper <= game.inbase) {
-		    ix = game.state.baseqx[klumper];
-		    iy = game.state.baseqy[klumper];
+		    ix = game.state.baseq[klumper].x;
+		    iy = game.state.baseq[klumper].y;
 		    klumper++;
 		}
 		else
@@ -333,17 +333,17 @@ void setup(int needprompt)
 		   game.state.galaxy[ix][iy].klingons > 8);
 	    // check for duplicate
 	    for (j = 1; j < i; j++)
-		if (game.state.cx[j]==ix && game.state.cy[j]==iy) break;
+		if (game.state.kcmdr[j].x==ix && game.state.kcmdr[j].y==iy) break;
 	} while (j < i);
 	game.state.galaxy[ix][iy].klingons++;
-	game.state.cx[i] = ix;
-	game.state.cy[i] = iy;
+	game.state.kcmdr[i].x = ix;
+	game.state.kcmdr[i].y = iy;
     }
     // Locate planets in galaxy
     for (i = 0; i < game.inplan; i++) {
 	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planet);
-	game.state.plnets[i].x = ix;
-	game.state.plnets[i].y = iy;
+	game.state.plnets[i].w.x = ix;
+	game.state.plnets[i].w.y = iy;
 	if (i < NINHAB) {
 	    game.state.plnets[i].pclass = M;	// All inhabited planets are class M
 	    game.state.plnets[i].crystals = 0;
@@ -367,16 +367,16 @@ void setup(int needprompt)
     if (game.state.nscrem > 0) {
 	do iran(GALSIZE, &ix, &iy);
 	while (game.state.galaxy[ix][iy].supernova || game.state.galaxy[ix][iy].klingons > 8);
-	game.state.isx = ix;
-	game.state.isy = iy;
+	game.state.kscmdr.x = ix;
+	game.state.kscmdr.y = iy;
 	game.state.galaxy[ix][iy].klingons++;
     }
     // Place thing (in tournament game, thingx == -1, don't want one!)
-    if (thingx != -1) {
-	iran(GALSIZE, &thingx, &thingy);
+    if (thing.x != -1) {
+	iran(GALSIZE, &thing.x, &thing.y);
     }
     else {
-	thingx = thingy = 0;
+	thing.x = thing.y = 0;
     }
 
 //	idate = date;
@@ -406,14 +406,14 @@ void setup(int needprompt)
 	proutn("%d starbases in ", game.inbase);
     }
     for (i = 1; i <= game.inbase; i++) {
-	proutn(cramlc(0, game.state.baseqx[i], game.state.baseqy[i]));
+	proutn(cramlc(0, game.state.baseq[i]));
 	proutn("  ");
     }
     skip(2);
     proutn("The Enterprise is currently in ");
-    proutn(cramlc(quadrant, game.quadx, game.quady));
+    proutn(cramlc(quadrant, game.quadrant));
     proutn(" ");
-    proutn(cramlc(sector, game.sectx, game.secty));
+    proutn(cramlc(sector, game.sector));
     skip(2);
     prout("Good Luck!");
     if (game.state.nscrem) prout("  YOU'LL NEED IT.");
@@ -443,7 +443,7 @@ int choose(int needprompt)
 		continue; // We don't want a blank entry
 	    }
 	    game.tourn = (int)aaitem;
-	    thingx = -1;
+	    thing.x = -1;
 	    srand((unsigned int)(int)aaitem);
 	    break;
 	}
@@ -534,43 +534,43 @@ int choose(int needprompt)
     return FALSE;
 }
 
-void dropin(int iquad, int *ix, int *iy) 
+void dropin(int iquad, coord *w) 
 {
-    do iran(QUADSIZE, ix, iy);
-    while (game.quad[*ix][*iy] != IHDOT);
-    game.quad[*ix][*iy] = iquad;
+    do iran(QUADSIZE, &w->x, &w->y);
+    while (game.quad[w->x][w->y] != IHDOT);
+    game.quad[w->x][w->y] = iquad;
 }
 
 void newcnd(void) 
 {
     game.condit = IHGREEN;
     if (game.energy < 1000.0) game.condit = IHYELLOW;
-    if (game.state.galaxy[game.quadx][game.quady].klingons || game.state.galaxy[game.quadx][game.quady].romulans)
+    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons || game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans)
 	game.condit = IHRED;
     if (!game.alive) game.condit=IHDEAD;
 }
 
-void newkling(int i, int *pix, int *piy)
+void newkling(int i, coord *pi)
 /* drop new Klingon into current quadrant */
 {
-    dropin(IHK, pix, piy);
-    game.kx[i] = *pix;
-    game.ky[i] = *piy;
-    game.kdist[i] = game.kavgd[i] = sqrt(square(game.sectx-*pix) + square(game.secty-*piy));
+    dropin(IHK, pi);
+    game.ks[i] = *pi;
+    game.kdist[i] = game.kavgd[i] = sqrt(square(game.sector.x-pi->x) + square(game.sector.y-pi->y));
     game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill;
 }
 
 void newqad(int shutup) 
 {
-    int i, j, ix, iy;
+    int i, j;
+    coord w;
     struct quadrant *here;
 
     game.iattak = 1;
     game.justin = 1;
-    game.basex = game.basey = 0;
+    game.base.x = game.base.y = 0;
     game.klhere = 0;
     game.comhere = 0;
-    game.plnetx = game.plnety = 0;
+    game.plnet.x = game.plnet.y = 0;
     game.ishere = 0;
     game.irhere = 0;
     game.iplnet = 0;
@@ -592,7 +592,7 @@ void newqad(int shutup)
     for_sectors(i)
 	for_sectors(j) 
 	    game.quad[i][j] = IHDOT;
-    here = &game.state.galaxy[game.quadx][game.quady];
+    here = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
     // cope with supernova
     if (here->supernova)
 	return;
@@ -601,25 +601,25 @@ void newqad(int shutup)
     game.nenhere = game.klhere + game.irhere;
 
     // Position Starship
-    game.quad[game.sectx][game.secty] = game.ship;
+    game.quad[game.sector.x][game.sector.y] = game.ship;
 
     if (here->klingons) {
 	// Position ordinary Klingons
 	for (i = 1; i <= game.klhere; i++)
-	    newkling(i, &ix, &iy);
+	    newkling(i, &w);
 	// If we need a commander, promote a Klingon
 	for_commanders(i)
-	    if (game.state.cx[i]==game.quadx && game.state.cy[i]==game.quady) break;
+	    if (game.state.kcmdr[i].x==game.quadrant.x && game.state.kcmdr[i].y==game.quadrant.y) break;
 			
 	if (i <= game.state.remcom) {
-	    game.quad[ix][iy] = IHC;
+	    game.quad[w.x][w.y] = IHC;
 	    game.kpower[game.klhere] = 950.0+400.0*Rand()+50.0*game.skill;
 	    game.comhere = 1;
 	}
 
 	// If we need a super-commander, promote a Klingon
-	if (game.quadx == game.state.isx && game.quady == game.state.isy) {
-	    game.quad[game.kx[1]][game.ky[1]] = IHS;
+	if (game.quadrant.x == game.state.kscmdr.x && game.quadrant.y == game.state.kscmdr.y) {
+	    game.quad[game.ks[1].x][game.ks[1].y] = IHS;
 	    game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*game.skill;
 	    game.iscate = game.state.remkl>1;
 	    game.ishere = 1;
@@ -627,29 +627,28 @@ void newqad(int shutup)
     }
     // Put in Romulans if needed
     for (i = game.klhere+1; i <= game.nenhere; i++) {
-	dropin(IHR, &ix, &iy);
-	game.kx[i] = ix;
-	game.ky[i] = iy;
-	game.kdist[i] = game.kavgd[i] = sqrt(square(game.sectx-ix) + square(game.secty-iy));
+	dropin(IHR, &w);
+	game.ks[i] = w;
+	game.kdist[i] = game.kavgd[i] = sqrt(square(game.sector.x-w.x) + square(game.sector.y-w.y));
 	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*game.skill;
     }
     // If quadrant needs a starbase, put it in
     if (here->starbase)
-	dropin(IHB, &game.basex, &game.basey);
+	dropin(IHB, &game.base);
 	
     // If quadrant needs a planet, put it in
     if (here->planet) {
 	game.iplnet = here->planet - game.state.plnets;
 	if (here->planet->inhabited == UNINHABITED)
-	    dropin(IHP, &game.plnetx, &game.plnety);
+	    dropin(IHP, &game.plnet);
 	else
-	    dropin(IHW, &game.plnetx, &game.plnety);
+	    dropin(IHW, &game.plnet);
     }
     // Check for game.condition
     newcnd();
     // And finally the stars
     for (i = 1; i <= here->stars; i++) 
-	dropin(IHSTAR, &ix, &iy);
+	dropin(IHSTAR, &w);
 
     // Check for RNZ
     if (game.irhere > 0 && game.klhere == 0 && (!here->planet || here->planet->inhabited == UNINHABITED)) {
@@ -666,15 +665,14 @@ void newqad(int shutup)
 
     if (shutup==0) {
 	// Put in THING if needed
-	if (thingx == game.quadx && thingy == game.quady) {
-	    dropin(IHQUEST, &ix, &iy);
-	    iran(GALSIZE, &thingx, &thingy);
+	if (same(thing, game.quadrant)) {
+	    dropin(IHQUEST, &w);
+	    iran(GALSIZE, &thing.x, &thing.y);
 	    game.nenhere++;
 	    iqhere=1;
-	    game.kx[game.nenhere] = ix;
-	    game.ky[game.nenhere] = iy;
+	    game.ks[game.nenhere] = w;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
-		sqrt(square(game.sectx-ix) + square(game.secty-iy));
+		sqrt(square(game.sector.x-w.x) + square(game.sector.y-w.y));
 	    game.kpower[game.nenhere] = Rand()*6000.0 +500.0 +250.0*game.skill;
 	    if (game.damage[DSRSENS] == 0.0) {
 		skip(1);
@@ -694,16 +692,16 @@ void newqad(int shutup)
     #endif
 	    ) {
 	    do {
-		game.ithx = Rand() > 0.5 ? QUADSIZE : 1;
-		game.ithy = Rand() > 0.5 ? QUADSIZE : 1;
-	    } while (game.quad[game.ithx][game.ithy] != IHDOT);
-	    game.quad[game.ithx][game.ithy] = IHT;
+		game.tholian.x = Rand() > 0.5 ? QUADSIZE : 1;
+		game.tholian.y = Rand() > 0.5 ? QUADSIZE : 1;
+	    } while (game.quad[game.tholian.x][game.tholian.y] != IHDOT);
+	    game.quad[game.tholian.x][game.tholian.y] = IHT;
 	    game.ithere = 1;
 	    game.nenhere++;
-	    game.kx[game.nenhere] = game.ithx;
-	    game.ky[game.nenhere] = game.ithy;
+	    game.ks[game.nenhere].x = game.tholian.x;
+	    game.ks[game.nenhere].y = game.tholian.y;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
-		sqrt(square(game.sectx-game.ithx) + square(game.secty-game.ithy));
+		sqrt(square(game.sector.x-game.tholian.x) + square(game.sector.y-game.tholian.y));
 	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill;
 	    /* Reserve unocupied corners */
 	    if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
@@ -718,7 +716,7 @@ void newqad(int shutup)
     // Put in a few black holes
     for (i = 1; i <= 3; i++)
 	if (Rand() > 0.5) 
-	    dropin(IHBLANK, &ix, &iy);
+	    dropin(IHBLANK, &w);
 
     // Take out X's in corners if Tholian present
     if (game.ithere) {
@@ -749,12 +747,12 @@ void sortkl(void)
 		t = game.kavgd[j];
 		game.kavgd[j] = game.kavgd[j+1];
 		game.kavgd[j+1] = t;
-		k = game.kx[j];
-		game.kx[j] = game.kx[j+1];
-		game.kx[j+1] = k;
-		k = game.ky[j];
-		game.ky[j] = game.ky[j+1];
-		game.ky[j+1] = k;
+		k = game.ks[j].x;
+		game.ks[j].x = game.ks[j+1].x;
+		game.ks[j+1].x = k;
+		k = game.ks[j].y;
+		game.ks[j].y = game.ks[j+1].y;
+		game.ks[j+1].y = k;
 		t = game.kpower[j];
 		game.kpower[j] = game.kpower[j+1];
 		game.kpower[j+1] = t;

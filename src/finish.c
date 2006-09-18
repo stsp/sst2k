@@ -61,7 +61,7 @@ void kaboom(void)
 	int l=1;
 	while (l <= game.nenhere) {
 	    if (game.kpower[l]*game.kdist[l] <= whammo) 
-		deadkl(game.kx[l],game.ky[l], game.quad[game.kx[l]][game.ky[l]], game.kx[l], game.ky[l]);
+		deadkl(game.ks[l].x,game.ks[l].x, game.quad[game.ks[l].x][game.ks[l].y], game.ks[l].x, game.ks[l].y);
 	    l++;
 	}
     }

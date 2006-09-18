@@ -129,7 +129,7 @@ void doshield(int i)
     }
 }
 
-void ram(int ibumpd, int ienm, int ix, int iy)
+void ram(int ibumpd, int ienm, coord w)
 {
     double type = 1.0, extradm;
     int icas, l;
@@ -148,10 +148,10 @@ void ram(int ibumpd, int ienm, int ix, int iy)
     case IHQUEST: type = 4.0; break;
     }
     proutn(ibumpd ? _(" rammed by ") : _(" rams "));
-    crmena(0, ienm, 2, ix, iy);
+    crmena(0, ienm, 2, w);
     if (ibumpd) proutn(_(" (original position)"));
     skip(1);
-    deadkl(ix, iy, ienm, game.sectx, game.secty);
+    deadkl(w.x, w.y, ienm, game.sector.x, game.sector.y);
     proutn("***");
     crmshp();
     prout(_(" heavily damaged."));
@@ -177,14 +177,16 @@ void ram(int ibumpd, int ienm, int ix, int iy)
 
 void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
 {
-    int l, iquad=0, ix=0, iy=0, jx=0, jy=0, shoved=0, ll;
+    int l, iquad=0, jx=0, jy=0, shoved=0, ll;
 	
     double ac=course + 0.25*r;
     double angle = (15.0-ac)*0.5235988;
     double bullseye = (15.0 - course)*0.5235988;
     double deltax=-sin(angle), deltay=cos(angle), x=inx, y=iny, bigger;
     double ang, temp, xx, yy, kp, h1;
+    coord w;
 
+    w.x = w.y = 0;
     bigger = fabs(deltax);
     if (fabs(deltay) > bigger) bigger = fabs(deltay);
     deltax /= bigger;
@@ -196,12 +198,12 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     /* Loop to move a single torpedo */
     for (l=1; l <= 15; l++) {
 	x += deltax;
-	ix = x + 0.5;
+	w.x = x + 0.5;
 	y += deltay;
-	iy = y + 0.5;
-	if (!VALID_SECTOR(ix, iy)) break;
-	iquad=game.quad[ix][iy];
-	tracktorpedo(ix, iy, l, i, n, iquad);
+	w.y = y + 0.5;
+	if (!VALID_SECTOR(w.x, w.y)) break;
+	iquad=game.quad[w.x][w.y];
+	tracktorpedo(w.x, w.y, l, i, n, iquad);
 	if (iquad==IHDOT) continue;
 	/* hit something */
 	setwnd(message_window);
@@ -214,7 +216,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmshp();
 	    prout(".");
 	    *hit = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(ix-inx)+square(iy-iny))*
+		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
 		fabs(sin(bullseye-angle));
 	    *hit = fabs(*hit);
 	    newcnd(); /* we're blown out of dock */
@@ -225,8 +227,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
 	    xx = -sin(ang)/temp;
 	    yy = cos(ang)/temp;
-	    jx=ix+xx+0.5;
-	    jy=iy+yy+0.5;
+	    jx=w.x+xx+0.5;
+	    jy=w.y+yy+0.5;
 	    if (!VALID_SECTOR(jx, jy)) return;
 	    if (game.quad[jx][jy]==IHBLANK) {
 		finish(FHOLE);
@@ -236,8 +238,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		/* can't move into object */
 		return;
 	    }
-	    game.sectx = jx;
-	    game.secty = jy;
+	    game.sector.x = jx;
+	    game.sector.y = jy;
 	    crmshp();
 	    shoved = 1;
 	    break;
@@ -245,7 +247,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHC: /* Hit a commander */
 	case IHS:
 	    if (Rand() <= 0.05) {
-		crmena(1, iquad, 2, ix, iy);
+		crmena(1, iquad, 2, w);
 		prout(_(" uses anti-photon device;"));
 		prout(_("   torpedo neutralized."));
 		return;
@@ -254,34 +256,34 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHK:
 	    /* find the enemy */
 	    for_local_enemies(ll)
-		if (ix==game.kx[ll] && iy==game.ky[ll]) break;
+		if (w.x==game.ks[ll].x && w.y==game.ks[ll].y) break;
 	    kp = fabs(game.kpower[ll]);
 	    h1 = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(ix-inx)+square(iy-iny))*
+		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
 		fabs(sin(bullseye-angle));
 	    h1 = fabs(h1);
 	    if (kp < h1) h1 = kp;
 	    game.kpower[ll] -= (game.kpower[ll]<0 ? -h1 : h1);
 	    if (game.kpower[ll] == 0) {
-		deadkl(ix, iy, iquad, ix, iy);
+		deadkl(w.x, w.y, iquad, w.x, w.y);
 		return;
 	    }
-	    crmena(1, iquad, 2, ix, iy);
+	    crmena(1, iquad, 2, w);
 	    /* If enemy damaged but not destroyed, try to displace */
 	    ang = angle + 2.5*(Rand()-0.5);
 	    temp = fabs(sin(ang));
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
 	    xx = -sin(ang)/temp;
 	    yy = cos(ang)/temp;
-	    jx=ix+xx+0.5;
-	    jy=iy+yy+0.5;
+	    jx=w.x+xx+0.5;
+	    jy=w.y+yy+0.5;
 	    if (!VALID_SECTOR(jx, jy)) {
 		prout(_(" damaged but not destroyed."));
 		return;
 	    }
 	    if (game.quad[jx][jy]==IHBLANK) {
 		prout(_(" buffeted into black hole."));
-		deadkl(ix, iy, iquad, jx, jy);
+		deadkl(w.x, w.y, iquad, jx, jy);
 		return;
 	    }
 	    if (game.quad[jx][jy]!=IHDOT) {
@@ -290,37 +292,37 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		return;
 	    }
 	    proutn(_(" damaged--"));
-	    game.kx[ll] = jx;
-	    game.ky[ll] = jy;
+	    game.ks[ll].x = jx;
+	    game.ks[ll].y = jy;
 	    shoved = 1;
 	    break;
 	case IHB: /* Hit a base */
 	    skip(1);
 	    prout(_("***STARBASE DESTROYED.."));
 	    for_starbases(ll) {
-		if (game.state.baseqx[ll]==game.quadx && game.state.baseqy[ll]==game.quady) {
-		    game.state.baseqx[ll]=game.state.baseqx[game.state.rembase];
-		    game.state.baseqy[ll]=game.state.baseqy[game.state.rembase];
+		if (game.state.baseq[ll].x==game.quadrant.x && game.state.baseq[ll].y==game.quadrant.y) {
+		    game.state.baseq[ll].x=game.state.baseq[game.state.rembase].x;
+		    game.state.baseq[ll].y=game.state.baseq[game.state.rembase].y;
 		    break;
 		}
 	    }
-	    game.quad[ix][iy]=IHDOT;
+	    game.quad[w.x][w.y]=IHDOT;
 	    game.state.rembase--;
-	    game.basex=game.basey=0;
-	    game.state.galaxy[game.quadx][game.quady].starbase--;
-	    game.state.chart[game.quadx][game.quady].starbase--;
+	    game.base.x=game.base.y=0;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase--;
+	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase--;
 	    game.state.basekl++;
 	    newcnd();
 	    return;
 	case IHP: /* Hit a planet */
-	    crmena(1, iquad, 2, ix, iy);
+	    crmena(1, iquad, 2, w);
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
-	    game.state.galaxy[game.quadx][game.quady].planet = NULL;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NULL;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
-	    game.plnetx = game.plnety = 0;
-	    game.quad[ix][iy] = IHDOT;
+	    game.plnet.x = game.plnet.y = 0;
+	    game.quad[w.x][w.y] = IHDOT;
 	    if (game.landed==1) {
 		/* captain perishes on planet */
 		finish(FDPLANET);
@@ -328,10 +330,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHSTAR: /* Hit a star */
 	    if (Rand() > 0.10) {
-		nova(ix, iy);
+		nova(w.x, w.y);
 		return;
 	    }
-	    crmena(1, IHSTAR, 2, ix, iy);
+	    crmena(1, IHSTAR, 2, w);
 	    prout(_(" unaffected by photon blast."));
 	    return;
 	case IHQUEST: /* Hit a thingy */
@@ -344,7 +346,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		proutn(_("Mr. Spock-"));
 		prouts(_("  \"Fascinating!\""));
 		skip(1);
-		deadkl(ix, iy, iquad, ix, iy);
+		deadkl(w.x, w.y, iquad, w.x, w.y);
 	    } else {
 		/*
 		 * Stas Sergeev added the possibility that
@@ -357,7 +359,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHBLANK: /* Black hole */
 	    skip(1);
-	    crmena(1, IHBLANK, 2, ix, iy);
+	    crmena(1, IHBLANK, 2, w);
 	    prout(_(" swallows torpedo."));
 	    return;
 	case IHWEB: /* hit the web */
@@ -366,36 +368,36 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHT:  /* Hit a Tholian */
 	    h1 = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(ix-inx)+square(iy-iny))*
+		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
 		fabs(sin(bullseye-angle));
 	    h1 = fabs(h1);
 	    if (h1 >= 600) {
-		game.quad[ix][iy] = IHDOT;
+		game.quad[w.x][w.y] = IHDOT;
 		game.ithere = 0;
-		game.ithx = game.ithy = 0;
-		deadkl(ix, iy, iquad, ix, iy);
+		game.tholian.x = game.tholian.y = 0;
+		deadkl(w.x, w.y, iquad, w.x, w.y);
 		return;
 	    }
 	    skip(1);
-	    crmena(1, IHT, 2, ix, iy);
+	    crmena(1, IHT, 2, w);
 	    if (Rand() > 0.05) {
 		prout(_(" survives photon blast."));
 		return;
 	    }
 	    prout(_(" disappears."));
-	    game.quad[ix][iy] = IHWEB;
-	    game.ithere = game.ithx = game.ithy = 0;
+	    game.quad[w.x][w.y] = IHWEB;
+	    game.ithere = game.tholian.x = game.tholian.y = 0;
 	    game.nenhere--;
 	    {
-		int dum, my;
-		dropin(IHBLANK, &dum, &my);
+		coord dummy;
+		dropin(IHBLANK, &dummy);
 	    }
 	    return;
 					
 	default: /* Problem! */
 	    skip(1);
 	    proutn("Don't know how to handle collision with ");
-	    crmena(1, iquad, 2, ix, iy);
+	    crmena(1, iquad, 2, w);
 	    skip(1);
 	    return;
 	}
@@ -405,11 +407,13 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	setwnd(message_window);
     }
     if (shoved) {
+	coord w;
+	w.x = jx; w.y = jy;
 	game.quad[jx][jy]=iquad;
-	game.quad[ix][iy]=IHDOT;
-	prout(_(" displaced by blast to %s "), cramlc(sector, jx, jy));
+	game.quad[w.x][w.y]=IHDOT;
+	prout(_(" displaced by blast to %s "), cramlc(sector, w));
 	for_local_enemies(ll)
-	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(game.sectx-game.kx[ll])+square(game.secty-game.ky[ll]));
+	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(game.sector.x-game.ks[ll].x)+square(game.sector.y-game.ks[ll].y));
 	sortkl();
 	return;
     }
@@ -457,10 +461,11 @@ static void fry(double hit)
 void attack(int torps_ok) 
 {
     /* torps_ok == 0 forces use of phasers in an attack */
-    int percent, ihurt=0, l, i=0, jx, jy, iquad, itflag;
+    int percent, ihurt=0, l, i=0, iquad, itflag;
     int atackd = 0, attempt = 0;
     double hit;
     double pfac, dustfac, hitmax=0.0, hittot=0.0, chgfac=1.0, r;
+    coord jay;
 
     game.iattak = 1;
     if (game.alldone) return;
@@ -487,9 +492,9 @@ void attack(int torps_ok)
 	/* Increase chance of photon torpedos if docked or enemy energy low */
 	if (game.condit == IHDOCKED) r *= 0.25;
 	if (game.kpower[l] < 500) r *= 0.25; 
-	jx = game.kx[l];
-	jy = game.ky[l];
-	iquad = game.quad[jx][jy];
+	jay.x = game.ks[l].x;
+	jay.y = game.ks[l].y;
+	iquad = game.quad[jay.x][jay.y];
 	if (iquad==IHT || (iquad==IHQUEST && !iqengry)) continue;
 	itflag = (iquad == IHK && r > 0.0005) || !torps_ok ||
 	    (iquad==IHC && r > 0.015) ||
@@ -505,21 +510,21 @@ void attack(int torps_ok)
 	    game.kpower[l] *= 0.75;
 	}
 	else { /* Enemy used photon torpedo */
-	    double course = 1.90985*atan2((double)game.secty-jy, (double)jx-game.sectx);
+	    double course = 1.90985*atan2((double)game.sector.y-jay.y, (double)jay.x-game.sector.x);
 	    hit = 0;
 	    proutn(_("***TORPEDO INCOMING"));
 	    if (game.damage[DSRSENS] <= 0.0) {
 		proutn(_(" From "));
-		crmena(0, iquad, i, jx, jy);
+		crmena(0, iquad, i, jay);
 	    }
 	    attempt = 1;
 	    prout("  ");
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[l]*r;
-	    torpedo(course, r, jx, jy, &hit, 1, 1);
+	    torpedo(course, r, jay.x, jay.y, &hit, 1, 1);
 	    if (KLINGREM==0) 
 		finish(FWON); /* Klingons did themselves in! */
-	    if (game.state.galaxy[game.quadx][game.quady].supernova || game.alldone) 
+	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.alldone) 
 		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
@@ -539,7 +544,7 @@ void attack(int torps_ok)
 	/* It's a hit -- print out hit size */
 	atackd = 1; /* We weren't going to check casualties, etc. if
 		       shields were down for some strange reason. This
-		       doesn't make any sense, so I've fixed it */
+		       doesn't make any sense, so I've fw.xed it */
 	ihurt = 1;
 	proutn(_("%d unit hit"), (int)hit);
 	if ((game.damage[DSRSENS] > 0 && itflag) || game.skill<=SKILL_FAIR) {
@@ -548,7 +553,7 @@ void attack(int torps_ok)
 	}
 	if (game.damage[DSRSENS] <= 0.0 && itflag) {
 	    proutn(_(" from "));
-	    crmena(0, iquad, i, jx, jy);
+	    crmena(0, iquad, i, jay);
 	}
 	skip(1);
 	/* Decide if hit is critical */
@@ -601,15 +606,16 @@ void attack(int torps_ok)
 void deadkl(int ix, int iy, int type, int ixx, int iyy) 
 {
     /* Added ixx and iyy allow enemy to "move" before dying */
-
+    coord mv;
     int i,j;
 
+    mv.x = ixx; mv.y = iyy;
     skip(1);
-    crmena(1, type, 2, ixx, iyy);
+    crmena(1, type, 2, mv);
     /* Decide what kind of enemy it is and update approriately */
     if (type == IHR) {
 	/* chalk up a Romulan */
-	game.state.galaxy[game.quadx][game.quady].romulans--;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans--;
 	game.irhere--;
 	game.state.nromrem--;
     }
@@ -619,21 +625,20 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     }
     else if (type == IHQUEST) {
 	/* Killed a Thingy */
-	iqhere=iqengry=thingx=thingy=0;
+	iqhere=iqengry=thing.x=thing.y=0;
     }
     else {
 	/* Some type of a Klingon */
-	game.state.galaxy[game.quadx][game.quady].klingons--;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons--;
 	game.klhere--;
 	switch (type) {
 	case IHC:
 	    game.comhere = 0;
 	    for_commanders (i)
-		if (game.state.cx[i]==game.quadx && game.state.cy[i]==game.quady) break;
-	    game.state.cx[i] = game.state.cx[game.state.remcom];
-	    game.state.cy[i] = game.state.cy[game.state.remcom];
-	    game.state.cx[game.state.remcom] = 0;
-	    game.state.cy[game.state.remcom] = 0;
+		if (game.state.kcmdr[i].x==game.quadrant.x && game.state.kcmdr[i].y==game.quadrant.y) break;
+	    game.state.kcmdr[i] = game.state.kcmdr[game.state.remcom];
+	    game.state.kcmdr[game.state.remcom].x = 0;
+	    game.state.kcmdr[game.state.remcom].y = 0;
 	    game.state.remcom--;
 	    unschedule(FTBEAM);
 	    if (game.state.remcom != 0)
@@ -644,7 +649,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 	    break;
 	case IHS:
 	    game.state.nscrem--;
-	    game.ishere = game.state.isx = game.state.isy = game.isatb = game.iscate = 0;
+	    game.ishere = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
 	    unschedule(FSCMOVE);
 	    unschedule(FSCDBAS);
 	    break;
@@ -659,21 +664,20 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
     /* Remove enemy ship from arrays describing local game.conditions */
-    if (is_scheduled(FCDBAS) && game.batx==game.quadx && game.baty==game.quady && type==IHC)
+    if (is_scheduled(FCDBAS) && game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y && type==IHC)
 	unschedule(FCDBAS);
     for_local_enemies(i)
-	if (game.kx[i]==ix && game.ky[i]==iy) break;
+	if (game.ks[i].x==ix && game.ks[i].y==iy) break;
     game.nenhere--;
     if (i <= game.nenhere)  {
 	for (j=i; j<=game.nenhere; j++) {
-	    game.kx[j] = game.kx[j+1];
-	    game.ky[j] = game.ky[j+1];
+	    game.ks[j] = game.ks[j+1];
 	    game.kpower[j] = game.kpower[j+1];
 	    game.kavgd[j] = game.kdist[j] = game.kdist[j+1];
 	}
     }
-    game.kx[game.nenhere+1] = 0;
-    game.ky[game.nenhere+1] = 0;
+    game.ks[game.nenhere+1].x = 0;
+    game.ks[game.nenhere+1].x = 0;
     game.kdist[game.nenhere+1] = 0;
     game.kavgd[game.nenhere+1] = 0;
     game.kpower[game.nenhere+1] = 0;
@@ -688,8 +692,8 @@ static int targetcheck(double x, double y, double *course)
 	huh();
 	return 1;
     }
-    deltx = 0.1*(y - game.secty);
-    delty = 0.1*(game.sectx - x);
+    deltx = 0.1*(y - game.sector.y);
+    delty = 0.1*(game.sector.x - x);
     if (deltx==0 && delty== 0) {
 	skip(1);
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"));
@@ -822,8 +826,8 @@ void photon(void)
 	}
 	if (game.shldup || game.condit == IHDOCKED) 
 	    r *= 1.0 + 0.0001*game.shield;
-	torpedo(course[i], r, game.sectx, game.secty, &dummy, i, n);
-	if (game.alldone || game.state.galaxy[game.quadx][game.quady].supernova)
+	torpedo(course[i], r, game.sector.x, game.sector.y, &dummy, i, n);
+	if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 	    return;
     }
     if (KLINGREM==0) finish(FWON);
@@ -1071,8 +1075,8 @@ void phasers(void)
     case MANUAL:
 	rpow = 0.0;
 	for (k = 1; k <= game.nenhere;) {
-	    int ii = game.kx[k], jj = game.ky[k];
-	    int ienm = game.quad[ii][jj];
+	    coord aim = game.ks[k];
+	    int ienm = game.quad[aim.x][aim.y];
 	    if (msgflag) {
 		proutn(_("Energy available= %.2f"),
 		       game.energy-.006-(ifast?200:0));
@@ -1080,7 +1084,7 @@ void phasers(void)
 		msgflag = 0;
 		rpow = 0.0;
 	    }
-	    if (game.damage[DSRSENS] && !(abs(game.sectx-ii) < 2 && abs(game.secty-jj) < 2) &&
+	    if (game.damage[DSRSENS] && !(abs(game.sector.x-aim.x) < 2 && abs(game.sector.y-aim.y) < 2) &&
 		(ienm == IHC || ienm == IHS)) {
 		cramen(ienm);
 		prout(_(" can't be located without short range scan."));
@@ -1101,7 +1105,7 @@ void phasers(void)
 		else proutn("??");
 		proutn(")  ");
 		proutn(_("units to fire at "));
-		crmena(0, ienm, 2, ii, jj);
+		crmena(0, ienm, 2, aim);
 		proutn("-  ");
 		key = scan();
 	    }
@@ -1179,7 +1183,8 @@ void phasers(void)
 void hittem(double *hits) 
 {
     double kp, kpow, wham, hit, dustfac, kpini;
-    int nenhr2=game.nenhere, k=1, kk=1, ii, jj, ienm;
+    int nenhr2=game.nenhere, k=1, kk=1, ienm;
+    coord w;
 
     skip(1);
 
@@ -1192,21 +1197,20 @@ void hittem(double *hits)
 	if (PHASEFAC*hit < kp) kp = PHASEFAC*hit;
 	game.kpower[kk] -= (game.kpower[kk] < 0 ? -kp: kp);
 	kpow = game.kpower[kk];
-	ii = game.kx[kk];
-	jj = game.ky[kk];
+	w = game.ks[kk];
 	if (hit > 0.005) {
 	    if (game.damage[DSRSENS]==0)
-		boom(ii, jj);
+		boom(w.x, w.y);
 	    proutn(_("%d unit hit on "), (int)hit);
 	}
 	else
 	    proutn(_("Very small hit on "));
-	ienm = game.quad[ii][jj];
+	ienm = game.quad[w.x][w.y];
 	if (ienm==IHQUEST) iqengry=1;
-	crmena(0,ienm,2,ii,jj);
+	crmena(0,ienm,2,w);
 	skip(1);
 	if (kpow == 0) {
-	    deadkl(ii, jj, ienm, ii, jj);
+	    deadkl(w.x, w.y, ienm, w.x, w.y);
 	    if (KLINGREM==0) finish(FWON);
 	    if (game.alldone) return;
 	    kk--; /* don't do the increment */
@@ -1215,7 +1219,7 @@ void hittem(double *hits)
 	    if (kpow > 0 && Rand() >= 0.9 &&
 		kpow <= ((0.4 + 0.4*Rand())*kpini)) {
 		prout(_("***Mr. Spock-  \"Captain, the vessel at "),
-		      cramlc(sector,ii,jj));
+		      cramlc(sector, w));
 		prout(_("   has just lost its firepower.\""));
 		game.kpower[kk] = -kpow;
 	    }

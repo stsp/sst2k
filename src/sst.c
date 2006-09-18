@@ -164,7 +164,8 @@ for a lot of magic numbers and refactored the heck out of it.
 static char line[128], *linep = line;
 
 struct game game;
-int thingx, thingy, iqhere, iqengry;
+coord thing;
+int iqhere, iqengry;
 int iscore, iskill; // Common PLAQ
 double aaitem;
 double perdate;
@@ -555,14 +556,14 @@ static void makemoves(void)
 		events();
 		if (game.alldone) break;	// Events did us in
 	    }
-	    if (game.state.galaxy[game.quadx][game.quady].supernova) { // Galaxy went Nova!
+	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) { // Galaxy went Nova!
 		atover(0);
 		continue;
 	    }
 	    if (hitme && game.justin==0) {
 		attack(2);
 		if (game.alldone) break;
-		if (game.state.galaxy[game.quadx][game.quady].supernova) {	// went NOVA! 
+		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) {	// went NOVA! 
 		    atover(0);
 		    hitme = TRUE;
 		    continue;
@@ -660,22 +661,22 @@ void cramen(int i)
     proutn(s);
 }
 
-char *cramlc(enum loctype key, int x, int y)
+char *cramlc(enum loctype key, coord w)
 {
     static char buf[32];
     buf[0] = '\0';
     if (key == quadrant) strcpy(buf, "Quadrant ");
     else if (key == sector) strcpy(buf, "Sector ");
-    sprintf(buf+strlen(buf), "%d - %d", x, y);
+    sprintf(buf+strlen(buf), "%d - %d", w.x, w.y);
     return buf;
 }
 
-void crmena(int i, int enemy, int key, int x, int y) 
+void crmena(int i, int enemy, int key, coord w) 
 {
     if (i == 1) proutn("***");
     cramen(enemy);
     proutn(" at ");
-    proutn(cramlc(key, x, y));
+    proutn(cramlc(key, w));
 }
 
 void crmshp(void) 
@@ -870,7 +871,7 @@ void debugme(void)
     }
     proutn("Induce supernova here? ");
     if (ja() != 0) {
-	game.state.galaxy[game.quadx][game.quady].supernova = TRUE;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = TRUE;
 	atover(1);
     }
 }
