@@ -36,6 +36,7 @@ void events(void)
     int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
     int radio_was_broken;
+    struct quadrant *pdest;
 
 #ifdef DEBUG
     if (game.idebug) prout("EVENTS");
@@ -280,8 +281,8 @@ void events(void)
 	    /* Not perfect, but will have to do */
 	    /* Handle case where base is in same quadrant as starship */
 	    if (game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y) {
-		game.state.chart[game.battle.x][game.battle.y].starbase = FALSE;
-		game.quad[game.base.x][game.base.y]= IHDOT;
+		game.state.chart[game.battle.x][game.battle.y].starbase = false;
+		game.quad[game.base.x][game.base.y] = IHDOT;
 		game.base.x=game.base.y=0;
 		newcnd();
 		skip(1);
@@ -299,10 +300,10 @@ void events(void)
 		prout(_(" has been destroyed by"));
 		if (game.isatb==2) prout(_("the Klingon Super-Commander"));
 		else prout(_("a Klingon Commander"));
-		game.state.chart[game.battle.x][game.battle.y].starbase = FALSE;
+		game.state.chart[game.battle.x][game.battle.y].starbase = false;
 	    }
 	    /* Remove Starbase from galaxy */
-	    game.state.galaxy[game.battle.x][game.battle.y].starbase = FALSE;
+	    game.state.galaxy[game.battle.x][game.battle.y].starbase = false;
 	    for_starbases(i)
 		if (game.state.baseq[i].x==game.battle.x && game.state.baseq[i].y==game.battle.y) {
 		    game.state.baseq[i].x=game.state.baseq[game.state.rembase].x;
@@ -360,17 +361,19 @@ void events(void)
 		    prout(".\"");
 		}
 	    }
+	    pdest = &game.state.galaxy[game.probec.x][game.probec.y];
 	    /* Update star chart if Radio is working or have access to
 	       radio. */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
-		game.state.chart[game.probec.x][game.probec.y].klingons = game.state.galaxy[game.probec.x][game.probec.y].klingons;
-		game.state.chart[game.probec.x][game.probec.y].starbase = game.state.galaxy[game.probec.x][game.probec.y].starbase;
-		game.state.chart[game.probec.x][game.probec.y].stars = game.state.galaxy[game.probec.x][game.probec.y].stars;
-		game.state.galaxy[game.probec.x][game.probec.y].charted = TRUE;
+		struct page *chp = &game.state.chart[game.probec.x][game.probec.y];
+
+		chp->klingons = pdest->klingons;
+		chp->starbase = pdest->starbase;
+		chp->stars = pdest->stars;
+		pdest->charted = true;
 	    }
 	    game.proben--; // One less to travel
-	    if (game.proben == 0 && game.isarmed &&
-		game.state.galaxy[game.probec.x][game.probec.y].stars) {
+	    if (game.proben == 0 && game.isarmed && pdest->stars) {
 		/* lets blow the sucker! */
 		snova(1,0);
 		unschedule(FDSPROB);
@@ -629,7 +632,7 @@ void nova(int ix, int iy)
 			game.quad[scratch.x][scratch.y] = IHDOT;
 			break;
 		    case IHB: /* Destroy base */
-			game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase = FALSE;
+			game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase = false;
 			for_starbases(i)
 			    if (game.state.baseq[i].x==game.quadrant.x && game.state.baseq[i].y==game.quadrant.y) 
 				break;
@@ -667,7 +670,7 @@ void nova(int ix, int iy)
 			kount++;
 			break;
 		    case IHK: /* kill klingon */
-			deadkl(scratch.x,scratch.y,iquad, scratch.x, scratch.y);
+			deadkl(scratch,iquad, scratch.x, scratch.y);
 			break;
 		    case IHC: /* Damage/destroy big enemies */
 		    case IHS:
@@ -676,7 +679,7 @@ void nova(int ix, int iy)
 			    if (game.ks[ll].x==scratch.x && game.ks[ll].y==scratch.y) break;
 			game.kpower[ll] -= 800.0; /* If firepower is lost, die */
 			if (game.kpower[ll] <= 0.0) {
-			    deadkl(scratch.x, scratch.y, iquad, scratch.x, scratch.y);
+			    deadkl(scratch, iquad, scratch.x, scratch.y);
 			    break;
 			}
 			newc.x = scratch.x + scratch.x - hits[mm][1];
@@ -693,7 +696,7 @@ void nova(int ix, int iy)
 			    proutn(_(", blasted into "));
 			    crmena(0, IHBLANK, 2, newc);
 			    skip(1);
-			    deadkl(scratch.x, scratch.y, iquad, newc.x, newc.y);
+			    deadkl(scratch, iquad, newc.x, newc.y);
 			    break;
 			}
 			if (iquad1 != IHDOT) {
@@ -886,7 +889,7 @@ void snova(int insx, int insy)
     if ((game.quadrant.x == nq.x && game.quadrant.y == nq.y) ||
 	game.damage[DRADIO] == 0 ||
 	game.condit == IHDOCKED)
-	game.state.galaxy[nq.x][nq.y].supernova = TRUE;
+	game.state.galaxy[nq.x][nq.y].supernova = true;
     /* If supernova destroys last klingons give special message */
     if (KLINGREM==0 && (nq.x != game.quadrant.x || nq.y != game.quadrant.y)) {
 	skip(2);

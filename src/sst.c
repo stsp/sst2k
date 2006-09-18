@@ -298,7 +298,7 @@ static void helpme(void)
     /* Give help on commands */
     int key;
     key = scan();
-    while (TRUE) {
+    for(;;) {
 	if (key == IHEOL) {
 	    setwnd(prompt_window);
 	    proutn("Help on what command? ");
@@ -375,13 +375,14 @@ void enqueue(char *s)
 
 static void makemoves(void) 
 {
-    int i, v = 0, hitme;
+    int i, v = 0;
+    bool hitme;
     clrscr();
     setwnd(message_window);
-    while (TRUE) { /* command loop */
+    for(;;) { /* command loop */
 	drawmaps(1);
-	while (TRUE)  { /* get a command */
-	    hitme = FALSE;
+	for(;;)  { /* get a command */
+	    hitme = false;
 	    game.justin = 0;
 	    game.optime = 0.0;
 	    i = -1;
@@ -413,7 +414,7 @@ static void makemoves(void)
 		break;
 	    listCommands();
 	}
-	commandhook(commands[i].name, TRUE);
+	commandhook(commands[i].name, true);
 	switch (v) { /* command switch */
 	case SRSCAN:                 // srscan
 	    srscan(SCAN_FULL);
@@ -429,11 +430,11 @@ static void makemoves(void)
 	    break;
 	case PHASERS:			// phasers
 	    phasers();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case TORPEDO:			// photons
 	    photon();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case MOVE:			// move
 	    warp(1);
@@ -441,7 +442,7 @@ static void makemoves(void)
 	case SHIELDS:			// shields
 	    doshield(1);
 	    if (game.ididit) {
-		hitme=TRUE;
+		hitme=true;
 		game.shldchg = 0;
 	    }
 	    break;
@@ -460,7 +461,7 @@ static void makemoves(void)
 	    break;
 	case REST:			// rest
 	    wait();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case WARP:			// warp
 	    setwrp();
@@ -473,22 +474,22 @@ static void makemoves(void)
 	    break;
 	case ORBIT:			// orbit
 	    orbit();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case TRANSPORT:			// transport "beam"
 	    beam();
 	    break;
 	case MINE:			// mine
 	    mine();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case CRYSTALS:			// crystals
 	    usecrystals();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case SHUTTLE:			// shuttle
 	    shuttle();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case PLANETS:			// Planet list
 	    preport();
@@ -504,12 +505,12 @@ static void makemoves(void)
 	    break;
 	case EMEXIT:			// Emergency exit
 	    clrscr();			// Hide screen
-	    freeze(TRUE);		// forced save
+	    freeze(true);		// forced save
 	    exit(1);			// And quick exit
 	    break;
 	case PROBE:
 	    probe();			// Launch probe
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case ABANDON:			// Abandon Ship
 	    abandn();
@@ -518,14 +519,14 @@ static void makemoves(void)
 	    dstrct();
 	    break;
 	case SAVE:			// Save Game
-	    freeze(FALSE);
+	    freeze(false);
 	    clrscr();
 	    if (game.skill > SKILL_GOOD)
 		prout("WARNING--Saved games produce no plaques!");
 	    break;
 	case DEATHRAY:			// Try a desparation measure
 	    deathray();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case DEBUGCMD:			// What do we want for debug???
 #ifdef DEBUG
@@ -534,7 +535,7 @@ static void makemoves(void)
 	    break;
 	case MAYDAY:			// Call for help
 	    mayday();
-	    if (game.ididit) hitme = TRUE;
+	    if (game.ididit) hitme = true;
 	    break;
 	case QUIT:
 	    game.alldone = 1;		// quit the game
@@ -546,7 +547,7 @@ static void makemoves(void)
 	    helpme();	// get help
 	    break;
 	}
-	commandhook(commands[i].name, FALSE);
+	commandhook(commands[i].name, false);
 	for (;;) {
 	    if (game.alldone) break;		// Game has ended
 #ifdef DEBUG
@@ -565,7 +566,7 @@ static void makemoves(void)
 		if (game.alldone) break;
 		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) {	// went NOVA! 
 		    atover(0);
-		    hitme = TRUE;
+		    hitme = true;
 		    continue;
 		}
 	    }
@@ -606,7 +607,7 @@ int main(int argc, char **argv)
 	strcat(line, argv[i]);
 	strcat(line, " ");
     }
-    while (TRUE) { /* Play a game */
+    for(;;) { /* Play a game */
 	setwnd(fullscreen_window);
 #ifdef DEBUG
 	prout("INITIAL OPTIONS: %0lx", game.options);
@@ -627,7 +628,7 @@ int main(int argc, char **argv)
 	    proutn("Do you want your score recorded?");
 	    if (ja()) {
 		chew2();
-		freeze(FALSE);
+		freeze(false);
 	    }
 	}
 	proutn("Do you want to play again? ");
@@ -779,14 +780,14 @@ int scan(void)
     return IHALPHA;
 }
 
-int ja(void) 
+bool ja(void) 
 {
     chew();
-    while (TRUE) {
+    for(;;) {
 	scan();
 	chew();
-	if (*citem == 'y') return TRUE;
-	if (*citem == 'n') return FALSE;
+	if (*citem == 'y') return true;
+	if (*citem == 'n') return false;
 	proutn("Please answer with \"Y\" or \"N\": ");
     }
 }
@@ -871,7 +872,7 @@ void debugme(void)
     }
     proutn("Induce supernova here? ");
     if (ja() != 0) {
-	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = TRUE;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = true;
 	atover(1);
     }
 }

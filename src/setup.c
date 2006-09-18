@@ -19,7 +19,7 @@ void prelim(void)
 #endif /* __HISTORICAL__ */
 }
 
-void freeze(int boss) 
+void freeze(bool boss) 
 {
     FILE *fp;
     int key;
@@ -220,7 +220,8 @@ void setup(int needprompt)
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.resting = game.casual = 0;
-    game.isatb = game.iscate = game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
+    game.isatb = game.iscate = true;
+    game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     game.iscraft = 1;
     game.landed = -1;
@@ -269,16 +270,16 @@ void setup(int needprompt)
 	}
     // Locate star bases in galaxy
     for (i = 1; i <= game.inbase; i++) {
-	int contflag;
+	bool contflag;
 	do {
 	    do iran(GALSIZE, &ix, &iy);
 	    while (game.state.galaxy[ix][iy].starbase);
-	    contflag = FALSE;
+	    contflag = false;
 	    for (j = i-1; j > 0; j--) {
 		/* Improved placement algorithm to spread out bases */
 		double distq = square(ix-game.state.baseq[j].x) + square(iy-game.state.baseq[j].y);
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
-		    contflag = TRUE;
+		    contflag = true;
 #ifdef DEBUG
 		    prout("DEBUG: Abandoning base #%d at %d-%d", i, ix, iy);
 #endif
@@ -423,9 +424,9 @@ void setup(int needprompt)
     if (game.neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
 
-int choose(int needprompt) 
+bool choose(bool needprompt) 
 {
-    while (TRUE) {
+    for(;;) {
 	game.tourn = 0;
 	game.thawed = 0;
 	game.skill = SKILL_NONE;
@@ -454,7 +455,7 @@ int choose(int needprompt)
 	    if (!game.alldone) game.thawed = 1; // No plaque if not finished
 	    report();
 	    waitfor();
-	    return TRUE;
+	    return true;
 	}
 	if (isit("regular")) break;
 	proutn("What is \"");
@@ -531,7 +532,7 @@ int choose(int needprompt)
     if (game.inkling > 50) {
 	game.inbase = (game.state.rembase += 1);
     }
-    return FALSE;
+    return false;
 }
 
 void dropin(int iquad, coord *w) 
@@ -730,17 +731,18 @@ void newqad(int shutup)
 void sortkl(void) 
 {
     double t;
-    int sw, j, k;
+    int j, k;
+    bool sw;
 
     // The author liked bubble sort. So we will use it. :-(
 
     if (game.nenhere-iqhere-game.ithere < 2) return;
 
     do {
-	sw = FALSE;
+	sw = false;
 	for (j = 1; j < game.nenhere; j++)
 	    if (game.kdist[j] > game.kdist[j+1]) {
-		sw = TRUE;
+		sw = true;
 		t = game.kdist[j];
 		game.kdist[j] = game.kdist[j+1];
 		game.kdist[j+1] = t;

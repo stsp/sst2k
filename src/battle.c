@@ -151,7 +151,7 @@ void ram(int ibumpd, int ienm, coord w)
     crmena(0, ienm, 2, w);
     if (ibumpd) proutn(_(" (original position)"));
     skip(1);
-    deadkl(w.x, w.y, ienm, game.sector.x, game.sector.y);
+    deadkl(w, ienm, game.sector.x, game.sector.y);
     proutn("***");
     crmshp();
     prout(_(" heavily damaged."));
@@ -265,7 +265,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    if (kp < h1) h1 = kp;
 	    game.kpower[ll] -= (game.kpower[ll]<0 ? -h1 : h1);
 	    if (game.kpower[ll] == 0) {
-		deadkl(w.x, w.y, iquad, w.x, w.y);
+		deadkl(w, iquad, w.x, w.y);
 		return;
 	    }
 	    crmena(1, iquad, 2, w);
@@ -283,7 +283,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    }
 	    if (game.quad[jx][jy]==IHBLANK) {
 		prout(_(" buffeted into black hole."));
-		deadkl(w.x, w.y, iquad, jx, jy);
+		deadkl(w, iquad, jx, jy);
 		return;
 	    }
 	    if (game.quad[jx][jy]!=IHDOT) {
@@ -346,7 +346,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		proutn(_("Mr. Spock-"));
 		prouts(_("  \"Fascinating!\""));
 		skip(1);
-		deadkl(w.x, w.y, iquad, w.x, w.y);
+		deadkl(w, iquad, w.x, w.y);
 	    } else {
 		/*
 		 * Stas Sergeev added the possibility that
@@ -375,7 +375,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		game.quad[w.x][w.y] = IHDOT;
 		game.ithere = 0;
 		game.tholian.x = game.tholian.y = 0;
-		deadkl(w.x, w.y, iquad, w.x, w.y);
+		deadkl(w, iquad, w.x, w.y);
 		return;
 	    }
 	    skip(1);
@@ -603,7 +603,7 @@ void attack(int torps_ok)
     return;
 }
 		
-void deadkl(int ix, int iy, int type, int ixx, int iyy) 
+void deadkl(coord w, int type, int ixx, int iyy) 
 {
     /* Added ixx and iyy allow enemy to "move" before dying */
     coord mv;
@@ -658,7 +658,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
 
     /* For each kind of enemy, finish message to player */
     prout(_(" destroyed."));
-    game.quad[ix][iy] = IHDOT;
+    game.quad[w.x][w.y] = IHDOT;
     if (KLINGREM==0) return;
 
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
@@ -667,7 +667,7 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     if (is_scheduled(FCDBAS) && game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y && type==IHC)
 	unschedule(FCDBAS);
     for_local_enemies(i)
-	if (game.ks[i].x==ix && game.ks[i].y==iy) break;
+	if (same(game.ks[i], w)) break;
     game.nenhere--;
     if (i <= game.nenhere)  {
 	for (j=i; j<=game.nenhere; j++) {
@@ -684,13 +684,13 @@ void deadkl(int ix, int iy, int type, int ixx, int iyy)
     return;
 }
 
-static int targetcheck(double x, double y, double *course) 
+static bool targetcheck(double x, double y, double *course) 
 {
     double deltx, delty;
-    /* Return TRUE if target is invalid */
+    /* Return true if target is invalid */
     if (!VALID_SECTOR(x, y)) {
 	huh();
-	return 1;
+	return true;
     }
     deltx = 0.1*(y - game.sector.y);
     delty = 0.1*(game.sector.x - x);
@@ -700,10 +700,10 @@ static int targetcheck(double x, double y, double *course)
 	prout(_("  I recommend an immediate review of"));
 	prout(_("  the Captain's psychological profile.\""));
 	chew();
-	return 1;
+	return true;
     }
     *course = 1.90985932*atan2(deltx, delty);
-    return 0;
+    return false;
 }
 
 void photon(void) 
@@ -1210,7 +1210,7 @@ void hittem(double *hits)
 	crmena(0,ienm,2,w);
 	skip(1);
 	if (kpow == 0) {
-	    deadkl(w.x, w.y, ienm, w.x, w.y);
+	    deadkl(w, ienm, w.x, w.y);
 	    if (KLINGREM==0) finish(FWON);
 	    if (game.alldone) return;
 	    kk--; /* don't do the increment */

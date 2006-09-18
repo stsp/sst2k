@@ -443,7 +443,7 @@ void deathray(void)
 	prouts("Sulu- \"Captain!  It's working!\"");
 	skip(2);
 	while (game.nenhere > 0)
-	    deadkl(game.ks[1].x,game.ks[1].y,game.quad[game.ks[1].x][game.ks[1].y],game.ks[1].x,game.ks[1].y);
+	    deadkl(game.ks[1], game.quad[game.ks[1].x][game.ks[1].y],game.ks[1].x,game.ks[1].y);
 	prout("Ensign Chekov-  \"Congratulations, Captain!\"");
 	if (KLINGREM == 0) finish(FWON);
 	if ((game.options & OPTION_PLAIN) == 0) {

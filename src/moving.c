@@ -2,7 +2,7 @@
 #include "sstlinux.h"
 #include "sst.h"
 
-static void getcd(int, int);
+static void getcd(bool, int);
 
 void imove(void) 
 {
@@ -14,7 +14,7 @@ void imove(void)
     w.x = w.y = 0;
     if (game.inorbit) {
 	prout("Helmsman Sulu- \"Leaving standard orbit.\"");
-	game.inorbit = FALSE;
+	game.inorbit = false;
     }
 
     angle = ((15.0 - game.direc) * 0.5235988);
@@ -246,7 +246,7 @@ void dock(int l)
     }
 }
 
-static void getcd(int isprobe, int akey) {
+static void getcd(bool isprobe, int akey) {
 	/* This program originally required input in terms of a (clock)
 	   direction and distance. Somewhere in history, it was changed to
 	   cartesian coordinates. So we need to convert. I think
@@ -446,7 +446,7 @@ void impuls(void)
     }
 
     if (game.energy > 30.0) {
-	getcd(FALSE, 0);
+	getcd(false, 0);
 	if (game.direc == -1.0) return;
 	power = 20.0 + 100.0*game.dist;
     }
@@ -511,7 +511,7 @@ void warp(int i)
 	}
 			
 	/* Read in course and distance */
-	getcd(FALSE, 0);
+	getcd(false, 0);
 	if (game.direc == -1.0) return;
 
 	/* Make sure starship has enough energy for the trip */
@@ -734,7 +734,7 @@ void atover(int igrab)
 	skip(1);
 	prout("safely out of quadrant.");
 	if (game.damage[DRADIO] == 0.0)
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = TRUE;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
 	/* Try to use warp engines */
 	if (game.damage[DWARPEN]) {
 	    skip(1);
@@ -869,16 +869,16 @@ void probe(void)
 	if (ja()==0) return;
     }
 
-    game.isarmed = FALSE;
+    game.isarmed = false;
     if (key == IHALPHA && strcmp(citem,"armed") == 0) {
-	game.isarmed = TRUE;
+	game.isarmed = true;
 	key = scan();
     }
     else if (key == IHEOL) {
 	proutn("Arm NOVAMAX warhead? ");
 	game.isarmed = ja();
     }
-    getcd(TRUE, key);
+    getcd(true, key);
     if (game.direc == -1.0) return;
     game.nprobes--;
     angle = ((15.0 - game.direc) * 0.5235988);
@@ -943,8 +943,7 @@ void mayday(void)
 	    }
 	}
 	/* Since starbase not in quadrant, set up new quadrant */
-	game.quadrant.x = game.state.baseq[line].x;
-	game.quadrant.y = game.state.baseq[line].y;
+	game.quadrant = game.state.baseq[line];
 	newqad(1);
     }
     /* dematerialize starship */

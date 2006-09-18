@@ -135,7 +135,7 @@ void lrscan(void)
 		proutn("  -1");
 	    else {
 		if (!game.damage[DRADIO])
-		    game.state.galaxy[x][y].charted = TRUE;
+		    game.state.galaxy[x][y].charted = true;
 		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
 		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
 		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
@@ -151,7 +151,8 @@ void lrscan(void)
 
 void dreprt(void) 
 {
-    int jdam = FALSE, i;
+    bool jdam = false;
+    int i;
     chew();
 
     for (i = 0; i < NDEVICES; i++) {
@@ -159,7 +160,7 @@ void dreprt(void)
 	    if (!jdam) {
 		prout("DEVICE            -REPAIR TIMES-");
 		prout("                IN FLIGHT   DOCKED");
-		jdam = TRUE;
+		jdam = true;
 	    }
 	    prout("  %16s %8.2f  %8.2f", 
 		  device[i],
@@ -334,15 +335,16 @@ int srscan(int l)
     /* the "sy" request is undocumented */
     static char requests[][3] =
 	{"","da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
-    int leftside=TRUE, rightside=TRUE, i, j, jj, req=0, nn=FALSE;
-    int goodScan=TRUE;
+    
+    int i, j, jj, req=0;
+    int goodScan=true, leftside=true, rightside=true, nn=false; 
     switch (l) {
     case SCAN_FULL: // SRSCAN
 	if (game.damage[DSRSENS] != 0) {
 	    /* Allow base's sensors if docked */
 	    if (game.condit != IHDOCKED) {
 		prout("   S.R. SENSORS DAMAGED!");
-		goodScan=FALSE;
+		goodScan=false;
 	    }
 	    else
 		prout("  [Using Base's sensors]");
@@ -352,11 +354,11 @@ int srscan(int l)
 	    game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
 	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
 	    game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = TRUE;
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
 	}
 	scan();
-	if (isit("chart")) nn = TRUE;
-	if (isit("no")) rightside = FALSE;
+	if (isit("chart")) nn = true;
+	if (isit("no")) rightside = false;
 	chew();
 	prout("    1 2 3 4 5 6 7 8 9 10");
 	break;
@@ -371,16 +373,16 @@ int srscan(int l)
 	    prout("UNRECOGNIZED REQUEST. Legal requests are:");
 	    prout("  date, condition, position, lsupport, warpfactor,");
 	    prout("  energy, torpedoes, shields, klingons, time, system, bases.");
-	    return FALSE;
+	    return false;
 	}
 	// no break
     case SCAN_STATUS: // STATUS
 	chew();
-	leftside = FALSE;
+	leftside = false;
 	skip(1);
 	// no break
     case SCAN_NO_LEFTSIDE: // REQUEST
-	leftside=FALSE;
+	leftside=false;
 	break;
     }
     if (game.condit != IHDOCKED) newcnd();
@@ -405,8 +407,8 @@ int srscan(int l)
 			
 void eta(void)
 {
-    int ix1, ix2, iy1, iy2, prompt=FALSE;
-    int wfl;
+    int ix1, ix2, iy1, iy2;
+    bool wfl, prompt = false;
     double ttime, twarp, tpower;
     if (game.damage[DCOMPTR] != 0.0) {
 	prout("COMPUTER DAMAGED, USE A POCKET CALCULATOR.");
@@ -414,7 +416,7 @@ void eta(void)
 	return;
     }
     if (scan() != IHREAL) {
-	prompt = TRUE;
+	prompt = true;
 	chew();
 	proutn("Destination quadrant and/or sector? ");
 	if (scan()!=IHREAL) {
@@ -449,10 +451,10 @@ void eta(void)
     }
     game.dist = sqrt(square(iy1-game.quadrant.x+0.1*(iy2-game.sector.x))+
 		square(ix1-game.quadrant.y+0.1*(ix2-game.sector.y)));
-    wfl = FALSE;
+    wfl = false;
 
     if (prompt) prout("Answer \"no\" if you don't know the value:");
-    while (TRUE) {
+    for (;;) {
 	chew();
 	proutn("Time or arrival date? ");
 	if (scan()==IHREAL) {
@@ -470,7 +472,7 @@ void eta(void)
 	chew();
 	proutn("Warp factor? ");
 	if (scan()== IHREAL) {
-	    wfl = TRUE;
+	    wfl = true;
 	    twarp = aaitem;
 	    if (twarp<1.0 || twarp > 10.0) {
 		huh();
@@ -480,7 +482,7 @@ void eta(void)
 	}
 	prout("Captain, certainly you can give me one of these.");
     }
-    while (TRUE) {
+    for (;;) {
 	chew();
 	ttime = (10.0*game.dist)/square(twarp);
 	tpower = game.dist*twarp*twarp*twarp*(game.shldup+1);
@@ -490,7 +492,7 @@ void eta(void)
 		if (!wfl) return;
 		proutn("New warp factor to try? ");
 		if (scan() == IHREAL) {
-		    wfl = TRUE;
+		    wfl = true;
 		    twarp = aaitem;
 		    if (twarp<1.0 || twarp > 10.0) {
 			huh();
@@ -532,7 +534,7 @@ void eta(void)
 	    prout("The starbase there will be destroyed by then.");
 	proutn("New warp factor to try? ");
 	if (scan() == IHREAL) {
-	    wfl = TRUE;
+	    wfl = true;
 	    twarp = aaitem;
 	    if (twarp<1.0 || twarp > 10.0) {
 		huh();

@@ -7,6 +7,7 @@
 #include <locale.h>
 #include <libintl.h>
 #include <curses.h>
+#include <stdbool.h>
 
 #ifdef DATA_DIR
 #define SSTDOC DATA_DIR"/"DOC_NAME
@@ -77,16 +78,16 @@ typedef struct {
     struct quadrant {
 	int stars;
 	planet *planet;
-	int starbase;
+	bool starbase;
 	int klingons;
 	int romulans;
-	int supernova;
-	int charted;
+	bool supernova;
+	bool charted;
 #ifdef EXPERIMENTAL
 	enum {secure, distressed, enslaved} status;
 #endif /* EXPERIMENTAL */
     } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
-    struct {
+    struct page {
 	int stars;
 	int starbase;
 	int klingons;
@@ -201,6 +202,16 @@ struct game {
     coord battle;		// base coordinates being attacked
     coord plnet;		// location of planet in quadrant
     coord probec;	// current probe quadrant
+    bool gamewon,	// Finished!
+	ididit,		// Action taken -- allows enemy to attack
+	alive,		// We are alive (not killed)
+	justin,		// just entered quadrant
+	alldone,	// game is now finished
+	neutz,		// Romulan Neutral Zone
+	isatb,		// =1 if super commander is attacking base
+	isarmed,	// probe is armed
+	thawed,		// thawed game
+	iscate;		// super commander is here
     int inkling,	// Initial number of klingons
 	inbase,		// Initial number of bases
 	incom,		// Initial number of commanders
@@ -218,11 +229,6 @@ struct game {
 	casual,		// causalties
 	nhelp,		// calls for help
 	nkinks,		// count of energy-barrier crossings
-	ididit,		// Action taken -- allows enemy to attack
-	gamewon,	// Finished!
-	alive,		// We are alive (not killed)
-	justin,		// just entered quadrant
-	alldone,	// game is now finished
 	shldchg,	// shield is changing (affects efficiency)
 	inorbit,	// orbiting
 	landed,		// party on planet (1), on ship (-1)
@@ -231,27 +237,22 @@ struct game {
 	inplan,		// initial planets
 	nenhere,	// number of enemies in quadrant
 	ishere,		// super-commander in quandrant
-	neutz,		// Romulan Neutral Zone
 	irhere,		// Romulans in quadrant
 	icraft,		// Kirk in Galileo
 	ientesc,	// attempted escape from supercommander
 	iscraft,	// =1 if craft on ship, -1 if removed from game
-	isatb,		// =1 if super commander is attacking base
-	iscate,		// super commander is here
 #ifdef DEBUG
 	idebug,		// debug mode
 #endif
 	iattak,		// attack recursion elimination (was cracks[4])
 	icrystl,	// dilithium crystals aboard
 	tourn,		// tournament number
-	thawed,		// thawed game
 	ithere,		// Tholian is here 
 	iseenit,	// seen base attack report
 #ifdef EXPERIMENTAL
 	ndistr,		//* count of distress calls */ 
 #endif /* EXPERIMENTAL */
 	proben,		// number of moves for probe
-	isarmed,	// probe is armed
 	nprobes;	// number of probes available
     double inresor,	// initial resources
 	intime,		// initial time
@@ -299,11 +300,6 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
 			  FHOLE} FINTYPE ;
 enum loctype {neither, quadrant, sector};
 
-#ifndef TRUE
-#define TRUE (1)
-#define FALSE (0)
-#endif
-
 #define IHR 'R'
 #define IHK 'K'
 #define IHC 'C'
@@ -332,7 +328,7 @@ enum loctype {neither, quadrant, sector};
 /* Function prototypes */
 void prelim(void);
 void attack(int);
-int choose(int);
+bool choose(bool);
 void setup(int);
 void score(void);
 void atover(int);
@@ -357,7 +353,7 @@ void abandn(void);
 void finish(FINTYPE);
 void dstrct(void);
 void kaboom(void);
-void freeze(int);
+void freeze(bool);
 int thaw(void);
 void plaque(void);
 int scan(void);
@@ -371,7 +367,7 @@ void prout(char *, ...);
 void proutn(char *, ...);
 void stars(void);
 void newqad(int);
-int ja(void);
+bool ja(void);
 void cramen(int);
 void crmshp(void);
 char *cramlc(enum loctype, coord w);
@@ -385,7 +381,7 @@ void sortkl(void);
 void imove(void);
 void ram(int, int, coord);
 void crmena(int, int, int, coord w);
-void deadkl(int, int, int, int, int);
+void deadkl(coord, int, int, int);
 void timwrp(void);
 void movcom(void);
 void torpedo(double, double, int, int, double *, int, int);
@@ -418,7 +414,7 @@ void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad);
 void cgetline(char *, int);
 void waitfor(void);
 void setpassword(void);
-void commandhook(char *, int);
+void commandhook(char *, bool);
 void makechart(void);
 void enqueue(char *);
 char *systemname(planet *);

@@ -423,10 +423,8 @@ void scom(int *ipage)
 
 	for_starbases(i2) {
 	    i = basetbl[i2];	/* bug in original had it not finding nearest*/
-	    ibq.x = game.state.baseq[i].x;
-	    ibq.y = game.state.baseq[i].y;
-	    if ((ibq.x == game.quadrant.x && ibq.y == game.quadrant.y) ||
-		(ibq.x == game.battle.x && ibq.y == game.battle.y) ||
+	    ibq = game.state.baseq[i];
+	    if (same(ibq, game.quadrant) || same(ibq, game.battle) ||
 		game.state.galaxy[ibq.x][ibq.y].supernova ||
 		game.state.galaxy[ibq.x][ibq.y].klingons > 8) 
 		continue;
@@ -446,8 +444,7 @@ void scom(int *ipage)
 	    }
 	}
 	if (ifindit==0) return; /* Nothing suitable -- wait until next time*/
-	ibq.x = game.state.baseq[iwhichb].x;
-	ibq.y = game.state.baseq[iwhichb].y;
+	ibq = game.state.baseq[iwhichb];
 	/* decide how to move toward base */
 	ideltax = ibq.x - game.state.kscmdr.x;
 	ideltay = ibq.y - game.state.kscmdr.y;
@@ -587,8 +584,7 @@ void movetho(void)
 	}
     }
     game.quad[game.tholian.x][game.tholian.y] = IHT;
-    game.ks[game.nenhere].x=game.tholian.x;
-    game.ks[game.nenhere].y=game.tholian.y;
+    game.ks[game.nenhere] = game.tholian;
 
     /* check to see if all holes plugged */
     for_sectors(i) {

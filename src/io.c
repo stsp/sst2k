@@ -303,7 +303,7 @@ void highvideo (void)
     }
 }
  
-void commandhook(char *cmd, int before) {
+void commandhook(char *cmd, bool before) {
 }
 
 /*
@@ -430,7 +430,7 @@ void makechart(void)
 void setpassword(void) 
 {
     if (!(game.options & OPTION_CURSES)) {
-	while (TRUE) {
+	for (;;) {
 	    scan();
 	    strcpy(game.passwd, citem);
 	    chew();
