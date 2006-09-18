@@ -584,14 +584,17 @@ int main(int argc, char **argv)
     else
 	game.options |= OPTION_TTY;
 
-    while ((option = getopt(argc, argv, "t")) != -1) {
+    while ((option = getopt(argc, argv, "tx")) != -1) {
 	switch (option) {
 	case 't':
 	    game.options |= OPTION_TTY;
 	    game.options &=~ OPTION_CURSES;
 	    break;
+	case 'x':
+	    idebug = true;
+	    break;
 	default:
-	    fprintf(stderr, "usage: sst [-t] [startcommand...].\n");
+	    fprintf(stderr, "usage: sst [-t] [-x] [startcommand...].\n");
 	    exit(0);
 	}
     }

@@ -38,13 +38,13 @@ void iostart(void)
     textdomain(PACKAGE);
     gettext("");
 
+    if (atexit(outro)){
+	fprintf(stderr,"Unable to register outro(), exiting...\n");
+	exit(1);
+    }
     if (!(game.options & OPTION_CURSES)) {
 	rows = atoi(getenv("LINES"));
     } else {
-	if (atexit(outro)){
-	    fprintf(stderr,"Unable to register outro(), exiting...\n");
-	    exit(1);
-	}
 	(void)initscr();
 #ifdef KEY_MIN
 	keypad(stdscr, TRUE);
