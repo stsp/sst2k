@@ -38,9 +38,7 @@ void events(void)
     int radio_was_broken;
     struct quadrant *pdest;
 
-#ifdef DEBUG
-    if (game.idebug) prout("EVENTS");
-#endif
+    if (idebug) prout("=== EVENTS");
 
     radio_was_broken = (game.damage[DRADIO] != 0.0);
 
@@ -298,7 +296,8 @@ void events(void)
 		proutn(_("   the starbase in "));
 		proutn(cramlc(quadrant, game.battle));
 		prout(_(" has been destroyed by"));
-		if (game.isatb==2) prout(_("the Klingon Super-Commander"));
+		if (game.isatb == 2) 
+		    prout(_("the Klingon Super-Commander"));
 		else prout(_("a Klingon Commander"));
 		game.state.chart[game.battle.x][game.battle.y].starbase = false;
 	    }
@@ -323,8 +322,8 @@ void events(void)
 	case FSCMOVE: /* Supercommander moves */
 	    schedule(FSCMOVE, 0.2777);
 	    if (game.ientesc+istract==0 &&
-		game.isatb!=1 &&
-		(game.iscate!=1 || game.justin==1)) scom(&ipage);
+		game.isatb != 1 &&
+		(game.iscate != 1 || !game.justin)) scom(&ipage);
 	    break;
 	case FDSPROB: /* Move deep space probe */
 	    schedule(FDSPROB, 0.01);
@@ -775,15 +774,13 @@ void snova(int insx, int insy)
 		}
 		if (num <=0) break;
 	    }
-#ifdef DEBUG
-	    if (game.idebug) {
-		proutn("Super nova here?");
+	    if (idebug) {
+		proutn("=== Super nova here?");
 		if (ja()==1) {
 		    nq.x = game.quadrant.x;
 		    nq.y = game.quadrant.y;
 		}
 	    }
-#endif
 	}
 
 	if (nq.x != game.quadrant.y || nq.y != game.quadrant.y || game.justin != 0) {

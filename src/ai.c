@@ -154,12 +154,8 @@ static void movebaddy(coord com, int loccom, int ienm)
 	    if (game.condit==IHDOCKED && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
 		motion -= game.skill*(2.0-square(Rand()));
 	}
-#ifdef DEBUG
-	if (game.idebug) {
-	    proutn("MOTION = %1.2f", motion);
-	    proutn("  FORCES = %1.2f", forces);
-	}
-#endif
+	if (idebug)
+	    proutn("=== MOTION = %1.2f, FORCES = %1.2f, ", motion, forces);
 	/* don't move if no motion */
 	if (motion==0) return;
 	/* Limit motion according to skill */
@@ -170,11 +166,9 @@ static void movebaddy(coord com, int loccom, int ienm)
     if (motion > 0 && nsteps > mdist) nsteps = mdist; /* don't overshoot */
     if (nsteps > QUADSIZE) nsteps = QUADSIZE; /* This shouldn't be necessary */
     if (nsteps < 1) nsteps = 1; /* This shouldn't be necessary */
-#ifdef DEBUG
-    if (game.idebug) {
-	prout("NSTEPS = %d", nsteps);
+    if (idebug) {
+	proutn("NSTEPS = %d:", nsteps);
     }
-#endif
     /* Compute preferred values of delta X and Y */
     mx = game.sector.x - com.x;
     my = game.sector.y - com.y;
@@ -185,11 +179,8 @@ static void movebaddy(coord com, int loccom, int ienm)
     next = com;
     /* main move loop */
     for (ll = 0; ll < nsteps; ll++) {
-#ifdef DEBUG
-	if (game.idebug) {
-	    prout("%d", ll+1);
-	}
-#endif
+	if (idebug)
+	    proutn(" %d", ll+1);
 	/* Check if preferred position available */
 	lookx = next.x + mx;
 	looky = next.y + my;
@@ -234,14 +225,14 @@ static void movebaddy(coord com, int loccom, int ienm)
 	if (success) {
 	    next.x = lookx;
 	    next.y = looky;
-#ifdef DEBUG
-	    if (game.idebug) {
-		prout(cramlc(neither, next));
-	    }
-#endif
+	    if (idebug)
+		proutn(cramlc(neither, next));
 	}
 	else break; /* done early */
+	
     }
+    if (idebug)
+	prout("");
     /* Put commander in place within same quadrant */
     game.quad[com.x][com.y] = IHDOT;
     game.quad[next.x][next.y] = ienm;
@@ -267,9 +258,7 @@ void movcom(void)
     coord w; 
     int i;
 
-#ifdef DEBUG
-    if (game.idebug) prout("MOVCOM");
-#endif
+    if (idebug) prout("== MOVCOM");
 
     /* Figure out which Klingon is the commander (or Supercommander)
        and do move */
@@ -302,7 +291,7 @@ void movcom(void)
     sortkl();
 }
 
-static int movescom(coord iq, int flag, int *ipage) 
+static bool movescom(coord iq, int flag, int *ipage) 
 {
     int i;
 
@@ -315,7 +304,7 @@ static int movescom(coord iq, int flag, int *ipage)
 	for_starbases(i)
 	    if (game.state.baseq[i].x==iq.x && game.state.baseq[i].y==iq.y) return 1;
     }
-    if (game.justin && !game.iscate) return 1;
+    if (game.justin && !game.iscate) return true;
     /* do the move */
     game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].klingons--;
     game.state.kscmdr = iq;
@@ -358,7 +347,7 @@ static int movescom(coord iq, int flag, int *ipage)
 	    break;
 	}
     }
-    return 0; /* looks good! */
+    return false; /* looks good! */
 }
 			
 void scom(int *ipage)
@@ -368,9 +357,8 @@ void scom(int *ipage)
     int basetbl[BASEMAX+1];
     double bdist[BASEMAX+1];
     int flag;
-#ifdef DEBUG
-    if (game.idebug) prout("SCOM");
-#endif
+
+    if (idebug) prout("== SCOM");
 
     /* Decide on being active or passive */
     flag = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
@@ -497,7 +485,7 @@ void scom(int *ipage)
 	    /* attack the base */
 	    if (flag) return; /* no, don't attack base! */
 	    game.iseenit = 0;
-	    game.isatb=1;
+	    game.isatb = 1;
 	    schedule(FSCDBAS, 1.0 +2.0*Rand());
 	    if (is_scheduled(FCDBAS)) 
 		postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
@@ -522,9 +510,7 @@ void scom(int *ipage)
     }
     /* Check for intelligence report */
     if (
-#ifdef DEBUG
-	game.idebug==0 &&
-#endif
+	!idebug &&
 	(Rand() > 0.2 ||
 	 (game.damage[DRADIO] > 0.0 && game.condit != IHDOCKED) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))

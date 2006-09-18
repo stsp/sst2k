@@ -71,8 +71,8 @@ void kaboom(void)
 
 void finish(FINTYPE ifin) 
 {
-    int igotit = 0;
-    game.alldone = 1;
+    bool igotit = false;
+    game.alldone = true;
     skip(3);
     prout(_("It is stardate %.1f."), game.state.date);
     skip(1);
@@ -84,7 +84,7 @@ void finish(FINTYPE ifin)
 
 	prout(_("You have smashed the Klingon invasion fleet and saved"));
 	prout(_("the Federation."));
-	game.gamewon=1;
+	game.gamewon = true;
 	if (game.alive) {
 	    double badpt;
 	    badpt = 5.0*game.state.starkl + game.casual + 10.0*game.state.nplankl +
@@ -134,11 +134,7 @@ void finish(FINTYPE ifin)
 		    break;
 		}
 		if (game.skill >= SKILL_EXPERT) {
-		    if (game.thawed
-#ifdef DEBUG
-			&& !game.idebug
-#endif
-			)
+		    if (game.thawed && !idebug)
 			prout(_("You cannot get a citation, so..."));
 		    else {
 			proutn(_("Do you want your Commodore Emeritus Citation printed? "));

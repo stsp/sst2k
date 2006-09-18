@@ -166,10 +166,14 @@ static char line[128], *linep = line;
 struct game game;
 coord thing;
 int iqhere, iqengry;
-int iscore, iskill; // Common PLAQ
+int iscore, iskill;	// Common PLAQ
 double aaitem;
 double perdate;
 char citem[10];
+int seed;		// the random-number seed
+bool idebug;		// debug mode
+bool randready;		// Has the random-number generator initialized?
+FILE *logfp;
 
 char *device[NDEVICES] = {
 	"S. R. Sensors",
@@ -529,9 +533,7 @@ static void makemoves(void)
 	    if (game.ididit) hitme = true;
 	    break;
 	case DEBUGCMD:			// What do we want for debug???
-#ifdef DEBUG
 	    debugme();
-#endif
 	    break;
 	case MAYDAY:			// Call for help
 	    mayday();
@@ -539,9 +541,6 @@ static void makemoves(void)
 	    break;
 	case QUIT:
 	    game.alldone = 1;		// quit the game
-#ifdef DEBUG
-	    if (game.idebug) score();
-#endif
 	    break;
 	case HELP:
 	    helpme();	// get help
@@ -550,9 +549,6 @@ static void makemoves(void)
 	commandhook(commands[i].name, false);
 	for (;;) {
 	    if (game.alldone) break;		// Game has ended
-#ifdef DEBUG
-	    if (game.idebug) prout("2500");
-#endif
 	    if (game.optime != 0.0) {
 		events();
 		if (game.alldone) break;	// Events did us in
@@ -574,6 +570,7 @@ static void makemoves(void)
 	}
 	if (game.alldone) break;
     }
+    if (idebug) prout("=== Ending");
 }
 
 
@@ -609,9 +606,6 @@ int main(int argc, char **argv)
     }
     for(;;) { /* Play a game */
 	setwnd(fullscreen_window);
-#ifdef DEBUG
-	prout("INITIAL OPTIONS: %0lx", game.options);
-#endif /* DEBUG */
 	clrscr();
 	prelim();
 	setup(line[0] == '\0');
@@ -702,8 +696,17 @@ double expran(double avrage)
     return -avrage*log(1e-7 + Rand());
 }
 
-double Rand(void) {
-	return rand()/(1.0 + (double)RAND_MAX);
+double Rand(void) 
+{
+    if (!randready) {
+	if (seed == 0)
+	    seed = (unsigned)time(NULL);
+	if (idebug)
+	    fprintf(logfp, "seed %d\n", seed);
+	srand(seed);
+	randready = true;
+    }
+    return rand()/(1.0 + (double)RAND_MAX);
 }
 
 void iran(int size, int *i, int *j) 
@@ -808,14 +811,13 @@ int isit(char *s)
 
 }
 
-#ifdef DEBUG
 void debugme(void) 
 {
     proutn("Reset levels? ");
     if (ja() != 0) {
-	if (energy < game.inenrg) energy = game.inenrg;
-	shield = game.inshld;
-	torps = game.intorps;
+	if (game.energy < game.inenrg) game.energy = game.inenrg;
+	game.shield = game.inshld;
+	game.torps = game.intorps;
 	game.lsupres = game.inlsr;
     }
     proutn("Reset damage? ");
@@ -827,8 +829,8 @@ void debugme(void)
     }
     proutn("Toggle game.idebug? ");
     if (ja() != 0) {
-	game.idebug = !game.idebug;
-	if (game.idebug) prout("Debug output ON");
+	idebug = !idebug;
+	if (idebug) prout("Debug output ON");
 	else prout("Debug output OFF");
     }
     proutn("Cause selective damage? ");
@@ -876,4 +878,3 @@ void debugme(void)
 	atover(1);
     }
 }
-#endif

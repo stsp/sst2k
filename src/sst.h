@@ -20,8 +20,6 @@
 #define min(x, y)	((x)<(y)?(x):(y))
 #define max(x, y)	((x)>(y)?(x):(y))
 
-// #define DEBUG
-
 #define PHASEFAC (2.0)
 #define GALSIZE	(8)
 #define NINHAB (GALSIZE * GALSIZE / 2)
@@ -241,9 +239,6 @@ struct game {
 	iscraft,	// =1 if craft on ship, -1 if removed from game
 	isatb,		// =1 if super commander is attacking base
 	iscate,		// super commander is here
-#ifdef DEBUG
-	idebug,		// debug mode
-#endif
 	iattak,		// attack recursion elimination (was cracks[4])
 	icrystl,	// dilithium crystals aboard
 	tourn,		// tournament number
@@ -288,6 +283,10 @@ extern int iscore, iskill; // Common PLAQ
 extern double perdate;
 extern double aaitem;
 extern char citem[10];
+extern int seed;
+extern bool randready;
+extern bool idebug;
+extern FILE *logfp;
 
 /* the Space Thingy's global state should *not* be saved! */
 extern coord thing;

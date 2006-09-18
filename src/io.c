@@ -27,6 +27,8 @@ static void outro(void)
 	(void)endwin();
 	putchar('\n');
     }
+    if (logfp)
+	fclose(logfp);
 }
 
 void iostart(void) 
@@ -203,6 +205,8 @@ void cgetline(char *line, int max)
     } else {
 	fgets(line, max, stdin);
     }
+    if (logfp)
+	fputs(line, logfp);
     line[strlen(line)-1] = '\0';
 }
 

@@ -195,9 +195,6 @@ void setup(int needprompt)
 {
     int i,j, krem, klumper;
     int ix, iy;
-#ifdef DEBUG
-    game.idebug = 0;
-#endif
     //  Decide how many of everything
     if (choose(needprompt)) return; // frozen game
     // Prepare the Enterprise
@@ -279,16 +276,14 @@ void setup(int needprompt)
 		double distq = square(ix-game.state.baseq[j].x) + square(iy-game.state.baseq[j].y);
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
 		    contflag = true;
-#ifdef DEBUG
-		    prout("DEBUG: Abandoning base #%d at %d-%d", i, ix, iy);
-#endif
+		    if (idebug)
+			prout("=== Abandoning base #%d at %d-%d", i, ix, iy);
 		    break;
 		}
-#ifdef DEBUG
 		else if (distq < 6.0 * (BASEMAX+1-game.inbase)) {
-		    prout("DEBUG: saving base #%d, close to #%d", i, j);
+		    if (idebug)
+			prout("=== Saving base #%d, close to #%d", i, j);
 		}
-#endif
 	    }
 	} while (contflag);
 			
@@ -300,7 +295,8 @@ void setup(int needprompt)
     // Position ordinary Klingon Battle Cruisers
     krem = game.inkling;
     klumper = 0.25*game.skill*(9.0-game.length)+1.0;
-    if (klumper > 9) klumper = 9; // Can't have more than 9 in quadrant
+    if (klumper > 9) 
+	klumper = 9; // Can't have more than 9 in quadrant
     do {
 	double r = Rand();
 	int klump = (1.0 - r*r)*klumper;
@@ -312,20 +308,20 @@ void setup(int needprompt)
 	game.state.galaxy[ix][iy].klingons += klump;
     } while (krem > 0);
     // Position Klingon Commander Ships
-#ifdef DEBUG
+#ifdef ODEBUG
     klumper = 1;
-#endif
+#endif /* ODEBUG */
     for (i = 1; i <= game.incom; i++) {
 	do {
 	    do { /* IF debugging, put commanders by bases, always! */
-#ifdef DEBUG
+#ifdef ODEBUG
 		if (game.idebug && klumper <= game.inbase) {
 		    ix = game.state.baseq[klumper].x;
 		    iy = game.state.baseq[klumper].y;
 		    klumper++;
 		}
 		else
-#endif
+#endif /* ODEBUG */
 		    iran(GALSIZE, &ix, &iy);
 	    }
 	    while ((!game.state.galaxy[ix][iy].klingons && Rand() < 0.75)||
@@ -508,9 +504,11 @@ bool choose(bool needprompt)
 	    prout("\"?");
     }
     setpassword();
-#ifdef DEBUG
-    if (strcmp(game.passwd, "debug")==0) game.idebug = 1;
-#endif
+    if (strcmp(game.passwd, "debug")==0) {
+	idebug = true;
+	logfp = fopen("sst-input.log", "w");
+	fputs("=== Debug mode enabled\n", stdout);
+    }
 
     // Use parameters to generate initial values of things
     game.damfac = 0.5 * game.skill;
@@ -687,9 +685,6 @@ void newqad(int shutup)
 	if ((game.skill < SKILL_GOOD && Rand() <= 0.02) ||   /* Lighten up if skill is low */
 	    (game.skill == SKILL_GOOD && Rand() <= 0.05) ||
 	    (game.skill > SKILL_GOOD && Rand() <= 0.08)
-    #ifdef DEBUG
-	    || strcmp(game.passwd, "tholianx")==0
-    #endif
 	    ) {
 	    do {
 		game.tholian.x = Rand() > 0.5 ? QUADSIZE : 1;

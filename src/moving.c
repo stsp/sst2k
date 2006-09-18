@@ -565,13 +565,11 @@ void warp(int i)
 	}
 	/* Decide if time warp will occur */
 	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand()) twarp=1;
-#ifdef DEBUG
-	if (game.idebug &&game.warpfac==10 && twarp==0) {
+	if (idebug && game.warpfac==10 && twarp==0) {
 	    blooey=0;
-	    proutn("Force time warp? ");
+	    proutn("=== Force time warp? ");
 	    if (ja()==1) twarp=1;
 	}
-#endif
 	if (blooey || twarp) {
 	    /* If time warp or engine damage, check path */
 	    /* If it is obstructed, don't do warp or damage */

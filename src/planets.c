@@ -27,7 +27,8 @@ static int consumeTime(void)
 
 void preport(void) 
 {
-    int iknow = 0, i;
+    bool iknow = false;
+    int i;
     skip(1);
     chew();
     prout("Spock-  \"Planet report follows, Captain.\"");
@@ -35,14 +36,11 @@ void preport(void)
     for (i = 0; i < game.inplan; i++) {
 	if ((game.state.plnets[i].known != unknown
 	    && game.state.plnets[i].crystals != 0)
-#ifdef DEBUG
-	    || ( game.idebug && game.state.plnets[i].x !=0)
-#endif
+	    || (idebug && game.state.plnets[i].w.x !=0)
 	    ) {
-	    iknow = 1;
-#ifdef DEBUG
-	    if (game.idebug && game.state.plnets[i].known==unknown) proutn("(Unknown) ");
-#endif
+	    iknow = true;
+	    if (idebug && game.state.plnets[i].known==unknown)
+		proutn("(Unknown) ");
 	    proutn(cramlc(quadrant, game.state.plnets[i].w));
 	    proutn("   class ");
 	    proutn(classes[game.state.plnets[i].pclass]);

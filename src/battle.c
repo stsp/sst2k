@@ -469,9 +469,7 @@ void attack(int torps_ok)
 
     game.iattak = 1;
     if (game.alldone) return;
-#ifdef DEBUG
-    if (game.idebug) prout("ATTACK!");
-#endif
+    if (idebug) prout("=== ATTACK!");
 
     if (game.ithere) movetho();
 
