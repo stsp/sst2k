@@ -670,7 +670,7 @@ void setwrp(void)
     game.warpfac = aaitem;
     game.wfacsq=game.warpfac*game.warpfac;
     if (game.warpfac <= oldfac || game.warpfac <= 6.0) {
-	proutn(_("Helmsman Sulu- \"Warp factor %d, Captain.\""),
+	prout(_("Helmsman Sulu- \"Warp factor %d, Captain.\""),
 	       (int)game.warpfac);
 	return;
     }

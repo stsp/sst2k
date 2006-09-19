@@ -16,7 +16,7 @@ void doshield(int i)
 		action = NRG;
 	    else {
 		chew();
-		if (!damaged(DSHIELD)) {
+		if (damaged(DSHIELD)) {
 		    prout(_("Shields damaged and down."));
 		    return;
 		}
@@ -350,7 +350,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHSTAR: /* Hit a star */
 	    if (Rand() > 0.10) {
-		nova(w.x, w.y);
+		nova(w);
 		return;
 	    }
 	    crmena(true, IHSTAR, sector, w);
