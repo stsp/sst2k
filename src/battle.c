@@ -158,6 +158,7 @@ void ram(int ibumpd, int ienm, coord w)
     icas = 10.0+20.0*Rand();
     prout(_("***Sickbay reports %d casualties"), icas);
     game.casual += icas;
+    game.state.crew -= icas;
     for (l=0; l < NDEVICES; l++) {
 	if (l == DDRAY) 
 	    continue; // Don't damage deathray 
@@ -550,13 +551,13 @@ void attack(int torps_ok)
 	    if (absorb > game.shield) absorb = game.shield;
 	    game.shield -= absorb;
 	    hit -= hitsh;
-	    if (game.condit==IHDOCKED) dock(0);
+	    if (game.condit==IHDOCKED) dock(false);
 	    if (propor > 0.1 && hit < 0.005*game.energy) continue;
 	}
 	/* It's a hit -- print out hit size */
 	atackd = 1; /* We weren't going to check casualties, etc. if
 		       shields were down for some strange reason. This
-		       doesn't make any sense, so I've fw.xed it */
+		       doesn't make any sense, so I've fixed it */
 	ihurt = 1;
 	proutn(_("%d unit hit"), (int)hit);
 	if ((damaged(DSRSENS) && itflag) || game.skill<=SKILL_FAIR) {
@@ -574,7 +575,7 @@ void attack(int torps_ok)
 	fry(hit);
 	game.energy -= hit;
 	if (game.condit==IHDOCKED) 
-	    dock(0);
+	    dock(false);
     }
     if (game.energy <= 0) {
 	/* Returning home upon your shield, not with it... */
@@ -606,6 +607,7 @@ void attack(int torps_ok)
 	    prout(_("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties"), icas);
 	    prout(_("   in that last attack.\""));
 	    game.casual += icas;
+	    game.state.crew -= icas;
 	}
     }
     /* After attack, reset average distance to enemies */
@@ -891,7 +893,8 @@ static int checkshctrl(double rpow)
 	skip(1);
 	prout(_("McCoy to bridge- \"Severe radiation burns, Jim."));
 	prout(_("  %d casualties so far.\""), icas);
-	game.casual -= icas;
+	game.casual += icas;
+	game.state.crew -= icas;
     }
     skip(1);
     prout(_("Phaser energy dispersed by shields."));

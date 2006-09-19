@@ -88,7 +88,7 @@ void finish(FINTYPE ifin)
 	if (game.alive) {
 	    double badpt;
 	    badpt = 5.0*game.state.starkl + game.casual + 10.0*game.state.nplankl +
-		45.*game.nhelp+100.*game.state.basekl;
+		45.*game.nhelp+100.*game.state.basekl+3.*game.abandoned;
 	    if (game.ship == IHF) badpt += 100.0;
 	    else if (game.ship == 0) badpt += 200.0;
 	    if (badpt < 100.0) badpt = 0.0;	// Close enough!
@@ -278,6 +278,9 @@ void finish(FINTYPE ifin)
 	prout(_("Your ship is drawn to the center of the black hole."));
 	prout(_("You are crushed into extremely dense matter."));
 	break;
+    case FCREW:
+	prout(_("Your last crew member has died."));
+	break;
     }
     if (game.ship==IHF) game.ship= 0;
     else if (game.ship == IHE) game.ship = IHF;
@@ -366,6 +369,9 @@ void score(void)
     if (game.casual)
 	prout(_("%6d casualties incurred                %5d"),
 	      game.casual, -game.casual);
+    if (game.abandoned)
+	prout(_("%6d crew abandoned in space            %5d"),
+	      game.abandoned, -3*game.abandoned);
     if (klship)
 	prout(_("%6d ship(s) lost or destroyed          %5d"),
 	      klship, -100*klship);

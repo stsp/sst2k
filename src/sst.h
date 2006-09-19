@@ -58,6 +58,8 @@ typedef struct {
 
 typedef struct {
     int snap,		// snapshot taken
+	crew,		// crew complement
+#define FULLCREW	428	/* BSD Trek was 387, that's wrong */
 	remkl,			// remaining klingons
 	remcom,			// remaining commanders
 	nscrem,			// remaining super commanders
@@ -224,6 +226,7 @@ struct game {
 	condit,		// condition (red/yellow/green/docked)
 	torps,		// number of torpedoes
 	ship,		// ship type -- 'E' is Enterprise
+	abandoned,	// count of crew abandoned in space
 	length,		// length of game
 	skill,		// skill level
 	klhere,		// klingons here
@@ -295,7 +298,7 @@ typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
 			  FMATERIALIZE, FPHASER, FLOST, FMINING, FDPLANET,
 			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
-			  FHOLE} FINTYPE ;
+	      FHOLE, FCREW} FINTYPE ;
 enum loctype {neither, quadrant, sector};
 
 #define IHR 'R'
@@ -336,7 +339,7 @@ void phasers(void);
 void photon(void);
 void warp(bool);
 void doshield(int);
-void dock(int);
+void dock(bool);
 void dreprt(void);
 void chart(int);
 void rechart(void);

@@ -112,6 +112,11 @@ void events(void)
 	    finish(FDEPLETE);
 	    return;
 	}
+	/* Any crew left alive? */
+	if (game.state.crew <=0) {
+	    finish(FCREW);
+	    return;
+	}
 	/* Is life support adequate? */
 	if (damaged(DLIFSUP) && game.condit != IHDOCKED) {
 	    if (game.lsupres < xtime && game.damage[DLIFSUP] > game.lsupres) {

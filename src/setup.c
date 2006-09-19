@@ -28,7 +28,7 @@ void freeze(bool boss)
     }
     else {
 	if ((key = scan()) == IHEOL) {
-	    proutn("File name: ");
+	    proutn(_("File name: "));
 	    key = scan();
 	}
 	if (key != IHALPHA) {
@@ -41,7 +41,7 @@ void freeze(bool boss)
 	}
     }
     if ((fp = fopen(citem, "wb")) == NULL) {
-	proutn("Can't freeze game as file ");
+	proutn(_("Can't freeze game as file "));
 	proutn(citem);
 	skip(1);
 	return;
@@ -169,6 +169,8 @@ void abandn(void)
 	    prout("to %s.", systemname(q->planet));
 	} else {
 	    prout("Entire crew of %d left to die in outer space.");
+	    game.casual += game.state.crew;
+	    game.abandoned += game.state.crew;
 	}
 
 	/* If at least one base left, give 'em the Faerie Queene */
@@ -202,6 +204,7 @@ void abandn(void)
     }
     /* Get new commission */
     game.quad[game.sector.x][game.sector.y] = game.ship = IHF;
+    game.state.crew = FULLCREW;
     prout("Starfleet puts you in command of another ship,");
     prout("the Faerie Queene, which is antiquated but,");
     prout("still useable.");
@@ -232,6 +235,7 @@ void setup(int needprompt)
     // Prepare the Enterprise
     game.alldone = game.gamewon = 0;
     game.ship = IHE;
+    game.state.crew = FULLCREW;
     game.energy = game.inenrg = 5000.0;
     game.shield = game.inshld = 2500.0;
     game.shldchg = 0;
@@ -249,7 +253,7 @@ void setup(int needprompt)
     // Set up assorted game parameters
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
-    game.nkinks = game.nhelp = game.casual = 0;
+    game.nkinks = game.nhelp = game.casual = game.abandoned = 0;
     game.resting = false;
     game.isatb = game.iscate = game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;

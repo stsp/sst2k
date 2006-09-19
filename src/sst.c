@@ -162,6 +162,12 @@ for a lot of magic numbers and refactored the heck out of it.
       type is "plain" or "almy".)
 
    6. User input is now logged so we can do regression testing.
+
+   7. More BSD-Trek features: You can now lose if your entire crew
+      dies in battle.  When abandoning ship in a game with inhabited
+      worlds enabled, they must have one in the quadrant to beam down
+      to; otherwise they die in space and this counts heavily against
+      your score.  Docking at a starbase replenishes your crew.
 */
 
 /* the input queue */

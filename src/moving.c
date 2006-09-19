@@ -214,10 +214,10 @@ no_quad_change:
     return;
 }
 
-void dock(int l) 
+void dock(bool verbose) 
 {
     chew();
-    if (game.condit == IHDOCKED && l) {
+    if (game.condit == IHDOCKED && verbose) {
 	prout(_("Already docked."));
 	return;
     }
@@ -231,12 +231,13 @@ void dock(int l)
 	return;
     }
     game.condit = IHDOCKED;
-    if (l) prout(_("Docked."));
+    if (verbose) prout(_("Docked."));
     game.ididit=1;
     if (game.energy < game.inenrg) game.energy = game.inenrg;
     game.shield = game.inshld;
     game.torps = game.intorps;
     game.lsupres = game.inlsr;
+    game.state.crew = FULLCREW;
     if (!damaged(DRADIO) &&
 	(is_scheduled(FCDBAS) || game.isatb == 1) && game.iseenit == 0) {
 	/* get attack report from base */
