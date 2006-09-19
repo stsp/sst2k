@@ -1,8 +1,9 @@
 #include "sst.h"
 
-static int tryexit(int lookx, int looky, int ienm, int loccom, int irun) 
+static bool tryexit(int lookx, int looky, int ienm, int loccom, int irun) 
+/* a bad guy attempts to bug out */
 {
-    int l;
+    int n;
     coord iq;
 
     iq.x = game.quadrant.x+(lookx+(QUADSIZE-1))/QUADSIZE - 1;
@@ -10,18 +11,18 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     if (!VALID_QUADRANT(iq.x,iq.y) ||
 	game.state.galaxy[iq.x][iq.y].supernova ||
 	game.state.galaxy[iq.x][iq.y].klingons > 8)
-	return 0; /* no can do -- neg energy, supernovae, or >8 Klingons */
-    if (ienm == IHR) return 0; /* Romulans cannot escape! */
+	return false; /* no can do -- neg energy, supernovae, or >8 Klingons */
+    if (ienm == IHR) return false; /* Romulans cannot escape! */
     if (irun == 0) {
 	/* avoid intruding on another commander's territory */
 	if (ienm == IHC) {
-	    for_commanders(l)
-		if (same(game.state.kcmdr[l],iq)) return 0;
+	    for_commanders(n)
+		if (same(game.state.kcmdr[n],iq)) return false;
 	    /* refuse to leave if currently attacking starbase */
-	    if (same(game.battle, game.quadrant)) return 0;
+	    if (same(game.battle, game.quadrant)) return false;
 	}
 	/* don't leave if over 1000 units of energy */
-	if (game.kpower[loccom] > 1000.) return 0;
+	if (game.kpower[loccom] > 1000.) return false;
     }
     /* print escape message and move out of quadrant.
        We know this if either short or long range sensors are working */
@@ -54,25 +55,26 @@ static int tryexit(int lookx, int looky, int ienm, int loccom, int irun)
 	game.state.kscmdr.y=iq.y;
     }
     else {
-	for_commanders(l) {
-	    if (same(game.state.kcmdr[l], game.quadrant)) {
-		game.state.kcmdr[l]=iq;
+	for_commanders(n) {
+	    if (same(game.state.kcmdr[n], game.quadrant)) {
+		game.state.kcmdr[n]=iq;
 		break;
 	    }
 	}
 	game.comhere = 0;
     }
-    return 1; /* success */
+    return true; /* success */
 }
 
 
-static void movebaddy(coord com, int loccom, int ienm) 
+static void movebaddy(coord com, int loccom, int ienm)
+/* tactical movement for the bad guys */
 {
     int motion, mdist, nsteps, mx, my, lookx, looky, ll;
     coord next;
     int irun = 0;
     int krawlx, krawly;
-    int success;
+    bool success;
     int attempts;
     /* This should probably be just game.comhere + game.ishere */
     int nbaddys = game.skill >= SKILL_EXPERT ?
@@ -186,7 +188,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 	looky = next.y + my;
 	krawlx = mx < 0 ? 1 : -1;
 	krawly = my < 0 ? 1 : -1;
-	success = 0;
+	success = false;
 	attempts = 0; /* Settle mysterious hang problem */
 	while (attempts++ < 20 && !success) {
 	    if (lookx < 1 || lookx > QUADSIZE) {
@@ -220,7 +222,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 		}
 		else break; /* we have failed */
 	    }
-	    else success = 1;
+	    else success = true;
 	}
 	if (success) {
 	    next.x = lookx;
@@ -254,6 +256,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 }
 
 void movcom(void) 
+/* move a commander */
 {
     coord w; 
     int i;
@@ -291,7 +294,8 @@ void movcom(void)
     sortkl();
 }
 
-static bool movescom(coord iq, int flag, int *ipage) 
+static bool movescom(coord iq, bool flag, bool *ipage) 
+/* commander movement helper */
 {
     int i;
 
@@ -350,13 +354,14 @@ static bool movescom(coord iq, int flag, int *ipage)
     return false; /* looks good! */
 }
 			
-void scom(int *ipage)
+void scom(bool *ipage)
+/* move the Super Commander */
 {
     int i, i2, j, ideltax, ideltay, ifindit, iwhichb;
     coord iq, sc, ibq;
     int basetbl[BASEMAX+1];
     double bdist[BASEMAX+1];
-    int flag;
+    bool flag;
 
     if (idebug) prout("== SCOM");
 
@@ -525,6 +530,7 @@ void scom(int *ipage)
 }
 
 void movetho(void)
+/* move the Tholian */
 {
     int idx, idy, im, i;
     coord dummy;

@@ -385,7 +385,7 @@ void huh(void);
 void pause_game(int);
 void nova(int, int);
 void snova(int, int);
-void scom(int *);
+void scom(bool *);
 void hittem(double *);
 void prouts(char *, ...);
 int isit(char *);

@@ -58,9 +58,9 @@ static bool cancelrest(void)
 
 void events(void) 
 {
-    int ictbeam=0, ipage=0, istract=0, line, i=0, j, k, l, ixhold=0, iyhold=0;
+    int istract=0, evcode, i=0, j, k, l;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
-    int radio_was_broken;
+    bool radio_was_broken, ictbeam = false, ipage = false;
     struct quadrant *pdest, *q;
     coord w, hold;
     event *ev, *ev2;
@@ -92,15 +92,15 @@ void events(void)
     radio_was_broken = (game.damage[DRADIO] != 0.0);
 
     for (;;) {
-	/* Select earliest extraneous event, line==0 if no events */
-	line = FSPY;
+	/* Select earliest extraneous event, evcode==0 if no events */
+	evcode = FSPY;
 	if (game.alldone) return;
 	datemin = fintim;
 	for (l = 1; l < NEVENTS; l++)
 	    if (game.future[l].date < datemin) {
-		line = l;
+		evcode = l;
 		if (idebug)
-		    prout("== Event %d fires", line);
+		    prout("== Event %d fires", evcode);
 		datemin = game.future[l].date;
 	    }
 	xtime = datemin-game.state.date;
@@ -141,12 +141,12 @@ void events(void)
 	    prout(_("   The star chart is now up to date.\""));
 	    skip(1);
 	}
-	/* Cause extraneous event LINE to occur */
+	/* Cause extraneous event EVCODE to occur */
 	game.optime -= xtime;
-	switch (line) {
+	switch (evcode) {
 	case FSNOVA: /* Supernova */
-	    if (ipage==0) pause_game(1);
-	    ipage=1;
+	    if (!ipage) pause_game(1);
+	    ipage=true;
 	    snova(0,0);
 	    schedule(FSNOVA, expran(0.5*game.intime));
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) return;
@@ -168,7 +168,7 @@ void events(void)
 	    }
 	    else return;
 	case FTBEAM: /* Tractor beam */
-	    if (line==FTBEAM) {
+	    if (evcode==FTBEAM) {
 		if (game.state.remcom == 0) {
 		    unschedule(FTBEAM);
 		    break;
@@ -184,8 +184,8 @@ void events(void)
 	    }
 	    /* tractor beaming cases merge here */
 	    yank = sqrt(yank);
-	    if (ipage==0) pause_game(1);
-	    ipage=1;
+	    if (!ipage) pause_game(1);
+	    ipage=true;
 	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 	    ictbeam = 1;
 	    skip(1);
@@ -212,7 +212,7 @@ void events(void)
 		    prout(_("Galileo, left on the planet surface, is well hidden."));
 		}
 	    }
-	    if (line==0)
+	    if (evcode==0)
 		game.quadrant = game.state.kscmdr;
 	    else
 		game.quadrant = game.state.kcmdr[i];
@@ -279,8 +279,8 @@ void events(void)
 	    if (game.damage[DRADIO] != 0.0 && game.condit != IHDOCKED) 
 		break; /* No warning :-( */
 	    game.iseenit = 1;
-	    if (ipage==0) pause_game(1);
-	    ipage = 1;
+	    if (!ipage) pause_game(1);
+	    ipage = true;
 	    skip(1);
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    prout(cramlc(quadrant, game.battle));
@@ -296,12 +296,11 @@ void events(void)
 	    game.isatb = 2;
 	    if (!game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].starbase) 
 		break; /* WAS RETURN! */
-	    ixhold = game.battle.x;
-	    iyhold = game.battle.y;
+	    hold = game.battle;
 	    game.battle = game.state.kscmdr;
 	    /* FALL THROUGH */
 	case FCDBAS: /* Commander succeeds in destroying base */
-	    if (line==FCDBAS) {
+	    if (evcode==FCDBAS) {
 		unschedule(FCDBAS);
 		/* find the lucky pair */
 		for_commanders(i)
@@ -328,8 +327,8 @@ void events(void)
 	    else if (game.state.rembase != 1 &&
 		     (game.damage[DRADIO] <= 0.0 || game.condit == IHDOCKED)) {
 		/* Get word via subspace radio */
-		if (ipage==0) pause_game(1);
-		ipage = 1;
+		if (!ipage) pause_game(1);
+		ipage = true;
 		skip(1);
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Command reports that"));
 		proutn(_("   the starbase in "));
@@ -348,8 +347,7 @@ void events(void)
 	    game.state.rembase--;
 	    if (game.isatb == 2) {
 		/* reinstate a commander's base attack */
-		game.battle.x = ixhold;
-		game.battle.y = iyhold;
+		game.battle = hold;
 		game.isatb = 0;
 	    }
 	    else {
