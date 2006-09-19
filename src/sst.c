@@ -175,7 +175,7 @@ static char line[128], *linep = line;
 
 struct game game;
 coord thing;
-int iqhere, iqengry;
+bool iqhere, iqengry;
 int iscore, iskill;	// Common PLAQ
 double aaitem;
 double perdate;

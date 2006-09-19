@@ -181,13 +181,14 @@ void ram(bool ibumpd, int ienm, coord w)
 void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
 /* let a photon torpedo fly */
 {
-    int l, iquad=0, jx=0, jy=0, shoved=0, ll;
-	
+    int l, iquad=0, jx=0, jy=0, ll;
+    bool shoved = false;
     double ac=course + 0.25*r;
     double angle = (15.0-ac)*0.5235988;
     double bullseye = (15.0 - course)*0.5235988;
     double deltax=-sin(angle), deltay=cos(angle), x=inx, y=iny, bigger;
     double ang, temp, xx, yy, kp, h1;
+    struct quadrant *q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
     coord w;
 
     w.x = w.y = 0;
@@ -245,7 +246,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    game.sector.x = jx;
 	    game.sector.y = jy;
 	    crmshp();
-	    shoved = 1;
+	    shoved = true;
 	    break;
 					  
 	case IHC: /* Hit a commander */
@@ -298,22 +299,21 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    proutn(_(" damaged--"));
 	    game.ks[ll].x = jx;
 	    game.ks[ll].y = jy;
-	    shoved = 1;
+	    shoved = true;
 	    break;
 	case IHB: /* Hit a base */
 	    skip(1);
 	    prout(_("***STARBASE DESTROYED.."));
 	    for_starbases(ll) {
-		if (game.state.baseq[ll].x==game.quadrant.x && game.state.baseq[ll].y==game.quadrant.y) {
-		    game.state.baseq[ll].x=game.state.baseq[game.state.rembase].x;
-		    game.state.baseq[ll].y=game.state.baseq[game.state.rembase].y;
+		if (same(game.state.baseq[ll], game.quadrant)) {
+		    game.state.baseq[ll]=game.state.baseq[game.state.rembase];
 		    break;
 		}
 	    }
 	    game.quad[w.x][w.y]=IHDOT;
 	    game.state.rembase--;
 	    game.base.x=game.base.y=0;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase--;
+	    q->starbase--;
 	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase--;
 	    game.state.basekl++;
 	    newcnd();
@@ -322,7 +322,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmena(true, iquad, sector, w);
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
+	    q->planet = NOPLANET;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
 	    game.plnet.x = game.plnet.y = 0;
@@ -336,7 +336,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmena(true, iquad, sector, w);
 	    prout(_(" destroyed."));
 	    game.state.nworldkl++;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
+	    q->planet = NOPLANET;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
 	    game.plnet.x = game.plnet.y = 0;
@@ -373,8 +373,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		 * you can shove the Thingy and piss it off.
 		 * It then becomes an enemy and may fire at you.
 		 */
-		iqengry=1;
-		shoved=1;
+		iqengry = true;
+		shoved = true;
 	    }
 	    return;
 	case IHBLANK: /* Black hole */
@@ -393,7 +393,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    h1 = fabs(h1);
 	    if (h1 >= 600) {
 		game.quad[w.x][w.y] = IHDOT;
-		game.ithere = 0;
+		game.ithere = false;
 		game.tholian.x = game.tholian.y = 0;
 		deadkl(w, iquad, w.x, w.y);
 		return;
@@ -406,7 +406,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    }
 	    prout(_(" disappears."));
 	    game.quad[w.x][w.y] = IHWEB;
-	    game.ithere = game.tholian.x = game.tholian.y = 0;
+	    game.ithere = false;
+	    game.tholian.x = game.tholian.y = 0;
 	    game.nenhere--;
 	    {
 		coord dummy;
@@ -498,7 +499,7 @@ void attack(bool torps_ok)
 	return;
     }
     if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) movcom();
-    if (game.nenhere==0 || (game.nenhere==1 && iqhere && iqengry==0)) return;
+    if (game.nenhere==0 || (game.nenhere==1 && iqhere && !iqengry)) return;
     pfac = 1.0/game.inshld;
     if (game.shldchg == 1) chgfac = 0.25+0.5*Rand();
     skip(1);
@@ -510,8 +511,7 @@ void attack(bool torps_ok)
 	/* Increase chance of photon torpedos if docked or enemy energy low */
 	if (game.condit == IHDOCKED) r *= 0.25;
 	if (game.kpower[loop] < 500) r *= 0.25; 
-	jay.x = game.ks[loop].x;
-	jay.y = game.ks[loop].y;
+	jay = game.ks[loop];
 	iquad = game.quad[jay.x][jay.y];
 	if (iquad==IHT || (iquad==IHQUEST && !iqengry)) continue;
 	itflag = (iquad == IHK && r > 0.0005) || !torps_ok ||
@@ -641,11 +641,12 @@ void deadkl(coord w, int type, int ixx, int iyy)
     }
     else if (type == IHT) {
 	/* Killed a Tholian */
-	game.ithere = 0;
+	game.ithere = false;
     }
     else if (type == IHQUEST) {
 	/* Killed a Thingy */
-	iqhere=iqengry=thing.x=thing.y=0;
+	iqhere = iqengry = false;
+	thing.x =thing.y = 0;
     }
     else {
 	/* Some type of a Klingon */
@@ -669,7 +670,8 @@ void deadkl(coord w, int type, int ixx, int iyy)
 	    break;
 	case IHS:
 	    game.state.nscrem--;
-	    game.ishere = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
+	    game.ishere = false;
+	    game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
 	    unschedule(FSCMOVE);
 	    unschedule(FSCDBAS);
 	    break;
@@ -731,7 +733,8 @@ void photon(void)
 {
     double targ[4][3], course[4];
     double r, dummy;
-    int key, n, i, osuabor;
+    int key, n, i;
+    bool osuabor;
 
     game.ididit = false;
 
@@ -824,7 +827,7 @@ void photon(void)
     }
     game.ididit = true;
     /* Loop for moving <n> torpedoes */
-    osuabor = 0;
+    osuabor = false;
     for (i = 1; i <= n && !osuabor; i++) {
 	if (game.condit != IHDOCKED) game.torps--;
 	r = (Rand()+Rand())*0.5 -0.5;
@@ -838,7 +841,7 @@ void photon(void)
 	    skip(1);
 	    if (i < n)
 		prout(_("  Remainder of burst aborted."));
-	    osuabor=1;
+	    osuabor = true;
 	    if (Rand() <= 0.2) {
 		prout(_("***Photon tubes damaged by misfire."));
 		game.damage[DPHOTON] = game.damfac*(1.0+2.0*Rand());
@@ -868,7 +871,7 @@ static void overheat(double rpow)
     }
 }
 
-static int checkshctrl(double rpow) 
+static bool checkshctrl(double rpow) 
 /* check shield control */
 {
     double hit;
@@ -877,7 +880,7 @@ static int checkshctrl(double rpow)
     skip(1);
     if (Rand() < .998) {
 	prout(_("Shields lowered."));
-	return 0;
+	return false;
     }
     /* Something bad has happened */
     prouts(_("***RED ALERT!  RED ALERT!"));
@@ -890,7 +893,7 @@ static int checkshctrl(double rpow)
 	skip(1);
 	stars();
 	finish(FPHASER);
-	return 1;
+	return true;
     }
     prouts(_("Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""));
     skip(2);
@@ -909,7 +912,7 @@ static int checkshctrl(double rpow)
     prout(_("Phaser energy dispersed by shields."));
     prout(_("Enemy unaffected."));
     overheat(rpow);
-    return 1;
+    return true;
 }
 	
 
@@ -918,13 +921,13 @@ void phasers(void)
 {
     double hits[21], rpow=0, extra, powrem, over, temp;
     int kz = 0, k=1, i, irec=0; /* Cheating inhibitor */
-    int ifast=0, no=0, ipoop=1, msgflag = 1;
+    bool ifast = false, no = false, ipoop = true, msgflag = true;
     enum {NOTSET, MANUAL, FORCEMAN, AUTOMATIC} automode = NOTSET;
     int key=0;
 
     skip(1);
     /* SR sensors and Computer */
-    if (damaged(DSRSENS) || damaged(DCOMPTR)) ipoop = 0;
+    if (damaged(DSRSENS) || damaged(DCOMPTR)) ipoop = false;
     if (game.condit == IHDOCKED) {
 	prout(_("Phasers can't be fired through base shields."));
 	chew();
@@ -947,7 +950,7 @@ void phasers(void)
 	    return;
 	}
 	prout(_("Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""));
-	ifast = 1;
+	ifast = true;
 		
     }
     /* Original code so convoluted, I re-did it all */
@@ -978,7 +981,7 @@ void phasers(void)
 		}
 	    }
 	    else if (isit("no")) {
-		no = 1;
+		no = true;
 	    }
 	    else {
 		huh();
@@ -1011,7 +1014,7 @@ void phasers(void)
     switch (automode) {
     case AUTOMATIC:
 	if (key == IHALPHA && isit("no")) {
-	    no = 1;
+	    no = true;
 	    key = scan();
 	}
 	if (key != IHREAL && game.nenhere != 0) {
@@ -1044,7 +1047,7 @@ void phasers(void)
 	    return;
 	}
 	if ((key=scan()) == IHALPHA && isit("no")) {
-	    no = 1;
+	    no = true;
 	}
 	if (ifast) {
 	    game.energy -= 200; /* Go and do it! */
@@ -1071,7 +1074,7 @@ void phasers(void)
 	    hittem(hits);
 	    game.ididit = true;
 	}
-	if (extra > 0 && game.alldone == 0) {
+	if (extra > 0 && !game.alldone) {
 	    if (game.ithere) {
 		proutn(_("*** Tholian web absorbs "));
 		if (game.nenhere>0) proutn(_("excess "));
@@ -1106,7 +1109,7 @@ void phasers(void)
 		proutn(_("Energy available= %.2f"),
 		       game.energy-.006-(ifast?200:0));
 		skip(1);
-		msgflag = 0;
+		msgflag = false;
 		rpow = 0.0;
 	    }
 	    if (damaged(DSRSENS) && !(abs(game.sector.x-aim.x) < 2 && abs(game.sector.y-aim.y) < 2) &&
@@ -1145,7 +1148,7 @@ void phasers(void)
 	    }
 	    if (key == IHEOL) {
 		if (k==1) { /* Let me say I'm baffled by this */
-		    msgflag = 1;
+		    msgflag = true;
 		}
 		continue;
 	    }
@@ -1172,7 +1175,7 @@ void phasers(void)
 	    return;
 	}
 	if (key == IHALPHA && isit("no")) {
-	    no = 1;
+	    no = true;
 	}
 	game.energy -= rpow;
 	chew();
@@ -1232,7 +1235,7 @@ void hittem(double *hits)
 	else
 	    proutn(_("Very small hit on "));
 	ienm = game.quad[w.x][w.y];
-	if (ienm==IHQUEST) iqengry=1;
+	if (ienm==IHQUEST) iqengry = true;
 	crmena(false,ienm,sector,w);
 	skip(1);
 	if (kpow == 0) {

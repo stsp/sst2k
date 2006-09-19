@@ -60,9 +60,9 @@ static bool cancelrest(void)
 void events(void) 
 /* run through the event queue looking for things to do */
 {
-    int istract=0, evcode, i=0, j, k, l;
+    int evcode, i=0, j, k, l;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
-    bool radio_was_broken, ictbeam = false, ipage = false;
+    bool radio_was_broken, ictbeam = false, ipage = false, istract = false;
     struct quadrant *pdest, *q;
     coord w, hold;
     event *ev, *ev2;
@@ -160,7 +160,7 @@ void events(void)
 	    break;
 	case FSPY: /* Check with spy to see if S.C. should tractor beam */
 	    if (game.state.nscrem == 0 ||
-		ictbeam+istract > 0 ||
+		ictbeam || istract ||
 		game.condit==IHDOCKED || game.isatb==1 || game.iscate==1) return;
 	    if (game.ientesc ||
 		(game.energy < 2000 && game.torps < 4 && game.shield < 1250) ||
@@ -169,7 +169,7 @@ void events(void)
 		 (game.energy < 2500 || damaged(DPHASER)) &&
 		 (game.torps < 5 || damaged(DPHOTON)))) {
 		/* Tractor-beam her! */
-		istract=1;
+		istract = true;
 		yank = square(game.state.kscmdr.x-game.quadrant.x) + square(game.state.kscmdr.y-game.quadrant.y);
 		/********* fall through to FTBEAM code ***********/
 	    }
@@ -202,7 +202,7 @@ void events(void)
 	    /* If Kirk & Co. screwing around on planet, handle */
 	    atover(true); /* atover(true) is Grab */
 	    if (game.alldone) return;
-	    if (game.icraft == 1) { /* Caught in Galileo? */
+	    if (game.icraft) { /* Caught in Galileo? */
 		finish(FSTRACTOR);
 		return;
 	    }
@@ -363,9 +363,9 @@ void events(void)
 	    break;
 	case FSCMOVE: /* Supercommander moves */
 	    schedule(FSCMOVE, 0.2777);
-	    if (game.ientesc+istract==0 &&
-		game.isatb != 1 &&
-		(game.iscate != 1 || !game.justin)) scom(&ipage);
+	    if (!game.ientesc && !istract && game.isatb != 1 &&
+			(game.iscate != 1 || !game.justin)) 
+		scom(&ipage);
 	    break;
 	case FDSPROB: /* Move deep space probe */
 	    schedule(FDSPROB, 0.01);

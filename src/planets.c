@@ -357,12 +357,12 @@ void shuttle(void)
 	    skip(1);
 	    prout(_("The short hop begins . . ."));
 	    game.state.plnets[game.iplnet].known=known;
-	    game.icraft = 1;
+	    game.icraft = true;
 	    skip(1);
 	    game.landed = -1;
 	    if (consumeTime()) return;
 	    game.iscraft = 1;
-	    game.icraft = 0;
+	    game.icraft = false;
 	    if (game.imine) {
 		game.icrystl = 1;
 		game.cryprob = 0.05;
@@ -380,12 +380,12 @@ void shuttle(void)
 	skip(1);
 	prouts(_("The hangar doors open; the trip begins."));
 	skip(1);
-	game.icraft = 1;
+	game.icraft = true;
 	game.iscraft = 0;
 	if (consumeTime()) return;
 	game.state.plnets[game.iplnet].known = shuttle_down;
 	game.landed = 1;
-	game.icraft = 0;
+	game.icraft = false;
 	prout(_("Trip complete"));
 	return;
     }

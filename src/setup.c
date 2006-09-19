@@ -253,8 +253,8 @@ void setup(bool needprompt)
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0;
-    game.resting = game.imine = false;
-    game.isatb = game.iscate = game.icrystl = game.icraft = game.state.nplankl = 0;
+    game.resting = game.imine = game.icraft = false;
+    game.isatb = game.iscate = game.icrystl = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     game.iscraft = 1;
     game.landed = -1;
@@ -595,7 +595,7 @@ void newqad(bool shutup)
 {
     int i, j;
     coord w;
-    struct quadrant *here;
+    struct quadrant *q;
 
     game.iattak = 1;
     game.justin = true;
@@ -603,39 +603,39 @@ void newqad(bool shutup)
     game.klhere = 0;
     game.comhere = 0;
     game.plnet.x = game.plnet.y = 0;
-    game.ishere = 0;
+    game.ishere = false;
     game.irhere = 0;
     game.iplnet = 0;
     game.nenhere = 0;
     game.neutz = false;
     game.inorbit = false;
     game.landed = -1;
-    game.ientesc = 0;
-    game.ithere = 0;
-    iqhere=0;
-    iqengry=0;
+    game.ientesc = false;
+    game.ithere = false;
+    iqhere = false;
+    iqengry = false;
     game.iseenit = 0;
     if (game.iscate) {
 	// Attempt to escape Super-commander, so tbeam back!
 	game.iscate = 0;
-	game.ientesc = 1;
+	game.ientesc = true;
     }
     // Clear quadrant
     for_sectors(i)
 	for_sectors(j) 
 	    game.quad[i][j] = IHDOT;
-    here = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
+    q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
     // cope with supernova
-    if (here->supernova)
+    if (q->supernova)
 	return;
-    game.klhere = here->klingons;
-    game.irhere = here->romulans;
+    game.klhere = q->klingons;
+    game.irhere = q->romulans;
     game.nenhere = game.klhere + game.irhere;
 
     // Position Starship
     game.quad[game.sector.x][game.sector.y] = game.ship;
 
-    if (here->klingons) {
+    if (q->klingons) {
 	// Position ordinary Klingons
 	for (i = 1; i <= game.klhere; i++)
 	    newkling(i, &w);
@@ -654,7 +654,7 @@ void newqad(bool shutup)
 	    game.quad[game.ks[1].x][game.ks[1].y] = IHS;
 	    game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*game.skill;
 	    game.iscate = game.state.remkl>1;
-	    game.ishere = 1;
+	    game.ishere = true;
 	}
     }
     // Put in Romulans if needed
@@ -665,13 +665,13 @@ void newqad(bool shutup)
 	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*game.skill;
     }
     // If quadrant needs a starbase, put it in
-    if (here->starbase)
+    if (q->starbase)
 	dropin(IHB, &game.base);
 	
     // If quadrant needs a planet, put it in
-    if (here->planet != NOPLANET) {
-	game.iplnet = here->planet;
-	if (game.state.plnets[here->planet].inhabited == UNINHABITED)
+    if (q->planet != NOPLANET) {
+	game.iplnet = q->planet;
+	if (game.state.plnets[q->planet].inhabited == UNINHABITED)
 	    dropin(IHP, &game.plnet);
 	else
 	    dropin(IHW, &game.plnet);
@@ -679,11 +679,11 @@ void newqad(bool shutup)
     // Check for game.condition
     newcnd();
     // And finally the stars
-    for (i = 1; i <= here->stars; i++) 
+    for (i = 1; i <= q->stars; i++) 
 	dropin(IHSTAR, &w);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0 && (here->planet == NOPLANET || game.state.plnets[here->planet].inhabited == UNINHABITED)) {
+    if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.plnets[q->planet].inhabited == UNINHABITED)) {
 	game.neutz = 1;
 	if (!damaged(DRADIO)) {
 	    skip(1);
@@ -725,7 +725,7 @@ void newqad(bool shutup)
 		game.tholian.y = Rand() > 0.5 ? QUADSIZE : 1;
 	    } while (game.quad[game.tholian.x][game.tholian.y] != IHDOT);
 	    game.quad[game.tholian.x][game.tholian.y] = IHT;
-	    game.ithere = 1;
+	    game.ithere = true;
 	    game.nenhere++;
 	    game.ks[game.nenhere].x = game.tholian.x;
 	    game.ks[game.nenhere].y = game.tholian.y;

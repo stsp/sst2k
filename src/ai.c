@@ -45,14 +45,13 @@ static bool tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons--;
     game.state.galaxy[iq.x][iq.y].klingons++;
     if (ienm==IHS) {
-	game.ishere=0;
-	game.iscate=0;
-	game.ientesc=0;
-	game.isatb=0;
+	game.ishere = false;
+	game.iscate = 0;
+	game.ientesc = false;
+	game.isatb = 0;
 	schedule(FSCMOVE, 0.2777);
 	unschedule(FSCDBAS);
-	game.state.kscmdr.x=iq.x;
-	game.state.kscmdr.y=iq.y;
+	game.state.kscmdr=iq;
     }
     else {
 	for_commanders(n) {
@@ -317,8 +316,8 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	/* SC has scooted, Remove him from current quadrant */
 	game.iscate=0;
 	game.isatb=0;
-	game.ishere=0;
-	game.ientesc=0;
+	game.ishere = false;
+	game.ientesc = false;
 	unschedule(FSCDBAS);
 	for_local_enemies(i) 
 	    if (game.quad[game.ks[i].x][game.ks[i].y] == IHS) break;
@@ -535,7 +534,7 @@ void movetho(void)
     int idx, idy, im, i;
     coord dummy;
     /* Move the Tholian */
-    if (game.ithere==0 || game.justin == 1) return;
+    if (!game.ithere || game.justin) return;
 
     if (game.tholian.x == 1 && game.tholian.y == 1) {
 	idx = 1; idy = QUADSIZE;
@@ -551,7 +550,7 @@ void movetho(void)
     }
     else {
 	/* something is wrong! */
-	game.ithere = 0;
+	game.ithere = false;
 	return;
     }
 
@@ -590,7 +589,8 @@ void movetho(void)
     dropin(IHBLANK, &dummy);
     crmena(true, IHT, sector, game.tholian);
     prout(_(" completes web."));
-    game.ithere = game.tholian.x = game.tholian.y = 0;
+    game.ithere = false;
+    game.tholian.x = game.tholian.y = 0;
     game.nenhere--;
     return;
 }

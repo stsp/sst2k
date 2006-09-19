@@ -210,7 +210,11 @@ struct game {
 	alive,		// we are alive (not killed)
 	justin,		// just entered quadrant
 	shldup,		// shields are up
+	ishere,		// super-commander in quadrant
+	ientesc,	// attempted escape from supercommander
+	ithere,		// Tholian is here 
 	resting,	// rest time
+	icraft,		// Kirk in Galileo
 	alldone,	// game is now finished
 	neutz,		// Romulan Neutral Zone
 	isarmed,	// probe is armed
@@ -240,17 +244,13 @@ struct game {
 	iplnet,		// planet # in quadrant
 	inplan,		// initial planets
 	nenhere,	// number of enemies in quadrant
-	ishere,		// super-commander in quandrant
 	irhere,		// Romulans in quadrant
-	icraft,		// Kirk in Galileo
-	ientesc,	// attempted escape from supercommander
 	iscraft,	// =1 if craft on ship, -1 if removed from game
 	isatb,		// =1 if super commander is attacking base
 	iscate,		// super commander is here
 	iattak,		// attack recursion elimination (was cracks[4])
 	icrystl,	// dilithium crystals aboard
 	tourn,		// tournament number
-	ithere,		// Tholian is here 
 	iseenit,	// seen base attack report
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available
@@ -292,7 +292,7 @@ extern FILE *logfp, *replayfp;
 
 /* the Space Thingy's global state should *not* be saved! */
 extern coord thing;
-extern int iqhere, iqengry;
+extern bool iqhere, iqengry;
 
 typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
               FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
