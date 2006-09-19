@@ -235,7 +235,7 @@ void dock(bool verbose)
     }
     game.condit = IHDOCKED;
     if (verbose) prout(_("Docked."));
-    game.ididit=true;
+    game.ididit = true;
     if (game.energy < game.inenrg) game.energy = game.inenrg;
     game.shield = game.inshld;
     game.torps = game.intorps;

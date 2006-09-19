@@ -42,6 +42,7 @@ void postpone(int evtype, double offset)
 }
 
 static bool cancelrest(void)
+/* rest period is interrupted by event */
 {
     if (game.resting) {
 	skip(1);
@@ -57,6 +58,7 @@ static bool cancelrest(void)
 }
 
 void events(void) 
+/* run through the event queue looking for things to do */
 {
     int istract=0, evcode, i=0, j, k, l;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
@@ -543,11 +545,12 @@ void events(void)
 
 				
 void wait(void) 
+/* wait on events */
 {
     int key;
     double temp, delay, origTime;
 
-    game.ididit = 0;
+    game.ididit = false;
     for (;;) {
 	key = scan();
 	if (key  != IHEOL) break;
@@ -584,7 +587,7 @@ void wait(void)
 	if (game.optime < delay) attack(0);
 	if (game.alldone) return;
 	events();
-	game.ididit = 1;
+	game.ididit = true;
 	if (game.alldone) return;
 	delay -= temp;
 	/* Repair Deathray if long rest at starbase */
@@ -599,6 +602,7 @@ void wait(void)
 }
 
 void nova(int ix, int iy) 
+/* star goes nova */
 {
     static double course[] =
 	{0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5};
@@ -782,10 +786,11 @@ void nova(int ix, int iy)
 	
 	
 void snova(int insx, int insy) 
+/* star goes supernova */
 {
     int comdead, nsx, nsy, num=0, kldead, iscdead;
     int nrmdead, npdead;
-    int incipient=0;
+    bool incipient = false;
     coord nq;
 
     nq.x = nq.y = 0;
@@ -835,7 +840,7 @@ void snova(int insx, int insy)
 	}
 	else {
 	    /* we are in the quadrant! */
-	    incipient = 1;
+	    incipient = true;
 	    num = Rand()* game.state.galaxy[nq.x][nq.y].stars + 1;
 	    for_sectors(nsx) {
 		for_sectors(nsy) {
@@ -849,7 +854,7 @@ void snova(int insx, int insy)
 	}
     }
     else {
-	incipient = 1;
+	incipient = true;
     }
 
     if (incipient) {
@@ -900,18 +905,18 @@ void snova(int insx, int insy)
     game.state.nromrem -= nrmdead;
     npdead = num - nrmdead*10;
     if (npdead) {
-	int l;
-	for (l = 0; l < game.inplan; l++)
-	    if (same(game.state.plnets[l].w, nq)) {
-		DESTROY(&game.state.plnets[l]);
+	int loop;
+	for (loop = 0; loop < game.inplan; loop++)
+	    if (same(game.state.plnets[loop].w, nq)) {
+		DESTROY(&game.state.plnets[loop]);
 	    }
     }
     /* Destroy any base in supernovaed quadrant */
     if (game.state.rembase) {
-	int maxloop = game.state.rembase, l;
-	for (l = 1; l <= maxloop; l++)
-	    if (same(game.state.baseq[l], nq)) {
-		game.state.baseq[l] = game.state.baseq[game.state.rembase];
+	int maxloop = game.state.rembase, loop;
+	for (loop = 1; loop <= maxloop; loop++)
+	    if (same(game.state.baseq[loop], nq)) {
+		game.state.baseq[loop] = game.state.baseq[game.state.rembase];
 		game.state.baseq[game.state.rembase].x = game.state.baseq[game.state.rembase].y = 0;
 		game.state.rembase--;
 		break;
@@ -927,7 +932,7 @@ void snova(int insx, int insy)
     if (same(game.quadrant, nq) || !damaged(DRADIO) || game.condit == IHDOCKED)
 	game.state.galaxy[nq.x][nq.y].supernova = true;
     /* If supernova destroys last Klingons give special message */
-    if (KLINGREM==0 && (nq.x != game.quadrant.x || nq.y != game.quadrant.y)) {
+    if (KLINGREM==0 && !same(nq, game.quadrant)) {
 	skip(2);
 	if (insx == 0) prout(_("Lucky you!"));
 	proutn(_("A supernova in %s has just destroyed the last Klingons."),

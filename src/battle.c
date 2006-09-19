@@ -6,7 +6,7 @@ void doshield(int i)
     int key;
     enum {NONE, SHUP, SHDN, NRG} action = NONE;
 
-    game.ididit = 0;
+    game.ididit = false;
 
     if (i == 2) action = SHUP;
     else {
@@ -80,7 +80,7 @@ void doshield(int i)
 	game.shldup=false;
 	game.shldchg=1;
 	prout(_("Shields lowered."));
-	game.ididit=1;
+	game.ididit = true;
 	return;
     case NRG:
 	while (scan() != IHREAL) {
@@ -109,7 +109,7 @@ void doshield(int i)
 	    prout(_("Engineering to bridge--"));
 	    prout(_("  Scott here. Power circuit problem, Captain."));
 	    prout(_("  I can't drain the shields."));
-	    game.ididit = 0;
+	    game.ididit = false;
 	    return;
 	}
 	if (game.shield+aaitem < 0) {
@@ -733,7 +733,7 @@ void photon(void)
     double r, dummy;
     int key, n, i, osuabor;
 
-    game.ididit = 0;
+    game.ididit = false;
 
     if (damaged(DPHOTON)) {
 	prout(_("Photon tubes damaged."));
@@ -822,7 +822,7 @@ void photon(void)
 	    if (targetcheck(targ[i][1], targ[i][2], &course[i])) return;
 	}
     }
-    game.ididit = 1;
+    game.ididit = true;
     /* Loop for moving <n> torpedoes */
     osuabor = 0;
     for (i = 1; i <= n && !osuabor; i++) {
@@ -1069,7 +1069,7 @@ void phasers(void)
 	    }
 	    if (powrem > 0.0) extra += powrem;
 	    hittem(hits);
-	    game.ididit=1;
+	    game.ididit = true;
 	}
 	if (extra > 0 && game.alldone == 0) {
 	    if (game.ithere) {
@@ -1181,7 +1181,7 @@ void phasers(void)
 	    if (checkshctrl(rpow)) return;
 	}
 	hittem(hits);
-	game.ididit=1;
+	game.ididit = true;
     case NOTSET:;	/* avoid gcc warning */
     }
     /* Say shield raised or malfunction, if necessary */

@@ -409,7 +409,7 @@ static void makemoves(void)
 		makechart();
 		continue;
 	    }
-	    game.ididit=0;
+	    game.ididit = false;
 	    clrscr();
 	    setwnd(message_window);
 	    clrscr();
