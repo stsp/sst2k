@@ -1,3 +1,11 @@
+/*
+ * events.c -- event-queue handling
+ *
+ * This isn't a real event queue a la BSD Trek yet -- you can only have one 
+ * event of each type active at any given time.  Mostly these means we can 
+ * only have one FDISTR/FENSLV/FREPRO sequence going at any given time;
+ * BSD Trek, from which we swiped the idea, can have up to 5.
+ */
 #include "sst.h"
 #include <math.h>
 
@@ -55,7 +63,7 @@ void events(void)
     int radio_was_broken;
     struct quadrant *pdest, *q;
     coord w, hold;
-    event *ev;
+    event *ev, *ev2;
 
     if (idebug) {
 	prout("=== EVENTS from %.2f to %.2f:", game.state.date, fintim);
@@ -438,13 +446,14 @@ void events(void)
 	    /* tell the captain about it if we can */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
 	    {
-		prout("Uhura: Captain, starsystem %s in quadrant %d - %d is under attack.",
-		      systemname(q->planet), w.x, w.y);
+		prout("Uhura- Captain, starsystem %s in quadrant %s",
+		      systemname(q->planet), cramlc(quadrant, w));
+		prout("is under attack.");
 		if (cancelrest())
 		    return;
 	    }
 	    break;
-      case FENSLV:		/* starsystem is enslaved */
+	case FENSLV:		/* starsystem is enslaved */
 	    ev = unschedule(FENSLV);
 	    /* see if current distress call still active */
 	    q = &game.state.galaxy[ev->quadrant.x][ev->quadrant.y];
@@ -455,17 +464,22 @@ void events(void)
 	    q->status = enslaved;
 
 	    /* play stork and schedule the first baby */
-	    ev = schedule(FREPRO, expran(2.0 * game.intime));
+	    ev2 = schedule(FREPRO, expran(2.0 * game.intime));
+	    ev2->quadrant = ev->quadrant;
 
 	    /* report the disaster if we can */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
 	    {
-		prout("\nUhura:  We've lost contact with starsystem %s\n",
+		prout("Uhura- We've lost contact with starsystem %s",
 		      systemname(q->planet));
-		prout("  in quadrant %d,%d.\n", ev->quadrant.x,ev->quadrant.y);
+		prout("in quadrant %s.\n", cramlc(quadrant, ev->quadrant));
 	    }
 	    break;
-      case FREPRO:		/* Klingon reproduces */
+	case FREPRO:		/* Klingon reproduces */
+	    /*
+	     * If we ever switch to a real event queue, we'll need to
+	     * explicitly retrieve and restore the x and y.
+	     */
 	    ev = schedule(FREPRO, expran(1.0 * game.intime));
 	    /* see if current distress call still active */
 	    q = &game.state.galaxy[ev->quadrant.x][ev->quadrant.y];
@@ -892,11 +906,9 @@ void snova(int insx, int insy)
 	game.state.nplankl += npdead;
     }
     /* mark supernova in galaxy and in star chart */
-    if ((game.quadrant.x == nq.x && game.quadrant.y == nq.y) ||
-	game.damage[DRADIO] == 0 ||
-	game.condit == IHDOCKED)
+    if (same(game.quadrant, nq) || game.damage[DRADIO] == 0 || game.condit == IHDOCKED)
 	game.state.galaxy[nq.x][nq.y].supernova = true;
-    /* If supernova destroys last klingons give special message */
+    /* If supernova destroys last Klingons give special message */
     if (KLINGREM==0 && (nq.x != game.quadrant.x || nq.y != game.quadrant.y)) {
 	skip(2);
 	if (insx == 0) prout(_("Lucky you!"));
