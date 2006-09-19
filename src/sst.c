@@ -176,8 +176,7 @@ double perdate;
 char citem[10];
 int seed;		// the random-number seed
 bool idebug;		// debug mode
-bool randready;		// Has the random-number generator initialized?
-FILE *logfp;
+FILE *logfp, *replayfp;
 
 char *device[NDEVICES] = {
 	"S. R. Sensors",
@@ -595,8 +594,20 @@ int main(int argc, char **argv)
     else
 	game.options |= OPTION_TTY;
 
-    while ((option = getopt(argc, argv, "tx")) != -1) {
+    seed = (int)time(NULL);
+    while ((option = getopt(argc, argv, "r:tx")) != -1) {
 	switch (option) {
+	case 'r':
+	    replayfp = fopen(optarg, "r");
+	    if (replayfp == NULL) {
+		fprintf(stderr, "sst: can't open replay file %s\n", optarg);
+		exit(1);	
+	    }
+	    if (fscanf(replayfp, "seed %d\n", &seed) != 1) {
+		fprintf(stderr, "sst: replay file %s is ill-formed\n", optarg);
+		exit(1);	
+	    }
+	    /* FALL THROUGH */
 	case 't':
 	    game.options |= OPTION_TTY;
 	    game.options &=~ OPTION_CURSES;
@@ -612,8 +623,10 @@ int main(int argc, char **argv)
     /* where to save the input in case of bugs */
     logfp = fopen("sst-input.log", "w");
     setlinebuf(logfp);
+    fprintf(logfp, "seed %d\n", seed);
+    srand(seed);
 
-    randomize();
+    srand(seed);
     iostart();
 
     line[0] = '\0';
@@ -715,14 +728,6 @@ double expran(double avrage)
 
 double Rand(void) 
 {
-    if (!randready) {
-	if (seed == 0)
-	    seed = (unsigned)time(NULL);
-	if (logfp)
-	    fprintf(logfp, "seed %d\n", seed);
-	srand(seed);
-	randready = true;
-    }
     return rand()/(1.0 + (double)RAND_MAX);
 }
 
@@ -884,12 +889,16 @@ void debugme(void)
 	    case FENSLV:  proutn("Enlavement      "); break;
 	    case FREPRO:  proutn("Klingon Build   "); break;
 	    }
-	    if (is_scheduled(i))
+	    if (is_scheduled(i)) {
 		proutn("%.2f", scheduled(i)-game.state.date);
-	    else
+		if (i == FENSLV || i == FREPRO) {
+		    ev = findevent(i);
+		    proutn(" in %d-%d", ev->quadrant.x,ev->quadrant.y);
+		}
+	    } else
 		proutn("never");
-	    chew();
 	    proutn("? ");
+	    chew();
 	    key = scan();
 	    if (key == 'n') {
 		unschedule(i);

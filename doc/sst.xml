@@ -15,8 +15,10 @@
 
 <cmdsynopsis>
 <command>sst</command>
-<arg choice='opt'>-t </arg> 
-<arg rep='repeat' ><replaceable>command</replaceable></arg>  
+      <arg choice='opt'>-r <replaceable>filename</replaceable></arg> 
+      <arg choice='opt'>-t </arg> 
+      <arg choice='opt'>-x </arg> 
+      <arg rep='repeat' ><replaceable>command</replaceable></arg>  
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -38,9 +40,16 @@ url='http://sst.berlios.de/sst-doc.html'>browseable</ulink>.  On
 systems where <filename>/usr/share/doc/sst/</filename> is a legal
 filename, it will probably be installed there as well.</para>
 
-<para>There is one option -t, which forces the original pure-tty mode.
+<para>The option -t forces the original pure-tty mode.
 Normally sst tries to come up in full-screen mode that assumes it is
 running on a cursor-addressable terminal or terminal emulator.</para>
+
+<para>The option -r sets up replay of a session logfile.  Commands
+in the logfile are executed, then additional commands are taken
+from stdin as normal.  The -r option forces -t mode.</para>
+
+<para>The option -x enables some debugging features of interest
+probably only to sst2k developers.</para>
 
 <para>Input tokens for the setup prompts will be read from the
 remainder of the command line before standard input.  Thus, for
@@ -54,11 +63,34 @@ sst regular medium good fancy
 mode (all features enabled).</para>
 </refsect1>
 
+<refsect1 id='files'><title>FILES</title>
+<variablelist>
+<varlistentry>
+<term>/usr/share/doc/sst/sst.doc</term>
+<listitem>
+<para>Documentation file.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>sst-input.log</term>
+<listitem>
+<para>Where user input is saved to (send this with your bug reports).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>emsave.trk</term>
+<listitem>
+<para>Save file produced by EMEXIT command.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
 <refsect1 id='authors'><title>AUTHORS</title> 
 <para>Super Star Trek was designed and written by David Matuszek, Paul
 Reynolds, and Don Smith in the 1970s.  It was resurrected by Tom Almy.
 The screen-oriented interface is by Stas Sergeev. This version has
-been cleaned up and documented by Eric S. Raymond
+been improved, cleaned up and documented by Eric S. Raymond
 <email>esr@snark.thyrsus.com</email>.  There is a <ulink
 url='https://developer.berlios.de/projects/sst/'>project
 page</ulink>.</para>

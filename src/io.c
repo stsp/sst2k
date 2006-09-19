@@ -203,7 +203,10 @@ void cgetline(char *line, int max)
 	strcat(line, "\n");
 	wrefresh(curwnd);
     } else {
-	fgets(line, max, stdin);
+	if (replayfp && !feof(replayfp))
+	    fgets(line, max, replayfp);
+	else
+	    fgets(line, max, stdin);
     }
     if (logfp)
 	fputs(line, logfp);

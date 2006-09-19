@@ -178,6 +178,7 @@ extern int is_scheduled(int);
 extern event *schedule(int, double);
 extern void postpone(int, double);
 extern double scheduled(int);
+#define findevent(evtype)	&game.future[evtype]
 
 #define SSTMAGIC	"SST2.0\n"
 
@@ -281,9 +282,8 @@ extern double perdate;
 extern double aaitem;
 extern char citem[10];
 extern int seed;
-extern bool randready;
 extern bool idebug;
-extern FILE *logfp;
+extern FILE *logfp, *replayfp;
 
 /* the Space Thingy's global state should *not* be saved! */
 extern coord thing;

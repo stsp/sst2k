@@ -1,5 +1,72 @@
 		Super Star Trek TO-DO list
 
+Bugs:
+
+-----------------------------------------------------------------------------
+     Short-range scan
+    1 2 3 4 5 6 7 8 9 10
+ 1  E . . . . . . . . . Stardate      3800.9, Time Left 6.14
+ 2  . . . . . . . . . C Condition     RED, 0 DAMAGES
+ 3  . @ . * . . . . . . Position      1 - 3 , 1 - 1
+ 4  . . . . . . . . . . Life Support  ACTIVE
+ 5  . . . . . . . . . . Warp Factor   5.0
+ 6  . . . . . . . . . . Energy        3871.68
+ 7  . . . . * . . . . . Torpedoes     10
+ 8  . . . . . . . . . . Shields       UP, 92% 2294.3 units
+ 9  . . . . . . R . . . Klingons Left 8
+10  . . . . . . * . . . Major system  Capella IV (Kohath)
+
+
+COMMAND> phot 2
+Target sector for torpedo number 1- 2 10
+Target sector for torpedo number 2- 2 10
+
+***Commander at Sector 2 - 10 damaged-- displaced by blast to Sector 3 - 10
+
+
+***Commander at Sector 2 - 10 destroyed.
+=== ATTACK!
+
+***TORPEDO INCOMING From Unknown?? at Sector 3 - 10
+
+Torpedo missed.
+-----------------------------------------------------------------------------
+
+Here's the log that reproduces it
+
+-----------------------------------------------------------------------------
+seed 1158606492
+sr
+phasers
+auto
+391
+sensors
+planets
+lr
+chart
+probe
+y
+n
+a
+1 8
+shields up
+sr
+m a 10 10
+
+chart
+m a 1 3 1 1
+
+n
+chart
+sr
+phot 2
+2 10
+2 10
+-----------------------------------------------------------------------------
+
+The bug is the 'Unknown??' in the incoming-torpedo message.  What
+happened here is that the Commander launched a torp just before being
+killed.  The torpedo knows its origin but not who fired it.
 
 Short-term items:
 

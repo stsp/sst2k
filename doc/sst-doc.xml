@@ -1440,6 +1440,11 @@ inform you how long the base under attack can last.  Since the
 <quote>Super-Commander</quote> is more powerful than an ordinary
 commander, he can destroy a base more quickly.</para>
 
+<para>Inhabited worlds can be attacked, enslaved, and forced to 
+build more Klingon starships.  They will send out a distress call
+by subspace radio when they are attacked, and you will lose contact
+with them when they are enslaved.</para>
+
 <para>The <quote>Super-Commander</quote> travels around the galaxy at
 a speed of about warp 6 or 7.  His movement is strictly time based;
 the more time passes, the further he can go.</para>
@@ -1507,11 +1512,12 @@ the game, your kill rate is based on a minimum of 5 stardates.</para>
 <para>You lose&mdash;</para>
 
 <orderedlist>
+<listitem><para>300 points for each inhabited world you destroy,</para></listitem>
 <listitem><para>200 points if you get yourself killed,</para></listitem>
 <listitem><para>100 points for each starbase you destroy,</para></listitem>
 <listitem><para>100 points for each starship you lose,</para></listitem>
 <listitem><para>45 points for each time you had to call for help,</para></listitem>
-<listitem><para>10 points for each planet you destroyed,</para></listitem>
+<listitem><para>10 points for each uninhabited planet you destroyed,</para></listitem>
 <listitem><para>5 points for each star you destroyed, and</para></listitem>
 <listitem><para>1 point for each casualty you incurred.</para></listitem>
 </orderedlist>

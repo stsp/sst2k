@@ -410,7 +410,7 @@ void events(void)
 	    }
 	    break;
 	case FDISTR: /* inhabited system issues distress call */
-	    schedule(FDISTR, expran(0.5*game.intime));
+	    unschedule(FDISTR);
 	    /* try a whole bunch of times to find something suitable */
 	    i = 100;
 	    do {
@@ -434,8 +434,6 @@ void events(void)
 	    ev = schedule(FENSLV, expran(game.intime));
 	    ev->quadrant = w;
 	    q->status = distressed;
-	    if (idebug)
-		prout("=== Distress call set at %d, %d.", w.x, w.y);
 
 	    /* tell the captain about it if we can */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
