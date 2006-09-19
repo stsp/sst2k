@@ -59,7 +59,7 @@ void doshield(int i)
 	    prout(_("Shields already up."));
 	    return;
 	}
-	game.shldup = 1;
+	game.shldup = true;
 	game.shldchg = 1;
 	if (game.condit != IHDOCKED) game.energy -= 50.0;
 	prout(_("Shields raised."));
@@ -72,11 +72,11 @@ void doshield(int i)
 	game.ididit=1;
 	return;
     case SHDN:
-	if (game.shldup==0) {
+	if (!game.shldup) {
 	    prout(_("Shields already down."));
 	    return;
 	}
-	game.shldup=0;
+	game.shldup=false;
 	game.shldchg=1;
 	prout(_("Shields lowered."));
 	game.ididit=1;
@@ -166,7 +166,7 @@ void ram(int ibumpd, int ienm, coord w)
 	extradm = (10.0*type*Rand()+1.0)*game.damfac;
 	game.damage[l] += game.optime + extradm; /* Damage for at least time of travel! */
     }
-    game.shldup = 0;
+    game.shldup = false;
     if (KLINGREM) {
 	pause_game(2);
 	dreprt();
@@ -470,7 +470,7 @@ static void fry(double hit)
     prout(_(" damaged."));
     if (game.damage[DSHIELD] && game.shldup) {
 	prout(_("***Shields knocked down."));
-	game.shldup=0;
+	game.shldup=false;
     }
 }
 
@@ -542,7 +542,7 @@ void attack(int torps_ok)
 		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
-	if (game.shldup != 0 || game.shldchg != 0 || game.condit==IHDOCKED) {
+	if (game.shldup || game.shldchg != 0 || game.condit==IHDOCKED) {
 	    /* shields will take hits */
 	    double absorb, hitsh, propor = pfac*game.shield*(game.condit==IHDOCKED ? 2.1 : 1.0);
 	    if(propor < 0.1) propor = 0.1;
@@ -1183,13 +1183,13 @@ void phasers(void)
 		prout(_("Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."));
 		prouts(_("         CLICK   CLICK   POP  . . ."));
 		prout(_(" No response, sir!"));
-		game.shldup = 0;
+		game.shldup = false;
 	    }
 	    else
 		prout(_("Shields raised."));
 	}
 	else
-	    game.shldup = 0;
+	    game.shldup = false;
     }
     overheat(rpow);
 }

@@ -185,7 +185,7 @@ void abandn(void)
     game.shield = game.inshld = 1250.0;
     game.torps = game.intorps = 6;
     game.lsupres=game.inlsr=3.0;
-    game.shldup=0;
+    game.shldup=false;
     game.warpfac=5.0;
     game.wfacsq=25.0;
     return;
@@ -202,7 +202,8 @@ void setup(int needprompt)
     game.ship = IHE;
     game.energy = game.inenrg = 5000.0;
     game.shield = game.inshld = 2500.0;
-    game.shldchg = game.shldup = 0;
+    game.shldchg = 0;
+    game.shldup = false;
     game.inlsr = 4.0;
     game.lsupres = 4.0;
     iran(GALSIZE, &game.quadrant.x, &game.quadrant.y);
@@ -216,7 +217,8 @@ void setup(int needprompt)
     // Set up assorted game parameters
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
-    game.nkinks = game.nhelp = game.resting = game.casual = 0;
+    game.nkinks = game.nhelp = game.casual = 0;
+    game.resting = false;
     game.isatb = game.iscate = game.imine = game.icrystl = game.icraft = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     game.iscraft = 1;
@@ -248,6 +250,8 @@ void setup(int needprompt)
     unschedule(FDSPROB);
     if ((game.options & OPTION_WORLDS) && game.skill >= SKILL_GOOD)
 	schedule(FDISTR, expran(1.0 + game.intime));
+    else
+	unschedule(FDISTR);
     unschedule(FENSLV);
     unschedule(FREPRO);
     // Starchart is functional but we've never seen it
@@ -411,7 +415,7 @@ void setup(int needprompt)
     if (game.state.nscrem) prout("  YOU'LL NEED IT.");
     waitfor();
     newqad(0);
-    if (game.nenhere-iqhere-game.ithere) game.shldup=1.0;
+    if (game.nenhere-iqhere-game.ithere) game.shldup = true;
     if (game.neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
 

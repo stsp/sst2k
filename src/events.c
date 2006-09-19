@@ -39,7 +39,7 @@ static bool cancelrest(void)
 	skip(1);
 	proutn(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
 	if (ja()) {
-	    game.resting = 0;
+	    game.resting = false;
 	    game.optime = 0.0;
 	    return true;
 	}
@@ -57,7 +57,29 @@ void events(void)
     coord w, hold;
     event *ev;
 
-    if (idebug) prout("=== EVENTS");
+    if (idebug) {
+	prout("=== EVENTS from %.2f to %.2f:", game.state.date, fintim);
+	for (i = 1; i < NEVENTS; i++) {
+	    switch (i) {
+	    case FSNOVA:  proutn("=== Supernova       "); break;
+	    case FTBEAM:  proutn("=== T Beam          "); break;
+	    case FSNAP:   proutn("=== Snapshot        "); break;
+	    case FBATTAK: proutn("=== Base Attack     "); break;
+	    case FCDBAS:  proutn("=== Base Destroy    "); break;
+	    case FSCMOVE: proutn("=== SC Move         "); break;
+	    case FSCDBAS: proutn("=== SC Base Destroy "); break;
+	    case FDSPROB: proutn("=== Probe Move      "); break;
+	    case FDISTR:  proutn("=== Distress Call   "); break;
+	    case FENSLV:  proutn("=== Enlavement      "); break;
+	    case FREPRO:  proutn("=== Klingon Build   "); break;
+	    }
+	    if (is_scheduled(i))
+		prout("%.2f", scheduled(i));
+	    else
+		prout("never");
+
+	}
+    }
 
     radio_was_broken = (game.damage[DRADIO] != 0.0);
 
@@ -69,6 +91,8 @@ void events(void)
 	for (l = 1; l < NEVENTS; l++)
 	    if (game.future[l].date < datemin) {
 		line = l;
+		if (idebug)
+		    prout("== Event %d fires", line);
 		datemin = game.future[l].date;
 	    }
 	xtime = datemin-game.state.date;
@@ -180,14 +204,10 @@ void events(void)
 		    prout(_("Galileo, left on the planet surface, is well hidden."));
 		}
 	    }
-	    if (line==0) {
-		game.quadrant.x = game.state.kscmdr.x;
-		game.quadrant.y = game.state.kscmdr.y;
-	    }
-	    else {
-		game.quadrant.x = game.state.kcmdr[i].x;
-		game.quadrant.y = game.state.kcmdr[i].y;
-	    }
+	    if (line==0)
+		game.quadrant = game.state.kscmdr;
+	    else
+		game.quadrant = game.state.kcmdr[i];
 	    iran(QUADSIZE, &game.sector.x, &game.sector.y);
 	    crmshp();
 	    proutn(_(" is pulled to "));
@@ -196,9 +216,9 @@ void events(void)
 	    prout(cramlc(sector, game.sector));
 	    if (game.resting) {
 		prout(_("(Remainder of rest/repair period cancelled.)"));
-		game.resting = 0;
+		game.resting = false;
 	    }
-	    if (game.shldup==0) {
+	    if (!game.shldup) {
 		if (game.damage[DSHIELD]==0 && game.shield > 0) {
 		    doshield(2); /* Shldsup */
 		    game.shldchg=0;
@@ -227,9 +247,9 @@ void events(void)
 	    i = 0;
 	    for_starbases(j) {
 		for_commanders(k)
-		    if (game.state.baseq[j].x==game.state.kcmdr[k].x && game.state.baseq[j].y==game.state.kcmdr[k].y &&
-			(game.state.baseq[j].x!=game.quadrant.x || game.state.baseq[j].y!=game.quadrant.y) &&
-			(game.state.baseq[j].x!=game.state.kscmdr.x || game.state.baseq[j].y!=game.state.kscmdr.y)) {
+		    if (same(game.state.baseq[j], game.state.kcmdr[k]) &&
+			!same(game.state.baseq[j], game.quadrant) &&
+			!same(game.state.baseq[j], game.state.kscmdr)) {
 			i = 1;
 			break;
 		    }
@@ -242,8 +262,7 @@ void events(void)
 		break;
 	    }
 	    /* commander + starbase combination found -- launch attack */
-	    game.battle.x = game.state.baseq[j].x;
-	    game.battle.y = game.state.baseq[j].y;
+	    game.battle = game.state.baseq[j];
 	    schedule(FCDBAS, 1.0+3.0*Rand());
 	    if (game.isatb) /* extra time if SC already attacking */
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date);
@@ -271,14 +290,14 @@ void events(void)
 		break; /* WAS RETURN! */
 	    ixhold = game.battle.x;
 	    iyhold = game.battle.y;
-	    game.battle.x = game.state.kscmdr.x;
-	    game.battle.y = game.state.kscmdr.y;
+	    game.battle = game.state.kscmdr;
+	    /* FALL THROUGH */
 	case FCDBAS: /* Commander succeeds in destroying base */
 	    if (line==FCDBAS) {
 		unschedule(FCDBAS);
 		/* find the lucky pair */
 		for_commanders(i)
-		    if (game.state.kcmdr[i].x==game.battle.x && game.state.kcmdr[i].y==game.battle.y) 
+		    if (same(game.state.kcmdr[i], game.battle)) 
 			break;
 		if (i > game.state.remcom || game.state.rembase == 0 ||
 		    !game.state.galaxy[game.battle.x][game.battle.y].starbase) {
@@ -290,7 +309,7 @@ void events(void)
 	    /* Code merges here for any commander destroying base */
 	    /* Not perfect, but will have to do */
 	    /* Handle case where base is in same quadrant as starship */
-	    if (game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y) {
+	    if (same(game.battle, game.quadrant)) {
 		game.state.chart[game.battle.x][game.battle.y].starbase = false;
 		game.quad[game.base.x][game.base.y] = IHDOT;
 		game.base.x=game.base.y=0;
@@ -316,10 +335,8 @@ void events(void)
 	    /* Remove Starbase from galaxy */
 	    game.state.galaxy[game.battle.x][game.battle.y].starbase = false;
 	    for_starbases(i)
-		if (game.state.baseq[i].x==game.battle.x && game.state.baseq[i].y==game.battle.y) {
-		    game.state.baseq[i].x=game.state.baseq[game.state.rembase].x;
-		    game.state.baseq[i].y=game.state.baseq[game.state.rembase].y;
-		}
+		if (same(game.state.baseq[i], game.battle))
+		    game.state.baseq[i] = game.state.baseq[game.state.rembase];
 	    game.state.rembase--;
 	    if (game.isatb == 2) {
 		/* reinstate a commander's base attack */
@@ -395,25 +412,30 @@ void events(void)
 	case FDISTR: /* inhabited system issues distress call */
 	    schedule(FDISTR, expran(0.5*game.intime));
 	    /* try a whole bunch of times to find something suitable */
-	    for (i = 0; i < 100; i++) {
-		iran(GALSIZE, &w.x, &w.y);
-		q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
+	    i = 100;
+	    do {
 		/* need a quadrant which is not the current one,
 		   which has some stars which are inhabited and
 		   not already under attack, which is not
 		   supernova'ed, and which has some Klingons in it */
-		if (!(same(game.quadrant, w) || q->stars<=0 ||
-		      q->supernova || q->status != secure || q->klingons <= 0))
-		    break;
-	    }
-	    if (i >= 100)
+		iran(GALSIZE, &w.x, &w.y);
+		q = &game.state.galaxy[w.x][w.y];
+	    } while (--i &&
+		     (same(game.quadrant, w) || q->planet == NOPLANET ||
+		      q->supernova || q->status!=secure || q->klingons<=0));
+	    if (i == 0) {
 		/* can't seem to find one; ignore this call */
+		if (idebug)
+		    prout("=== Couldn't find location for distress event.");
 		break;
+	    }
 
 	    /* got one!!  Schedule its enslavement */
 	    ev = schedule(FENSLV, expran(game.intime));
 	    ev->quadrant = w;
 	    q->status = distressed;
+	    if (idebug)
+		prout("=== Distress call set at %d, %d.", w.x, w.y);
 
 	    /* tell the captain about it if we can */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
@@ -444,6 +466,7 @@ void events(void)
 		      systemname(q->planet));
 		prout("  in quadrant %d,%d.\n", ev->quadrant.x,ev->quadrant.y);
 	    }
+	    break;
       case FREPRO:		/* Klingon reproduces */
 	    ev = schedule(FREPRO, expran(1.0 * game.intime));
 	    /* see if current distress call still active */
@@ -465,7 +488,7 @@ void events(void)
 			continue;
 		    q = &game.state.galaxy[w.x][w.y];
 		    /* check for this quad ok (not full & no snova) */
-		    if (q->klingons >= MAXKLQUAD || q->stars < 0)
+		    if (q->klingons >= MAXKLQUAD || !q->supernova)
 			continue;
 		    goto foundit;
 		}
@@ -477,6 +500,7 @@ void events(void)
 
 	    /* deliver the child */
 	    game.state.remkl++;
+	    q->klingons++;
 	    if (same(game.quadrant, w))
 		newkling(++game.klhere, &hold);
 
@@ -513,10 +537,10 @@ void wait(void)
 
     /* Alternate resting periods (events) with attacks */
 
-    game.resting = 1;
+    game.resting = true;
     do {
-	if (delay <= 0) game.resting = 0;
-	if (game.resting == 0) {
+	if (delay <= 0) game.resting = false;
+	if (!game.resting) {
 	    prout(_("%d stardates left."), (int)game.state.remtime);
 	    return;
 	}
@@ -540,7 +564,7 @@ void wait(void)
 	// leave if quadrant supernovas
 	(!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova);
 
-    game.resting = 0;
+    game.resting = false;
     game.optime = 0;
 }
 
@@ -640,7 +664,7 @@ void nova(int ix, int iy)
 				double diff = 2000.0 - game.shield;
 				game.energy -= diff;
 				game.shield = 0.0;
-				game.shldup = 0;
+				game.shldup = false;
 				prout(_("***Shields knocked out."));
 				game.damage[DSHIELD] += 0.005*game.damfac*Rand()*diff;
 			    }

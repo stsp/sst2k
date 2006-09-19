@@ -488,7 +488,7 @@ void eta(void)
 	tpower = game.dist*twarp*twarp*twarp*(game.shldup+1);
 	if (tpower >= game.energy) {
 	    prout("Insufficient energy, sir.");
-	    if (game.shldup==0 || tpower > game.energy*2.0) {
+	    if (!game.shldup || tpower > game.energy*2.0) {
 		if (!wfl) return;
 		proutn("New warp factor to try? ");
 		if (scan() == IHREAL) {

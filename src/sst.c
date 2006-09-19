@@ -871,7 +871,6 @@ void debugme(void)
 	int i;
 	for (i = 1; i < NEVENTS; i++) {
 	    int key;
-	    if (!is_scheduled(i)) continue;
 	    switch (i) {
 	    case FSNOVA:  proutn("Supernova       "); break;
 	    case FTBEAM:  proutn("T Beam          "); break;
@@ -880,16 +879,22 @@ void debugme(void)
 	    case FCDBAS:  proutn("Base Destroy    "); break;
 	    case FSCMOVE: proutn("SC Move         "); break;
 	    case FSCDBAS: proutn("SC Base Destroy "); break;
-	    //case FDSPROB:proutn("Probe Move      "); break;
+	    case FDSPROB: proutn("Probe Move      "); break;
 	    case FDISTR:  proutn("Distress Call   "); break;
 	    case FENSLV:  proutn("Enlavement      "); break;
 	    case FREPRO:  proutn("Klingon Build   "); break;
 	    }
-	    proutn("%.2f", scheduled(i)-game.state.date);
+	    if (is_scheduled(i))
+		proutn("%.2f", scheduled(i)-game.state.date);
+	    else
+		proutn("never");
 	    chew();
-	    proutn("  ?");
+	    proutn("? ");
 	    key = scan();
-	    if (key == IHREAL) {
+	    if (key == 'n') {
+		unschedule(i);
+		chew();
+	    } else if (key == IHREAL) {
 		ev = schedule(i, aaitem);
 		if (i == FENSLV || i == FREPRO) {
 		    chew();
@@ -915,7 +920,7 @@ void debugme(void)
 	chew();
     }
     proutn("Induce supernova here? ");
-    if (ja() != 0) {
+    if (ja()) {
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = true;
 	atover(1);
     }

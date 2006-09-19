@@ -204,6 +204,8 @@ struct game {
 	ididit,		// action taken -- allows enemy to attack
 	alive,		// we are alive (not killed)
 	justin,		// just entered quadrant
+	shldup,		// shields are up
+	resting,	// rest time
 	alldone,	// game is now finished
 	neutz,		// Romulan Neutral Zone
 	isarmed,	// probe is armed
@@ -254,7 +256,6 @@ struct game {
 	indate,		// initial date
 	energy,		// energy level
 	shield,		// shield level
-	shldup,		// shields are up
 	warpfac,	// warp speed
 	wfacsq,		// squared warp factor
 	lsupres,	// life support reserves
@@ -262,7 +263,6 @@ struct game {
 	direc,		// movement direction
 	optime,		// time taken by current operation
 	docfac,		// repair factor when docking (constant?)
-	resting,	// rest time
 	damfac,		// damage factor
 	lastchart,	// time star chart was last updated
 	cryprob,	// probability that crystal will work

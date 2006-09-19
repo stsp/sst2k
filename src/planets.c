@@ -127,7 +127,7 @@ void beam(void)
 	prout(" not in standard orbit.");
 	return;
     }
-    if (game.shldup!=0) {
+    if (game.shldup) {
 	prout("Impossible to transport through shields.");
 	return;
     }
@@ -312,7 +312,7 @@ void shuttle(void)
 	prout("You will have to beam down to retrieve the shuttle craft.");
 	return;
     }
-    if (game.shldup!=0 || game.condit == IHDOCKED) {
+    if (game.shldup || game.condit == IHDOCKED) {
 	prout("Shuttle craft cannot pass through shields.");
 	return;
     }

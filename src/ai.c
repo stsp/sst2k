@@ -130,7 +130,7 @@ static void movebaddy(coord com, int loccom, int ienm)
  */
 
 	forces = game.kpower[loccom]+100.0*game.nenhere+400*(nbaddys-1);
-	if (game.shldup==0) forces += 1000; /* Good for enemy if shield is down! */
+	if (!game.shldup) forces += 1000; /* Good for enemy if shield is down! */
 	if (game.damage[DPHASER] == 0.0 || game.damage[DPHOTON] == 0.0) {
 	    if (game.damage[DPHASER] != 0) /* phasers damaged */
 		forces += 300.0;
@@ -500,10 +500,10 @@ void scom(int *ipage)
 	    prout(_("   reports that it is under attack from the Klingon Super-commander."));
 	    proutn(_("   It can survive until stardate %d.\""),
 		   (int)scheduled(FSCDBAS));
-	    if (game.resting==0) return;
+	    if (!game.resting) return;
 	    prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
 	    if (ja()==0) return;
-	    game.resting = 0;
+	    game.resting = false;
 	    game.optime = 0.0; /* actually finished */
 	    return;
 	}

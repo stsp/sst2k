@@ -523,7 +523,7 @@ void warp(bool timewarp)
 	    game.ididit = 0;
 	    skip(1);
 	    prout("Engineering to bridge--");
-	    if (game.shldup==0 || 0.5*power > game.energy) {
+	    if (!game.shldup || 0.5*power > game.energy) {
 		iwarp = pow((game.energy/(game.dist+0.05)), 0.333333333);
 		if (iwarp <= 0) {
 		    prout("We can't do it, Captain. We haven't the energy.");
