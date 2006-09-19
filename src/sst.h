@@ -367,7 +367,7 @@ void skip(int);
 void prout(char *, ...);
 void proutn(char *, ...);
 void stars(void);
-void newqad(int);
+void newqad(bool);
 bool ja(void);
 void cramen(int);
 void crmshp(void);

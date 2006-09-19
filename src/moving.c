@@ -113,7 +113,7 @@ void imove(void)
 		skip(1);
 		prout(_("Entering %s."), cramlc(quadrant, game.quadrant));
 		game.quad[game.sector.x][game.sector.y] = game.ship;
-		newqad(0);
+		newqad(false);
 		if (game.skill>SKILL_NOVICE) attack(0);
 		return;
 	    }
@@ -824,7 +824,7 @@ void timwrp()
 	postpone(FTBEAM, game.optime);
 	game.damage[DRADIO] += game.optime;
     }
-    newqad(0);
+    newqad(false);
     events();	/* Stas Sergeev added this -- do pending events */
 }
 
@@ -943,7 +943,7 @@ void mayday(void)
 	}
 	/* Since starbase not in quadrant, set up new quadrant */
 	game.quadrant = game.state.baseq[line];
-	newqad(1);
+	newqad(true);
     }
     /* dematerialize starship */
     game.quad[game.sector.x][game.sector.y]=IHDOT;

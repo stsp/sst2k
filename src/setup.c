@@ -181,11 +181,10 @@ void abandn(void)
 	prout("the Federation in a prisoner-of-war exchange.");
 	nb = Rand()*game.state.rembase+1;
 	/* Set up quadrant and position FQ adjacient to base */
-	if (game.quadrant.x!=game.state.baseq[nb].x || game.quadrant.y!=game.state.baseq[nb].y) {
-	    game.quadrant.x = game.state.baseq[nb].x;
-	    game.quadrant.y = game.state.baseq[nb].y;
+	if (!same(game.quadrant, game.state.baseq[nb])) {
+	    game.quadrant = game.state.baseq[nb];
 	    game.sector.x = game.sector.y = 5;
-	    newqad(1);
+	    newqad(true);
 	}
 	for (;;) {
 	    /* position next to base by trial and error */
@@ -199,7 +198,7 @@ void abandn(void)
 	    if (l < QUADSIZE+1) break; /* found a spot */
 	    game.sector.x=QUADSIZE/2;
 	    game.sector.y=QUADSIZE/2;
-	    newqad(1);
+	    newqad(true);
 	}
     }
     /* Get new commission */
@@ -450,7 +449,7 @@ void setup(int needprompt)
     prout("Good Luck!");
     if (game.state.nscrem) prout("  YOU'LL NEED IT.");
     waitfor();
-    newqad(0);
+    newqad(false);
     if (game.nenhere-iqhere-game.ithere) game.shldup = true;
     if (game.neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
 }
@@ -592,7 +591,7 @@ void newkling(int i, coord *pi)
     game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill;
 }
 
-void newqad(int shutup) 
+void newqad(bool shutup) 
 {
     int i, j;
     coord w;

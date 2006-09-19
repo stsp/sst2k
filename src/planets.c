@@ -512,9 +512,10 @@ void deathray(void)
 
 char *systemname(int pindx)
 {
-    /* the below array shoud not be static, or it won't gettextize
+    static char copy[BUFSIZ];
+    /* the below array should not be static, or it won't gettextize
      * because of the early initialization. */
-    char *names[NINHAB] =
+    char *names[NINHAB+1] =
     {
 	/*
 	 * I used <http://www.memory-alpha.org> to find planets
@@ -553,7 +554,7 @@ char *systemname(int pindx)
 	_("Marcos XII"),		/* TOS: "And the Children Shall Lead", */
 	_("Omega IV"),		/* TOS: "The Omega Glory" */
 	_("Regulus V"),		/* TOS: "Amok Time */
-	_("Deeva"),		/* TOS: "Operation -- Annihilate!" */
+	_("Deneva"),		/* TOS: "Operation -- Annihilate!" */
 	/* Worlds from BSD Trek */
 	_("Rigel II"),		/* TOS: "Shore Leave" ("III" in BSD) */
 	_("Beta III"),		/* TOS: "The Return of the Archons" */
@@ -570,7 +571,8 @@ char *systemname(int pindx)
 	_("Coridan (Desotriana)"),	/* TOS: "Journey to Babel" */
 	_("Iotia"),		/* TOS: "A Piece of the Action" */
 #endif
-   };
+    };
 
-    return names[pindx];
+    strcpy(copy, names[pindx]);
+    return copy;
 }

@@ -238,7 +238,7 @@ void events(void)
 		}
 		else prout(_("(Shields not currently useable.)"));
 	    }
-	    newqad(0);
+	    newqad(false);
 	    /* Adjust finish time to time of tractor beaming */
 	    fintim = game.state.date+game.optime;
 	    attack(0);
