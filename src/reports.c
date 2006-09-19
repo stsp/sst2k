@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void attakreport(int curt) 
+void attakreport(bool curt) 
 {
     if (!curt) {
 	if (is_scheduled(FCDBAS)) {
@@ -72,7 +72,7 @@ void report(void)
     if (!damaged(DRADIO) || game.condit == IHDOCKED || game.iseenit) {
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
-	attakreport(0);
+	attakreport(false);
 	game.iseenit = 1;
     }
     if (game.casual) prout(_("%d casualt%s suffered so far."),
@@ -185,7 +185,7 @@ void rechart(void)
 	    }
 }
 
-void chart(int nn) 
+void chart(bool title) 
 {
     int i,j;
     chew();
@@ -198,7 +198,7 @@ void chart(int nn)
 	rechart();
     }
 
-    if (nn == 0) prout(_("       STAR CHART FOR THE KNOWN GALAXY"));
+    if (!title) prout(_("       STAR CHART FOR THE KNOWN GALAXY"));
     if (game.state.date > game.lastchart)
 	prout(_("(Last surveillance update %d stardates ago)."),
 	      (int)(game.state.date-game.lastchart));
@@ -325,7 +325,7 @@ static void status(int req)
 
 	break;
     case 11:
-	attakreport(1);
+	attakreport(true);
 	break;
     }
 }
@@ -337,7 +337,7 @@ int srscan(int l)
 	{"","da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
     
     int i, j, jj, req=0;
-    int goodScan=true, leftside=true, rightside=true, nn=false; 
+    int goodScan=true, leftside=true, rightside=true, title=false; 
     switch (l) {
     case SCAN_FULL: // SRSCAN
 	if (damaged(DSRSENS)) {
@@ -357,7 +357,7 @@ int srscan(int l)
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
 	}
 	scan();
-	if (isit("chart")) nn = true;
+	if (isit("chart")) title = true;
 	if (isit("no")) rightside = false;
 	chew();
 	prout("    1 2 3 4 5 6 7 8 9 10");
@@ -400,7 +400,7 @@ int srscan(int l)
 	if (req!=0) return(goodScan);
     }
     prout("");
-    if (nn) chart(1);
+    if (title) chart(true);
     return(goodScan);
 }
 			

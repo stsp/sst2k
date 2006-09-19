@@ -316,17 +316,17 @@ void commandhook(char *cmd, bool before) {
  * Things past this point have policy implications.
  */
 
-void drawmaps(short l)
+void drawmaps(int mode)
 /* hook to be called after moving to redraw maps */
 {
     if (game.options & OPTION_CURSES) {
-	if (l == 1)
+	if (mode == 1)
 	    sensor();
         setwnd(srscan_window);
         wmove(curwnd, 0, 0);
         enqueue("no");
         srscan(SCAN_FULL);
-	if (l != 2) {
+	if (mode != 2) {
 	    setwnd(report_window);
 	    wclear(report_window);
 	    wmove(report_window, 0, 0);
@@ -429,6 +429,6 @@ void makechart(void)
     if (game.options & OPTION_CURSES) {
 	setwnd(message_window);
 	wclear(message_window);
-	chart(0);
+	chart(false);
     }
 }

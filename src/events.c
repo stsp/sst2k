@@ -139,7 +139,7 @@ void events(void)
 	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
 	    if (game.iseenit==0) {
-		attakreport(0);
+		attakreport(false);
 		game.iseenit = 1;
 	    }
 	    rechart();
@@ -198,7 +198,7 @@ void events(void)
 	    crmshp();
 	    prout(_(" caught in long range tractor beam--"));
 	    /* If Kirk & Co. screwing around on planet, handle */
-	    atover(1); /* atover(1) is Grab */
+	    atover(true); /* atover(true) is Grab */
 	    if (game.alldone) return;
 	    if (game.icraft == 1) { /* Caught in Galileo? */
 		finish(FSTRACTOR);

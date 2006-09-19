@@ -225,14 +225,14 @@ void abandn(void)
     return;
 }
 	
-void setup(int needprompt) 
+void setup(bool needprompt) 
 {
     int i,j, krem, klumper;
     int ix, iy;
     //  Decide how many of everything
     if (choose(needprompt)) return; // frozen game
     // Prepare the Enterprise
-    game.alldone = game.gamewon = 0;
+    game.alldone = game.gamewon = false;
     game.ship = IHE;
     game.state.crew = FULLCREW;
     game.energy = game.inenrg = 5000.0;

@@ -469,7 +469,7 @@ static void makemoves(void)
 	    dreprt();
 	    break;
 	case CHART:			// chart
-	    chart(0);
+	    chart(false);
 	    break;
 	case IMPULSE:			// impulse
 	    impuls();
@@ -570,14 +570,14 @@ static void makemoves(void)
 		if (game.alldone) break;	// Events did us in
 	    }
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) { // Galaxy went Nova!
-		atover(0);
+		atover(false);
 		continue;
 	    }
-	    if (hitme && game.justin==0) {
+	    if (hitme && !game.justin) {
 		attack(2);
 		if (game.alldone) break;
 		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) {	// went NOVA! 
-		    atover(0);
+		    atover(false);
 		    hitme = true;
 		    continue;
 		}
@@ -940,6 +940,6 @@ void debugme(void)
     proutn("Induce supernova here? ");
     if (ja()) {
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = true;
-	atover(1);
+	atover(true);
     }
 }

@@ -242,7 +242,7 @@ void dock(bool verbose)
 	(is_scheduled(FCDBAS) || game.isatb == 1) && game.iseenit == 0) {
 	/* get attack report from base */
 	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""));
-	attakreport(0);
+	attakreport(false);
 	game.iseenit = 1;
     }
 }
@@ -675,7 +675,7 @@ void setwrp(void)
     return;
 }
 
-void atover(int igrab) 
+void atover(bool igrab) 
 {
     double power, distreq;
 
