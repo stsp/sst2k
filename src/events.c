@@ -444,9 +444,9 @@ void events(void)
 	    /* tell the captain about it if we can */
 	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
 	    {
-		prout("Uhura- Captain, starsystem %s in quadrant %s",
+		prout("Uhura- Captain, %s in %s reports it is under attack",
 		      systemname(q->planet), cramlc(quadrant, w));
-		prout("is under attack.");
+		prout("by a Klingon invasion fleet.");
 		if (cancelrest())
 		    return;
 	    }
@@ -470,7 +470,7 @@ void events(void)
 	    {
 		prout("Uhura- We've lost contact with starsystem %s",
 		      systemname(q->planet));
-		prout("in quadrant %s.\n", cramlc(quadrant, ev->quadrant));
+		prout("in %s.\n", cramlc(quadrant, ev->quadrant));
 	    }
 	    break;
 	case FREPRO:		/* Klingon reproduces */
@@ -485,28 +485,30 @@ void events(void)
 		q->status = secure;
 		break;
 	    }
-	    /* reproduce one Klingon */
-	    w = ev->quadrant;
 	    if (game.state.remkl >=MAXKLGAME)
 		break;		/* full right now */
-	    /* this quadrant not ok, pick an adjacent one */
-	    for (i = w.x - 1; i <= w.x + 1; i++)
-	    {
-		for (j = w.y - 1; j <= w.y + 1; j++)
+	    /* reproduce one Klingon */
+	    w = ev->quadrant;
+	    if (game.klhere >= MAXKLQUAD) {
+		/* this quadrant not ok, pick an adjacent one */
+		for (i = w.x - 1; i <= w.x + 1; i++)
 		{
-		    if (!VALID_QUADRANT(i, j))
-			continue;
-		    q = &game.state.galaxy[w.x][w.y];
-		    /* check for this quad ok (not full & no snova) */
-		    if (q->klingons >= MAXKLQUAD || !q->supernova)
-			continue;
-		    goto foundit;
+		    for (j = w.y - 1; j <= w.y + 1; j++)
+		    {
+			if (!VALID_QUADRANT(i, j))
+			    continue;
+			q = &game.state.galaxy[w.x][w.y];
+			/* check for this quad ok (not full & no snova) */
+			if (q->klingons >= MAXKLQUAD || q->supernova)
+			    continue;
+			goto foundit;
+		    }
 		}
+		break;	/* search for eligible quadrant failed */
+	    foundit:
+		w.x = i;
+		w.y = j;
 	    }
-	    break;	/* search for eligible quadrant failed */
-	foundit:
-	    w.x = i;
-	    w.y = j;
 
 	    /* deliver the child */
 	    game.state.remkl++;
@@ -516,6 +518,19 @@ void events(void)
 
 	    /* recompute time left */
 	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
+	    /* report the disaster if we can */
+	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+	    {
+		if (same(game.quadrant, w)) {
+		    prout("Spock- sensors indicate the Klingons have");
+		    prout("launched a warship from %s.",systemname(q->planet));
+		} else {
+		    prout("Uhura- Starfleet reports increased Klingon activity");
+		    if (q->planet != NOPLANET)
+			proutn("near %s", systemname(q->planet));
+		    prout("in %s.\n", cramlc(quadrant, w));
+		}
+	    }
 	    break;
 	}
     }
