@@ -15,7 +15,7 @@ void doshield(int i)
 		action = NRG;
 	    else {
 		chew();
-		if (game.damage[DSHIELD]) {
+		if (!damaged(DSHIELD)) {
 		    prout(_("Shields damaged and down."));
 		    return;
 		}
@@ -31,7 +31,7 @@ void doshield(int i)
 		proutn(_("Energy to transfer to shields- "));
 		action = NRG;
 	    }
-	    else if (game.damage[DSHIELD]) {
+	    else if (damaged(DSHIELD)) {
 		prout(_("Shields damaged and down."));
 		return;
 	    }
@@ -191,7 +191,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     if (fabs(deltay) > bigger) bigger = fabs(deltay);
     deltax /= bigger;
     deltay /= bigger;
-    if (game.damage[DSRSENS]==0 || game.condit==IHDOCKED) 
+    if (!damaged(DSRSENS) || game.condit==IHDOCKED) 
 	setwnd(srscan_window);
     else 
 	setwnd(message_window);
@@ -466,7 +466,7 @@ static void fry(double hit)
 	proutn(device[j]);
     }
     prout(_(" damaged."));
-    if (game.damage[DSHIELD] && game.shldup) {
+    if (damaged(DSHIELD) && game.shldup) {
 	prout(_("***Shields knocked down."));
 	game.shldup=false;
     }
@@ -525,7 +525,7 @@ void attack(int torps_ok)
 	    double course = 1.90985*atan2((double)game.sector.y-jay.y, (double)jay.x-game.sector.x);
 	    hit = 0;
 	    proutn(_("***TORPEDO INCOMING"));
-	    if (game.damage[DSRSENS] <= 0.0) {
+	    if (!damaged(DSRSENS)) {
 		proutn(_(" From "));
 		crmena(0, iquad, i, jay);
 	    }
@@ -559,11 +559,11 @@ void attack(int torps_ok)
 		       doesn't make any sense, so I've fw.xed it */
 	ihurt = 1;
 	proutn(_("%d unit hit"), (int)hit);
-	if ((game.damage[DSRSENS] > 0 && itflag) || game.skill<=SKILL_FAIR) {
+	if ((damaged(DSRSENS) && itflag) || game.skill<=SKILL_FAIR) {
 	    proutn(_(" on the "));
 	    crmshp();
 	}
-	if (game.damage[DSRSENS] <= 0.0 && itflag) {
+	if (!damaged(DSRSENS) && itflag) {
 	    proutn(_(" from "));
 	    crmena(0, iquad, i, jay);
 	}
@@ -594,7 +594,7 @@ void attack(int torps_ok)
 	skip(1);
 	proutn(_("Energy left %2d    shields "), (int)game.energy);
 	if (game.shldup) proutn(_("up "));
-	else if (game.damage[DSHIELD] == 0) proutn(_("down "));
+	else if (!damaged(DSHIELD)) proutn(_("down "));
 	else proutn(_("damaged, "));
     }
     prout(_("%d%%,   torpedoes left %d"), percent, game.torps);
@@ -726,7 +726,7 @@ void photon(void)
 
     game.ididit = 0;
 
-    if (game.damage[DPHOTON]) {
+    if (damaged(DPHOTON)) {
 	prout(_("Photon tubes damaged."));
 	chew();
 	return;
@@ -911,19 +911,19 @@ void phasers(void)
 
     skip(1);
     /* SR sensors and Computer */
-    if (game.damage[DSRSENS]+game.damage[DCOMPTR] > 0) ipoop = 0;
+    if (damaged(DSRSENS) || damaged(DCOMPTR)) ipoop = 0;
     if (game.condit == IHDOCKED) {
 	prout(_("Phasers can't be fired through base shields."));
 	chew();
 	return;
     }
-    if (game.damage[DPHASER] != 0) {
+    if (damaged(DPHASER)) {
 	prout(_("Phaser control damaged."));
 	chew();
 	return;
     }
     if (game.shldup) {
-	if (game.damage[DSHCTRL]) {
+	if (damaged(DSHCTRL)) {
 	    prout(_("High speed shield control damaged."));
 	    chew();
 	    return;
@@ -1073,7 +1073,7 @@ void phasers(void)
     case FORCEMAN:
 	chew();
 	key = IHEOL;
-	if (game.damage[DCOMPTR]!=0)
+	if (damaged(DCOMPTR))
 	    prout(_("Battle comuter damaged, manual file only."));
 	else {
 	    skip(1);
@@ -1096,7 +1096,7 @@ void phasers(void)
 		msgflag = 0;
 		rpow = 0.0;
 	    }
-	    if (game.damage[DSRSENS] && !(abs(game.sector.x-aim.x) < 2 && abs(game.sector.y-aim.y) < 2) &&
+	    if (damaged(DSRSENS) && !(abs(game.sector.x-aim.x) < 2 && abs(game.sector.y-aim.y) < 2) &&
 		(ienm == IHC || ienm == IHS)) {
 		cramen(ienm);
 		prout(_(" can't be located without short range scan."));
@@ -1113,7 +1113,7 @@ void phasers(void)
 			(1.01+0.05*Rand()) + 1.0;
 		kz = k;
 		proutn("(");
-		if (game.damage[DCOMPTR]==0) proutn("%d", irec);
+		if (!damaged(DCOMPTR)) proutn("%d", irec);
 		else proutn("??");
 		proutn(")  ");
 		proutn(_("units to fire at "));
@@ -1211,7 +1211,7 @@ void hittem(double *hits)
 	kpow = game.kpower[kk];
 	w = game.ks[kk];
 	if (hit > 0.005) {
-	    if (game.damage[DSRSENS]==0)
+	    if (!damaged(DSRSENS))
 		boom(w.x, w.y);
 	    proutn(_("%d unit hit on "), (int)hit);
 	}

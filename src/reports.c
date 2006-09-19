@@ -69,7 +69,7 @@ void report(void)
 	prout(" destroyed, %d remaining.", game.state.rembase);
     }
     else prout("There are %d bases.", game.inbase);
-    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED || game.iseenit) {
+    if (!damaged(DRADIO) || game.condit == IHDOCKED || game.iseenit) {
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
 	attakreport(0);
@@ -87,7 +87,7 @@ void report(void)
 	if (game.nprobes!=1) proutn("s");
 	prout(".");
     }
-    if ((game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+    if ((!damaged(DRADIO) || game.condit == IHDOCKED)
 		&& is_scheduled(FDSPROB)) {
 	if (game.isarmed) 
 	    proutn("An armed deep space probe is in");
@@ -117,7 +117,7 @@ void lrscan(void)
 {
     int x, y;
     chew();
-    if (game.damage[DLRSENS] != 0.0) {
+    if (damaged(DLRSENS)) {
 	/* Now allow base's sensors if docked */
 	if (game.condit != IHDOCKED) {
 	    prout("LONG-RANGE SENSORS DAMAGED.");
@@ -134,7 +134,7 @@ void lrscan(void)
 	    if (!VALID_QUADRANT(x, y))
 		proutn("  -1");
 	    else {
-		if (!game.damage[DRADIO])
+		if (!damaged(DRADIO))
 		    game.state.galaxy[x][y].charted = true;
 		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
 		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
@@ -156,7 +156,7 @@ void dreprt(void)
     chew();
 
     for (i = 0; i < NDEVICES; i++) {
-	if (game.damage[i] > 0.0) {
+	if (damaged(i)) {
 	    if (!jdam) {
 		prout("DEVICE            -REPAIR TIMES-");
 		prout("                IN FLIGHT   DOCKED");
@@ -190,7 +190,7 @@ void chart(int nn)
     int i,j;
     chew();
 
-    if (game.damage[DRADIO] == 0.0)
+    if (!damaged(DRADIO))
 	rechart();
 
     if (game.lastchart < game.state.date && game.condit == IHDOCKED) {
@@ -280,7 +280,7 @@ static void status(int req)
 	break;
     case 4:
 	proutn("Life Support  ");
-	if (game.damage[DLIFSUP] != 0.0) {
+	if (damaged(DLIFSUP)) {
 	    if (game.condit == IHDOCKED)
 		proutn("DAMAGED, Base provides");
 	    else
@@ -302,7 +302,7 @@ static void status(int req)
 	break;
     case 8:
 	proutn("Shields       ");
-	if (game.damage[DSHIELD] != 0)
+	if (damaged(DSHIELD))
 	    proutn("DAMAGED,");
 	else if (game.shldup)
 	    proutn("UP,");
@@ -340,7 +340,7 @@ int srscan(int l)
     int goodScan=true, leftside=true, rightside=true, nn=false; 
     switch (l) {
     case SCAN_FULL: // SRSCAN
-	if (game.damage[DSRSENS] != 0) {
+	if (damaged(DSRSENS)) {
 	    /* Allow base's sensors if docked */
 	    if (game.condit != IHDOCKED) {
 		prout("   S.R. SENSORS DAMAGED!");
@@ -350,7 +350,7 @@ int srscan(int l)
 		prout("  [Using Base's sensors]");
 	}
 	else prout("     Short-range scan");
-	if (goodScan && !game.damage[DRADIO]) { 
+	if (goodScan && !damaged(DRADIO)) { 
 	    game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
 	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
 	    game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
@@ -410,7 +410,7 @@ void eta(void)
     int ix1, ix2, iy1, iy2;
     bool wfl, prompt = false;
     double ttime, twarp, tpower;
-    if (game.damage[DCOMPTR] != 0.0) {
+    if (damaged(DCOMPTR)) {
 	prout("COMPUTER DAMAGED, USE A POCKET CALCULATOR.");
 	skip(1);
 	return;

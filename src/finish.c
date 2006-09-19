@@ -6,7 +6,7 @@ void dstrct()
 {
     /* Finish with a BANG! */
     chew();
-    if (game.damage[DCOMPTR] != 0.0) {
+    if (damaged(DCOMPTR)) {
 	prout(_("Computer damaged; cannot execute destruct sequence."));
 	return;
     }

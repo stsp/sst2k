@@ -237,7 +237,7 @@ void dock(int l)
     game.shield = game.inshld;
     game.torps = game.intorps;
     game.lsupres = game.inlsr;
-    if (game.damage[DRADIO] == 0.0 &&
+    if (!damaged(DRADIO) &&
 	(is_scheduled(FCDBAS) || game.isatb == 1) && game.iseenit == 0) {
 	/* get attack report from base */
 	prout("Lt. Uhura- \"Captain, an important message from the starbase:\"");
@@ -276,7 +276,7 @@ static void getcd(bool isprobe, int akey) {
 		return;
 	}
 	while (automatic == -1) {
-		if (game.damage[DCOMPTR]) {
+		if (damaged(DCOMPTR)) {
 			if (isprobe)
 				prout("Computer damaged; manual navigation only");
 			else
@@ -438,7 +438,7 @@ void impuls(void)
     double power;
 
     game.ididit = 0;
-    if (game.damage[DIMPULS]) {
+    if (damaged(DIMPULS)) {
 	chew();
 	skip(1);
 	prout("Engineer Scott- \"The impulse engines are damaged, Sir.\"");
@@ -502,7 +502,7 @@ void warp(bool timewarp)
 	    prout("Engineer Scott- \"The impulse engines are damaged, Sir.\"");
 	    return;
 	}
-	if (game.damage[DWARPEN] > 0.0 && game.warpfac > 4.0) {
+	if (damaged(DWARPEN) && game.warpfac > 4.0) {
 	    chew();
 	    skip(1);
 	    prout("Engineer Scott- \"Sorry, Captain. Until this damage");
@@ -641,7 +641,7 @@ void setwrp(void)
 	prout("Warp engines inoperative.");
 	return;
     }
-    if (game.damage[DWARPEN] > 0.0 && aaitem > 4.0) {
+    if (damaged(DWARPEN) && aaitem > 4.0) {
 	prout("Engineer Scott- \"I'm doing my best, Captain,");
 	prout("  but right now we can only go warp 4.\"");
 	return;
@@ -681,7 +681,7 @@ void atover(int igrab)
     chew();
     /* is captain on planet? */
     if (game.landed==1) {
-	if (game.damage[DTRANSP]) {
+	if (damaged(DTRANSP)) {
 	    finish(FPNOVA);
 	    return;
 	}
@@ -731,10 +731,10 @@ void atover(int igrab)
 	crmshp();
 	skip(1);
 	prout("safely out of quadrant.");
-	if (game.damage[DRADIO] == 0.0)
+	if (!damaged(DRADIO))
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
 	/* Try to use warp engines */
-	if (game.damage[DWARPEN]) {
+	if (damaged(DWARPEN)) {
 	    skip(1);
 	    prout("Warp engines damaged.");
 	    finish(FSNOVAED);
@@ -841,7 +841,7 @@ void probe(void)
 	    prout("Ye Faerie Queene has no deep space probes.");
 	return;
     }
-    if (game.damage[DDSP] != 0.0) {
+    if (damaged(DDSP)) {
 	chew();
 	skip(1);
 	prout("Engineer Scott- \"The probe launcher is damaged, Sir.\"");
@@ -850,7 +850,7 @@ void probe(void)
     if (is_scheduled(FDSPROB)) {
 	chew();
 	skip(1);
-	if (game.damage[DRADIO] != 0 && game.condit != IHDOCKED) {
+	if (damaged(DRADIO) && game.condit != IHDOCKED) {
 	    prout("Spock-  \"Records show the previous probe has not yet");
 	    prout("   reached its destination.\"");
 	}
@@ -911,7 +911,7 @@ void mayday(void)
 	prout("Lt. Uhura-  \"But Captain, we're already docked.\"");
 	return;
     }
-    if (game.damage[DRADIO] != 0) {
+    if (damaged(DRADIO)) {
 	prout("Subspace radio damaged.");
 	return;
     }

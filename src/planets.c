@@ -62,7 +62,7 @@ void orbit(void)
 	prout("Already in standard orbit.");
 	return;
     }
-    if (game.damage[DWARPEN] != 0 && game.damage[DIMPULS] != 0) {
+    if (damaged(DWARPEN) && damaged(DIMPULS)) {
 	prout("Both warp and impulse engines damaged.");
 	return;
     }
@@ -86,7 +86,7 @@ void sensor(void)
 {
     skip(1);
     chew();
-    if (game.damage[DSRSENS] != 0.0) {
+    if (damaged(DSRSENS)) {
 	prout("Short range sensors damaged.");
 	return;
     }
@@ -113,9 +113,9 @@ void beam(void)
 {
     chew();
     skip(1);
-    if (game.damage[DTRANSP] != 0) {
+    if (damaged(DTRANSP)) {
 	prout("Transporter damaged.");
-	if (game.damage[DSHUTTL]==0 && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == 1)) {
+	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == 1)) {
 	    skip(1);
 	    proutn("Spock-  \"May I suggest the shuttle craft, Sir?\" ");
 	    if (ja() != 0) shuttle();
@@ -287,7 +287,7 @@ void shuttle(void)
 {
     chew();
     skip(1);
-    if(game.damage[DSHUTTL] != 0.0) {
+    if(damaged(DSHUTTL)) {
 	if (game.damage[DSHUTTL] == -1.0) {
 	    if (game.inorbit && game.state.plnets[game.iplnet].known == shuttle_down)
 		prout("Ye Faerie Queene has no shuttle craft bay to dock it at.");
@@ -296,7 +296,8 @@ void shuttle(void)
 	}
 	else if (game.damage[DSHUTTL] > 0)
 	    prout("The Galileo is damaged.");
-	else prout("Shuttle craft is now serving Big Macs.");
+	else /* game.damage[DSHUTTL] < 0 */ 
+	    prout("Shuttle craft is now serving Big Macs.");
 	return;
     }
     if (!game.inorbit) {
@@ -338,7 +339,7 @@ void shuttle(void)
 	/* Kirk on planet */
 	if (game.iscraft==1) {
 	    /* Galileo on ship! */
-	    if (game.damage[DTRANSP]==0) {
+	    if (!damaged(DTRANSP)) {
 		proutn("Spock-  \"Would you rather use the transporter?\" ");
 		if (ja() != 0) {
 		    beam();
@@ -412,7 +413,7 @@ void deathray(void)
 	prout("Sulu-  \"But Sir, there are no enemies in this quadrant.\"");
 	return;
     }
-    if (game.damage[DDRAY] > 0.0) {
+    if (damaged(DDRAY)) {
 	prout("Death Ray is damaged.");
 	return;
     }

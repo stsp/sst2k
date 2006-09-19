@@ -92,9 +92,31 @@ int thaw(void)
     return 0;
 }
 
+/*
+**  Abandon Ship
+**
+**	The ship is abandoned.  If your current ship is the Faire
+**	Queene, or if your shuttlecraft is dead, you're out of
+**	luck.  You need the shuttlecraft in order for the captain
+**	(that's you!!) to escape.
+**
+**	Your crew can beam to an inhabited starsystem in the
+**	quadrant, if there is one and if the transporter is working.
+**	If there is no inhabited starsystem, or if the transporter
+**	is out, they are left to die in outer space.
+**
+**	If there are no starbases left, you are captured by the
+**	Klingons, who torture you mercilessly.  However, if there
+**	is at least one starbase, you are returned to the
+**	Federation in a prisoner of war exchange.  Of course, this
+**	can't happen unless you have taken some prisoners.
+**
+*/
+
 void abandn(void) 
 {
     int nb, l;
+    struct quadrant *q;
 
     chew();
     if (game.condit==IHDOCKED) {
@@ -132,13 +154,23 @@ void abandn(void)
 	prouts("***ALL HANDS ABANDON SHIP!");
 	skip(2);
 	prout("Captain and crew escape in shuttle craft.");
-	prout("Remainder of ship's complement beam down");
-	prout("to nearest habitable planet.");
 	if (game.state.rembase==0) {
 	    /* Oops! no place to go... */
 	    finish(FABANDN);
 	    return;
 	}
+	q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
+	/* Dispose of crew */
+	if (!(game.options & OPTION_WORLDS) && !damaged(DTRANSP)) {
+	    prout("Remainder of ship's complement beam down");
+	    prout("to nearest habitable planet.");
+	} else if (q->planet != NOPLANET && !damaged(DTRANSP)) {
+	    prout("Remainder of ship's complement beam down");
+	    prout("to %s.", systemname(q->planet));
+	} else {
+	    prout("Entire crew of %d left to die in outer space.");
+	}
+
 	/* If at least one base left, give 'em the Faerie Queene */
 	skip(1);
 	game.icrystl = 0; /* crystals are lost */
@@ -175,7 +207,7 @@ void abandn(void)
     prout("still useable.");
     if (game.icrystl!=0) prout("The dilithium crystals have been moved.");
     game.imine=0;
-    game.iscraft=0; /* Gallileo disappears */
+    game.iscraft=0; /* Galileo disappears */
     /* Resupply ship */
     game.condit=IHDOCKED;
     for (l = 0; l < NDEVICES; l++) 
@@ -650,7 +682,7 @@ void newqad(int shutup)
     // Check for RNZ
     if (game.irhere > 0 && game.klhere == 0 && (here->planet == NOPLANET || game.state.plnets[here->planet].inhabited == UNINHABITED)) {
 	game.neutz = 1;
-	if (game.damage[DRADIO] <= 0.0) {
+	if (!damaged(DRADIO)) {
 	    skip(1);
 	    prout("LT. Uhura- \"Captain, an urgent message.");
 	    prout("  I'll put it on audio.\"  CLICK");
@@ -671,7 +703,7 @@ void newqad(int shutup)
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
 		sqrt(square(game.sector.x-w.x) + square(game.sector.y-w.y));
 	    game.kpower[game.nenhere] = Rand()*6000.0 +500.0 +250.0*game.skill;
-	    if (game.damage[DSRSENS] == 0.0) {
+	    if (!damaged(DSRSENS)) {
 		skip(1);
 		prout("MR. SPOCK- \"Captain, this is most unusual.");
 		prout("    Please examine your short-range scan.\"");

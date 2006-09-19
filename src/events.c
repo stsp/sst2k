@@ -89,7 +89,7 @@ void events(void)
 	}
     }
 
-    radio_was_broken = (game.damage[DRADIO] != 0.0);
+    radio_was_broken = damaged(DRADIO);
 
     for (;;) {
 	/* Select earliest extraneous event, evcode==0 if no events */
@@ -113,7 +113,7 @@ void events(void)
 	    return;
 	}
 	/* Is life support adequate? */
-	if (game.damage[DLIFSUP] && game.condit != IHDOCKED) {
+	if (damaged(DLIFSUP) && game.condit != IHDOCKED) {
 	    if (game.lsupres < xtime && game.damage[DLIFSUP] > game.lsupres) {
 		finish(FLIFESUP);
 		return;
@@ -129,7 +129,7 @@ void events(void)
 	    if (game.damage[l] > 0.0 && l != DDRAY)
 		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
 	/* If radio repaired, update star chart and attack reports */
-	if (radio_was_broken && game.damage[DRADIO] == 0.0) {
+	if (radio_was_broken && !damaged(DRADIO)) {
 	    prout(_("Lt. Uhura- \"Captain, the sub-space radio is working and"));
 	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
@@ -157,10 +157,10 @@ void events(void)
 		game.condit==IHDOCKED || game.isatb==1 || game.iscate==1) return;
 	    if (game.ientesc ||
 		(game.energy < 2000 && game.torps < 4 && game.shield < 1250) ||
-		(game.damage[DPHASER]>0 && (game.damage[DPHOTON]>0 || game.torps < 4)) ||
-		(game.damage[DSHIELD] > 0 &&
-		 (game.energy < 2500 || game.damage[DPHASER] > 0) &&
-		 (game.torps < 5 || game.damage[DPHOTON] > 0))) {
+		(damaged(DPHASER) && (damaged(DPHOTON) || game.torps < 4)) ||
+		(damaged(DSHIELD) &&
+		 (game.energy < 2500 || damaged(DPHASER)) &&
+		 (game.torps < 5 || damaged(DPHOTON)))) {
 		/* Tractor-beam her! */
 		istract=1;
 		yank = square(game.state.kscmdr.x-game.quadrant.x) + square(game.state.kscmdr.y-game.quadrant.y);
@@ -227,7 +227,7 @@ void events(void)
 		game.resting = false;
 	    }
 	    if (!game.shldup) {
-		if (game.damage[DSHIELD]==0 && game.shield > 0) {
+		if (!damaged(DSHIELD) && game.shield > 0) {
 		    doshield(2); /* Shldsup */
 		    game.shldchg=0;
 		}
@@ -276,7 +276,7 @@ void events(void)
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date);
 	    game.future[FBATTAK].date = game.future[FCDBAS].date + expran(0.3*game.intime);
 	    game.iseenit = 0;
-	    if (game.damage[DRADIO] != 0.0 && game.condit != IHDOCKED) 
+	    if (!damaged(DRADIO) && game.condit != IHDOCKED) 
 		break; /* No warning :-( */
 	    game.iseenit = 1;
 	    if (!ipage) pause_game(1);
@@ -325,7 +325,7 @@ void events(void)
 		prout(_("Spock-  \"Captain, I believe the starbase has been destroyed.\""));
 	    }
 	    else if (game.state.rembase != 1 &&
-		     (game.damage[DRADIO] <= 0.0 || game.condit == IHDOCKED)) {
+		     (!damaged(DRADIO) || game.condit == IHDOCKED)) {
 		/* Get word via subspace radio */
 		if (!ipage) pause_game(1);
 		ipage = true;
@@ -372,7 +372,7 @@ void events(void)
 		if (!VALID_QUADRANT(i, j) ||
 		    game.state.galaxy[game.probec.x][game.probec.y].supernova) {
 		    // Left galaxy or ran into supernova
-		    if (game.damage[DRADIO]==0.0 || game.condit == IHDOCKED) {
+		    if (!damaged(DRADIO) || game.condit == IHDOCKED) {
 			if (ipage==0) pause_game(1);
 			ipage = 1;
 			skip(1);
@@ -386,7 +386,7 @@ void events(void)
 		    unschedule(FDSPROB);
 		    break;
 		}
-		if (game.damage[DRADIO]==0.0   || game.condit == IHDOCKED) {
+		if (!damaged(DRADIO) || game.condit == IHDOCKED) {
 		    if (ipage==0) pause_game(1);
 		    ipage = 1;
 		    skip(1);
@@ -398,7 +398,7 @@ void events(void)
 	    pdest = &game.state.galaxy[game.probec.x][game.probec.y];
 	    /* Update star chart if Radio is working or have access to
 	       radio. */
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED) {
 		struct page *chp = &game.state.chart[game.probec.x][game.probec.y];
 
 		chp->klingons = pdest->klingons;
@@ -442,7 +442,7 @@ void events(void)
 	    q->status = distressed;
 
 	    /* tell the captain about it if we can */
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED)
 	    {
 		prout("Uhura- Captain, %s in %s reports it is under attack",
 		      systemname(q->planet), cramlc(quadrant, w));
@@ -466,7 +466,7 @@ void events(void)
 	    ev2->quadrant = ev->quadrant;
 
 	    /* report the disaster if we can */
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED)
 	    {
 		prout("Uhura- We've lost contact with starsystem %s",
 		      systemname(q->planet));
@@ -519,7 +519,7 @@ void events(void)
 	    /* recompute time left */
 	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
 	    /* report the disaster if we can */
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED)
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED)
 	    {
 		if (same(game.quadrant, w)) {
 		    prout("Spock- sensors indicate the Klingons have");
@@ -821,7 +821,7 @@ void snova(int insx, int insy)
 
 	if (nq.x != game.quadrant.y || nq.y != game.quadrant.y || game.justin != 0) {
 	    /* it isn't here, or we just entered (treat as inroute) */
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED) {
 		skip(1);
 		prout(_("Message from Starfleet Command       Stardate %.2f"), game.state.date);
 		prout(_("     Supernova in %s; caution advised."),
@@ -919,7 +919,7 @@ void snova(int insx, int insy)
 	game.state.nplankl += npdead;
     }
     /* mark supernova in galaxy and in star chart */
-    if (same(game.quadrant, nq) || game.damage[DRADIO] == 0 || game.condit == IHDOCKED)
+    if (same(game.quadrant, nq) || !damaged(DRADIO) || game.condit == IHDOCKED)
 	game.state.galaxy[nq.x][nq.y].supernova = true;
     /* If supernova destroys last Klingons give special message */
     if (KLINGREM==0 && (nq.x != game.quadrant.x || nq.y != game.quadrant.y)) {

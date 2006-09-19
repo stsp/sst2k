@@ -146,6 +146,8 @@ typedef struct {
 #define DDSP    14  // Added deep space probe
 #define NDEVICES (15)	// Number of devices
 
+#define damaged(dev)	game.damage[dev] != 0.0
+
 #define FOREVER	1e30
 
 /* Define future events */

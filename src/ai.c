@@ -26,7 +26,7 @@ static bool tryexit(int lookx, int looky, int ienm, int loccom, int irun)
     }
     /* print escape message and move out of quadrant.
        We know this if either short or long range sensors are working */
-    if (game.damage[DSRSENS] == 0.0 || game.damage[DLRSENS] == 0.0 ||
+    if (!damaged(DSRSENS) || !damaged(DLRSENS) ||
 	game.condit == IHDOCKED) {
 	crmena(1, ienm, 2, game.ks[loccom]);
 	prout(_(" escapes to %s (and regains strength)."),
@@ -87,7 +87,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 
     /* If SC, check with spy to see if should hi-tail it */
     if (ienm==IHS &&
-	(game.kpower[loccom] <= 500.0 || (game.condit==IHDOCKED && game.damage[DPHOTON]==0))) {
+	(game.kpower[loccom] <= 500.0 || (game.condit==IHDOCKED && !damaged(DPHOTON)))) {
 	irun = 1;
 	motion = -QUADSIZE;
     }
@@ -133,12 +133,12 @@ static void movebaddy(coord com, int loccom, int ienm)
 
 	forces = game.kpower[loccom]+100.0*game.nenhere+400*(nbaddys-1);
 	if (!game.shldup) forces += 1000; /* Good for enemy if shield is down! */
-	if (game.damage[DPHASER] == 0.0 || game.damage[DPHOTON] == 0.0) {
-	    if (game.damage[DPHASER] != 0) /* phasers damaged */
+	if (!damaged(DPHASER) || !damaged(DPHOTON)) {
+	    if (damaged(DPHASER)) /* phasers damaged */
 		forces += 300.0;
 	    else
 		forces -= 0.2*(game.energy - 2500.0);
-	    if (game.damage[DPHOTON] != 0) /* photon torpedoes damaged */
+	    if (damaged(DPHOTON)) /* photon torpedoes damaged */
 		forces += 300.0;
 	    else
 		forces -= 50.0*game.torps;
@@ -244,7 +244,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 	game.ks[loccom].y = next.y;
 	game.kdist[loccom] = game.kavgd[loccom] =
 	    sqrt(square(game.sector.x-next.x)+square(game.sector.y-next.y));
-	if (game.damage[DSRSENS] == 0 || game.condit == IHDOCKED) {
+	if (!damaged(DSRSENS) || game.condit == IHDOCKED) {
 	    proutn("***");
 	    cramen(ienm);
 	    proutn(_(" from %s"), cramlc(2, com));
@@ -339,7 +339,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
-	    if (game.damage[DRADIO] == 0.0 || game.condit == IHDOCKED) {
+	    if (!damaged(DRADIO) || game.condit == IHDOCKED) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
@@ -494,7 +494,7 @@ void scom(bool *ipage)
 	    schedule(FSCDBAS, 1.0 +2.0*Rand());
 	    if (is_scheduled(FCDBAS)) 
 		postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
-	    if (game.damage[DRADIO] > 0 && game.condit != IHDOCKED)
+	    if (damaged(DRADIO) && game.condit != IHDOCKED)
 		return; /* no warning */
 	    game.iseenit = 1;
 	    if (*ipage == 0)  pause_game(1);
@@ -517,7 +517,7 @@ void scom(bool *ipage)
     if (
 	!idebug &&
 	(Rand() > 0.2 ||
-	 (game.damage[DRADIO] > 0.0 && game.condit != IHDOCKED) ||
+	 (damaged(DRADIO) && game.condit != IHDOCKED) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
     if (*ipage==0) pause_game(1);
