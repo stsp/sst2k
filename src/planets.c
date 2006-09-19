@@ -514,73 +514,60 @@ char *systemname(int pindx)
     static char	*names[NINHAB] =
     {
 	/*
-	 * This started out life as the BSD Trek inhabited-planets list,
-	 * but I used <http://www.memory-alpha.org> to weed out planets
-	 * with no references in ST:TOS and to fill it out again to the
-	 * required length from "The Worlds of The Federation" list,
-	 * <http://memory-alpha.org/en/wiki/The_Worlds_of_the_Federation>.
-	 * Some misspellings have been silently corrected.  (To be
-	 * fair, there was no Web when Eric Allman did his list.)
-	 *
+	 * I used <http://www.memory-alpha.org> to find planets
+	 * with references in ST:TOS.  Eath and the Alpha Centauri
+	 * Colony have been omitted.
+ 	 *
 	 * Some planets marked Class G and P here will be displayed as class M
 	 * because of the way planets are generated. This is a known bug.
 	 */
 	"ERROR",
-	// Added Federation Worlds
-	"Deneva",		/* TOS: "Operation -- Annihilate!" */
+	// Federation Worlds
+	"Andoria (Fesoan)",	/* several episodes */
+	"Tellar Prime (Miracht)",	/* TOS: "Journey to Babel" */
+	"Vulcan (T'Khasi)",	/* many episodes */
+	"Medusa",		/* TOS: "Is There in Truth No Beauty?" */
+	"Argelius II (Nelphia)",/* TOS: "Wolf in the Fold" ("IV" in BSD) */
+	"Ardana",		/* TOS: "The Cloud Minders" */
+	"Catulla (Cendo-Prae)",	/* TOS: "The Way to Eden" */
+	"Gideon",		/* TOS: "The Mark of Gideon" */
+	"Aldebaran III",	/* TOS: "The Deadly Years" */
+	"Alpha Majoris I",	/* TOS: "Wolf in the Fold" */
+	"Altair IV",		/* TOS: "Amok Time */
+	"Ariannus",		/* TOS: "Let That Be Your Last Battlefield" */
+	"Benecia"		/* TOS: "The Conscience of the King" */
+	"Beta Niobe I (Sarpeidon)",	/* TOS: "All Our Yesterdays" */
+	"Alpha Carinae II",	/* TOS: "The Ultimate Computer" */
+	"Capella IV (Kohath)",	/* TOS: "Friday's Child" (Class G) */
+	"Daran V",		/* TOS: "For the World is Hollow and I Have Touched the Sky" */
+	"Deneb II",		/* TOS: "Wolf in the Fold" ("IV" in BSD) */
 	"Eminiar VII",		/* TOS: "A Taste of Armageddon" */
+	"Gamma Canaris IV",	/* TOS: "Metamorphosis" */
+	"Gamma Tranguli VI (Vaalel)",	/* TOS: "The Apple" */
+	"Ingraham B",		/* TOS: "Operation: Annihilate" */
+	"Janus IV",		/* TOS: "The Devil in the Dark" */
+	"Makus III",		/* TOS: "The Galileo Seven" */
+	"Marcos XII",		/* TOS: "And the Children Shall Lead", */
+	"Omega IV",		/* TOS: "The Omega Glory" */
+	"Regulus V",		/* TOS: "Amok Time */
+	"Deeva",		/* TOS: "Operation -- Annihilate!" */
+	/* Worlds from BSD Trek */
+	"Rigel II",		/* TOS: "Shore Leave" ("III" in BSD) */
+	"Beta III",		/* TOS: "The Return of the Archons" */
+	"Triacus",		/* TOS: "And the Children Shall Lead", */
+	"Exo III",		/* TOS: "What Are Little Girls Made Of?" (Class P) */
+#if 0
+	// Others
 	"Hansen's Planet",	/* TOS: "The Galileo Seven" */
 	"Taurus IV",		/* TOS: "The Galileo Seven" (class G) */
-	"Aldebaran III",	/* TOS: "The Deadly Years" */
-	"Vulcan (T'Khasi)",	/* many episodes */
-	"Tellar Prime (Miracht)",	/* TOS: "Journey to Babel" */
-	"Andoria (Fesoan)",	/* several episodes */
 	"Antos IV (Doraphane)",	/* TOS: "Whom Gods Destroy", "Who Mourns for Adonais?" */
-	"Catulla (Cendo-Prae)",	/* TOS: "The Way to Eden" */
 	"Izar",			/* TOS: "Whom Gods Destroy" */
 	"Tiburon",		/* TOS: "The Way to Eden" */
-	"Merak II",		/* TOS: "The Cloud Minders" */
-	"Argelius II (Nelphia)",	/* TOS: "Wolf in the Fold" ("IV" in BSD) */
-	"Daran V",		/* TOS: "For the World is Hollow and I Have Touched the Sky" */
-	"Medusa",		/* TOS: "Is There in Truth No Beauty?" */
+	"Merak II",		/* TOS: "The Cloud Minders" */ 
 	"Coridan (Desotriana)",	/* TOS: "Journey to Babel" */
-	"Berengaria IV",	/* TOS: "This Side of Paradise" */
-	"Capella IV (Kohath)",	/* TOS: "Friday's Child" (Class G) */
-	"Gideon",		/* TOS: "The Mark of Gideon" */
 	"Iotia",		/* TOS: "A Piece of the Action" */
-	/* Worlds from BSD Trek */
-	//"Talos IV",		/* TOS: "The Cage" (interdicted world) */
-	"Rigel II",		/* TOS: "Shore Leave" ("III" in BSD) */
-	"Deneb II",		/* TOS: "Wolf in the Fold" ("IV" in BSD) */
-	//"Canopus V",		/* noncanonical */
-	//"Icarus I",		/* noncanonical */
-	//"Prometheus II",	/* noncanonical */
-	//"Omega VII",		/* noncanonical */
-	//"Elysium I",		/* noncanonical */
-	"Scalos IV",		/* TOS: "Wink of an Eye" */
-	//"Procyon IV",		/* noncanonical */
-	//"Arachnid I",		/* noncanonical */
-	//"Argo VIII",		/* noncanonical */
-	//"Triad III",		/* noncanonical */
-	//"Echo IV",		/* noncanonical */
-	//"Nimrod III",		/* noncanonical */
-	//"Nemisis IV",		/* noncanonical */
-	//"Centarurus I",	/* noncanonical */
-	//"Kronos III",		/* noncanonical */
-	//"Spectros V",		/* noncanonical */
-	"Beta III",		/* TOS: "The Return of the Archons" */
-	"Gamma Tranguli VI (Vaalel)",	/* TOS: "The Apple" */
-	"Pyris VII",		/* TOS: "Catspaw" ("III" in BSD) */
-	"Triacus",		/* TOS: "And the Children Shall Lead", */
-	"Marcos XII",		/* TOS: "And the Children Shall Lead", */
-	//"Kaland",		/* noncanonical */
-	"Ardana",		/* TOS: "The Cloud Minders" */
-	//"Stratos",		/* noncanonical */
-	//"Eden",		/* TOS: "The Way to Eden" (in Romulan space) */
-	//"Arrikis",		/* noncanonical */
-	//"Epsilon Eridani IV",	/* noncanonical */
-	"Exo III",		/* TOS: "What Are Little Girls Made Of?" (Class P) */
-    };
+#endif
+   };
 
     return names[pindx];
 }
