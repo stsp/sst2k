@@ -423,10 +423,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	setwnd(message_window);
     }
     if (shoved) {
-	coord w;
-	w.x = jx; w.y = jy;
-	game.quad[jx][jy]=iquad;
 	game.quad[w.x][w.y]=IHDOT;
+	game.quad[jx][jy]=iquad;
 	prout(_(" displaced by blast to %s "), cramlc(sector, w));
 	for_local_enemies(ll)
 	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(game.sector.x-game.ks[ll].x)+square(game.sector.y-game.ks[ll].y));

@@ -909,20 +909,23 @@ void debugme(void)
 		    chew();
 		    proutn("In quadrant- ");
 		    key = scan();
-		    if (key != IHREAL) {
-			prout("Event %d canceled, no y coordinate.", i);
-			unschedule(i);
-			continue;
+		    /* IHEOL says to leave coordinates as they are */
+		    if (key != IHEOL) {
+			if (key != IHREAL) {
+			    prout("Event %d canceled, no x coordinate.", i);
+			    unschedule(i);
+			    continue;
+			}
+			w.x = (int)aaitem;
+			key = scan();
+			if (key != IHREAL) {
+			    prout("Event %d canceled, no y coordinate.", i);
+			    unschedule(i);
+			    continue;
+			}
+			w.y = (int)aaitem;
+			ev->quadrant = w;
 		    }
-		    w.y = (int)aaitem;
-		    key = scan();
-		    if (key != IHREAL) {
-			prout("Event %d canceled, no x coordinate.", i);
-			unschedule(i);
-			continue;
-		    }
-		    w.x = (int)aaitem;
-		    ev->quadrant = w;
 		}
 	    }
 	}
