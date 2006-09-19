@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void attakreport(bool curt) 
+void attakreport(bool curt)
+/* report status of bases under attack */
 {
     if (!curt) {
 	if (is_scheduled(FCDBAS)) {
@@ -28,7 +29,8 @@ void attakreport(bool curt)
 }
 	
 
-void report(void) 
+void report(void)
+/* report on general game status */
 {
     char *s1,*s2,*s3;
 
@@ -114,6 +116,7 @@ void report(void)
 }
 	
 void lrscan(void) 
+/* long-range sensor scan */
 {
     int x, y;
     chew();
@@ -150,6 +153,7 @@ void lrscan(void)
 }
 
 void dreprt(void) 
+/* damage report */
 {
     bool jdam = false;
     int i;
@@ -185,7 +189,8 @@ void rechart(void)
 	    }
 }
 
-void chart(bool title) 
+void chart(bool title)
+/* display the star chart */ 
 {
     int i,j;
     chew();
@@ -232,6 +237,7 @@ void chart(bool title)
 }
 
 static void sectscan(int goodScan, int i, int j) 
+/* light up an individual dot in a sector */
 {
     if (goodScan || (abs(i-game.sector.x)<= 1 && abs(j-game.sector.y) <= 1)){
 	if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
@@ -252,7 +258,8 @@ static void sectscan(int goodScan, int i, int j)
 	proutn("- ");
 }
 
-static void status(int req) 
+static void status(int req)
+/* print status report lines */
 {
     char *cp = NULL;
     int t, dam = 0;
@@ -330,7 +337,8 @@ static void status(int req)
     }
 }
 		
-int srscan(int l) 
+int srscan(int l)
+/* short-range scan */
 {
     /* the "sy" request is undocumented */
     static char requests[][3] =
@@ -406,6 +414,7 @@ int srscan(int l)
 			
 			
 void eta(void)
+/* use computer to get estimated time of arrival for a warp jump */
 {
     int ix1, ix2, iy1, iy2;
     bool wfl, prompt = false;

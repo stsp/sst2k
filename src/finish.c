@@ -2,7 +2,8 @@
 #include <string.h>
 #include <time.h>
 
-void dstrct() 
+void selfdestruct(void)
+/* self-destruct maneuver */
 {
     /* Finish with a BANG! */
     chew();
@@ -69,7 +70,8 @@ void kaboom(void)
 }
 				
 
-void finish(FINTYPE ifin) 
+void finish(FINTYPE ifin)
+/* end the game, with appropriate notfications */
 {
     bool igotit = false;
     game.alldone = true;
@@ -313,6 +315,7 @@ void finish(FINTYPE ifin)
 }
 
 void score(void) 
+/* compute player's score */
 {
     double timused = game.state.date - game.indate;
     int ithperd, iwon, klship;
@@ -392,7 +395,9 @@ void score(void)
     prout(_("TOTAL SCORE                               %5d"), iscore);
 }
 
-void plaque(void) {
+void plaque(void)
+/* emit winner's commemmorative plaque */
+{
 	FILE *fp=NULL;
 	time_t t;
 	char *timestring;

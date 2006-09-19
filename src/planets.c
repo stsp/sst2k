@@ -2,30 +2,18 @@
 
 static char *classes[] = {"M","N","O"};
 
-static int consumeTime(void) 
+static bool consumeTime(void)
+/* abort a lengthy operation if an event interrupts it */
 {
-/* I think most of this avoidance was caused by overlay scheme.
-   Let's see what happens if all events can occur here */
-
-//  double asave;
-    game.ididit = 1;
-#if 0
-    /* Don't worry about this */
-    if (scheduled(FTBEAM) <= game.state.date+game.optime && game.state.remcom != 0 && game.condit != IHDOCKED) {
-	/* We are about to be tractor beamed -- operation fails */
-	return 1;
-    }
-#endif
-//	asave = scheduled(FSNOVA);
-//	unschedule(FSNOVA); /* defer supernovas */
-    events();	/* Used to avoid if FSCMOVE is scheduled within time */
-//	schedule(FSNOVA, asave-game.state.time);
-    /*fails if game over, quadrant super-novas or we've moved to new quadrant*/
-    if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.justin != 0) return 1;
-    return 0;
+    game.ididit = true;
+    events();
+    if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.justin) 
+	return true;
+    return false;
 }
 
 void preport(void) 
+/* report on (uninhabited) planets in the galaxy */
 {
     bool iknow = false;
     int i;
@@ -51,10 +39,11 @@ void preport(void)
 		prout(_("    Shuttle Craft Galileo on surface."));
 	}
     }
-    if (iknow==0) prout(_("No information available."));
+    if (!iknow) prout(_("No information available."));
 }
 
-void orbit(void) 
+void orbit(void)
+/* enter standard orbit */
 {
     skip(1);
     chew();
@@ -82,7 +71,8 @@ void orbit(void)
     game.ididit = true;
 }
 
-void sensor(void) 
+void sensor(void)
+/* examine planets in this quadrant */
 {
     skip(1);
     chew();
@@ -110,6 +100,7 @@ void sensor(void)
 }
 
 void beam(void) 
+/* use the transporter */
 {
     chew();
     skip(1);
@@ -171,7 +162,7 @@ void beam(void)
 	skip(1);
 	prout(_("Kirk-  \"Energize.\""));
     }
-    game.ididit=1;
+    game.ididit = true;
     skip(1);
     prouts("WWHOOOIIIIIRRRRREEEE.E.E.  .  .  .  .   .    .");
     skip(2);
@@ -189,15 +180,16 @@ void beam(void)
     if (game.landed==1 && game.state.plnets[game.iplnet].known==shuttle_down) {
 	prout(_("The shuttle craft Galileo is here!"));
     }
-    if (game.landed!=1 && game.imine==1) {
+    if (game.landed!=1 && game.imine) {
 	game.icrystl = 1;
 	game.cryprob = 0.05;
     }
-    game.imine = 0;
+    game.imine = false;
     return;
 }
 
 void mine(void) 
+/* strip-mine a world for dilithium */
 {
     skip(1);
     chew();
@@ -213,7 +205,7 @@ void mine(void)
 	prout(_("No dilithium crystals on this planet."));
 	return;
     }
-    if (game.imine == 1) {
+    if (game.imine) {
 	prout(_("You've already mined enough crystals for this trip."));
 	return;
     }
@@ -228,13 +220,13 @@ void mine(void)
     if (consumeTime()) return;
     prout(_("Mining operation complete."));
     game.state.plnets[game.iplnet].crystals = MINED;
-    game.imine = 1;
-    game.ididit=1;
+    game.imine = game.ididit = true;
 }
 
-void usecrystals(void) 
+void usecrystals(void)
+/* use dilithium crystals */
 {
-    game.ididit=0;
+    game.ididit = false;
     skip(1);
     chew();
     if (game.icrystl!=1) {
@@ -280,10 +272,11 @@ void usecrystals(void)
     prout(_("   are going crazy, but I think it's"));
     prout(_("   going to work!!  Congratulations, Sir!\""));
     game.cryprob *= 2.0;
-    game.ididit=1;
+    game.ididit = true;
 }
 
 void shuttle(void) 
+/* use shuttlecraft for planetary jaunt */
 {
     chew();
     skip(1);
@@ -370,11 +363,11 @@ void shuttle(void)
 	    if (consumeTime()) return;
 	    game.iscraft = 1;
 	    game.icraft = 0;
-	    if (game.imine!=0) {
+	    if (game.imine) {
 		game.icrystl = 1;
 		game.cryprob = 0.05;
 	    }
-	    game.imine = 0;
+	    game.imine = false;
 	    prout(_("Trip complete."));
 	    return;
 	}
@@ -398,11 +391,12 @@ void shuttle(void)
     }
 }
 
-void deathray(void) 
+void deathray(void)
+/* use the big zapper */
 {
     double dprob, r = Rand();
 	
-    game.ididit = 0;
+    game.ididit = false;
     skip(1);
     chew();
     if (game.ship != IHE) {
@@ -423,7 +417,7 @@ void deathray(void)
     if (ja() == false) return;
     prout(_("Spock-  \"Acknowledged.\""));
     skip(1);
-    game.ididit=1;
+    game.ididit = true;
     prouts(_("WHOOEE ... WHOOEE ... WHOOEE ... WHOOEE"));
     skip(1);
     prout(_("Crew scrambles in emergency preparation."));
@@ -511,6 +505,7 @@ void deathray(void)
 }
 
 char *systemname(int pindx)
+/* return the name of a given solar system */
 {
     static char copy[BUFSIZ];
     /* the below array should not be static, or it won't gettextize

@@ -531,7 +531,7 @@ static void makemoves(void)
 	    abandn();
 	    break;
 	case DESTRUCT:			// Self Destruct
-	    dstrct();
+	    selfdestruct();
 	    break;
 	case SAVE:			// Save Game
 	    freeze(false);

@@ -215,6 +215,7 @@ struct game {
 	neutz,		// Romulan Neutral Zone
 	isarmed,	// probe is armed
 	inorbit,	// orbiting a planet
+	imine,		// mining
 	thawed;		// thawed game
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
@@ -237,7 +238,6 @@ struct game {
 	shldchg,	// shield is changing (affects efficiency)
 	landed,		// party on planet (1), on ship (-1)
 	iplnet,		// planet # in quadrant
-	imine,		// mining
 	inplan,		// initial planets
 	nenhere,	// number of enemies in quadrant
 	ishere,		// super-commander in quandrant
@@ -352,7 +352,7 @@ void eta(void);
 void mayday(void);
 void abandn(void);
 void finish(FINTYPE);
-void dstrct(void);
+void selfdestruct(void);
 void kaboom(void);
 void freeze(bool);
 int thaw(void);

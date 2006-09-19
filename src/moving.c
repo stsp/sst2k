@@ -711,7 +711,7 @@ void atover(bool igrab)
 	}
 	prout(_("SUCCEEDS!"));
 	if (game.imine) {
-	    game.imine = 0;
+	    game.imine = false;
 	    proutn(_("The crystals mined were "));
 	    if (Rand() <= 0.25) {
 		prout(_("lost."));
