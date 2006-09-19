@@ -786,3 +786,20 @@ void sortkl(void)
 	    }
     } while (sw);
 }
+
+void setpassword(void) 
+{
+    if (!(game.options & OPTION_CURSES)) {
+	while (TRUE) {
+	    scan();
+	    strcpy(game.passwd, citem);
+	    chew();
+	    if (*game.passwd != 0) break;
+	    proutn(_("Please type in a secret password-"));
+	}
+    } else {
+	int i;
+        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
+        game.passwd[3]=0;
+    }
+}

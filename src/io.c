@@ -36,7 +36,6 @@ void iostart(void)
     setlocale(LC_ALL, "");
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
-    gettext("");
 
     if (atexit(outro)){
 	fprintf(stderr,"Unable to register outro(), exiting...\n");
@@ -92,15 +91,15 @@ void pause_game(int i)
     char buf[BUFSIZ];
     if (i==1) {
 	if (game.skill > SKILL_FAIR)
-	    prompt = "[ANOUNCEMENT ARRIVING...]";
+	    prompt = _("[ANOUNCEMENT ARRIVING...]");
 	else
-	    prompt = "[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]";
+	    prompt = _("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
     }
     else {
 	if (game.skill > SKILL_FAIR)
-	    prompt = "[CONTINUE?]";
+	    prompt = _("[CONTINUE?]");
 	else
-	    prompt = "[PRESS ENTER TO CONTINUE]";
+	    prompt = _("[PRESS ENTER TO CONTINUE]");
 
     }
     if (game.options & OPTION_CURSES) {
@@ -388,11 +387,11 @@ void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
 	if (l == 1) {
 	    if (n != 1) {
 		skip(1);
-		proutn("Track for torpedo number %d-  ", i);
+		proutn(_("Track for torpedo number %d-  "), i);
 	    }
 	    else {
 		skip(1);
-		proutn("Torpedo track- ");
+		proutn(_("Torpedo track- "));
 	    }
 	} else if (l==4 || l==9) 
 	    skip(1);
@@ -433,21 +432,3 @@ void makechart(void)
 	chart(0);
     }
 }
-
-void setpassword(void) 
-{
-    if (!(game.options & OPTION_CURSES)) {
-	for (;;) {
-	    scan();
-	    strcpy(game.passwd, citem);
-	    chew();
-	    if (*game.passwd != 0) break;
-	    proutn("Please type in a secret password-");
-	}
-    } else {
-	int i;
-        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
-        game.passwd[3]=0;
-    }
-}
-
