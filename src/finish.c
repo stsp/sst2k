@@ -139,7 +139,7 @@ void finish(FINTYPE ifin)
 		    else {
 			proutn(_("Do you want your Commodore Emeritus Citation printed? "));
 			chew();
-			if (ja()) {
+			if (ja() == true) {
 			    igotit = 1;
 			}
 		    }

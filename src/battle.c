@@ -1,6 +1,7 @@
 #include "sst.h"
 
 void doshield(int i) 
+/* change shield status */
 {
     int key;
     enum {NONE, SHUP, SHDN, NRG} action = NONE;
@@ -27,7 +28,7 @@ void doshield(int i)
 	}
 	if (action==NONE) {
 	    proutn(_("Do you wish to change shield energy? "));
-	    if (ja()) {
+	    if (ja() == true) {
 		proutn(_("Energy to transfer to shields- "));
 		action = NRG;
 	    }
@@ -37,7 +38,7 @@ void doshield(int i)
 	    }
 	    else if (game.shldup) {
 		proutn(_("Shields are up. Do you want them down? "));
-		if (ja()) action = SHDN;
+		if (ja() == true) action = SHDN;
 		else {
 		    chew();
 		    return;
@@ -45,7 +46,7 @@ void doshield(int i)
 	    }
 	    else {
 		proutn(_("Shields are down. Do you want them up? "));
-		if (ja()) action = SHUP;
+		if (ja() == true) action = SHUP;
 		else {
 		    chew();
 		    return;
@@ -69,7 +70,7 @@ void doshield(int i)
 	    finish(FNRG);
 	    return;
 	}
-	game.ididit=1;
+	game.ididit=true;
 	return;
     case SHDN:
 	if (!game.shldup) {
@@ -92,7 +93,7 @@ void doshield(int i)
 	    prout(_("Insufficient ship energy."));
 	    return;
 	}
-	game.ididit = 1;
+	game.ididit = true;
 	if (game.shield+aaitem >= game.inshld) {
 	    prout(_("Shield energy maximized."));
 	    if (game.shield+aaitem > game.inshld) {
@@ -129,10 +130,11 @@ void doshield(int i)
     }
 }
 
-void ram(int ibumpd, int ienm, coord w)
+void ram(bool ibumpd, int ienm, coord w)
+/* make our ship ram something */
 {
     double type = 1.0, extradm;
-    int icas, l;
+    int icas, m;
 	
     prouts(_("***RED ALERT!  RED ALERT!"));
     skip(1);
@@ -148,7 +150,7 @@ void ram(int ibumpd, int ienm, coord w)
     case IHQUEST: type = 4.0; break;
     }
     proutn(ibumpd ? _(" rammed by ") : _(" rams "));
-    crmena(0, ienm, 2, w);
+    crmena(false, ienm, sector, w);
     if (ibumpd) proutn(_(" (original position)"));
     skip(1);
     deadkl(w, ienm, game.sector.x, game.sector.y);
@@ -159,13 +161,13 @@ void ram(int ibumpd, int ienm, coord w)
     prout(_("***Sickbay reports %d casualties"), icas);
     game.casual += icas;
     game.state.crew -= icas;
-    for (l=0; l < NDEVICES; l++) {
-	if (l == DDRAY) 
+    for (m=0; m < NDEVICES; m++) {
+	if (m == DDRAY) 
 	    continue; // Don't damage deathray 
-	if (game.damage[l] < 0) 
+	if (game.damage[m] < 0) 
 	    continue;
 	extradm = (10.0*type*Rand()+1.0)*game.damfac;
-	game.damage[l] += game.optime + extradm; /* Damage for at least time of travel! */
+	game.damage[m] += game.optime + extradm; /* Damage for at least time of travel! */
     }
     game.shldup = false;
     if (KLINGREM) {
@@ -177,6 +179,7 @@ void ram(int ibumpd, int ienm, coord w)
 }
 
 void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
+/* let a photon torpedo fly */
 {
     int l, iquad=0, jx=0, jy=0, shoved=0, ll;
 	
@@ -248,7 +251,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHC: /* Hit a commander */
 	case IHS:
 	    if (Rand() <= 0.05) {
-		crmena(1, iquad, 2, w);
+		crmena(true, iquad, sector, w);
 		prout(_(" uses anti-photon device;"));
 		prout(_("   torpedo neutralized."));
 		return;
@@ -269,7 +272,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		deadkl(w, iquad, w.x, w.y);
 		return;
 	    }
-	    crmena(1, iquad, 2, w);
+	    crmena(true, iquad, sector, w);
 	    /* If enemy damaged but not destroyed, try to displace */
 	    ang = angle + 2.5*(Rand()-0.5);
 	    temp = fabs(sin(ang));
@@ -316,7 +319,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    newcnd();
 	    return;
 	case IHP: /* Hit a planet */
-	    crmena(1, iquad, 2, w);
+	    crmena(true, iquad, sector, w);
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
@@ -330,7 +333,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    }
 	    return;
 	case IHW: /* Hit an inhabited world -- very bad! */
-	    crmena(1, iquad, 2, w);
+	    crmena(true, iquad, sector, w);
 	    prout(_(" destroyed."));
 	    game.state.nworldkl++;
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
@@ -350,7 +353,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		nova(w.x, w.y);
 		return;
 	    }
-	    crmena(1, IHSTAR, 2, w);
+	    crmena(true, IHSTAR, sector, w);
 	    prout(_(" unaffected by photon blast."));
 	    return;
 	case IHQUEST: /* Hit a thingy */
@@ -376,7 +379,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHBLANK: /* Black hole */
 	    skip(1);
-	    crmena(1, IHBLANK, 2, w);
+	    crmena(true, IHBLANK, sector, w);
 	    prout(_(" swallows torpedo."));
 	    return;
 	case IHWEB: /* hit the web */
@@ -396,7 +399,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		return;
 	    }
 	    skip(1);
-	    crmena(1, IHT, 2, w);
+	    crmena(true, IHT, sector, w);
 	    if (Rand() > 0.05) {
 		prout(_(" survives photon blast."));
 		return;
@@ -414,7 +417,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	default: /* Problem! */
 	    skip(1);
 	    proutn("Don't know how to handle collision with ");
-	    crmena(1, iquad, 2, w);
+	    crmena(true, iquad, sector, w);
 	    skip(1);
 	    return;
 	}
@@ -437,10 +440,11 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     return;
 }
 
-static void fry(double hit) 
+static void fry(double hit)
+/* critical-hit resolution */
 {
     double ncrit, extradm;
-    int ktr=1, l, ll, j, cdam[NDEVICES];
+    int ktr=1, loop1, loop2, j, cdam[NDEVICES];
 
     /* a critical hit occured */
     if (hit < (275.0-25.0*game.skill)*(1.0+0.5*Rand())) return;
@@ -448,18 +452,18 @@ static void fry(double hit)
     ncrit = 1.0 + hit/(500.0+100.0*Rand());
     proutn(_("***CRITICAL HIT--"));
     /* Select devices and cause damage */
-    for (l = 0; l < ncrit && 0 < NDEVICES; l++) {
+    for (loop1 = 0; loop1 < ncrit && 0 < NDEVICES; loop1++) {
 	do {
 	    j = NDEVICES*Rand();
 	    /* Cheat to prevent shuttle damage unless on ship */
 	} while 
 	      (game.damage[j]<0.0 || (j==DSHUTTL && game.iscraft!=1) || j==DDRAY);
-	cdam[l] = j;
+	cdam[loop1] = j;
 	extradm = (hit*game.damfac)/(ncrit*(75.0+25.0*Rand()));
 	game.damage[j] += extradm;
-	if (l > 0) {
-	    for (ll=2; ll<=l && j != cdam[ll-1]; ll++) ;
-	    if (ll<=l) continue;
+	if (loop1 > 0) {
+	    for (loop2=2; loop2<=loop1 && j != cdam[loop2-1]; loop2++) ;
+	    if (loop2<=loop1) continue;
 	    ktr += 1;
 	    if (ktr==3) skip(1);
 	    proutn(_(" and "));
@@ -473,14 +477,15 @@ static void fry(double hit)
     }
 }
 
-void attack(int torps_ok) 
+void attack(bool torps_ok) 
+/* bad guy attacks us */
 {
-    /* torps_ok == 0 forces use of phasers in an attack */
-    int percent, ihurt=0, l, i=0, iquad, itflag;
-    int atackd = 0, attempt = 0;
-    double hit;
-    double pfac, dustfac, hitmax=0.0, hittot=0.0, chgfac=1.0, r;
+    /* torps_ok == false forces use of phasers in an attack */
+    int percent, loop, iquad;
+    bool itflag, atackd = false, attempt = false, ihurt = false;
+    double hit, pfac, dustfac, hitmax=0.0, hittot=0.0, chgfac=1.0, r;
     coord jay;
+    enum loctype where = neither;
 
     game.iattak = 1;
     if (game.alldone) return;
@@ -492,21 +497,21 @@ void attack(int torps_ok)
 	game.neutz = 0;
 	return;
     }
-    if ((((game.comhere || game.ishere) && (game.justin == 0)) || game.skill == SKILL_EMERITUS)&&(torps_ok!=0)) movcom();
+    if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) movcom();
     if (game.nenhere==0 || (game.nenhere==1 && iqhere && iqengry==0)) return;
     pfac = 1.0/game.inshld;
     if (game.shldchg == 1) chgfac = 0.25+0.5*Rand();
     skip(1);
-    if (game.skill <= SKILL_FAIR) i = 2;
-    for_local_enemies(l) {
-	if (game.kpower[l] < 0) continue;	/* too weak to attack */
+    if (game.skill <= SKILL_FAIR) where = sector;
+    for_local_enemies(loop) {
+	if (game.kpower[loop] < 0) continue;	/* too weak to attack */
 	/* compute hit strength and diminsh shield power */
 	r = Rand();
 	/* Increase chance of photon torpedos if docked or enemy energy low */
 	if (game.condit == IHDOCKED) r *= 0.25;
-	if (game.kpower[l] < 500) r *= 0.25; 
-	jay.x = game.ks[l].x;
-	jay.y = game.ks[l].y;
+	if (game.kpower[loop] < 500) r *= 0.25; 
+	jay.x = game.ks[loop].x;
+	jay.y = game.ks[loop].y;
 	iquad = game.quad[jay.x][jay.y];
 	if (iquad==IHT || (iquad==IHQUEST && !iqengry)) continue;
 	itflag = (iquad == IHK && r > 0.0005) || !torps_ok ||
@@ -517,10 +522,10 @@ void attack(int torps_ok)
 	if (itflag) {
 	    /* Enemy uses phasers */
 	    if (game.condit == IHDOCKED) continue; /* Don't waste the effort! */
-	    attempt = 1; /* Attempt to attack */
+	    attempt = true; /* Attempt to attack */
 	    dustfac = 0.8+0.05*Rand();
-	    hit = game.kpower[l]*pow(dustfac,game.kavgd[l]);
-	    game.kpower[l] *= 0.75;
+	    hit = game.kpower[loop]*pow(dustfac,game.kavgd[loop]);
+	    game.kpower[loop] *= 0.75;
 	}
 	else { /* Enemy used photon torpedo */
 	    double course = 1.90985*atan2((double)game.sector.y-jay.y, (double)jay.x-game.sector.x);
@@ -528,12 +533,12 @@ void attack(int torps_ok)
 	    proutn(_("***TORPEDO INCOMING"));
 	    if (!damaged(DSRSENS)) {
 		proutn(_(" From "));
-		crmena(0, iquad, i, jay);
+		crmena(false, iquad, where, jay);
 	    }
-	    attempt = 1;
+	    attempt = true;
 	    prout("  ");
 	    r = (Rand()+Rand())*0.5 -0.5;
-	    r += 0.002*game.kpower[l]*r;
+	    r += 0.002*game.kpower[loop]*r;
 	    torpedo(course, r, jay.x, jay.y, &hit, 1, 1);
 	    if (KLINGREM==0) 
 		finish(FWON); /* Klingons did themselves in! */
@@ -546,7 +551,7 @@ void attack(int torps_ok)
 	    double absorb, hitsh, propor = pfac*game.shield*(game.condit==IHDOCKED ? 2.1 : 1.0);
 	    if(propor < 0.1) propor = 0.1;
 	    hitsh = propor*chgfac*hit+1.0;
-	    atackd=1;
+	    atackd = true;
 	    absorb = 0.8*hitsh;
 	    if (absorb > game.shield) absorb = game.shield;
 	    game.shield -= absorb;
@@ -555,10 +560,10 @@ void attack(int torps_ok)
 	    if (propor > 0.1 && hit < 0.005*game.energy) continue;
 	}
 	/* It's a hit -- print out hit size */
-	atackd = 1; /* We weren't going to check casualties, etc. if
+	atackd = true; /* We weren't going to check casualties, etc. if
 		       shields were down for some strange reason. This
 		       doesn't make any sense, so I've fixed it */
-	ihurt = 1;
+	ihurt = true;
 	proutn(_("%d unit hit"), (int)hit);
 	if ((damaged(DSRSENS) && itflag) || game.skill<=SKILL_FAIR) {
 	    proutn(_(" on the "));
@@ -566,7 +571,7 @@ void attack(int torps_ok)
 	}
 	if (!damaged(DSRSENS) && itflag) {
 	    proutn(_(" from "));
-	    crmena(0, iquad, i, jay);
+	    crmena(false, iquad, where, jay);
 	}
 	skip(1);
 	/* Decide if hit is critical */
@@ -582,11 +587,11 @@ void attack(int torps_ok)
 	finish(FBATTLE);
 	return;
     }
-    if (attempt == 0 && game.condit == IHDOCKED)
+    if (!attempt && game.condit == IHDOCKED)
 	prout(_("***Enemies decide against attacking your ship."));
-    if (atackd == 0) return;
+    if (!atackd) return;
     percent = 100.0*pfac*game.shield+0.5;
-    if (ihurt==0) {
+    if (!ihurt) {
 	/* Shields fully protect ship */
 	proutn(_("Enemy attack reduces shield strength to "));
     }
@@ -611,13 +616,14 @@ void attack(int torps_ok)
 	}
     }
     /* After attack, reset average distance to enemies */
-    for_local_enemies(l)
-	game.kavgd[l] = game.kdist[l];
+    for_local_enemies(loop)
+	game.kavgd[loop] = game.kdist[loop];
     sortkl();
     return;
 }
 		
-void deadkl(coord w, int type, int ixx, int iyy) 
+void deadkl(coord w, int type, int ixx, int iyy)
+/* kill a Klingon, Tholian, Romulan, or Thingy */
 {
     /* Added ixx and iyy allow enemy to "move" before dying */
     coord mv;
@@ -625,7 +631,7 @@ void deadkl(coord w, int type, int ixx, int iyy)
 
     mv.x = ixx; mv.y = iyy;
     skip(1);
-    crmena(1, type, 2, mv);
+    crmena(true, type, sector, mv);
     /* Decide what kind of enemy it is and update approriately */
     if (type == IHR) {
 	/* chalk up a Romulan */
@@ -721,6 +727,7 @@ static bool targetcheck(double x, double y, double *course)
 }
 
 void photon(void) 
+/* launch photon torpedo */
 {
     double targ[4][3], course[4];
     double r, dummy;
@@ -849,7 +856,8 @@ void photon(void)
 
 	
 
-static void overheat(double rpow) 
+static void overheat(double rpow)
+/* check for phasers overheating */
 {
     if (rpow > 1500) {
 	double chekbrn = (rpow-1500.)*0.00038;
@@ -861,6 +869,7 @@ static void overheat(double rpow)
 }
 
 static int checkshctrl(double rpow) 
+/* check shield control */
 {
     double hit;
     int icas;
@@ -905,6 +914,7 @@ static int checkshctrl(double rpow)
 	
 
 void phasers(void) 
+/* fire phasers */
 {
     double hits[21], rpow=0, extra, powrem, over, temp;
     int kz = 0, k=1, i, irec=0; /* Cheating inhibitor */
@@ -1120,7 +1130,7 @@ void phasers(void)
 		else proutn("??");
 		proutn(")  ");
 		proutn(_("units to fire at "));
-		crmena(0, ienm, 2, aim);
+		crmena(false, ienm, sector, aim);
 		proutn("-  ");
 		key = scan();
 	    }
@@ -1196,6 +1206,7 @@ void phasers(void)
 }
 
 void hittem(double *hits) 
+/* register a phaser hit on Klingons and Romulans */
 {
     double kp, kpow, wham, hit, dustfac, kpini;
     int nenhr2=game.nenhere, k=1, kk=1, ienm;
@@ -1222,7 +1233,7 @@ void hittem(double *hits)
 	    proutn(_("Very small hit on "));
 	ienm = game.quad[w.x][w.y];
 	if (ienm==IHQUEST) iqengry=1;
-	crmena(0,ienm,2,w);
+	crmena(false,ienm,sector,w);
 	skip(1);
 	if (kpow == 0) {
 	    deadkl(w, ienm, w.x, w.y);

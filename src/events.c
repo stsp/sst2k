@@ -46,7 +46,7 @@ static bool cancelrest(void)
     if (game.resting) {
 	skip(1);
 	proutn(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
-	if (ja()) {
+	if (ja() == true) {
 	    game.resting = false;
 	    game.optime = 0.0;
 	    return true;
@@ -562,7 +562,7 @@ void wait(void)
     if (delay <= 0.0) return;
     if (delay >= game.state.remtime || game.nenhere != 0) {
 	proutn(_("Are you sure? "));
-	if (ja() == 0) return;
+	if (ja() == false) return;
     }
 
     /* Alternate resting periods (events) with attacks */
@@ -615,7 +615,7 @@ void nova(int ix, int iy)
 
     /* handle initial nova */
     game.quad[ix][iy] = IHDOT;
-    crmena(1, IHSTAR, 2, nov);
+    crmena(false, IHSTAR, sector, nov);
     prout(_(" novas."));
     game.state.galaxy[game.quadrant.x][game.quadrant.y].stars--;
     game.state.starkl++;
@@ -654,14 +654,14 @@ void nova(int ix, int iy)
 			hits[top2][2]=scratch.y;
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1;
 			game.state.starkl++;
-			crmena(1, IHSTAR, 2, scratch);
+			crmena(true, IHSTAR, sector, scratch);
 			prout(_(" novas."));
 			game.quad[scratch.x][scratch.y] = IHDOT;
 			break;
 		    case IHP: /* Destroy planet */
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET;
 			game.state.nplankl++;
-			crmena(1, IHP, 2, scratch);
+			crmena(true, IHP, sector, scratch);
 			prout(_(" destroyed."));
 			DESTROY(&game.state.plnets[game.iplnet]);
 			game.iplnet = game.plnet.x = game.plnet.y = 0;
@@ -681,7 +681,7 @@ void nova(int ix, int iy)
 			game.base.x = game.base.y = 0;
 			game.state.basekl++;
 			newcnd();
-			crmena(1, IHB, 2, scratch);
+			crmena(true, IHB, sector, scratch);
 			prout(_(" destroyed."));
 			game.quad[scratch.x][scratch.y] = IHDOT;
 			break;
@@ -724,7 +724,7 @@ void nova(int ix, int iy)
 			}
 			newc.x = scratch.x + scratch.x - hits[mm][1];
 			newc.y = scratch.y + scratch.y - hits[mm][2];
-			crmena(1, iquad, 2, scratch);
+			crmena(true, iquad, sector, scratch);
 			proutn(_(" damaged"));
 			if (!VALID_SECTOR(newc.x, newc.y)) {
 			    /* can't leave quadrant */
@@ -734,7 +734,7 @@ void nova(int ix, int iy)
 			iquad1 = game.quad[newc.x][newc.y];
 			if (iquad1 == IHBLANK) {
 			    proutn(_(", blasted into "));
-			    crmena(0, IHBLANK, 2, newc);
+			    crmena(false, IHBLANK, sector, newc);
 			    skip(1);
 			    deadkl(scratch, iquad, newc.x, newc.y);
 			    break;
@@ -817,7 +817,7 @@ void snova(int insx, int insy)
 	    }
 	    if (idebug) {
 		proutn("=== Super nova here?");
-		if (ja()==1) {
+		if (ja() == true) {
 		    nq.x = game.quadrant.x;
 		    nq.y = game.quadrant.y;
 		}

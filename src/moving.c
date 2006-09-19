@@ -4,12 +4,14 @@
 
 static void getcd(bool, int);
 
-void imove(void) 
+void imove(void)
+/* movement execution for warp, impule, supernova, and tractor-beam events */
 {
     double angle, deltax, deltay, bigger, x, y,
         finald, finalx, finaly, stopegy, probf;
-    int trbeam = 0, n, l, kink, kinks, iquad;
+    int n, m, kink, kinks, iquad;
     coord w;
+    bool trbeam = 0;
 
     w.x = w.y = 0;
     if (game.inorbit) {
@@ -30,7 +32,7 @@ void imove(void)
 
     /* If tractor beam is to occur, don't move full distance */
     if (game.state.date+game.optime >= scheduled(FTBEAM)) {
-	trbeam = 1;
+	trbeam = true;
 	game.condit = IHRED;
 	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1;
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5;
@@ -42,7 +44,7 @@ void imove(void)
     n = 10.0*game.dist*bigger+0.5;
 
     if (n > 0) {
-	for (l = 1; l <= n; l++) {
+	for (m = 1; m <= n; m++) {
 	    w.x = (x += deltax) + 0.5;
 	    w.y = (y += deltay) + 0.5;
 	    if (!VALID_SECTOR(w.x, w.y)) {
@@ -50,10 +52,10 @@ void imove(void)
 		/* Don't do it if being pushed by Nova */
 		if (game.nenhere != 0 && game.iattak != 2) {
 		    newcnd();
-		    for_local_enemies(l) {
-			finald = sqrt((w.x-game.ks[l].x)*(double)(w.x-game.ks[l].x) +
-				      (w.y-game.ks[l].y)*(double)(w.y-game.ks[l].y));
-			game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
+		    for_local_enemies(m) {
+			finald = sqrt((w.x-game.ks[m].x)*(double)(w.x-game.ks[m].x) +
+				      (w.y-game.ks[m].y)*(double)(w.y-game.ks[m].y));
+			game.kavgd[m] = 0.5 * (finald+game.kdist[m]);
 		    }
 		    /*
 		     * Stas Sergeev added the game.condition
@@ -150,8 +152,8 @@ void imove(void)
 		     * possibility that you'll get timewarped instead.
 		     */
 		    n=0;
-		    for (l=0;l<NDEVICES;l++)
-			if (game.damage[l]>0) 
+		    for (m=0;m<NDEVICES;m++)
+			if (game.damage[m]>0) 
 			    n++;
 		    probf=pow(1.4,(game.energy+game.shield)/5000.0-1.0)*pow(1.3,1.0/(n+1)-1.0);
 		    if ((game.options & OPTION_BLKHOLE) && Rand()>probf) 
@@ -196,16 +198,16 @@ no_quad_change:
     /* No quadrant change -- compute new avg enemy distances */
     game.quad[game.sector.x][game.sector.y] = game.ship;
     if (game.nenhere) {
-	for_local_enemies(l) {
-	    finald = sqrt((w.x-game.ks[l].x)*(double)(w.x-game.ks[l].x) +
-			  (w.y-game.ks[l].y)*(double)(w.y-game.ks[l].y));
-	    game.kavgd[l] = 0.5 * (finald+game.kdist[l]);
-	    game.kdist[l] = finald;
+	for_local_enemies(m) {
+	    finald = sqrt((w.x-game.ks[m].x)*(double)(w.x-game.ks[m].x) +
+			  (w.y-game.ks[m].y)*(double)(w.y-game.ks[m].y));
+	    game.kavgd[m] = 0.5 * (finald+game.kdist[m]);
+	    game.kdist[m] = finald;
 	}
 	sortkl();
 	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova && game.iattak == 0)
 	    attack(0);
-	for_local_enemies(l) game.kavgd[l] = game.kdist[l];
+	for_local_enemies(m) game.kavgd[m] = game.kdist[m];
     }
     newcnd();
     game.iattak = 0;
@@ -215,6 +217,7 @@ no_quad_change:
 }
 
 void dock(bool verbose) 
+/* dock our ship at a starbase */
 {
     chew();
     if (game.condit == IHDOCKED && verbose) {
@@ -232,7 +235,7 @@ void dock(bool verbose)
     }
     game.condit = IHDOCKED;
     if (verbose) prout(_("Docked."));
-    game.ididit=1;
+    game.ididit=true;
     if (game.energy < game.inenrg) game.energy = game.inenrg;
     game.shield = game.inshld;
     game.torps = game.intorps;
@@ -247,198 +250,203 @@ void dock(bool verbose)
     }
 }
 
-static void getcd(bool isprobe, int akey) {
-	/* This program originally required input in terms of a (clock)
-	   direction and distance. Somewhere in history, it was changed to
-	   cartesian coordinates. So we need to convert. I think
-	   "manual" input should still be done this way -- it's a real
-	   pain if the computer isn't working! Manual mode is still confusing
-	   because it involves giving x and y motions, yet the coordinates
-	   are always displayed y - x, where +y is downward! */
+/* 
+ * This program originally required input in terms of a (clock)
+ * direction and distance. Somewhere in history, it was changed to
+ * cartesian coordinates. So we need to convert. I think
+ * "manual" input should still be done this way -- it's a real
+ * pain if the computer isn't working! Manual mode is still confusing
+ * because it involves giving x and y motions, yet the coordinates
+ * are always displayed y - x, where +y is downward!
+ */
 
+static void getcd(bool isprobe, int akey)
+/* get course and distance */
+{
+    int irowq=game.quadrant.x, icolq=game.quadrant.y, key=0;
+    double xi, xj, xk, xl;
+    double deltax, deltay;
+    enum {unspecified, manual, automatic} navmode = unspecified;
+    enum {curt, normal, verbose} itemp = curt;
+    coord incr;
+    bool iprompt = false;
+
+    /* Get course direction and distance. If user types bad values, return
+       with DIREC = -1.0. */
+
+    game.direc = -1.0;
 	
-        int irowq=game.quadrant.x, icolq=game.quadrant.y, itemp=0, iprompt=0, key=0;
-	double xi, xj, xk, xl;
-	double deltax, deltay;
-	int automatic = -1;
-	coord incr;
-
-	/* Get course direction and distance. If user types bad values, return
-	   with DIREC = -1.0. */
-
-	game.direc = -1.0;
-	
-	if (game.landed == 1 && !isprobe) {
-		prout(_("Dummy! You can't leave standard orbit until you"));
-		proutn(_("are back aboard the "));
-		crmshp();
-		prout(".");
-		chew();
-		return;
-	}
-	while (automatic == -1) {
-		if (damaged(DCOMPTR)) {
-			if (isprobe)
-				prout(_("Computer damaged; manual navigation only"));
-			else
-				prout(_("Computer damaged; manual movement only"));
-			chew();
-			automatic = 0;
-			key = IHEOL;
-			break;
-		}
-		if (isprobe && akey != -1) {
-			/* For probe launch, use pre-scaned value first time */
-			key = akey;
-			akey = -1;
-		}
-		else 
-			key = scan();
-
-		if (key == IHEOL) {
-			proutn(_("Manual or automatic- "));
-			iprompt = 1;
-			chew();
-		}
-		else if (key == IHALPHA) {
-			if (isit("manual")) {
-				automatic =0;
-				key = scan();
-				break;
-			}
-			else if (isit("automatic")) {
-				automatic = 1;
-				key = scan();
-				break;
-			}
-			else {
-				huh();
-				chew();
-				return;
-			}
-		}
-		else { /* numeric */
-			if (isprobe)
-				prout(_("(Manual navigation assumed.)"));
-			else
-				prout(_("(Manual movement assumed.)"));
-			automatic = 0;
-			break;
-		}
-	}
-
-	if (automatic) {
-		while (key == IHEOL) {
-			if (isprobe)
-				proutn(_("Target quadrant or quadrant&sector- "));
-			else
-				proutn(_("Destination sector or quadrant&sector- "));
-			chew();
-			iprompt = 1;
-			key = scan();
-		}
-
-		if (key != IHREAL) {
-			huh();
-			return;
-		}
-		xi = aaitem;
-		key = scan();
-		if (key != IHREAL){
-			huh();
-			return;
-		}
-		xj = aaitem;
-		key = scan();
-		if (key == IHREAL) {
-			/* both quadrant and sector specified */
-			xk = aaitem;
-			key = scan();
-			if (key != IHREAL) {
-				huh();
-				return;
-			}
-			xl = aaitem;
-
-			irowq = xi + 0.5;
-			icolq = xj + 0.5;
-			incr.y = xk + 0.5;
-			incr.x = xl + 0.5;
-		}
-		else {
-			if (isprobe) {
-				/* only quadrant specified -- go to center of dest quad */
-				irowq = xi + 0.5;
-				icolq = xj + 0.5;
-				incr.y = incr.x = 5;
-			}
-			else {
-				incr.y = xi + 0.5;
-				incr.x = xj + 0.5;
-			}
-			itemp = 1;
-		}
-		if (!VALID_QUADRANT(icolq,irowq)||!VALID_SECTOR(incr.x,incr.y)) {
-		    huh();
-		    return;
-		}
-		skip(1);
-		if (!isprobe) {
-			if (itemp) {
-				if (iprompt) {
-					prout(_("Helmsman Sulu- \"Course locked in for %s.\""),
-						cramlc(sector, incr));
-				}
-			}
-			else prout(_("Ensign Chekov- \"Course laid in, Captain.\""));
-		}
-		deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y);
-		deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y);
-	}
-	else { /* manual */
-		while (key == IHEOL) {
-			proutn(_("X and Y displacements- "));
-			chew();
-			iprompt = 1;
-			key = scan();
-		}
-		itemp = 2;
-		if (key != IHREAL) {
-			huh();
-			return;
-		}
-		deltax = aaitem;
-		key = scan();
-		if (key != IHREAL) {
-			huh();
-			return;
-		}
-		deltay = aaitem;
-	}
-	/* Check for zero movement */
-	if (deltax == 0 && deltay == 0) {
-		chew();
-		return;
-	}
-	if (itemp == 2 && !isprobe) {
-		skip(1);
-		prout(_("Helmsman Sulu- \"Aye, Sir.\""));
-	}
-	game.dist = sqrt(deltax*deltax + deltay*deltay);
-	game.direc = atan2(deltax, deltay)*1.90985932;
-	if (game.direc < 0.0) game.direc += 12.0;
+    if (game.landed == 1 && !isprobe) {
+	prout(_("Dummy! You can't leave standard orbit until you"));
+	proutn(_("are back aboard the "));
+	crmshp();
+	prout(".");
 	chew();
 	return;
+    }
+    while (navmode == unspecified) {
+	if (damaged(DCOMPTR)) {
+	    if (isprobe)
+		prout(_("Computer damaged; manual navigation only"));
+	    else
+		prout(_("Computer damaged; manual movement only"));
+	    chew();
+	    navmode = manual;
+	    key = IHEOL;
+	    break;
+	}
+	if (isprobe && akey != -1) {
+	    /* For probe launch, use pre-scanned value first time */
+	    key = akey;
+	    akey = -1;
+	}
+	else 
+	    key = scan();
 
+	if (key == IHEOL) {
+	    proutn(_("Manual or automatic- "));
+	    iprompt = true;
+	    chew();
+	}
+	else if (key == IHALPHA) {
+	    if (isit("manual")) {
+		navmode = manual;
+		key = scan();
+		break;
+	    }
+	    else if (isit("automatic")) {
+		navmode = automatic;
+		key = scan();
+		break;
+	    }
+	    else {
+		huh();
+		chew();
+		return;
+	    }
+	}
+	else { /* numeric */
+	    if (isprobe)
+		prout(_("(Manual navigation assumed.)"));
+	    else
+		prout(_("(Manual movement assumed.)"));
+	    navmode = automatic;
+	    break;
+	}
+    }
+
+    if (navmode == automatic) {
+	while (key == IHEOL) {
+	    if (isprobe)
+		proutn(_("Target quadrant or quadrant&sector- "));
+	    else
+		proutn(_("Destination sector or quadrant&sector- "));
+	    chew();
+	    iprompt = true;
+	    key = scan();
+	}
+
+	if (key != IHREAL) {
+	    huh();
+	    return;
+	}
+	xi = aaitem;
+	key = scan();
+	if (key != IHREAL){
+	    huh();
+	    return;
+	}
+	xj = aaitem;
+	key = scan();
+	if (key == IHREAL) {
+	    /* both quadrant and sector specified */
+	    xk = aaitem;
+	    key = scan();
+	    if (key != IHREAL) {
+		huh();
+		return;
+	    }
+	    xl = aaitem;
+
+	    irowq = xi + 0.5;
+	    icolq = xj + 0.5;
+	    incr.y = xk + 0.5;
+	    incr.x = xl + 0.5;
+	}
+	else {
+	    if (isprobe) {
+		/* only quadrant specified -- go to center of dest quad */
+		irowq = xi + 0.5;
+		icolq = xj + 0.5;
+		incr.y = incr.x = 5;
+	    }
+	    else {
+		incr.y = xi + 0.5;
+		incr.x = xj + 0.5;
+	    }
+	    itemp = normal;
+	}
+	if (!VALID_QUADRANT(icolq,irowq)||!VALID_SECTOR(incr.x,incr.y)) {
+	    huh();
+	    return;
+	}
+	skip(1);
+	if (!isprobe) {
+	    if (itemp > curt) {
+		if (iprompt) {
+		    prout(_("Helmsman Sulu- \"Course locked in for %s.\""),
+			  cramlc(sector, incr));
+		}
+	    }
+	    else prout(_("Ensign Chekov- \"Course laid in, Captain.\""));
+	}
+	deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y);
+	deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y);
+    }
+    else { /* manual */
+	while (key == IHEOL) {
+	    proutn(_("X and Y displacements- "));
+	    chew();
+	    iprompt = true;
+	    key = scan();
+	}
+	itemp = verbose;
+	if (key != IHREAL) {
+	    huh();
+	    return;
+	}
+	deltax = aaitem;
+	key = scan();
+	if (key != IHREAL) {
+	    huh();
+	    return;
+	}
+	deltay = aaitem;
+    }
+    /* Check for zero movement */
+    if (deltax == 0 && deltay == 0) {
+	chew();
+	return;
+    }
+    if (itemp == verbose && !isprobe) {
+	skip(1);
+	prout(_("Helmsman Sulu- \"Aye, Sir.\""));
+    }
+    game.dist = sqrt(deltax*deltax + deltay*deltay);
+    game.direc = atan2(deltax, deltay)*1.90985932;
+    if (game.direc < 0.0) game.direc += 12.0;
+    chew();
+    return;
 }
 		
 
 
 void impuls(void) 
+/* move under impulse power */
 {
     double power;
 
-    game.ididit = 0;
+    game.ididit = false;
     if (damaged(DIMPULS)) {
 	chew();
 	skip(1);
@@ -476,11 +484,11 @@ void impuls(void)
 	prout(_("First Officer Spock- \"Captain, our speed under impulse"));
 	prout(_("power is only 0.95 sectors per stardate. Are you sure"));
 	proutn(_("we dare spend the time?\" "));
-	if (ja() == 0) return;
+	if (ja() == false) return;
     }
     /* Activate impulse engines and pay the cost */
     imove();
-    game.ididit = 1;
+    game.ididit = true;
     if (game.alldone) return;
     power = 20.0 + 100.0*game.dist;
     game.energy -= power;
@@ -490,13 +498,15 @@ void impuls(void)
 }
 
 
-void warp(bool timewarp) 
+void warp(bool timewarp)
+/* move under warp drive */
 {
-    int blooey=0, twarp=0, iwarp;
+    int iwarp;
+    bool blooey = false, twarp = false;
     double power;
 
     if (!timewarp) { /* Not WARPX entry */
-	game.ididit = 0;
+	game.ididit = false;
 	if (game.damage[DWARPEN] > 10.0) {
 	    chew();
 	    skip(1);
@@ -521,7 +531,7 @@ void warp(bool timewarp)
 
 	if (power >= game.energy) {
 	    /* Insufficient power for trip */
-	    game.ididit = 0;
+	    game.ididit = false;
 	    skip(1);
 	    prout(_("Engineering to bridge--"));
 	    if (!game.shldup || 0.5*power > game.energy) {
@@ -553,7 +563,7 @@ void warp(bool timewarp)
 		   100.0*game.optime/game.state.remtime);
 	    prout(_(" percent of our"));
 	    proutn(_("  remaining time.  Are you sure this is wise?\" "));
-	    if (ja() == 0) { game.ididit = 0; game.optime=0; return;}
+	    if (ja() == false) { game.ididit = false; game.optime=0; return;}
 	}
     }
     /* Entry WARPX */
@@ -561,15 +571,15 @@ void warp(bool timewarp)
 	/* Decide if engine damage will occur */
 	double prob = game.dist*(6.0-game.warpfac)*(6.0-game.warpfac)/66.666666666;
 	if (prob > Rand()) {
-	    blooey = 1;
+	    blooey = true;
 	    game.dist = Rand()*game.dist;
 	}
 	/* Decide if time warp will occur */
-	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand()) twarp=1;
-	if (idebug && game.warpfac==10 && twarp==0) {
-	    blooey=0;
+	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand()) twarp = true;
+	if (idebug && game.warpfac==10 && !twarp) {
+	    blooey = false;
 	    proutn("=== Force time warp? ");
-	    if (ja()==1) twarp=1;
+	    if (ja() == true) twarp = true;
 	}
 	if (blooey || twarp) {
 	    /* If time warp or engine damage, check path */
@@ -596,8 +606,8 @@ void warp(bool timewarp)
 		iy = y +0.5;
 		if (!VALID_SECTOR(ix, iy)) break;
 		if (game.quad[ix][iy] != IHDOT) {
-		    blooey = 0;
-		    twarp = 0;
+		    blooey = false;
+		    twarp = false;
 		}
 	    }
 	}
@@ -618,13 +628,14 @@ void warp(bool timewarp)
 	prout(_("  Scott here.  The warp engines are damaged."));
 	prout(_("  We'll have to reduce speed to warp 4."));
     }
-    game.ididit = 1;
+    game.ididit = true;
     return;
 }
 
 
 
 void setwrp(void) 
+/* change the warp factor */
 {
     int key;
     double oldfac;
@@ -676,6 +687,7 @@ void setwrp(void)
 }
 
 void atover(bool igrab) 
+/* cope with being tossed out of quadrant by supernova or yanked by beam */
 {
     double power, distreq;
 
@@ -769,6 +781,7 @@ void atover(bool igrab)
 }
 
 void timwrp() 
+/* let's do the time warp again */
 {
     int l, gotit;
     prout(_("***TIME WARP ENTERED."));
@@ -829,6 +842,7 @@ void timwrp()
 }
 
 void probe(void) 
+/* launch deep-space probe */
 {
     double angle, bigger;
     int key;
@@ -865,7 +879,7 @@ void probe(void)
 	/* slow mode, so let Kirk know how many probes there are left */
 	prout(game.nprobes==1 ? _("%d probe left.") : _("%d probes left."), game.nprobes);
 	proutn(_("Are you sure you want to fire a probe? "));
-	if (ja()==0) return;
+	if (ja() == false) return;
     }
 
     game.isarmed = false;
@@ -896,15 +910,16 @@ void probe(void)
     game.probec = game.quadrant;
     schedule(FDSPROB, 0.01); // Time to move one sector
     prout(_("Ensign Chekov-  \"The deep space probe is launched, Captain.\""));
-    game.ididit = 1;
+    game.ididit = true;
     return;
 }
 
 void mayday(void) 
+/* yell for help from nearest starbase */
 {
     /* There's more than one way to move in this game! */
     double ddist, xdist, probf;
-    int line = 0, l, ix, iy;
+    int line = 0, m, ix, iy;
 
     chew();
     /* Test for game.conditions which prevent calling for help */
@@ -934,11 +949,11 @@ void mayday(void)
     }
     else {
 	ddist = FOREVER;
-	for_starbases(l) {
-	    xdist=10.0*sqrt(square(game.state.baseq[l].x-game.quadrant.x)+square(game.state.baseq[l].y-game.quadrant.y));
+	for_starbases(m) {
+	    xdist=10.0*sqrt(square(game.state.baseq[m].x-game.quadrant.x)+square(game.state.baseq[m].y-game.quadrant.y));
 	    if (xdist < ddist) {
 		ddist = xdist;
-		line = l;
+		line = m;
 	    }
 	}
 	/* Since starbase not in quadrant, set up new quadrant */
@@ -952,7 +967,7 @@ void mayday(void)
     crmshp();
     prout(_(" dematerializes."));
     game.sector.x=0;
-    for (l = 1; l <= 5; l++) {
+    for (m = 1; m <= 5; m++) {
 	ix = game.base.x+3.0*Rand()-1;
 	iy = game.base.y+3.0*Rand()-1;
 	if (VALID_SECTOR(ix,iy) && game.quad[ix][iy]==IHDOT) {
@@ -969,15 +984,15 @@ void mayday(void)
     }
     /* Give starbase three chances to rematerialize starship */
     probf = pow((1.0 - pow(0.98,ddist)), 0.33333333);
-    for (l = 1; l <= 3; l++) {
-	switch (l) {
+    for (m = 1; m <= 3; m++) {
+	switch (m) {
 	case 1: proutn(_("1st")); break;
 	case 2: proutn(_("2nd")); break;
 	case 3: proutn(_("3rd")); break;
 	}
 	proutn(_(" attempt to re-materialize "));
 	crmshp();
-	switch (l){
+	switch (m){
 	case 1: game.quad[ix][iy]=IHMATER0;
 	    break;
 	case 2: game.quad[ix][iy]=IHMATER1;
@@ -992,7 +1007,7 @@ void mayday(void)
 	delay(500);
 	textcolor(DEFAULT);
     }
-    if (l > 3) {
+    if (m > 3) {
 	game.quad[ix][iy]=IHQUEST;
 	game.alive = 0;
 	drawmaps(1);
@@ -1004,7 +1019,7 @@ void mayday(void)
     textcolor(GREEN);
     prout(_("succeeds."));
     textcolor(DEFAULT);
-    dock(0);
+    dock(false);
     skip(1);
     prout(_("Lt. Uhura-  \"Captain, we made it!\""));
 }

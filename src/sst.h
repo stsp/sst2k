@@ -328,7 +328,7 @@ enum loctype {neither, quadrant, sector};
 
 /* Function prototypes */
 void prelim(void);
-void attack(int);
+void attack(bool);
 bool choose(bool);
 void setup(bool);
 void score(void);
@@ -380,8 +380,8 @@ void dropin(int, coord*);
 void newcnd(void);
 void sortkl(void);
 void imove(void);
-void ram(int, int, coord);
-void crmena(int, int, int, coord w);
+void ram(bool, int, coord);
+void crmena(bool, int, enum loctype, coord w);
 void deadkl(coord, int, int, int);
 void timwrp(void);
 void movcom(void);

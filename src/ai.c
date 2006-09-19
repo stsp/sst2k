@@ -28,7 +28,7 @@ static bool tryexit(int lookx, int looky, int ienm, int loccom, int irun)
        We know this if either short or long range sensors are working */
     if (!damaged(DSRSENS) || !damaged(DLRSENS) ||
 	game.condit == IHDOCKED) {
-	crmena(1, ienm, 2, game.ks[loccom]);
+	crmena(1, ienm, sector, game.ks[loccom]);
 	prout(_(" escapes to %s (and regains strength)."),
 	      cramlc(quadrant, iq));
     }
@@ -507,7 +507,7 @@ void scom(bool *ipage)
 		   (int)scheduled(FSCDBAS));
 	    if (!game.resting) return;
 	    prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
-	    if (ja()==0) return;
+	    if (ja() == false) return;
 	    game.resting = false;
 	    game.optime = 0.0; /* actually finished */
 	    return;
@@ -588,7 +588,7 @@ void movetho(void)
     /* All plugged up -- Tholian splits */
     game.quad[game.tholian.x][game.tholian.y]=IHWEB;
     dropin(IHBLANK, &dummy);
-    crmena(1,IHT, 2, game.tholian);
+    crmena(true, IHT, sector, game.tholian);
     prout(_(" completes web."));
     game.ithere = game.tholian.x = game.tholian.y = 0;
     game.nenhere--;

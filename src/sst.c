@@ -656,7 +656,7 @@ int main(int argc, char **argv)
 
 	if (game.tourn && game.alldone) {
 	    proutn("Do you want your score recorded?");
-	    if (ja()) {
+	    if (ja() == true) {
 		chew2();
 		freeze(false);
 	    }
@@ -702,9 +702,9 @@ char *cramlc(enum loctype key, coord w)
     return buf;
 }
 
-void crmena(int i, int enemy, int key, coord w) 
+void crmena(bool stars, int enemy, enum loctype key, coord w) 
 {
-    if (i == 1) proutn("***");
+    if (stars) proutn("***");
     cramen(enemy);
     proutn(" at ");
     proutn(cramlc(key, w));
@@ -842,27 +842,27 @@ int isit(char *s)
 void debugme(void) 
 {
     proutn("Reset levels? ");
-    if (ja() != 0) {
+    if (ja() == true) {
 	if (game.energy < game.inenrg) game.energy = game.inenrg;
 	game.shield = game.inshld;
 	game.torps = game.intorps;
 	game.lsupres = game.inlsr;
     }
     proutn("Reset damage? ");
-    if (ja() != 0) {
+    if (ja() == true) {
 	int i;
 	for (i=0; i < NDEVICES; i++) 
 	    if (game.damage[i] > 0.0) 
 		game.damage[i] = 0.0;
     }
     proutn("Toggle debug flag? ");
-    if (ja() != 0) {
+    if (ja() == true) {
 	idebug = !idebug;
 	if (idebug) prout("Debug output ON");
 	else prout("Debug output OFF");
     }
     proutn("Cause selective damage? ");
-    if (ja() != 0) {
+    if (ja() == true) {
 	int i, key;
 	for (i=0; i < NDEVICES; i++) {
 	    proutn("Kill ");
@@ -876,7 +876,7 @@ void debugme(void)
 	}
     }
     proutn("Examine/change events? ");
-    if (ja() != 0) {
+    if (ja() == true) {
 	event *ev;
 	coord w;
 	int i;
@@ -938,7 +938,7 @@ void debugme(void)
 	chew();
     }
     proutn("Induce supernova here? ");
-    if (ja()) {
+    if (ja() == true) {
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = true;
 	atover(true);
     }

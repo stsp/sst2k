@@ -118,7 +118,7 @@ void beam(void)
 	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == 1)) {
 	    skip(1);
 	    proutn(_("Spock-  \"May I suggest the shuttle craft, Sir?\" "));
-	    if (ja() != 0) shuttle();
+	    if (ja() == true) shuttle();
 	}
 	return;
     }
@@ -141,7 +141,7 @@ void beam(void)
 	/* Coming from planet */
 	if (game.state.plnets[game.iplnet].known==shuttle_down) {
 	    proutn(_("Spock-  \"Wouldn't you rather take the Galileo?\" "));
-	    if (ja() != 0) {
+	    if (ja() == true) {
 		chew();
 		return;
 	    }
@@ -160,7 +160,7 @@ void beam(void)
 	    prout(_("Spock-  \"Captain, I fail to see the logic in"));
 	    prout(_("  exploring a planet with no dilithium crystals."));
 	    proutn(_("  Are you sure this is wise?\" "));
-	    if (ja()==0) {
+	    if (ja() == false) {
 		chew();
 		return;
 	    }
@@ -250,7 +250,7 @@ void usecrystals(void)
     prout(_("  raw dilithium crystals into the ship's power"));
     prout(_("  system may risk a severe explosion."));
     proutn(_("  Are you sure this is wise?\" "));
-    if (ja()==0) {
+    if (ja() == false) {
 	chew();
 	return;
     }
@@ -330,7 +330,7 @@ void shuttle(void)
 	       (int)(100*game.optime/game.state.remtime));
 	prout(_("remaining time."));
 	proutn(_("Are you sure this is wise?\" "));
-	if (ja()==0) {
+	if (ja() == false) {
 	    game.optime = 0.0;
 	    return;
 	}
@@ -341,7 +341,7 @@ void shuttle(void)
 	    /* Galileo on ship! */
 	    if (!damaged(DTRANSP)) {
 		proutn(_("Spock-  \"Would you rather use the transporter?\" "));
-		if (ja() != 0) {
+		if (ja() == true) {
 		    beam();
 		    return;
 		}
@@ -420,7 +420,7 @@ void deathray(void)
     prout(_("Spock-  \"Captain, the 'Experimental Death Ray'"));
     prout(_("  is highly unpredictible.  Considering the alternatives,"));
     proutn(_("  are you sure this is wise?\" "));
-    if (ja()==0) return;
+    if (ja() == false) return;
     prout(_("Spock-  \"Acknowledged.\""));
     skip(1);
     game.ididit=1;
