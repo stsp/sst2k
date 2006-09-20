@@ -274,12 +274,12 @@ void setup(bool needprompt)
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
 		    contflag = true;
 		    if (idebug)
-			prout(_("=== Abandoning base #%d at %d-%d"), i, w.x, w.y);
+			prout("=== Abandoning base #%d at %d-%d", i, w.x, w.y);
 		    break;
 		}
 		else if (distq < 6.0 * (BASEMAX+1-game.inbase)) {
 		    if (idebug)
-			prout(_("=== Saving base #%d, close to #%d"), i, j);
+			prout("=== Saving base #%d, close to #%d", i, j);
 		}
 	    }
 	} while (contflag);

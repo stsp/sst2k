@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sst 2.0\n"
 "Report-Msgid-Bugs-To: stsp\n"
-"POT-Creation-Date: 2006-09-20 20:41+0400\n"
+"POT-Creation-Date: 2006-09-20 20:51+0400\n"
 "PO-Revision-Date: 2006-09-15 11:01+0400\n"
 "Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -2803,6 +2803,10 @@ msgstr "На такой скорости летать рисковано, Кап
 msgid "The starbase there will be destroyed by then."
 msgstr "База к тому моменту уже будет уничтожена."
 
+#: src/reports.c:594
+msgid "Direction? "
+msgstr ""
+
 #: src/setup.c:15
 msgid "-SUPER- STAR TREK"
 msgstr "-СУПЕР- ЗВЁЗДНЫЙ ПУТЬ"
@@ -3051,16 +3055,6 @@ msgstr "Луч Смерти"
 msgid "D. S. Probe"
 msgstr "Д. К. Ракета"
 
-#: src/setup.c:277
-#, c-format
-msgid "=== Abandoning base #%d at %d-%d"
-msgstr ""
-
-#: src/setup.c:282
-#, c-format
-msgid "=== Saving base #%d, close to #%d"
-msgstr ""
-
 #: src/setup.c:374
 #, c-format
 msgid "It is stardate %d. The Federation is being attacked by"
@@ -3190,129 +3184,126 @@ msgstr "    Пожалуйста посмотрите результаты бл�
 msgid "Please type in a secret password-"
 msgstr "Пожалуйста наберите пароль-"
 
-#: src/sst.c:288
+#: src/sst.c:292
 msgid "LEGAL COMMANDS ARE:"
 msgstr "ВОЗМОЖНЫЕ КОМАНДЫ:"
 
-#: src/sst.c:313
+#: src/sst.c:317
 msgid "Help on what command? "
 msgstr "Справка на какую команду? "
 
-#: src/sst.c:343
+#: src/sst.c:347
 msgid "Spock-  \"Captain, that information is missing from the"
 msgstr "Спок- \"Капитан, такой информации нет в"
 
-#: src/sst.c:344
+#: src/sst.c:348
 msgid "   computer. You need to find "
 msgstr "   компьютере. Вам надо найти "
 
-#: src/sst.c:346
+#: src/sst.c:350
 msgid " and put it in the"
 msgstr "и поместить его в"
 
-#: src/sst.c:347
+#: src/sst.c:351
 msgid "   current directory or to "
 msgstr "   текущий каталог или в "
 
-#: src/sst.c:358
+#: src/sst.c:362
 msgid "Spock- \"Captain, there is no information on that command.\""
 msgstr "Спок- \"Капитан, на эту команду нет информации.\""
 
-#: src/sst.c:372
+#: src/sst.c:376
 msgid "Spock- \"Captain, I've found the following information:\""
 msgstr "Спок- \"Капитан, я нашёл кое-какую информацию:\""
 
-#: src/sst.c:543
+#: src/sst.c:547
 msgid "WARNING--Saved games produce no plaques!"
 msgstr "ПРЕДУПРЕЖДЕНИЕ--Сохранённые игры не дают грамоты!"
 
-#: src/sst.c:661
+#: src/sst.c:670
 msgid "Do you want your score recorded?"
 msgstr "Хотите записать свой счёт? "
 
-#: src/sst.c:667
+#: src/sst.c:676
 msgid "Do you want to play again? "
 msgstr "Хотите сыграть снова? "
 
-#: src/sst.c:671
+#: src/sst.c:680
 msgid "May the Great Bird of the Galaxy roost upon your home planet."
 msgstr "И пусть Великая Птица Галактики нагадит на твою планету."
 
-#: src/sst.c:683
+#: src/sst.c:692
 msgid "Romulan"
 msgstr "Ромулан"
 
-#: src/sst.c:684
+#: src/sst.c:693
 msgid "Klingon"
 msgstr "Клингон"
 
-#: src/sst.c:685
+#: src/sst.c:694
 msgid "Commander"
 msgstr "Командир"
 
-#: src/sst.c:686
+#: src/sst.c:695
 msgid "Super-commander"
 msgstr "Глав-ком"
 
-#: src/sst.c:687
+#: src/sst.c:696
 msgid "Star"
 msgstr "Звезда"
 
-#: src/sst.c:688
+#: src/sst.c:697
 msgid "Planet"
 msgstr "Планета"
 
-#: src/sst.c:689
+#: src/sst.c:698
 msgid "Starbase"
 msgstr "База"
 
-#: src/sst.c:690
+#: src/sst.c:699
 msgid "Black hole"
 msgstr "Чёрная дыра"
 
-#: src/sst.c:691
+#: src/sst.c:700
 msgid "Tholian"
 msgstr "Толиан"
 
-#: src/sst.c:692
+#: src/sst.c:701
 msgid "Tholian web"
 msgstr "Толианская сеть"
 
-#: src/sst.c:693
+#: src/sst.c:702
 msgid "Stranger"
 msgstr "Странник"
 
-#: src/sst.c:694
+#: src/sst.c:703
 msgid "Inhabited World"
 msgstr "Обитаемый Мир"
 
-#: src/sst.c:705
+#: src/sst.c:714
 msgid "Quadrant "
 msgstr "Квадрант "
 
-#: src/sst.c:706
+#: src/sst.c:715
 msgid "Sector "
 msgstr "Сектор "
 
-#: src/sst.c:716
+#: src/sst.c:725
 msgid " at "
 msgstr " в "
 
-#: src/sst.c:725
+#: src/sst.c:734
 msgid "Enterprise"
 msgstr "Энтерпрайз"
 
-#: src/sst.c:726
+#: src/sst.c:735
 msgid "Faerie Queene"
 msgstr "Волшебная Королева"
 
-#: src/sst.c:835
+#: src/sst.c:844
 msgid "Please answer with \"y\" or \"n\": "
 msgstr "Пожалуйста отвечайте Да (\"y\") или Нет (\"n\"): "
 
-#: src/sst.c:844
+#: src/sst.c:853
 msgid "Beg your pardon, Captain?"
 msgstr "Прошу прощения, Капитан?"
-
-#~ msgid "You must be aboard the ship."
-#~ msgstr "Вы должны быть на борту карабля."
