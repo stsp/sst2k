@@ -544,7 +544,6 @@ void attack(bool torps_ok)
     coord jay;
     enum loctype where = neither;
 
-    game.iattak = 1;
     if (game.alldone) return;
     if (idebug) prout("=== ATTACK!");
 

@@ -4,8 +4,8 @@
 
 static void getcd(bool, int);
 
-void imove(void)
-/* movement execution for warp, impule, supernova, and tractor-beam events */
+void imove(bool novapush)
+/* movement execution for warp, impulse, supernova, and tractor-beam events */
 {
     double angle, deltax, deltay, bigger, x, y,
         finald, stopegy, probf;
@@ -51,7 +51,7 @@ void imove(void)
 	    if (!VALID_SECTOR(w.x, w.y)) {
 		/* Leaving quadrant -- allow final enemy attack */
 		/* Don't do it if being pushed by Nova */
-		if (game.nenhere != 0 && game.iattak != 2) {
+		if (game.nenhere != 0 && !novapush) {
 		    newcnd();
 		    for_local_enemies(m) {
 			finald = distance(w, game.ks[m]);
@@ -197,12 +197,11 @@ no_quad_change:
 	    game.kdist[m] = finald;
 	}
 	sortkl();
-	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova && game.iattak == 0)
+	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 	    attack(false);
 	for_local_enemies(m) game.kavgd[m] = game.kdist[m];
     }
     newcnd();
-    game.iattak = 0;
     drawmaps(0);
     setwnd(message_window);
     return;
@@ -477,7 +476,7 @@ void impuls(void)
 	if (ja() == false) return;
     }
     /* Activate impulse engines and pay the cost */
-    imove();
+    imove(false);
     game.ididit = true;
     if (game.alldone) return;
     power = 20.0 + 100.0*game.dist;
@@ -605,7 +604,7 @@ void warp(bool timewarp)
 				
 
     /* Activate Warp Engines and pay the cost */
-    imove();
+    imove(false);
     if (game.alldone) return;
     game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1);
     if (game.energy <= 0) finish(FNRG);

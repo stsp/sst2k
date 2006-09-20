@@ -286,7 +286,6 @@ struct game {
 	nenhere,	// number of enemies in quadrant
 	irhere,		// Romulans in quadrant
 	isatb,		// =1 if super commander is attacking base
-	iattak,		// attack recursion elimination (was cracks[4])
 	tourn,		// tournament number
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available
@@ -400,7 +399,7 @@ coord randplace(int);
 coord dropin(feature);
 void newcnd(void);
 void sortkl(void);
-void imove(void);
+void imove(bool);
 void ram(bool, feature, coord);
 void crmena(bool, feature, enum loctype, coord w);
 void deadkl(coord, feature, coord);

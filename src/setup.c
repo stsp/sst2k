@@ -560,7 +560,6 @@ void newqad(bool shutup)
     coord w;
     struct quadrant *q;
 
-    game.iattak = 1;
     game.justin = true;
     game.base.x = game.base.y = 0;
     game.klhere = 0;

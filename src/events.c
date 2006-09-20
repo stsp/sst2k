@@ -784,8 +784,7 @@ void nova(coord nov)
     game.optime = 10.0*game.dist/16.0;
     skip(1);
     prout(_("Force of nova displaces starship."));
-    game.iattak=2;	/* Eliminates recursion problem */
-    imove();
+    imove(true);
     game.optime = 10.0*game.dist/16.0;
     return;
 }
