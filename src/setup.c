@@ -607,7 +607,7 @@ void newqad(bool shutup)
     game.justin = true;
     game.base.x = game.base.y = 0;
     game.klhere = 0;
-    game.comhere = 0;
+    game.comhere = false;
     game.plnet.x = game.plnet.y = 0;
     game.ishere = false;
     game.irhere = 0;
@@ -620,7 +620,7 @@ void newqad(bool shutup)
     game.ithere = false;
     iqhere = false;
     iqengry = false;
-    game.iseenit = 0;
+    game.iseenit = false;
     if (game.iscate) {
 	// Attempt to escape Super-commander, so tbeam back!
 	game.iscate = 0;
@@ -654,7 +654,7 @@ void newqad(bool shutup)
 	if (i <= game.state.remcom) {
 	    game.quad[w.x][w.y] = IHC;
 	    game.kpower[game.klhere] = 950.0+400.0*Rand()+50.0*game.skill;
-	    game.comhere = 1;
+	    game.comhere = true;
 	}
 
 	// If we need a super-commander, promote a Klingon
@@ -692,7 +692,7 @@ void newqad(bool shutup)
 
     // Check for RNZ
     if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.plnets[q->planet].inhabited == UNINHABITED)) {
-	game.neutz = 1;
+	game.neutz = true;
 	if (!damaged(DRADIO)) {
 	    skip(1);
 	    prout("LT. Uhura- \"Captain, an urgent message.");
@@ -735,8 +735,7 @@ void newqad(bool shutup)
 	    game.quad[game.tholian.x][game.tholian.y] = IHT;
 	    game.ithere = true;
 	    game.nenhere++;
-	    game.ks[game.nenhere].x = game.tholian.x;
-	    game.ks[game.nenhere].y = game.tholian.y;
+	    game.ks[game.nenhere] = game.tholian;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
 		distance(game.sector, game.tholian);
 	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill;

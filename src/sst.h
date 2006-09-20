@@ -212,6 +212,7 @@ struct game {
 	alive,		// we are alive (not killed)
 	justin,		// just entered quadrant
 	shldup,		// shields are up
+	comhere,	// commander here
 	ishere,		// super-commander in quadrant
 	ientesc,	// attempted escape from supercommander
 	ithere,		// Tholian is here 
@@ -223,6 +224,7 @@ struct game {
 	inorbit,	// orbiting a planet
 	imine,		// mining
 	icrystl,	// dilithium crystals aboard
+	iseenit,	// seen base attack report
 	thawed;		// thawed game
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
@@ -238,7 +240,6 @@ struct game {
 	length,		// length of game
 	skill,		// skill level
 	klhere,		// klingons here
-	comhere,	// commanders here
 	casual,		// causalties
 	nhelp,		// calls for help
 	nkinks,		// count of energy-barrier crossings
@@ -253,7 +254,6 @@ struct game {
 	iscate,		// super commander is here
 	iattak,		// attack recursion elimination (was cracks[4])
 	tourn,		// tournament number
-	iseenit,	// seen base attack report
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available
     double inresor,	// initial resources

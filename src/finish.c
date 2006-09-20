@@ -142,7 +142,7 @@ void finish(FINTYPE ifin)
 			proutn(_("Do you want your Commodore Emeritus Citation printed? "));
 			chew();
 			if (ja() == true) {
-			    igotit = 1;
+			    igotit = true;
 			}
 		    }
 		}
@@ -152,7 +152,7 @@ void finish(FINTYPE ifin)
 	    prout(_("LIVE LONG AND PROSPER."));
 	}
 	score();
-	if (igotit != 0) plaque();
+	if (igotit) plaque();
 	return;
     case FDEPLETE: // Federation Resources Depleted
 	prout(_("Your time has run out and the Federation has been"));

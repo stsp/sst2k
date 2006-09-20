@@ -390,7 +390,6 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    if (h1 >= 600) {
 		game.quad[w.x][w.y] = IHDOT;
 		game.ithere = false;
-		game.tholian.x = game.tholian.y = 0;
 		deadkl(w, iquad, w);
 		return;
 	    }
@@ -403,7 +402,6 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    prout(_(" disappears."));
 	    game.quad[w.x][w.y] = IHWEB;
 	    game.ithere = false;
-	    game.tholian.x = game.tholian.y = 0;
 	    game.nenhere--;
 	    dropin(IHBLANK);
 	    return;
@@ -488,7 +486,7 @@ void attack(bool torps_ok)
     if (game.ithere) movetho();
 
     if (game.neutz) { /* The one chance not to be attacked */
-	game.neutz = 0;
+	game.neutz = false;
 	return;
     }
     if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) movcom();
@@ -645,7 +643,7 @@ void deadkl(coord w, int type, coord mv)
 	game.klhere--;
 	switch (type) {
 	case IHC:
-	    game.comhere = 0;
+	    game.comhere = false;
 	    for_commanders (i)
 		if (game.state.kcmdr[i].x==game.quadrant.x && game.state.kcmdr[i].y==game.quadrant.y) break;
 	    game.state.kcmdr[i] = game.state.kcmdr[game.state.remcom];

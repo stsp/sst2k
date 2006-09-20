@@ -75,7 +75,7 @@ void report(void)
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
 	attakreport(false);
-	game.iseenit = 1;
+	game.iseenit = true;
     }
     if (game.casual) prout(_("%d casualt%s suffered so far."),
 		      game.casual, game.casual==1? "y" : "ies");

@@ -141,9 +141,9 @@ void events(void)
 	    prout(_("Lt. Uhura- \"Captain, the sub-space radio is working and"));
 	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
-	    if (game.iseenit==0) {
+	    if (!game.iseenit) {
 		attakreport(false);
-		game.iseenit = 1;
+		game.iseenit = true;
 	    }
 	    rechart();
 	    prout(_("   The star chart is now up to date.\""));
@@ -283,10 +283,10 @@ void events(void)
 	    if (game.isatb) /* extra time if SC already attacking */
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date);
 	    game.future[FBATTAK].date = game.future[FCDBAS].date + expran(0.3*game.intime);
-	    game.iseenit = 0;
+	    game.iseenit = false;
 	    if (!damaged(DRADIO) && game.condit != IHDOCKED) 
 		break; /* No warning :-( */
-	    game.iseenit = 1;
+	    game.iseenit = true;
 	    if (!ipage) pause_game(1);
 	    ipage = true;
 	    skip(1);

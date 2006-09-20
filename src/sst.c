@@ -403,7 +403,7 @@ static void makemoves(void)
 	drawmaps(1);
 	for(;;)  { /* get a command */
 	    hitme = false;
-	    game.justin = 0;
+	    game.justin = false;
 	    game.optime = 0.0;
 	    i = -1;
 	    chew();

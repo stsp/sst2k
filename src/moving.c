@@ -233,11 +233,11 @@ void dock(bool verbose)
     game.lsupres = game.inlsr;
     game.state.crew = FULLCREW;
     if (!damaged(DRADIO) &&
-	(is_scheduled(FCDBAS) || game.isatb == 1) && game.iseenit == 0) {
+	(is_scheduled(FCDBAS) || game.isatb == 1) && !game.iseenit) {
 	/* get attack report from base */
 	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""));
 	attakreport(false);
-	game.iseenit = 1;
+	game.iseenit = true;
     }
 }
 
@@ -774,7 +774,8 @@ void atover(bool igrab)
 void timwrp() 
 /* let's do the time warp again */
 {
-    int l, gotit;
+    int l;
+    bool gotit;
     prout(_("***TIME WARP ENTERED."));
     if (game.state.snap && Rand() < 0.5) {
 	/* Go back in time */
@@ -798,10 +799,10 @@ void timwrp()
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
 	   when on planet, which would give us two Galileos! */
-	gotit = 0;
+	gotit = false;
 	for (l = 0; l < game.inplan; l++) {
 	    if (game.state.plnets[l].known == shuttle_down) {
-		gotit = 1;
+		gotit = true;
 		if (game.iscraft==1 && game.ship==IHE) {
 		    prout(_("Checkov-  \"Security reports the Galileo has disappeared, Sir!"));
 		    game.iscraft = 0;
@@ -810,7 +811,7 @@ void timwrp()
 	}
 	/* Likewise, if in the original time the Galileo was abandoned, but
 	   was on ship earlier, it would have vanished -- lets restore it */
-	if (game.iscraft==0 && gotit==0 && game.damage[DSHUTTL] >= 0.0) {
+	if (game.iscraft==0 && !gotit && game.damage[DSHUTTL] >= 0.0) {
 	    prout(_("Checkov-  \"Security reports the Galileo has reappeared in the dock!\""));
 	    game.iscraft = 1;
 	}
