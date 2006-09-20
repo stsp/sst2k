@@ -19,12 +19,12 @@ static void outro(void)
 /* wrap up, either normally or due to signal */
 {
     if (game.options & OPTION_CURSES) {
-	clear();
-	curs_set(1);
-	(void)refresh();
-	(void)resetterm();
-	//(void)echo();
-	(void)endwin();
+	//clear();
+	//curs_set(1);
+	//refresh();
+	//resetterm();
+	//echo();
+	endwin();
 	putchar('\n');
     }
     if (logfp)

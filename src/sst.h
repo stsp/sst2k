@@ -316,6 +316,7 @@ extern struct game game;
 
 /* the following global state doesn't need to be saved */
 extern char *device[NDEVICES];
+extern char *systnames[NINHAB + 1];
 extern int iscore, iskill; // Common PLAQ
 extern double perdate;
 extern double aaitem;
@@ -436,7 +437,6 @@ void setpassword(void);
 void commandhook(char *, bool);
 void makechart(void);
 void enqueue(char *);
-char *systemname(int);
 coord newkling(int);
 #if BSD_BUG_FOR_BUG
 void visual(void);

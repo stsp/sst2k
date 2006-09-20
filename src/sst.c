@@ -189,23 +189,8 @@ int seed;		// the random-number seed
 bool idebug;		// debug mode
 FILE *logfp, *replayfp;
 
-char *device[NDEVICES] = {
-	"S. R. Sensors",
-	"L. R. Sensors",
-	"Phasers",
-	"Photon Tubes",
-	"Life Support",
-	"Warp Engines",
-	"Impulse Engines",
-	"Shields",
-	"Subspace Radio",
-	"Shuttle Craft",
-	"Computer",
-	"Navigation System",
-	"Transporter",
-	"Shield Control",
-	"Death Ray",
-	"D. S. Probe"};									
+char *systnames[NINHAB + 1];
+char *device[NDEVICES];
 
 static struct 
 {
@@ -304,7 +289,7 @@ static void listCommands(void)
 /* generate a list of legal commands */
 {
     int i, k = 0;
-    proutn("LEGAL COMMANDS ARE:");
+    proutn(_("LEGAL COMMANDS ARE:"));
     for (i = 0; i < NUMCOMMANDS; i++) {
 	if (!ACCEPT(i))
 	    continue;
@@ -329,7 +314,7 @@ static void helpme(void)
     for(;;) {
 	if (key == IHEOL) {
 	    setwnd(prompt_window);
-	    proutn("Help on what command? ");
+	    proutn(_("Help on what command? "));
 	    key = scan();
 	}
 	setwnd(message_window);
@@ -342,7 +327,6 @@ static void helpme(void)
 	}
 	if (i != NUMCOMMANDS) break;
 	skip(1);
-	prout("Valid commands:");
 	listCommands();
 	key = IHEOL;
 	chew();
@@ -360,9 +344,13 @@ static void helpme(void)
     if (fp == NULL)
         fp = fopen(DOC_NAME, "r");
     if (fp == NULL) {
-	prout("Spock-  \"Captain, that information is missing from the");
-        prout("   computer. You need to find "DOC_NAME" and put it in the");
-        prout("   current directory or to "SSTDOC".\"");
+	prout(_("Spock-  \"Captain, that information is missing from the"));
+        proutn(_("   computer. You need to find "));
+        proutn(DOC_NAME);
+        prout(_(" and put it in the"));
+        proutn(_("   current directory or to "));
+        proutn(SSTDOC);
+        prout(".\"");
 	/*
 	 * This used to continue: "You need to find SST.DOC and put 
 	 * it in the current directory."
@@ -371,7 +359,7 @@ static void helpme(void)
     }
     for (;;) {
 	if (fgets(linebuf, sizeof(linebuf), fp) == NULL) {
-	    prout("Spock- \"Captain, there is no information on that command.\"");
+	    prout(_("Spock- \"Captain, there is no information on that command.\""));
 	    fclose(fp);
 	    return;
 	}
@@ -385,13 +373,16 @@ static void helpme(void)
     }
 
     skip(1);
-    prout("Spock- \"Captain, I've found the following information:\"");
+    prout(_("Spock- \"Captain, I've found the following information:\""));
     skip(1);
 
-    while (fgets(linebuf, sizeof(linebuf),fp)) {
+    while (fgets(linebuf, sizeof(linebuf), fp)) {
+	char *eol;
 	if (strstr(linebuf, "******"))
 	    break;
-	proutn(linebuf);
+	if ((eol = strpbrk(linebuf, "\r\n")))
+	    *eol = 0;
+	prout(linebuf);
     }
     fclose(fp);
 }
@@ -399,6 +390,7 @@ static void helpme(void)
 void enqueue(char *s)
 /* enqueue input for the command parser */
 {
+    chew();
     strcpy(line, s);
 }
 
@@ -552,7 +544,7 @@ static void makemoves(void)
 	    freeze(false);
 	    clrscr();
 	    if (game.skill > SKILL_GOOD)
-		prout("WARNING--Saved games produce no plaques!");
+		prout(_("WARNING--Saved games produce no plaques!"));
 	    break;
 	case DEATHRAY:			// Try a desparation measure
 	    deathray();
@@ -675,17 +667,17 @@ int main(int argc, char **argv)
 	skip(1);
 
 	if (game.tourn && game.alldone) {
-	    proutn("Do you want your score recorded?");
+	    proutn(_("Do you want your score recorded?"));
 	    if (ja() == true) {
 		chew2();
 		freeze(false);
 	    }
 	}
-	proutn("Do you want to play again? ");
+	proutn(_("Do you want to play again? "));
 	if (!ja()) break;
     }
     skip(1);
-    prout("May the Great Bird of the Galaxy roost upon your home planet.");
+    prout(_("May the Great Bird of the Galaxy roost upon your home planet."));
     return 0;
 }
 
@@ -697,17 +689,18 @@ void cramen(feature i)
     char *s;
 	
     switch (i) {
-    case IHR: s = "Romulan"; break;
-    case IHK: s = "Klingon"; break;
-    case IHC: s = "Commander"; break;
-    case IHS: s = "Super-commander"; break;
-    case IHSTAR: s = "Star"; break;
-    case IHP: s = "Planet"; break;
-    case IHB: s = "Starbase"; break;
-    case IHBLANK: s = "Black hole"; break;
-    case IHT: s = "Tholian"; break;
-    case IHWEB: s = "Tholian web"; break;
-    case IHQUEST: s = "Stranger"; break;
+    case IHR: s = _("Romulan"); break;
+    case IHK: s = _("Klingon"); break;
+    case IHC: s = _("Commander"); break;
+    case IHS: s = _("Super-commander"); break;
+    case IHSTAR: s = _("Star"); break;
+    case IHP: s = _("Planet"); break;
+    case IHB: s = _("Starbase"); break;
+    case IHBLANK: s = _("Black hole"); break;
+    case IHT: s = _("Tholian"); break;
+    case IHWEB: s = _("Tholian web"); break;
+    case IHQUEST: s = _("Stranger"); break;
+    case IHW: s = _("Inhabited World"); break;
     default: s = "Unknown??"; break;
     }
     proutn(s);
@@ -718,8 +711,8 @@ char *cramlc(enum loctype key, coord w)
 {
     static char buf[32];
     buf[0] = '\0';
-    if (key == quadrant) strcpy(buf, "Quadrant ");
-    else if (key == sector) strcpy(buf, "Sector ");
+    if (key == quadrant) strcpy(buf, _("Quadrant "));
+    else if (key == sector) strcpy(buf, _("Sector "));
     sprintf(buf+strlen(buf), "%d - %d", w.x, w.y);
     return buf;
 }
@@ -729,7 +722,7 @@ void crmena(bool stars, feature enemy, enum loctype key, coord w)
 {
     if (stars) proutn("***");
     cramen(enemy);
-    proutn(" at ");
+    proutn(_(" at "));
     proutn(cramlc(key, w));
 }
 
@@ -738,8 +731,8 @@ void crmshp(void)
 {
     char *s;
     switch (game.ship) {
-    case IHE: s = "Enterprise"; break;
-    case IHF: s = "Faerie Queene"; break;
+    case IHE: s = _("Enterprise"); break;
+    case IHF: s = _("Faerie Queene"); break;
     default:  s = "Ship???"; break;
     }
     proutn(s);
@@ -848,7 +841,7 @@ bool ja(void)
 	chew();
 	if (*citem == 'y') return true;
 	if (*citem == 'n') return false;
-	proutn("Please answer with \"Y\" or \"N\": ");
+	proutn(_("Please answer with \"y\" or \"n\": "));
     }
 }
 
@@ -857,7 +850,7 @@ void huh(void)
 {
     chew();
     skip(1);
-    prout("Beg your pardon, Captain?");
+    prout(_("Beg your pardon, Captain?"));
 }
 
 bool isit(char *s) 

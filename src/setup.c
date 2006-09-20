@@ -12,10 +12,10 @@ void prelim(void)
 /* issue a historically correct banner */
 {
     skip(2);
-    prout("-SUPER- STAR TREK");
+    prout(_("-SUPER- STAR TREK"));
     skip(1);
 #ifdef __HISTORICAL__
-    prout("Latest update-21 Sept 78");
+    prout(_("Latest update-21 Sept 78"));
     skip(1);
 #endif /* __HISTORICAL__ */
 }
@@ -63,7 +63,7 @@ bool thaw(void)
 
     game.passwd[0] = '\0';
     if ((key = scan()) == IHEOL) {
-	proutn("File name: ");
+	proutn(_("File name: "));
 	key = scan();
     }
     if (key != IHALPHA) {
@@ -75,14 +75,15 @@ bool thaw(void)
 	strcat(citem, ".trk");
     }
     if ((fp = fopen(citem, "rb")) == NULL) {
-	proutn("Can't find game file ");
+	proutn(_("Can't find game file "));
 	proutn(citem);
 	skip(1);
 	return 1;
     }
     fread(&game, sizeof(game), 1, fp);
     if (feof(fp) || ftell(fp) != filelength(fileno(fp)) || strcmp(game.magic, SSTMAGIC)) {
-	prout("Game file format is bad, should begin with " SSTMAGIC);
+	proutn(_("Game file format is bad, should begin with "));
+	prout(SSTMAGIC);
 	skip(1);
 	fclose(fp);
 	return 1;
@@ -93,138 +94,92 @@ bool thaw(void)
     return false;
 }
 
-/*
-**  Abandon Ship
-**
-**	The ship is abandoned.  If your current ship is the Faire
-**	Queene, or if your shuttlecraft is dead, you're out of
-**	luck.  You need the shuttlecraft in order for the captain
-**	(that's you!!) to escape.
-**
-**	Your crew can beam to an inhabited starsystem in the
-**	quadrant, if there is one and if the transporter is working.
-**	If there is no inhabited starsystem, or if the transporter
-**	is out, they are left to die in outer space.
-**
-**	If there are no starbases left, you are captured by the
-**	Klingons, who torture you mercilessly.  However, if there
-**	is at least one starbase, you are returned to the
-**	Federation in a prisoner of war exchange.  Of course, this
-**	can't happen unless you have taken some prisoners.
-**
-*/
+#define SYSTEM_NAMES \
+    { \
+	/* \
+	 * I used <http://www.memory-alpha.org> to find planets \
+	 * with references in ST:TOS.  Eath and the Alpha Centauri \
+	 * Colony have been omitted. \
+ 	 * \
+	 * Some planets marked Class G and P here will be displayed as class M \
+	 * because of the way planets are generated. This is a known bug. \
+	 */ \
+	"ERROR", \
+	/* Federation Worlds */ \
+	_("Andoria (Fesoan)"),	/* several episodes */ \
+	_("Tellar Prime (Miracht)"),	/* TOS: "Journey to Babel" */ \
+	_("Vulcan (T'Khasi)"),	/* many episodes */ \
+	_("Medusa"),		/* TOS: "Is There in Truth No Beauty?" */ \
+	_("Argelius II (Nelphia)"),/* TOS: "Wolf in the Fold" ("IV" in BSD) */ \
+	_("Ardana"),		/* TOS: "The Cloud Minders" */ \
+	_("Catulla (Cendo-Prae)"),	/* TOS: "The Way to Eden" */ \
+	_("Gideon"),		/* TOS: "The Mark of Gideon" */ \
+	_("Aldebaran III"),	/* TOS: "The Deadly Years" */ \
+	_("Alpha Majoris I"),	/* TOS: "Wolf in the Fold" */ \
+	_("Altair IV"),		/* TOS: "Amok Time */ \
+	_("Ariannus"),		/* TOS: "Let That Be Your Last Battlefield" */ \
+	_("Benecia"),		/* TOS: "The Conscience of the King" */ \
+	_("Beta Niobe I (Sarpeidon)"),	/* TOS: "All Our Yesterdays" */ \
+	_("Alpha Carinae II"),	/* TOS: "The Ultimate Computer" */ \
+	_("Capella IV (Kohath)"),	/* TOS: "Friday's Child" (Class G) */ \
+	_("Daran V"),		/* TOS: "For the World is Hollow and I Have Touched the Sky" */ \
+	_("Deneb II"),		/* TOS: "Wolf in the Fold" ("IV" in BSD) */ \
+	_("Eminiar VII"),		/* TOS: "A Taste of Armageddon" */ \
+	_("Gamma Canaris IV"),	/* TOS: "Metamorphosis" */ \
+	_("Gamma Tranguli VI (Vaalel)"),	/* TOS: "The Apple" */ \
+	_("Ingraham B"),		/* TOS: "Operation: Annihilate" */ \
+	_("Janus IV"),		/* TOS: "The Devil in the Dark" */ \
+	_("Makus III"),		/* TOS: "The Galileo Seven" */ \
+	_("Marcos XII"),		/* TOS: "And the Children Shall Lead", */ \
+	_("Omega IV"),		/* TOS: "The Omega Glory" */ \
+	_("Regulus V"),		/* TOS: "Amok Time */ \
+	_("Deneva"),		/* TOS: "Operation -- Annihilate!" */ \
+	/* Worlds from BSD Trek */ \
+	_("Rigel II"),		/* TOS: "Shore Leave" ("III" in BSD) */ \
+	_("Beta III"),		/* TOS: "The Return of the Archons" */ \
+	_("Triacus"),		/* TOS: "And the Children Shall Lead", */ \
+	_("Exo III"),		/* TOS: "What Are Little Girls Made Of?" (Class P) */ \
+    }
+#if 0	/* Others */
+	_("Hansen's Planet"),	/* TOS: "The Galileo Seven" */
+	_("Taurus IV"),		/* TOS: "The Galileo Seven" (class G) */
+	_("Antos IV (Doraphane)"),	/* TOS: "Whom Gods Destroy", "Who Mourns for Adonais?" */
+	_("Izar"),			/* TOS: "Whom Gods Destroy" */
+	_("Tiburon"),		/* TOS: "The Way to Eden" */
+	_("Merak II"),		/* TOS: "The Cloud Minders" */
+	_("Coridan (Desotriana)"),	/* TOS: "Journey to Babel" */
+	_("Iotia"),		/* TOS: "A Piece of the Action" */
+#endif
 
-void abandn(void) 
-/* abandon ship */
+#define DEVICE_NAMES \
+    { \
+	_("S. R. Sensors"), \
+	_("L. R. Sensors"), \
+	_("Phasers"), \
+	_("Photon Tubes"), \
+	_("Life Support"), \
+	_("Warp Engines"), \
+	_("Impulse Engines"), \
+	_("Shields"), \
+	_("Subspace Radio"), \
+	_("Shuttle Craft"), \
+	_("Computer"), \
+	_("Navigation System"), \
+	_("Transporter"), \
+	_("Shield Control"), \
+	_("Death Ray"), \
+	_("D. S. Probe") \
+    }
+
+static void setup_names(void)
+/* Sets up some arrays with localized names.
+ * Must be done after iostart() for localization to work. */
 {
-    int nb, l;
-    struct quadrant *q;
+    char *tmp1[] = SYSTEM_NAMES;
+    char *tmp2[] = DEVICE_NAMES;
 
-    chew();
-    if (game.condition==docked) {
-	if (game.ship!=IHE) {
-	    prout("You cannot abandon Ye Faerie Queene.");
-	    return;
-	}
-    }
-    else {
-	/* Must take shuttle craft to exit */
-	if (game.damage[DSHUTTL]==-1) {
-	    prout("Ye Faerie Queene has no shuttle craft.");
-	    return;
-	}
-	if (game.damage[DSHUTTL]<0) {
-	    prout("Shuttle craft now serving Big Macs.");
-	    return;
-	}
-	if (game.damage[DSHUTTL]>0) {
-	    prout("Shuttle craft damaged.");
-	    return;
-	}
-	if (game.landed) {
-	    prout("You must be aboard the Enterprise.");
-	    return;
-	}
-	if (game.iscraft != onship) {
-	    prout("Shuttle craft not currently available.");
-	    return;
-	}
-	/* Print abandon ship messages */
-	skip(1);
-	prouts("***ABANDON SHIP!  ABANDON SHIP!");
-	skip(1);
-	prouts("***ALL HANDS ABANDON SHIP!");
-	skip(2);
-	prout("Captain and crew escape in shuttle craft.");
-	if (game.state.rembase==0) {
-	    /* Oops! no place to go... */
-	    finish(FABANDN);
-	    return;
-	}
-	q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
-	/* Dispose of crew */
-	if (!(game.options & OPTION_WORLDS) && !damaged(DTRANSP)) {
-	    prout("Remainder of ship's complement beam down");
-	    prout("to nearest habitable planet.");
-	} else if (q->planet != NOPLANET && !damaged(DTRANSP)) {
-	    prout("Remainder of ship's complement beam down");
-	    prout("to %s.", systemname(q->planet));
-	} else {
-	    prout("Entire crew of %d left to die in outer space.");
-	    game.casual += game.state.crew;
-	    game.abandoned += game.state.crew;
-	}
-
-	/* If at least one base left, give 'em the Faerie Queene */
-	skip(1);
-	game.icrystl = false; /* crystals are lost */
-	game.nprobes = 0; /* No probes */
-	prout("You are captured by Klingons and released to");
-	prout("the Federation in a prisoner-of-war exchange.");
-	nb = Rand()*game.state.rembase+1;
-	/* Set up quadrant and position FQ adjacient to base */
-	if (!same(game.quadrant, game.state.baseq[nb])) {
-	    game.quadrant = game.state.baseq[nb];
-	    game.sector.x = game.sector.y = 5;
-	    newqad(true);
-	}
-	for (;;) {
-	    /* position next to base by trial and error */
-	    game.quad[game.sector.x][game.sector.y] = IHDOT;
-	    for_sectors(l) {
-		game.sector.x = 3.0*Rand() - 1.0 + game.base.x;
-		game.sector.y = 3.0*Rand() - 1.0 + game.base.y;
-		if (VALID_SECTOR(game.sector.x, game.sector.y) &&
-		    game.quad[game.sector.x][game.sector.y] == IHDOT) break;
-	    }
-	    if (l < QUADSIZE+1) break; /* found a spot */
-	    game.sector.x=QUADSIZE/2;
-	    game.sector.y=QUADSIZE/2;
-	    newqad(true);
-	}
-    }
-    /* Get new commission */
-    game.quad[game.sector.x][game.sector.y] = game.ship = IHF;
-    game.state.crew = FULLCREW;
-    prout("Starfleet puts you in command of another ship,");
-    prout("the Faerie Queene, which is antiquated but,");
-    prout("still useable.");
-    if (game.icrystl) prout("The dilithium crystals have been moved.");
-    game.imine = false;
-    game.iscraft = offship; /* Galileo disappears */
-    /* Resupply ship */
-    game.condition=docked;
-    for (l = 0; l < NDEVICES; l++) 
-	game.damage[l] = 0.0;
-    game.damage[DSHUTTL] = -1;
-    game.energy = game.inenrg = 3000.0;
-    game.shield = game.inshld = 1250.0;
-    game.torps = game.intorps = 6;
-    game.lsupres=game.inlsr=3.0;
-    game.shldup=false;
-    game.warpfac=5.0;
-    game.wfacsq=25.0;
-    return;
+    memcpy(systnames, tmp1, sizeof(systnames));
+    memcpy(device, tmp2, sizeof(device));
 }
 	
 void setup(bool needprompt) 
@@ -232,6 +187,10 @@ void setup(bool needprompt)
 {
     int i,j, krem, klumper;
     coord w;
+
+    /* call the setup hooks here */
+    setup_names();
+
     //  Decide how many of everything
     if (choose(needprompt)) return; // frozen game
     // Prepare the Enterprise
@@ -315,12 +274,12 @@ void setup(bool needprompt)
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
 		    contflag = true;
 		    if (idebug)
-			prout("=== Abandoning base #%d at %d-%d", i, w.x, w.y);
+			prout(_("=== Abandoning base #%d at %d-%d"), i, w.x, w.y);
 		    break;
 		}
 		else if (distq < 6.0 * (BASEMAX+1-game.inbase)) {
 		    if (idebug)
-			prout("=== Saving base #%d, close to #%d", i, j);
+			prout(_("=== Saving base #%d, close to #%d"), i, j);
 		}
 	    }
 	} while (contflag);
@@ -412,39 +371,39 @@ void setup(bool needprompt)
     game.state.snap = false;
 		
     if (game.skill == SKILL_NOVICE) {
-	prout("It is stardate %d. The Federation is being attacked by",
+	prout(_("It is stardate %d. The Federation is being attacked by"),
 	      (int)game.state.date);
-	prout("a deadly Klingon invasion force. As captain of the United");
-	prout("Starship U.S.S. Enterprise, it is your mission to seek out");
-	prout("and destroy this invasion force of %d battle cruisers.",
+	prout(_("a deadly Klingon invasion force. As captain of the United"));
+	prout(_("Starship U.S.S. Enterprise, it is your mission to seek out"));
+	prout(_("and destroy this invasion force of %d battle cruisers."),
 	      INKLINGTOT);
-	prout("You have an initial allotment of %d stardates to complete", (int)game.intime);
-	prout("your mission.  As you proceed you may be given more time.");
+	prout(_("You have an initial allotment of %d stardates to complete"), (int)game.intime);
+	prout(_("your mission.  As you proceed you may be given more time."));
 	prout("");
-	prout("You will have %d supporting starbases.", game.inbase);
-	proutn("Starbase locations-  ");
+	prout(_("You will have %d supporting starbases."), game.inbase);
+	proutn(_("Starbase locations-  "));
     }
     else {
-	prout("Stardate %d.", (int)game.state.date);
+	prout(_("Stardate %d."), (int)game.state.date);
 	prout("");
-	prout("%d Klingons.", INKLINGTOT);
-	prout("An unknown number of Romulans.");
-	if (game.state.nscrem) prout("and one (GULP) Super-Commander.");
-	prout("%d stardates.",(int)game.intime);
-	proutn("%d starbases in ", game.inbase);
+	prout(_("%d Klingons."), INKLINGTOT);
+	prout(_("An unknown number of Romulans."));
+	if (game.state.nscrem) prout(_("And one (GULP) Super-Commander."));
+	prout(_("%d stardates."),(int)game.intime);
+	proutn(_("%d starbases in "), game.inbase);
     }
     for (i = 1; i <= game.inbase; i++) {
 	proutn(cramlc(0, game.state.baseq[i]));
 	proutn("  ");
     }
     skip(2);
-    proutn("The Enterprise is currently in ");
+    proutn(_("The Enterprise is currently in "));
     proutn(cramlc(quadrant, game.quadrant));
     proutn(" ");
     proutn(cramlc(sector, game.sector));
     skip(2);
-    prout("Good Luck!");
-    if (game.state.nscrem) prout("  YOU'LL NEED IT.");
+    prout(_("Good Luck!"));
+    if (game.state.nscrem) prout(_("  YOU'LL NEED IT."));
     waitfor();
     newqad(false);
     if (game.nenhere-iqhere-game.ithere) game.shldup = true;
@@ -460,12 +419,12 @@ bool choose(bool needprompt)
 	game.skill = SKILL_NONE;
 	game.length = 0;
 	if (needprompt) /* Can start with command line options */
-	    proutn("Would you like a regular, tournament, or saved game? ");
+	    proutn(_("Would you like a regular, tournament, or saved game? "));
 	scan();
 	if (strlen(citem)==0) continue; // Try again
 	if (isit("tournament")) {
 	    while (scan() == IHEOL) {
-		proutn("Type in tournament number-");
+		proutn(_("Type in tournament number-"));
 	    }
 	    if (aaitem == 0) {
 		chew();
@@ -486,7 +445,7 @@ bool choose(bool needprompt)
 	    return true;
 	}
 	if (isit("regular")) break;
-	proutn("What is \"");
+	proutn(_("What is \""));
 	proutn(citem);
 	prout("\"?");
 	chew();
@@ -502,21 +461,21 @@ bool choose(bool needprompt)
 	    else if (isit("expert")) game.skill = SKILL_EXPERT;
 	    else if (isit("emeritus")) game.skill = SKILL_EMERITUS;
 	    else {
-		proutn("What is \"");
+		proutn(_("What is \""));
 		proutn(citem);
 		prout("\"?");
 	    }
 	}
 	else {
 	    chew();
-	    if (game.length==0) proutn("Would you like a Short, Medium, or Long game? ");
-	    else if (game.skill == SKILL_NONE) proutn("Are you a Novice, Fair, Good, Expert, or Emeritus player? ");
+	    if (game.length==0) proutn(_("Would you like a Short, Medium, or Long game? "));
+	    else if (game.skill == SKILL_NONE) proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "));
 	}
     }
     // Choose game options -- added by ESR for SST2K
     if (scan() != IHALPHA) {
 	chew();
-	proutn("Choose your game style (or just press enter): ");
+	proutn(_("Choose your game style (or just press enter): "));
 	scan();
     }
     if (isit("plain")) {
@@ -532,7 +491,7 @@ bool choose(bool needprompt)
     else if (isit("fancy"))
 	/* do nothing */;
     else if (strlen(citem)) {
-	    proutn("What is \"");
+	    proutn(_("What is \""));
 	    proutn(citem);
 	    prout("\"?");
     }
@@ -693,11 +652,11 @@ void newqad(bool shutup)
 	game.neutz = true;
 	if (!damaged(DRADIO)) {
 	    skip(1);
-	    prout("LT. Uhura- \"Captain, an urgent message.");
-	    prout("  I'll put it on audio.\"  CLICK");
+	    prout(_("LT. Uhura- \"Captain, an urgent message."));
+	    prout(_("  I'll put it on audio.\"  CLICK"));
 	    skip(1);
-	    prout("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE.");
-	    prout("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!");
+	    prout(_("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."));
+	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"));
 	}
     }
 
@@ -714,8 +673,8 @@ void newqad(bool shutup)
 	    game.kpower[game.nenhere] = Rand()*6000.0 +500.0 +250.0*game.skill;
 	    if (!damaged(DSRSENS)) {
 		skip(1);
-		prout("MR. SPOCK- \"Captain, this is most unusual.");
-		prout("    Please examine your short-range scan.\"");
+		prout(_("Mr. Spock- \"Captain, this is most unusual."));
+		prout(_("    Please examine your short-range scan.\""));
 	    }
 	}
     }

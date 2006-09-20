@@ -453,7 +453,7 @@ void events(void)
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {
 		prout("Uhura- Captain, %s in %s reports it is under attack",
-		      systemname(q->planet), cramlc(quadrant, w));
+		      systnames[q->planet], cramlc(quadrant, w));
 		prout("by a Klingon invasion fleet.");
 		if (cancelrest())
 		    return;
@@ -477,7 +477,7 @@ void events(void)
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {
 		prout("Uhura- We've lost contact with starsystem %s",
-		      systemname(q->planet));
+		      systnames[q->planet]);
 		prout("in %s.\n", cramlc(quadrant, ev->quadrant));
 	    }
 	    break;
@@ -531,11 +531,11 @@ void events(void)
 	    {
 		if (same(game.quadrant, w)) {
 		    prout("Spock- sensors indicate the Klingons have");
-		    prout("launched a warship from %s.",systemname(q->planet));
+		    prout("launched a warship from %s.", systnames[q->planet]);
 		} else {
 		    prout("Uhura- Starfleet reports increased Klingon activity");
 		    if (q->planet != NOPLANET)
-			proutn("near %s", systemname(q->planet));
+			proutn("near %s", systnames[q->planet]);
 		    prout("in %s.\n", cramlc(quadrant, w));
 		}
 	    }

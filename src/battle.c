@@ -407,8 +407,8 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 		/* captain perishes on planet */
 		finish(FDPLANET);
 	    }
-	    prout("You have just destroyed an inhabited planet.");
-	    prout("Celebratory rallies are being held on the Klingon homeworld.");
+	    prout(_("You have just destroyed an inhabited planet."));
+	    prout(_("Celebratory rallies are being held on the Klingon homeworld."));
 	    return;
 	case IHSTAR: /* Hit a star */
 	    if (Rand() > 0.10) {
@@ -1087,7 +1087,7 @@ void phasers(void)
 		irec+=fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
 		    (1.01+0.05*Rand()) + 1.0;
 	    kz=1;
-	    proutn(_("(%d) units required. "), irec);
+	    proutn(_("%d units required. "), irec);
 	    chew();
 	    proutn(_("Units to fire= "));
 	    key = scan();

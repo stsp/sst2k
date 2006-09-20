@@ -7,3 +7,5 @@ src/io.c
 src/moving.c
 src/planets.c
 src/reports.c
+src/setup.c
+src/sst.c

@@ -270,9 +270,7 @@ static void getcd(bool isprobe, int akey)
 	
     if (game.landed && !isprobe) {
 	prout(_("Dummy! You can't leave standard orbit until you"));
-	proutn(_("are back aboard the "));
-	crmshp();
-	prout(".");
+	proutn(_("are back aboard the ship."));
 	chew();
 	return;
     }
@@ -1035,4 +1033,138 @@ void mayday(void)
     dock(false);
     skip(1);
     prout(_("Lt. Uhura-  \"Captain, we made it!\""));
+}
+
+/*
+**  Abandon Ship
+**
+**	The ship is abandoned.  If your current ship is the Faire
+**	Queene, or if your shuttlecraft is dead, you're out of
+**	luck.  You need the shuttlecraft in order for the captain
+**	(that's you!!) to escape.
+**
+**	Your crew can beam to an inhabited starsystem in the
+**	quadrant, if there is one and if the transporter is working.
+**	If there is no inhabited starsystem, or if the transporter
+**	is out, they are left to die in outer space.
+**
+**	If there are no starbases left, you are captured by the
+**	Klingons, who torture you mercilessly.  However, if there
+**	is at least one starbase, you are returned to the
+**	Federation in a prisoner of war exchange.  Of course, this
+**	can't happen unless you have taken some prisoners.
+**
+*/
+
+void abandn(void) 
+/* abandon ship */
+{
+    int nb, l;
+    struct quadrant *q;
+
+    chew();
+    if (game.condition==docked) {
+	if (game.ship!=IHE) {
+	    prout(_("You cannot abandon Ye Faerie Queene."));
+	    return;
+	}
+    }
+    else {
+	/* Must take shuttle craft to exit */
+	if (game.damage[DSHUTTL]==-1) {
+	    prout(_("Ye Faerie Queene has no shuttle craft."));
+	    return;
+	}
+	if (game.damage[DSHUTTL]<0) {
+	    prout(_("Shuttle craft now serving Big Macs."));
+	    return;
+	}
+	if (game.damage[DSHUTTL]>0) {
+	    prout(_("Shuttle craft damaged."));
+	    return;
+	}
+	if (game.landed) {
+	    prout(_("You must be aboard the Enterprise."));
+	    return;
+	}
+	if (game.iscraft != onship) {
+	    prout(_("Shuttle craft not currently available."));
+	    return;
+	}
+	/* Print abandon ship messages */
+	skip(1);
+	prouts(_("***ABANDON SHIP!  ABANDON SHIP!"));
+	skip(1);
+	prouts(_("***ALL HANDS ABANDON SHIP!"));
+	skip(2);
+	prout(_("Captain and crew escape in shuttle craft."));
+	if (game.state.rembase==0) {
+	    /* Oops! no place to go... */
+	    finish(FABANDN);
+	    return;
+	}
+	q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
+	/* Dispose of crew */
+	if (!(game.options & OPTION_WORLDS) && !damaged(DTRANSP)) {
+	    prout(_("Remainder of ship's complement beam down"));
+	    prout(_("to nearest habitable planet."));
+	} else if (q->planet != NOPLANET && !damaged(DTRANSP)) {
+	    prout(_("Remainder of ship's complement beam down"));
+	    prout(_("to %s."), systnames[q->planet]);
+	} else {
+	    prout(_("Entire crew of %d left to die in outer space."));
+	    game.casual += game.state.crew;
+	    game.abandoned += game.state.crew;
+	}
+
+	/* If at least one base left, give 'em the Faerie Queene */
+	skip(1);
+	game.icrystl = false; /* crystals are lost */
+	game.nprobes = 0; /* No probes */
+	prout(_("You are captured by Klingons and released to"));
+	prout(_("the Federation in a prisoner-of-war exchange."));
+	nb = Rand()*game.state.rembase+1;
+	/* Set up quadrant and position FQ adjacient to base */
+	if (!same(game.quadrant, game.state.baseq[nb])) {
+	    game.quadrant = game.state.baseq[nb];
+	    game.sector.x = game.sector.y = 5;
+	    newqad(true);
+	}
+	for (;;) {
+	    /* position next to base by trial and error */
+	    game.quad[game.sector.x][game.sector.y] = IHDOT;
+	    for_sectors(l) {
+		game.sector.x = 3.0*Rand() - 1.0 + game.base.x;
+		game.sector.y = 3.0*Rand() - 1.0 + game.base.y;
+		if (VALID_SECTOR(game.sector.x, game.sector.y) &&
+		    game.quad[game.sector.x][game.sector.y] == IHDOT) break;
+	    }
+	    if (l < QUADSIZE+1) break; /* found a spot */
+	    game.sector.x=QUADSIZE/2;
+	    game.sector.y=QUADSIZE/2;
+	    newqad(true);
+	}
+    }
+    /* Get new commission */
+    game.quad[game.sector.x][game.sector.y] = game.ship = IHF;
+    game.state.crew = FULLCREW;
+    prout(_("Starfleet puts you in command of another ship,"));
+    prout(_("the Faerie Queene, which is antiquated but,"));
+    prout(_("still useable."));
+    if (game.icrystl) prout(_("The dilithium crystals have been moved."));
+    game.imine = false;
+    game.iscraft = offship; /* Galileo disappears */
+    /* Resupply ship */
+    game.condition=docked;
+    for (l = 0; l < NDEVICES; l++) 
+	game.damage[l] = 0.0;
+    game.damage[DSHUTTL] = -1;
+    game.energy = game.inenrg = 3000.0;
+    game.shield = game.inshld = 1250.0;
+    game.torps = game.intorps = 6;
+    game.lsupres=game.inlsr=3.0;
+    game.shldup=false;
+    game.warpfac=5.0;
+    game.wfacsq=25.0;
+    return;
 }

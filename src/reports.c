@@ -35,24 +35,24 @@ void report(void)
     char *s1,*s2,*s3;
 
     chew();
-    s1 = (game.thawed?"thawed ":"");
+    s1 = (game.thawed?_("thawed "):"");
     switch (game.length) {
-    case 1: s2="short"; break;
-    case 2: s2="medium"; break;
-    case 4: s2="long"; break;
-    default: s2="unknown length"; break;
+    case 1: s2=_("short"); break;
+    case 2: s2=_("medium"); break;
+    case 4: s2=_("long"); break;
+    default: s2=_("unknown length"); break;
     }
     switch (game.skill) {
-    case SKILL_NOVICE: s3="novice"; break;
-    case SKILL_FAIR: s3="fair"; break;
-    case SKILL_GOOD: s3="good"; break;
-    case SKILL_EXPERT: s3="expert"; break;
-    case SKILL_EMERITUS: s3="emeritus"; break;
-    default: s3="skilled"; break;
+    case SKILL_NOVICE: s3=_("novice"); break;
+    case SKILL_FAIR: s3=_("fair"); break;
+    case SKILL_GOOD: s3=_("good"); break;
+    case SKILL_EXPERT: s3=_("expert"); break;
+    case SKILL_EMERITUS: s3=_("emeritus"); break;
+    default: s3=_("skilled"); break;
     }
     prout("");
-    prout(_("You %s playing a %s%s %s game."),
-	  game.alldone? _("were") : _("are now"), s1, s2, s3);
+    prout(_("You %s a %s%s %s game."),
+	  game.alldone? _("were playing") : _("are playing"), s1, s2, s3);
     if (game.skill>SKILL_GOOD && game.thawed && !game.alldone) prout(_("No plaque is allowed."));
     if (game.tourn) prout(_("This is tournament game %d."), game.tourn);
     prout(_("Your secret password is \"%s\""),game.passwd);
@@ -270,11 +270,11 @@ static void status(int req)
     case 2:
 	if (game.condition != docked) newcnd();
 	switch (game.condition) {
-	case red: cp = "RED"; break;
-	case green: cp = "GREEN"; break;
-	case yellow: cp = "YELLOW"; break;
-	case docked: cp = "DOCKED"; break;
-	case dead: cp="DEAD"; break;
+	case red: cp = _("RED"); break;
+	case green: cp = _("GREEN"); break;
+	case yellow: cp = _("YELLOW"); break;
+	case docked: cp = _("DOCKED"); break;
+	case dead: cp = _("DEAD"); break;
 	}
 	for (t=0;t<NDEVICES;t++)
 	    if (game.damage[t]>0) 
@@ -325,7 +325,7 @@ static void status(int req)
 	if (game.options & OPTION_WORLDS) {
 	    int plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
 	    if (plnet != NOPLANET && game.state.plnets[plnet].inhabited != UNINHABITED)
-		proutn(_("Major system  %s"), systemname(plnet));
+		proutn(_("Major system  %s"), systnames[plnet]);
 	    else
 		proutn(_("Sector is uninhabited"));
 	}
@@ -379,8 +379,8 @@ void srscan(scantype type)
 		break;
 	if (req > sizeof(requests)/sizeof(requests[0])) {
 	    prout(_("UNRECOGNIZED REQUEST. Legal requests are:"));
-	    prout(_("  date, condition, position, lsupport, warpfactor,"));
-	    prout(_("  energy, torpedoes, shields, klingons, time, system, bases."));
+	    prout(("  date, condition, position, lsupport, warpfactor,"));
+	    prout(("  energy, torpedoes, shields, klingons, time, system, bases."));
 	    return;
 	}
 	// no break

@@ -4,20 +4,24 @@ Short-term items:
 
 * Adjust the sst.spec wrt the build system changes
 
-* Maybe make a release
+* Complete, polish, improve, complete, polish, improve the
+  gettextization and the translation! Right now it just sucks.
+
+* Probably a separate window for status in ncurses mode
+  (right now status uses srscan window)
+
+* srscan() really needs to be restructured and cleaned up.
 
 
 Long-term items:
-
-* gettextize
-
-* Russian translation
 
 * Wrap a GUI around it.
 
 * Wandering planet-killer as in "The Doomsday Machine";
   see <http://www.ericweisstein.com/fun/startrek/TheDoomsdayMachine.html>.
  
+* Maybe make a release
+
 BSD-Trek features we haven't swiped yet:
 
 * The cloaking device.
