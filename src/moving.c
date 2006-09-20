@@ -907,6 +907,26 @@ void probe(void)
     return;
 }
 
+/*
+ *	Here's how the mayday code works:
+ *
+ *	First, the closest starbase is selected.  If there is a
+ *	a starbase in your own quadrant, you are in good shape.
+ *	This distance takes quadrant distances into account only.
+ *
+ *	A magic number is computed based on the distance which acts
+ *	as the probability that you will be rematerialized.  You
+ *	get three tries.
+ *
+ *	When it is determined that you should be able to be remater-
+ *	ialized (i.e., when the probability thing mentioned above
+ *	comes up positive), you are put into that quadrant (anywhere).
+ *	Then, we try to see if there is a spot adjacent to the star-
+ *	base.  If not, you can't be rematerialized!!!  Otherwise,
+ *	it drops you there.  It only tries five times to find a spot
+ *	to drop you.  After that, it's your problem.
+ */
+
 void mayday(void) 
 /* yell for help from nearest starbase */
 {

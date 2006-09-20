@@ -602,6 +602,14 @@ void wait(void)
     game.optime = 0;
 }
 
+/*
+ *	A nova occurs.  It is the result of having a star hit with a
+ *	photon torpedo, or possibly of a probe warhead going off.
+ *	Stars that go nova cause stars which surround them to undergo
+ *	the same probabilistic process.  Klingons next to them are
+ *	destroyed.  And if the starship is next to it, it gets zapped.
+ *	If the zap is too much, it gets destroyed.
+ */
 void nova(coord nov) 
 /* star goes nova */
 {
