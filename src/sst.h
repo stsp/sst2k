@@ -165,13 +165,14 @@ typedef struct {
 #define DRADIO  8
 #define DSHUTTL 9
 #define DCOMPTR 10
-#define DTRANSP 11
-#define DSHCTRL 12
-#define DDRAY   13  // Added deathray
-#define DDSP    14  // Added deep space probe
-#define NDEVICES (15)	// Number of devices
+#define DNAVSYS	11
+#define DTRANSP 12
+#define DSHCTRL 13
+#define DDRAY   14
+#define DDSP    15
+#define NDEVICES (16)	// Number of devices
 
-#define damaged(dev)	game.damage[dev] != 0.0
+#define damaged(dev)	(game.damage[dev] != 0.0)
 
 #define FOREVER	1e30
 

@@ -168,6 +168,11 @@ for a lot of magic numbers and refactored the heck out of it.
       worlds enabled, they must have one in the quadrant to beam down
       to; otherwise they die in space and this counts heavily against
       your score.  Docking at a starbase replenishes your crew.
+
+   8. Still more BSD-Trek: we now have a weighted damage table.
+      Also, the nav subsystem (enabling automatic course
+      setting) can be damaged separately from the main computer (which
+      handles weapons targeting, ETA calculation, and self-destruct).
 */
 
 /* the input queue */
@@ -196,6 +201,7 @@ char *device[NDEVICES] = {
 	"Subspace Radio",
 	"Shuttle Craft",
 	"Computer",
+	"Navigation System",
 	"Transporter",
 	"Shield Control",
 	"Death Ray",

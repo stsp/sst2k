@@ -277,7 +277,7 @@ static void getcd(bool isprobe, int akey)
 	return;
     }
     while (navmode == unspecified) {
-	if (damaged(DCOMPTR)) {
+	if (damaged(DNAVSYS)) {
 	    if (isprobe)
 		prout(_("Computer damaged; manual navigation only"));
 	    else

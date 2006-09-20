@@ -131,11 +131,66 @@ void doshield(bool raise)
     }
 }
 
+static int randdevice(void)
+/* choose a device to damage, at random. */
+{
+    /*
+     * Quoth Eric Allman in the code of BSD-Trek:
+     * "Under certain conditions you can get a critical hit.  This
+     * sort of hit damages devices.  The probability that a given
+     * device is damaged depends on the device.  Well protected
+     * devices (such as the computer, which is in the core of the
+     * ship and has considerable redundancy) almost never get
+     * damaged, whereas devices which are exposed (such as the
+     * warp engines) or which are particularly delicate (such as
+     * the transporter) have a much higher probability of being
+     * damaged."
+     *
+     * This is one place where OPTION_PLAIN does not restore the
+     * original behavior, which was equiprobable damage across
+     * all devices.  If we wanted that, we'd return NDEVICES*Rand()
+     * and have done with it.  Also, in the original game, DNAVYS
+     * and DCOMPTR were the same device. 
+     *
+     * Instead, we use a table of weights similar to the one from BSD Trek.
+     * BSD doesn't have the shuttle, shield controller, death ray, or probes. 
+     * We don't have a cloaking device.  The shuttle got the allocation
+     * for the cloaking device, then we shaved a half-percent off
+     * everything to have some weight to give DSHCTRL/DDRAY/DDSP.
+     */
+    static int weights[NDEVICES] = {
+	105,	/* DSRSENS: short range scanners	10.5% */
+	105,	/* DLRSENS: long range scanners		10.5% */
+	120,	/* DPHASER: phasers			12.0% */
+	120,	/* DPHOTON: photon torpedoes		12.0% */
+	25,	/* DLIFSUP: life support		 2.5% */
+	65,	/* DWARPEN: warp drive			 6.5% */
+	70,	/* DIMPULS: impulse engines		 6.5% */
+	145,	/* DSHIELD: deflector shields		14.5% */
+	30,	/* DRADIO:  subspace radio		 3.0% */
+	45,	/* DSHUTTL: shuttle			 4.5% */
+	15,	/* DCOMPTR: computer			 1.5% */
+	20,	/* NAVCOMP: navigation system		 2.0% */
+	75,	/* DTRANSP: transporter			 7.5% */
+	20,	/* DSHCTRL: high-speed shield controller 2.0% */
+	10,	/* DDRAY: death ray			 1.0% */
+	30,	/* DDSP: deep-space probes		 3.0% */
+    };
+    int sum, i, idx = Rand() * 1000.0;	/* weights must sum to 1000 */
+
+    for (i = sum = 0; i < NDEVICES; i++) {
+	sum += weights[i];
+	if (idx < sum)
+	    return i;
+    }
+    return -1;	/* we should never get here, but this quiets GCC */
+}
+
 void ram(bool ibumpd, feature ienm, coord w)
 /* make our ship ram something */
 {
     double hardness, extradm;
-    int icas, m;
+    int icas, m, ncrits;
 	
     prouts(_("***RED ALERT!  RED ALERT!"));
     skip(1);
@@ -163,15 +218,22 @@ void ram(bool ibumpd, feature ienm, coord w)
     prout(_("***Sickbay reports %d casualties"), icas);
     game.casual += icas;
     game.state.crew -= icas;
-    for (m=0; m < NDEVICES; m++) {
-	if (m == DDRAY) 
-	    continue; // Don't damage deathray 
-	if (game.damage[m] < 0) 
+    /*
+     * In the pre-SST2K version, all devices got equiprobably damaged,
+     * which was silly.  Instead, pick up to half the devices at
+     * random according to our weighting table,
+     */
+    ncrits = Rand() * (NDEVICES/2);
+    for (m=0; m < ncrits; m++) {
+	int dev = randdevice();
+	if (game.damage[dev] < 0) 
 	    continue;
 	extradm = (10.0*hardness*Rand()+1.0)*game.damfac;
-	game.damage[m] += game.optime + extradm; /* Damage for at least time of travel! */
+	/* Damage for at least time of travel! */
+	game.damage[dev] += game.optime + extradm;
     }
     game.shldup = false;
+    prout(_("***Shields are down."));
     if (KLINGREM) {
 	pause_game(true);
 	dreprt();
@@ -446,12 +508,12 @@ static void fry(double hit)
     ncrit = 1.0 + hit/(500.0+100.0*Rand());
     proutn(_("***CRITICAL HIT--"));
     /* Select devices and cause damage */
-    for (loop1 = 0; loop1 < ncrit && 0 < NDEVICES; loop1++) {
+    for (loop1 = 0; loop1 < ncrit; loop1++) {
 	do {
-	    j = NDEVICES*Rand();
+	    j = randdevice();
 	    /* Cheat to prevent shuttle damage unless on ship */
 	} while 
-	      (game.damage[j]<0.0 || (j==DSHUTTL && game.iscraft!=1) || j==DDRAY);
+	      (game.damage[j]<0.0 || (j==DSHUTTL && game.iscraft!=1));
 	cdam[loop1] = j;
 	extradm = (hit*game.damfac)/(ncrit*(75.0+25.0*Rand()));
 	game.damage[j] += extradm;
@@ -872,7 +934,7 @@ static bool checkshctrl(double rpow)
     int icas;
 	
     skip(1);
-    if (Rand() < .998) {
+    if (Rand() < 0.998) {
 	prout(_("Shields lowered."));
 	return false;
     }
@@ -915,13 +977,14 @@ void phasers(void)
 {
     double hits[21], rpow=0, extra, powrem, over, temp;
     int kz = 0, k=1, i, irec=0; /* Cheating inhibitor */
-    bool ifast = false, no = false, ipoop = true, msgflag = true;
+    bool ifast = false, no = false, itarg = true, msgflag = true;
     enum {NOTSET, MANUAL, FORCEMAN, AUTOMATIC} automode = NOTSET;
     int key=0;
 
     skip(1);
-    /* SR sensors and Computer */
-    if (damaged(DSRSENS) || damaged(DCOMPTR)) ipoop = false;
+    /* SR sensors and Computer are needed fopr automode */
+    if (damaged(DSRSENS) || damaged(DCOMPTR)) 
+	itarg = false;
     if (game.condition == docked) {
 	prout(_("Phasers can't be fired through base shields."));
 	chew();
@@ -964,7 +1027,7 @@ void phasers(void)
 		}
 	    }
 	    else if (isit("automatic")) {
-		if ((!ipoop) && game.nenhere != 0) {
+		if ((!itarg) && game.nenhere != 0) {
 		    automode = FORCEMAN;
 		}
 		else {
@@ -987,7 +1050,7 @@ void phasers(void)
 		prout(_("Energy will be expended into space."));
 		automode = AUTOMATIC;
 	    }
-	    else if (!ipoop)
+	    else if (!itarg)
 		automode = FORCEMAN;
 	    else
 		automode = AUTOMATIC;
@@ -998,7 +1061,7 @@ void phasers(void)
 		prout(_("Energy will be expended into space."));
 		automode = AUTOMATIC;
 	    }
-	    else if (!ipoop)
+	    else if (!itarg)
 		automode = FORCEMAN;
 	    else 
 		proutn(_("Manual or automatic? "));
@@ -1084,7 +1147,7 @@ void phasers(void)
 	chew();
 	key = IHEOL;
 	if (damaged(DCOMPTR))
-	    prout(_("Battle comuter damaged, manual file only."));
+	    prout(_("Battle computer damaged, manual file only."));
 	else {
 	    skip(1);
 	    prouts(_("---WORKING---"));
@@ -1118,7 +1181,7 @@ void phasers(void)
 	    }
 	    if (key == IHEOL) {
 		chew();
-		if (ipoop && k > kz)
+		if (itarg && k > kz)
 		    irec=(fabs(game.kpower[k])/(PHASEFAC*pow(0.9,game.kdist[k])))*
 			(1.01+0.05*Rand()) + 1.0;
 		kz = k;
