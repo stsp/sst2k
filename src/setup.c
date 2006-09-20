@@ -141,11 +141,11 @@ void abandn(void)
 	    prout("Shuttle craft damaged.");
 	    return;
 	}
-	if (game.landed==1) {
+	if (game.landed) {
 	    prout("You must be aboard the Enterprise.");
 	    return;
 	}
-	if (game.iscraft!=1) {
+	if (game.iscraft != onship) {
 	    prout("Shuttle craft not currently available.");
 	    return;
 	}
@@ -211,7 +211,7 @@ void abandn(void)
     prout("still useable.");
     if (game.icrystl) prout("The dilithium crystals have been moved.");
     game.imine = false;
-    game.iscraft=0; /* Galileo disappears */
+    game.iscraft = offship; /* Galileo disappears */
     /* Resupply ship */
     game.condition=docked;
     for (l = 0; l < NDEVICES; l++) 
@@ -240,7 +240,7 @@ void setup(bool needprompt)
     game.state.crew = FULLCREW;
     game.energy = game.inenrg = 5000.0;
     game.shield = game.inshld = 2500.0;
-    game.shldchg = 0;
+    game.shldchg = false;
     game.shldup = false;
     game.inlsr = 4.0;
     game.lsupres = 4.0;
@@ -256,12 +256,12 @@ void setup(bool needprompt)
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0;
-    game.resting = game.imine = game.icrystl = game.icraft = false;
-    game.isatb = game.iscate = game.state.nplankl = 0;
+    game.iscate = game.resting = game.imine = game.icrystl = game.icraft = false;
+    game.isatb = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
-    game.iscraft = 1;
-    game.landed = -1;
-    game.alive = 1;
+    game.iscraft = onship;
+    game.landed = false;
+    game.alive = true;
     game.docfac = 0.25;
     for_quadrants(i)
 	for_quadrants(j) {
@@ -270,8 +270,8 @@ void setup(bool needprompt)
 	    quad->planet = NOPLANET;
 	    quad->romulans = 0;
 	    quad->klingons = 0;
-	    quad->starbase = 0;
-	    quad->supernova = 0;
+	    quad->starbase = false;
+	    quad->supernova = false;
 	    quad->status = secure;
 	}
     // Initialize times for extraneous events
@@ -326,8 +326,8 @@ void setup(bool needprompt)
 	} while (contflag);
 			
 	game.state.baseq[i] = w;
-	game.state.galaxy[w.x][w.y].starbase = 1;
-	game.state.chart[w.x][w.y].starbase = 1;
+	game.state.galaxy[w.x][w.y].starbase = true;
+	game.state.chart[w.x][w.y].starbase = true;
     }
     // Position ordinary Klingon Battle Cruisers
     krem = game.inkling;
@@ -405,13 +405,11 @@ void setup(bool needprompt)
     if (thing.x != -1) {
 	thing = randplace(GALSIZE);
     }
-    else {
+    else
 	thing.x = thing.y = 0;
-    }
 
-//	idate = date;
     skip(2);
-    game.state.snap = 0;
+    game.state.snap = false;
 		
     if (game.skill == SKILL_NOVICE) {
 	prout("It is stardate %d. The Federation is being attacked by",
@@ -615,7 +613,7 @@ void newqad(bool shutup)
     game.nenhere = 0;
     game.neutz = false;
     game.inorbit = false;
-    game.landed = -1;
+    game.landed = false;
     game.ientesc = false;
     game.ithere = false;
     iqhere = false;
@@ -623,7 +621,7 @@ void newqad(bool shutup)
     game.iseenit = false;
     if (game.iscate) {
 	// Attempt to escape Super-commander, so tbeam back!
-	game.iscate = 0;
+	game.iscate = false;
 	game.ientesc = true;
     }
     // Clear quadrant
@@ -661,7 +659,7 @@ void newqad(bool shutup)
 	if (same(game.quadrant, game.state.kscmdr)) {
 	    game.quad[game.ks[1].x][game.ks[1].y] = IHS;
 	    game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*game.skill;
-	    game.iscate = game.state.remkl>1;
+	    game.iscate = (game.state.remkl > 1);
 	    game.ishere = true;
 	}
     }
@@ -709,7 +707,7 @@ void newqad(bool shutup)
 	    w = dropin(IHQUEST);
 	    thing = randplace(GALSIZE);
 	    game.nenhere++;
-	    iqhere=1;
+	    iqhere = true;
 	    game.ks[game.nenhere] = w;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
 		distance(game.sector, w);

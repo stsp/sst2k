@@ -106,7 +106,7 @@ void beam(void)
     skip(1);
     if (damaged(DTRANSP)) {
 	prout(_("Transporter damaged."));
-	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == 1)) {
+	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == onship)) {
 	    skip(1);
 	    proutn(_("Spock-  \"May I suggest the shuttle craft, Sir?\" "));
 	    if (ja() == true) shuttle();
@@ -128,7 +128,7 @@ void beam(void)
 	prout(_("  you may not go down.\""));
 	return;
     }
-    if (game.landed==1) {
+    if (game.landed) {
 	/* Coming from planet */
 	if (game.state.plnets[game.iplnet].known==shuttle_down) {
 	    proutn(_("Spock-  \"Wouldn't you rather take the Galileo?\" "));
@@ -176,11 +176,11 @@ void beam(void)
     prouts(".    .   .  .  .  .  .E.E.EEEERRRRRIIIIIOOOHWW");
     skip(2);
     prout(_("Transport complete."));
-    game.landed = -game.landed;
-    if (game.landed==1 && game.state.plnets[game.iplnet].known==shuttle_down) {
+    game.landed = !game.landed;
+    if (game.landed && game.state.plnets[game.iplnet].known==shuttle_down) {
 	prout(_("The shuttle craft Galileo is here!"));
     }
-    if (game.landed!=1 && game.imine) {
+    if (!game.landed && game.imine) {
 	game.icrystl = true;
 	game.cryprob = 0.05;
     }
@@ -193,7 +193,7 @@ void mine(void)
 {
     skip(1);
     chew();
-    if (game.landed!= 1) {
+    if (!game.landed) {
 	prout(_("Mining party not on planet."));
 	return;
     }
@@ -298,11 +298,11 @@ void shuttle(void)
 	prout(_(" not in standard orbit."));
 	return;
     }
-    if ((game.state.plnets[game.iplnet].known != shuttle_down) && game.iscraft != 1) {
+    if ((game.state.plnets[game.iplnet].known != shuttle_down) && game.iscraft != onship) {
 	prout(_("Shuttle craft not currently available."));
 	return;
     }
-    if (game.landed==-1 && game.state.plnets[game.iplnet].known==shuttle_down) {
+    if (!game.landed && game.state.plnets[game.iplnet].known==shuttle_down) {
 	prout(_("You will have to beam down to retrieve the shuttle craft."));
 	return;
     }
@@ -328,9 +328,9 @@ void shuttle(void)
 	    return;
 	}
     }
-    if (game.landed == 1) {
+    if (game.landed) {
 	/* Kirk on planet */
-	if (game.iscraft==1) {
+	if (game.iscraft == onship) {
 	    /* Galileo on ship! */
 	    if (!damaged(DTRANSP)) {
 		proutn(_("Spock-  \"Would you rather use the transporter?\" "));
@@ -343,7 +343,7 @@ void shuttle(void)
 	    else
 		proutn(_("Rescue party"));
 	    prout(_(" boards Galileo and swoops toward planet surface."));
-	    game.iscraft = 0;
+	    game.iscraft = offship;
 	    skip(1);
 	    if (consumeTime()) return;
 	    game.state.plnets[game.iplnet].known=shuttle_down;
@@ -359,9 +359,9 @@ void shuttle(void)
 	    game.state.plnets[game.iplnet].known=known;
 	    game.icraft = true;
 	    skip(1);
-	    game.landed = -1;
+	    game.landed = false;
 	    if (consumeTime()) return;
-	    game.iscraft = 1;
+	    game.iscraft = onship;
 	    game.icraft = false;
 	    if (game.imine) {
 		game.icrystl = true;
@@ -381,10 +381,10 @@ void shuttle(void)
 	prouts(_("The hangar doors open; the trip begins."));
 	skip(1);
 	game.icraft = true;
-	game.iscraft = 0;
+	game.iscraft = offship;
 	if (consumeTime()) return;
 	game.state.plnets[game.iplnet].known = shuttle_down;
-	game.landed = 1;
+	game.landed = true;
 	game.icraft = false;
 	prout(_("Trip complete"));
 	return;

@@ -80,8 +80,8 @@ typedef enum {
 } feature;
 
 typedef struct {
-    int snap,		// snapshot taken
-	crew,		// crew complement
+    bool snap;		// snapshot taken
+    int crew,		// crew complement
 #define FULLCREW	428	/* BSD Trek was 387, that's wrong */
 	remkl,			// remaining klingons
 	remcom,			// remaining commanders
@@ -112,7 +112,7 @@ typedef struct {
     } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
     struct page {
 	int stars;
-	int starbase;
+	bool starbase;
 	int klingons;
     } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
@@ -127,13 +127,6 @@ typedef struct {
 #define KLINGREM (game.state.remkl + game.state.remcom + game.state.nscrem)
 #define INKLINGTOT (game.inkling + game.incom + game.inscom)
 #define KLINGKILLED (INKLINGTOT - KLINGREM)
-
-#define SKILL_NONE	0
-#define SKILL_NOVICE	1
-#define SKILL_FAIR	2
-#define SKILL_GOOD	3
-#define SKILL_EXPERT	4
-#define SKILL_EMERITUS	5
 
 /* game options */
 #define OPTION_ALL	0xffffffff
@@ -234,12 +227,15 @@ struct game {
 	alive,		// we are alive (not killed)
 	justin,		// just entered quadrant
 	shldup,		// shields are up
+	shldchg,	// shield is changing (affects efficiency)
 	comhere,	// commander here
 	ishere,		// super-commander in quadrant
+	iscate,		// super commander is here
 	ientesc,	// attempted escape from supercommander
 	ithere,		// Tholian is here 
 	resting,	// rest time
 	icraft,		// Kirk in Galileo
+	landed,		// party on planet (true), on ship (false)
 	alldone,	// game is now finished
 	neutz,		// Romulan Neutral Zone
 	isarmed,	// probe is armed
@@ -255,31 +251,39 @@ struct game {
 	docked,
 	dead,
     } condition;		// condition (red/yellow/green/docked)
+    enum {
+	onship,
+	offship,
+	removed,
+    } iscraft;		// 'onship' if craft on ship, 'removed' if out of game
+    enum {
+	SKILL_NONE,
+	SKILL_NOVICE,
+	SKILL_FAIR,
+	SKILL_GOOD,
+	SKILL_EXPERT,
+	SKILL_EMERITUS,
+    } skill;		// skill level
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
 	incom,		// initial number of commanders
 	inscom,		// initial number of commanders
 	inrom,		// initial number of commanders
 	instar,		// initial stars
-	intorps,	// initial/Max torpedoes
+	intorps,	// initial/max torpedoes
 	torps,		// number of torpedoes
 	ship,		// ship type -- 'E' is Enterprise
 	abandoned,	// count of crew abandoned in space
 	length,		// length of game
-	skill,		// skill level
 	klhere,		// klingons here
 	casual,		// causalties
 	nhelp,		// calls for help
 	nkinks,		// count of energy-barrier crossings
-	shldchg,	// shield is changing (affects efficiency)
-	landed,		// party on planet (1), on ship (-1)
 	iplnet,		// planet # in quadrant
 	inplan,		// initial planets
 	nenhere,	// number of enemies in quadrant
 	irhere,		// Romulans in quadrant
-	iscraft,	// =1 if craft on ship, -1 if removed from game
 	isatb,		// =1 if super commander is attacking base
-	iscate,		// super commander is here
 	iattak,		// attack recursion elimination (was cracks[4])
 	tourn,		// tournament number
 	proben,		// number of moves for probe

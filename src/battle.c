@@ -62,7 +62,7 @@ void doshield(bool raise)
 	    return;
 	}
 	game.shldup = true;
-	game.shldchg = 1;
+	game.shldchg = true;
 	if (game.condition != docked) game.energy -= 50.0;
 	prout(_("Shields raised."));
 	if (game.energy <= 0) {
@@ -79,7 +79,7 @@ void doshield(bool raise)
 	    return;
 	}
 	game.shldup=false;
-	game.shldchg=1;
+	game.shldchg=true;
 	prout(_("Shields lowered."));
 	game.ididit = true;
 	return;
@@ -289,7 +289,8 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    *hit = fabs(*hit);
 	    newcnd(); /* we're blown out of dock */
 	    /* We may be displaced. */
-	    if (game.landed==1 || game.condition==docked) return; /* Cheat if on a planet */
+	    if (game.landed || game.condition==docked) 
+		return; /* Cheat if on a planet */
 	    ang = angle + 2.5*(Rand()-0.5);
 	    temp = fabs(sin(ang));
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
@@ -388,7 +389,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    game.iplnet = 0;
 	    game.plnet.x = game.plnet.y = 0;
 	    game.quad[w.x][w.y] = IHDOT;
-	    if (game.landed==1) {
+	    if (game.landed) {
 		/* captain perishes on planet */
 		finish(FDPLANET);
 	    }
@@ -402,7 +403,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    game.iplnet = 0;
 	    game.plnet.x = game.plnet.y = 0;
 	    game.quad[w.x][w.y] = IHDOT;
-	    if (game.landed==1) {
+	    if (game.landed) {
 		/* captain perishes on planet */
 		finish(FDPLANET);
 	    }
@@ -513,7 +514,7 @@ static void fry(double hit)
 	    j = randdevice();
 	    /* Cheat to prevent shuttle damage unless on ship */
 	} while 
-	      (game.damage[j]<0.0 || (j==DSHUTTL && game.iscraft!=1));
+	      (game.damage[j]<0.0 || (j==DSHUTTL && game.iscraft != onship));
 	cdam[loop1] = j;
 	extradm = (hit*game.damfac)/(ncrit*(75.0+25.0*Rand()));
 	game.damage[j] += extradm;
@@ -556,7 +557,7 @@ void attack(bool torps_ok)
     if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) movcom();
     if (game.nenhere==0 || (game.nenhere==1 && iqhere && !iqengry)) return;
     pfac = 1.0/game.inshld;
-    if (game.shldchg == 1) chgfac = 0.25+0.5*Rand();
+    if (game.shldchg) chgfac = 0.25+0.5*Rand();
     skip(1);
     if (game.skill <= SKILL_FAIR) where = sector;
     for_local_enemies(loop) {
@@ -601,7 +602,7 @@ void attack(bool torps_ok)
 		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
-	if (game.shldup || game.shldchg != 0 || game.condition==docked) {
+	if (game.shldup || game.shldchg || game.condition==docked) {
 	    /* shields will take hits */
 	    double absorb, hitsh, propor = pfac*game.shield*(game.condition==docked ? 2.1 : 1.0);
 	    if(propor < 0.1) propor = 0.1;
@@ -724,7 +725,8 @@ void deadkl(coord w, feature type, coord mv)
 	case IHS:
 	    game.state.nscrem--;
 	    game.ishere = false;
-	    game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
+	    game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = 0;
+	    game.iscate = false;
 	    unschedule(FSCMOVE);
 	    unschedule(FSCDBAS);
 	    break;
@@ -1195,7 +1197,7 @@ void phasers(void)
 		key = scan();
 	    }
 	    if (key == IHALPHA && isit("no")) {
-		no = 1;
+		no = true;
 		key = scan();
 		continue;
 	    }

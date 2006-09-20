@@ -162,7 +162,7 @@ void events(void)
 	case FSPY: /* Check with spy to see if S.C. should tractor beam */
 	    if (game.state.nscrem == 0 ||
 		ictbeam || istract ||
-		game.condition==docked || game.isatb==1 || game.iscate==1) return;
+		game.condition==docked || game.isatb==1 || game.iscate) return;
 	    if (game.ientesc ||
 		(game.energy < 2000 && game.torps < 4 && game.shield < 1250) ||
 		(damaged(DPHASER) && (damaged(DPHOTON) || game.torps < 4)) ||
@@ -195,7 +195,7 @@ void events(void)
 	    if (!ipage) pause_game(true);
 	    ipage=true;
 	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
-	    ictbeam = 1;
+	    ictbeam = true;
 	    skip(1);
 	    proutn("***");
 	    crmshp();
@@ -208,13 +208,13 @@ void events(void)
 		return;
 	    }
 	    /* Check to see if shuttle is aboard */
-	    if (game.iscraft==0) {
+	    if (game.iscraft == offship) {
 		skip(1);
 		if (Rand() > 0.5) {
 		    prout(_("Galileo, left on the planet surface, is captured"));
 		    prout(_("by aliens and made into a flying McDonald's."));
 		    game.damage[DSHUTTL] = -10;
-		    game.iscraft = -1;
+		    game.iscraft = removed;
 		}
 		else {
 		    prout(_("Galileo, left on the planet surface, is well hidden."));
@@ -237,7 +237,7 @@ void events(void)
 	    if (!game.shldup) {
 		if (!damaged(DSHIELD) && game.shield > 0) {
 		    doshield(true); /* raise shields */
-		    game.shldchg=0;
+		    game.shldchg=false;
 		}
 		else prout(_("(Shields not currently useable.)"));
 	    }
@@ -250,7 +250,7 @@ void events(void)
 	    break;
 	case FSNAP: /* Snapshot of the universe (for time warp) */
 	    game.snapsht = game.state;
-	    game.state.snap = 1;
+	    game.state.snap = true;
 	    schedule(FSNAP, expran(0.5 * game.intime));
 	    break;
 	case FBATTAK: /* Commander attacks starbase */
@@ -365,7 +365,7 @@ void events(void)
 	case FSCMOVE: /* Supercommander moves */
 	    schedule(FSCMOVE, 0.2777);
 	    if (!game.ientesc && !istract && game.isatb != 1 &&
-			(game.iscate != 1 || !game.justin)) 
+			(!game.iscate || !game.justin)) 
 		scom(&ipage);
 	    break;
 	case FDSPROB: /* Move deep space probe */
@@ -381,8 +381,8 @@ void events(void)
 		    game.state.galaxy[game.probec.x][game.probec.y].supernova) {
 		    // Left galaxy or ran into supernova
 		    if (!damaged(DRADIO) || game.condition == docked) {
-			if (ipage==0) pause_game(true);
-			ipage = 1;
+			if (!ipage) pause_game(true);
+			ipage = true;
 			skip(1);
 			proutn(_("Lt. Uhura-  \"The deep space probe "));
 			if (!VALID_QUADRANT(j, i))
@@ -395,8 +395,8 @@ void events(void)
 		    break;
 		}
 		if (!damaged(DRADIO) || game.condition == docked) {
-		    if (ipage==0) pause_game(true);
-		    ipage = 1;
+		    if (!ipage) pause_game(true);
+		    ipage = true;
 		    skip(1);
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in "));
 		    proutn(cramlc(quadrant, game.probec));
@@ -677,7 +677,7 @@ void nova(coord nov)
 			prout(_(" destroyed."));
 			DESTROY(&game.state.plnets[game.iplnet]);
 			game.iplnet = game.plnet.x = game.plnet.y = 0;
-			if (game.landed == 1) {
+			if (game.landed) {
 			    finish(FPNOVA);
 			    return;
 			}
@@ -866,7 +866,8 @@ void snova(bool induced, coord *w)
     game.state.galaxy[nq.x][nq.y].klingons = 0;
     if (same(nq, game.state.kscmdr)) {
 	/* did in the Supercommander! */
-	game.state.nscrem = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
+	game.state.nscrem = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb =  0;
+	game.iscate = false;
 	unschedule(FSCMOVE);
 	unschedule(FSCDBAS);
     }

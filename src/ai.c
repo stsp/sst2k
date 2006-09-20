@@ -46,7 +46,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     game.state.galaxy[iq.x][iq.y].klingons++;
     if (ienm==IHS) {
 	game.ishere = false;
-	game.iscate = 0;
+	game.iscate = false;
 	game.ientesc = false;
 	game.isatb = 0;
 	schedule(FSCMOVE, 0.2777);
@@ -310,7 +310,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].klingons++;
     if (game.ishere) {
 	/* SC has scooted, Remove him from current quadrant */
-	game.iscate=0;
+	game.iscate=false;
 	game.isatb=0;
 	game.ishere = false;
 	game.ientesc = false;
@@ -335,8 +335,8 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
-		if (*ipage==0) pause_game(true);
-		*ipage = 1;
+		if (!*ipage) pause_game(true);
+		*ipage = true;
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
 		proutn(_("   a planet in "));
 		proutn(cramlc(quadrant, game.state.kscmdr));
@@ -363,7 +363,7 @@ void scom(bool *ipage)
     /* Decide on being active or passive */
     flag = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
 	    (game.state.date-game.indate) < 3.0);
-    if (game.iscate==0 && flag) {
+    if (!game.iscate && flag) {
 	/* compute move away from Enterprise */
 	ideltax = game.state.kscmdr.x-game.quadrant.x;
 	ideltay = game.state.kscmdr.y-game.quadrant.y;
@@ -387,9 +387,9 @@ void scom(bool *ipage)
 	}
 	if (game.state.rembase > 1) {
 	    /* sort into nearest first order */
-	    int iswitch;
+	    bool iswitch;
 	    do {
-		iswitch = 0;
+		iswitch = false;
 		for (i=1; i < game.state.rembase-1; i++) {
 		    if (bdist[i] > bdist[i+1]) {
 			int ti = basetbl[i];
@@ -398,7 +398,7 @@ void scom(bool *ipage)
 			bdist[i+1] = t;
 			basetbl[i] = basetbl[i+1];
 			basetbl[i+1] =ti;
-			iswitch = 1;
+			iswitch = true;
 		    }
 		}
 	    } while (iswitch);
@@ -417,7 +417,7 @@ void scom(bool *ipage)
 	    /* if there is a commander, an no other base is appropriate,
 	       we will take the one with the commander */
 	    for_commanders (j) {
-		if (ibq.x==game.state.kcmdr[j].x && ibq.y==game.state.kcmdr[j].y && ifindit!= 2) {
+		if (same(ibq, game.state.kcmdr[j]) && ifindit!= 2) {
 		    ifindit = 2;
 		    iwhichb = i;
 		    break;
@@ -490,8 +490,8 @@ void scom(bool *ipage)
 	    if (damaged(DRADIO) && game.condition != docked)
 		return; /* no warning */
 	    game.iseenit = true;
-	    if (*ipage == 0)  pause_game(true);
-	    *ipage=1;
+	    if (!*ipage)  pause_game(true);
+	    *ipage = true;
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    proutn(cramlc(quadrant, game.state.kscmdr));
 	    skip(1);
@@ -513,8 +513,8 @@ void scom(bool *ipage)
 	 (damaged(DRADIO) && game.condition != docked) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
-    if (*ipage==0) pause_game(true);
-    *ipage = 1;
+    if (!*ipage) pause_game(true);
+    *ipage = true;
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
     proutn(_("   the Super-commander is in "));
     proutn(cramlc(quadrant, game.state.kscmdr));

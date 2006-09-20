@@ -468,8 +468,8 @@ static void makemoves(void)
 	case SHIELDS:			// shields
 	    doshield(false);
 	    if (game.ididit) {
-		hitme=true;
-		game.shldchg = 0;
+		hitme = true;
+		game.shldchg = false;
 	    }
 	    break;
 	case DOCK:			// dock

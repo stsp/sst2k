@@ -101,6 +101,8 @@ void finish(FINTYPE ifin)
 		skip(1);
 		prout(_("In fact, you have done so well that Starfleet Command"));
 		switch (game.skill) {
+		case SKILL_NONE:
+		    break;	/* quiet gcc warning */
 		case SKILL_NOVICE:
 		    prout(_("promotes you one step in rank from \"Novice\" to \"Fair\"."));
 		    break;
@@ -167,7 +169,7 @@ void finish(FINTYPE ifin)
 	else {
 	    prout(_("found guilty and"));
 	    prout(_("sentenced to death by slow torture."));
-	    game.alive = 0;
+	    game.alive = false;
 	}
 	score();
 	return;
@@ -286,7 +288,7 @@ void finish(FINTYPE ifin)
     }
     if (game.ship==IHF) game.ship= 0;
     else if (game.ship == IHE) game.ship = IHF;
-    game.alive = 0;
+    game.alive = false;
     if (KLINGREM != 0) {
 	double goodies = game.state.remres/game.inresor;
 	double baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom);
@@ -309,7 +311,7 @@ void finish(FINTYPE ifin)
 	prout(_("martyr and a hero. Someday maybe they'll erect a"));
 	prout(_("statue in your memory. Rest in peace, and try not"));
 	prout(_("to think about pigeons."));
-	game.gamewon = 1;
+	game.gamewon = true;
     }
     score();
 }
@@ -329,11 +331,11 @@ void score(void)
     if (game.ship == IHE) klship = 0;
     else if (game.ship == IHF) klship = 1;
     else klship = 2;
-    if (game.gamewon == 0) game.state.nromrem = 0; // None captured if no win
+    if (!game.gamewon) game.state.nromrem = 0; // None captured if no win
     iscore = 10*NKILLK + 50*NKILLC + ithperd + iwon
 	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
 	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
-    if (game.alive == 0) iscore -= 200;
+    if (!game.alive) iscore -= 200;
     skip(2);
     prout(_("Your score --"));
     if (NKILLROM)
@@ -378,11 +380,12 @@ void score(void)
     if (klship)
 	prout(_("%6d ship(s) lost or destroyed          %5d"),
 	      klship, -100*klship);
-    if (game.alive==0)
+    if (!game.alive)
 	prout(_("Penalty for getting yourself killed        -200"));
     if (game.gamewon) {
 	proutn(_("Bonus for winning "));
 	switch (game.skill) {
+	case SKILL_NONE:     break;	/* quiet gcc warning */
 	case SKILL_NOVICE:   proutn(_("Novice game  ")); break;
 	case SKILL_FAIR:     proutn(_("Fair game    ")); break;
 	case SKILL_GOOD:     proutn(_("Good game    ")); break;

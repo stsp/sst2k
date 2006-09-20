@@ -268,7 +268,7 @@ static void getcd(bool isprobe, int akey)
 
     game.direc = -1.0;
 	
-    if (game.landed == 1 && !isprobe) {
+    if (game.landed && !isprobe) {
 	prout(_("Dummy! You can't leave standard orbit until you"));
 	proutn(_("are back aboard the "));
 	crmshp();
@@ -685,7 +685,7 @@ void atover(bool igrab)
 
     chew();
     /* is captain on planet? */
-    if (game.landed==1) {
+    if (game.landed) {
 	if (damaged(DTRANSP)) {
 	    finish(FPNOVA);
 	    return;
@@ -783,7 +783,7 @@ void timwrp()
 	prout(_("You are traveling backwards in time %d stardates."),
 	      (int)(game.state.date-game.snapsht.date));
 	game.state = game.snapsht;
-	game.state.snap = 0;
+	game.state.snap = false;
 	if (game.state.remcom) {
 	    schedule(FTBEAM, expran(game.intime/game.state.remcom));
 	    schedule(FBATTAK, expran(0.3*game.intime));
@@ -804,17 +804,17 @@ void timwrp()
 	for (l = 0; l < game.inplan; l++) {
 	    if (game.state.plnets[l].known == shuttle_down) {
 		gotit = true;
-		if (game.iscraft==1 && game.ship==IHE) {
+		if (game.iscraft == onship && game.ship==IHE) {
 		    prout(_("Checkov-  \"Security reports the Galileo has disappeared, Sir!"));
-		    game.iscraft = 0;
+		    game.iscraft = offship;
 		}
 	    }
 	}
 	/* Likewise, if in the original time the Galileo was abandoned, but
 	   was on ship earlier, it would have vanished -- lets restore it */
-	if (game.iscraft==0 && !gotit && game.damage[DSHUTTL] >= 0.0) {
+	if (game.iscraft == offship && !gotit && game.damage[DSHUTTL] >= 0.0) {
 	    prout(_("Checkov-  \"Security reports the Galileo has reappeared in the dock!\""));
-	    game.iscraft = 1;
+	    game.iscraft = onship;
 	}
 	/* 
 	 * There used to be code to do the actual reconstrction here,
@@ -948,7 +948,7 @@ void mayday(void)
 	prout(_("Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\""));
 	return;
     }
-    if (game.landed == 1) {
+    if (game.landed) {
 	proutn(_("You must be aboard the "));
 	crmshp();
 	prout(".");
@@ -1022,7 +1022,7 @@ void mayday(void)
     }
     if (m > 3) {
 	game.quad[ix][iy]=IHQUEST;
-	game.alive = 0;
+	game.alive = false;
 	drawmaps(1);
 	setwnd(message_window);
 	finish(FMATERIALIZE);
