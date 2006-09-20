@@ -340,26 +340,26 @@ void drawmaps(int mode)
     }
 }
 
-static void put_srscan_sym(int x, int y, char sym)
+static void put_srscan_sym(coord w, char sym)
 {
-    wmove(srscan_window, x+1, y*2+2);
+    wmove(srscan_window, w.x+1, w.y*2+2);
     waddch(srscan_window, sym);
     wrefresh(srscan_window);
 }
 
-void boom(int ii, int jj)
+void boom(coord w)
 /* enemy fall down, go boom */ 
 {
     if (game.options & OPTION_CURSES) {
 	drawmaps(2);
 	setwnd(srscan_window);
 	wattron(srscan_window, A_REVERSE);
-	put_srscan_sym(ii, jj, game.quad[ii][jj]);
+	put_srscan_sym(w, game.quad[w.x][w.y]);
 	sound(500);
 	delay(1000);
 	nosound();
 	wattroff(srscan_window, A_REVERSE);
-	put_srscan_sym(ii, jj, game.quad[ii][jj]);
+	put_srscan_sym(w, game.quad[w.x][w.y]);
 	delay(500);
 	setwnd(message_window);
     }
@@ -380,7 +380,7 @@ void warble(void)
     }
 }
 
-void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
+void tracktorpedo(coord w, int l, int i, int n, int iquad)
 /* torpedo-track animation */
 {
     if (!game.options & OPTION_CURSES) {
@@ -395,7 +395,7 @@ void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
 	    }
 	} else if (l==4 || l==9) 
 	    skip(1);
-	proutn("%d - %d   ", ix, iy);
+	proutn("%d - %d   ", w.x, w.y);
     } else {
 	if (!damaged(DSRSENS) || game.condit==IHDOCKED) {
 	    if (i != 1 && l == 1) {
@@ -403,23 +403,23 @@ void tracktorpedo(int ix, int iy, int l, int i, int n, int iquad)
 		delay(400);
 	    }
 	    if ((iquad==IHDOT)||(iquad==IHBLANK)){
-		put_srscan_sym(ix, iy, '+');
+		put_srscan_sym(w, '+');
 		sound(l*10);
 		delay(100);
 		nosound();
-		put_srscan_sym(ix, iy, iquad);
+		put_srscan_sym(w, iquad);
 	    }
 	    else {
 		wattron(curwnd, A_REVERSE);
-		put_srscan_sym(ix, iy, iquad);
+		put_srscan_sym(w, iquad);
 		sound(500);
 		delay(1000);
 		nosound();
 		wattroff(curwnd, A_REVERSE);
-		put_srscan_sym(ix, iy, iquad);
+		put_srscan_sym(w, iquad);
 	    }
 	} else {
-	    proutn("%d - %d   ", ix, iy);
+	    proutn("%d - %d   ", w.x, w.y);
 	}
     }
 }

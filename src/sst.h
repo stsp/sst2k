@@ -222,6 +222,7 @@ struct game {
 	isarmed,	// probe is armed
 	inorbit,	// orbiting a planet
 	imine,		// mining
+	icrystl,	// dilithium crystals aboard
 	thawed;		// thawed game
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
@@ -251,7 +252,6 @@ struct game {
 	isatb,		// =1 if super commander is attacking base
 	iscate,		// super commander is here
 	iattak,		// attack recursion elimination (was cracks[4])
-	icrystl,	// dilithium crystals aboard
 	tourn,		// tournament number
 	iseenit,	// seen base attack report
 	proben,		// number of moves for probe
@@ -411,8 +411,8 @@ void probe(void);
 void iostart(void);
 void setwnd(WINDOW *);
 void warble(void);
-void boom(int, int);
-void tracktorpedo(int, int, int, int, int, int);
+void boom(coord);
+void tracktorpedo(coord, int, int, int, int);
 void cgetline(char *, int);
 void waitfor(void);
 void setpassword(void);

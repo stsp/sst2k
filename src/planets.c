@@ -181,7 +181,7 @@ void beam(void)
 	prout(_("The shuttle craft Galileo is here!"));
     }
     if (game.landed!=1 && game.imine) {
-	game.icrystl = 1;
+	game.icrystl = true;
 	game.cryprob = 0.05;
     }
     game.imine = false;
@@ -209,7 +209,7 @@ void mine(void)
 	prout(_("You've already mined enough crystals for this trip."));
 	return;
     }
-    if (game.icrystl == 1 && game.cryprob == 0.05) {
+    if (game.icrystl && game.cryprob == 0.05) {
 	proutn(_("With all those fresh crystals aboard the "));
 	crmshp();
 	skip(1);
@@ -229,7 +229,7 @@ void usecrystals(void)
     game.ididit = false;
     skip(1);
     chew();
-    if (game.icrystl!=1) {
+    if (!game.icrystl) {
 	prout(_("No dilithium crystals available."));
 	return;
     }
@@ -364,7 +364,7 @@ void shuttle(void)
 	    game.iscraft = 1;
 	    game.icraft = false;
 	    if (game.imine) {
-		game.icrystl = 1;
+		game.icrystl = true;
 		game.cryprob = 0.05;
 	    }
 	    game.imine = false;

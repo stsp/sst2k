@@ -181,7 +181,7 @@ void ram(bool ibumpd, int ienm, coord w)
 void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
 /* let a photon torpedo fly */
 {
-    int l, iquad=0, jx=0, jy=0, ll;
+    int l, iquad=0, ll;
     bool shoved = false;
     double ac=course + 0.25*r;
     double angle = (15.0-ac)*0.5235988;
@@ -189,9 +189,9 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     double deltax=-sin(angle), deltay=cos(angle), x=inx, y=iny, bigger;
     double ang, temp, xx, yy, kp, h1;
     struct quadrant *q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
-    coord w;
+    coord w, jw;
 
-    w.x = w.y = 0;
+    w.x = w.y = jw.x = jw.y = 0;
     bigger = fabs(deltax);
     if (fabs(deltay) > bigger) bigger = fabs(deltay);
     deltax /= bigger;
@@ -208,7 +208,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	w.y = y + 0.5;
 	if (!VALID_SECTOR(w.x, w.y)) break;
 	iquad=game.quad[w.x][w.y];
-	tracktorpedo(w.x, w.y, l, i, n, iquad);
+	tracktorpedo(w, l, i, n, iquad);
 	if (iquad==IHDOT) continue;
 	/* hit something */
 	setwnd(message_window);
@@ -232,19 +232,19 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
 	    xx = -sin(ang)/temp;
 	    yy = cos(ang)/temp;
-	    jx=w.x+xx+0.5;
-	    jy=w.y+yy+0.5;
-	    if (!VALID_SECTOR(jx, jy)) return;
-	    if (game.quad[jx][jy]==IHBLANK) {
+	    jw.x=w.x+xx+0.5;
+	    jw.y=w.y+yy+0.5;
+	    if (!VALID_SECTOR(jw.x, jw.y)) return;
+	    if (game.quad[jw.x][jw.y]==IHBLANK) {
 		finish(FHOLE);
 		return;
 	    }
-	    if (game.quad[jx][jy]!=IHDOT) {
+	    if (game.quad[jw.x][jw.y]!=IHDOT) {
 		/* can't move into object */
 		return;
 	    }
-	    game.sector.x = jx;
-	    game.sector.y = jy;
+	    game.sector.x = jw.x;
+	    game.sector.y = jw.y;
 	    crmshp();
 	    shoved = true;
 	    break;
@@ -280,25 +280,25 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
 	    xx = -sin(ang)/temp;
 	    yy = cos(ang)/temp;
-	    jx=w.x+xx+0.5;
-	    jy=w.y+yy+0.5;
-	    if (!VALID_SECTOR(jx, jy)) {
+	    jw.x=w.x+xx+0.5;
+	    jw.y=w.y+yy+0.5;
+	    if (!VALID_SECTOR(jw.x, jw.y)) {
 		prout(_(" damaged but not destroyed."));
 		return;
 	    }
-	    if (game.quad[jx][jy]==IHBLANK) {
+	    if (game.quad[jw.x][jw.y]==IHBLANK) {
 		prout(_(" buffeted into black hole."));
-		deadkl(w, iquad, jx, jy);
+		deadkl(w, iquad, jw.x, jw.y);
 		return;
 	    }
-	    if (game.quad[jx][jy]!=IHDOT) {
+	    if (game.quad[jw.x][jw.y]!=IHDOT) {
 		/* can't move into object */
 		prout(_(" damaged but not destroyed."));
 		return;
 	    }
 	    proutn(_(" damaged--"));
-	    game.ks[ll].x = jx;
-	    game.ks[ll].y = jy;
+	    game.ks[ll].x = jw.x;
+	    game.ks[ll].y = jw.y;
 	    shoved = true;
 	    break;
 	case IHB: /* Hit a base */
@@ -426,9 +426,8 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     }
     if (shoved) {
 	game.quad[w.x][w.y]=IHDOT;
-	game.quad[jx][jy]=iquad;
-	w.x = jx; w.y = jy;
-	prout(_(" displaced by blast to %s "), cramlc(sector, w));
+	game.quad[jw.x][jw.y]=iquad;
+	prout(_(" displaced by blast to %s "), cramlc(sector, jw));
 	for_local_enemies(ll)
 	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll]);
 	sortkl();
@@ -1227,7 +1226,7 @@ void hittem(double *hits)
 	w = game.ks[kk];
 	if (hit > 0.005) {
 	    if (!damaged(DSRSENS))
-		boom(w.x, w.y);
+		boom(w);
 	    proutn(_("%d unit hit on "), (int)hit);
 	}
 	else

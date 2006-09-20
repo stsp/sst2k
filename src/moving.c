@@ -8,10 +8,10 @@ void imove(void)
 /* movement execution for warp, impule, supernova, and tractor-beam events */
 {
     double angle, deltax, deltay, bigger, x, y,
-        finald, finalx, finaly, stopegy, probf;
+        finald, stopegy, probf;
     int n, m, kink, kinks, iquad;
-    coord w;
-    bool trbeam = 0;
+    coord w, final;
+    bool trbeam = false;
 
     w.x = w.y = 0;
     if (game.inorbit) {
@@ -53,9 +53,8 @@ void imove(void)
 		if (game.nenhere != 0 && game.iattak != 2) {
 		    newcnd();
 		    for_local_enemies(m) {
-			finald = sqrt((w.x-game.ks[m].x)*(double)(w.x-game.ks[m].x) +
-				      (w.y-game.ks[m].y)*(double)(w.y-game.ks[m].y));
-			game.kavgd[m] = 0.5 * (finald+game.kdist[m]);
+			finald = distance(w, game.ks[m]);
+			game.kavgd[m] = 0.5 * (finald + game.kdist[m]);
 		    }
 		    /*
 		     * Stas Sergeev added the game.condition
@@ -123,8 +122,7 @@ void imove(void)
 	    if (iquad != IHDOT) {
 		/* object encountered in flight path */
 		stopegy = 50.0*game.dist/game.optime;
-		game.dist=0.1*sqrt((game.sector.x-w.x)*(double)(game.sector.x-w.x) +
-			      (game.sector.y-w.y)*(double)(game.sector.y-w.y));
+		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0);
 		switch (iquad) {
 		case IHT: /* Ram a Tholian */
 		case IHK: /* Ram enemy ship */
@@ -132,11 +130,9 @@ void imove(void)
 		case IHS:
 		case IHR:
 		case IHQUEST:
-		    game.sector.x = w.x;
-		    game.sector.y = w.y;
+		    game.sector = w;
 		    ram(0, iquad, game.sector);
-		    finalx = game.sector.x;
-		    finaly = game.sector.y;
+		    final = game.sector;
 		    break;
 		case IHBLANK:
 		    skip(1);
@@ -174,10 +170,9 @@ void imove(void)
 		    proutn(_("Emergency stop required "));
 		    prout(_("%2d units of energy."), (int)stopegy);
 		    game.energy -= stopegy;
-		    finalx = x-deltax+0.5;
-		    game.sector.x = finalx;
-		    finaly = y-deltay+0.5;
-		    game.sector.y = finaly;
+		    final.x = x-deltax+0.5;
+		    final.y = y-deltay+0.5;
+		    game.sector = final;
 		    if (game.energy <= 0) {
 			finish(FNRG);
 			return;
@@ -187,20 +182,16 @@ void imove(void)
 		goto no_quad_change;	/* sorry! */
 	    }
 	}
-	game.dist = 0.1*sqrt((game.sector.x-w.x)*(double)(game.sector.x-w.x) +
-			(game.sector.y-w.y)*(double)(game.sector.y-w.y));
-	game.sector.x = w.x;
-	game.sector.y = w.y;
+	game.dist = distance(game.sector, w) / (QUADSIZE * 1.0);
+	game.sector = w;
     }
-    finalx = game.sector.x;
-    finaly = game.sector.y;
+    final = game.sector;
 no_quad_change:
     /* No quadrant change -- compute new avg enemy distances */
     game.quad[game.sector.x][game.sector.y] = game.ship;
     if (game.nenhere) {
 	for_local_enemies(m) {
-	    finald = sqrt((w.x-game.ks[m].x)*(double)(w.x-game.ks[m].x) +
-			  (w.y-game.ks[m].y)*(double)(w.y-game.ks[m].y));
+	    finald = distance(w, game.ks[m]);
 	    game.kavgd[m] = 0.5 * (finald+game.kdist[m]);
 	    game.kdist[m] = finald;
 	}
@@ -718,7 +709,7 @@ void atover(bool igrab)
 	    }
 	    else {
 		prout(_("saved."));
-		game.icrystl = 1;
+		game.icrystl = true;
 	    }
 	}
     }

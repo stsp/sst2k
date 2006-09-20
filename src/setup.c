@@ -177,7 +177,7 @@ void abandn(void)
 
 	/* If at least one base left, give 'em the Faerie Queene */
 	skip(1);
-	game.icrystl = 0; /* crystals are lost */
+	game.icrystl = false; /* crystals are lost */
 	game.nprobes = 0; /* No probes */
 	prout("You are captured by Klingons and released to");
 	prout("the Federation in a prisoner-of-war exchange.");
@@ -209,7 +209,7 @@ void abandn(void)
     prout("Starfleet puts you in command of another ship,");
     prout("the Faerie Queene, which is antiquated but,");
     prout("still useable.");
-    if (game.icrystl!=0) prout("The dilithium crystals have been moved.");
+    if (game.icrystl) prout("The dilithium crystals have been moved.");
     game.imine = false;
     game.iscraft=0; /* Galileo disappears */
     /* Resupply ship */
@@ -256,8 +256,8 @@ void setup(bool needprompt)
     game.battle.x = game.battle.y = 0;
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0;
-    game.resting = game.imine = game.icraft = false;
-    game.isatb = game.iscate = game.icrystl = game.state.nplankl = 0;
+    game.resting = game.imine = game.icrystl = game.icraft = false;
+    game.isatb = game.iscate = game.state.nplankl = 0;
     game.state.starkl = game.state.basekl = 0;
     game.iscraft = 1;
     game.landed = -1;
