@@ -438,6 +438,9 @@ void makechart(void);
 void enqueue(char *);
 char *systemname(int);
 coord newkling(int);
+#if BSD_BUG_FOR_BUG
+void visual(void);
+#endif
 
 extern WINDOW *curwnd;
 extern WINDOW *fullscreen_window;

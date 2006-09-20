@@ -411,6 +411,21 @@ short-range scan anytime you like.</para>
 the contents of adjacent sectors.</para>
 
 </sect1>
+<!--
+<sect1><title>Visual Scan</title>
+
+<literallayout>
+Mnemonic:  VISUAL
+Shortest abbreviation: V
+</literallayout>
+
+<para>A visual scan is made in a particular direction of three sectors
+in the general direction specified.  This takes time, and Klingons can
+attack you, so it should be done only when short-range sensors are
+out.</para>
+
+</sect1>
+-->
 <sect1><title>Status Report</title>
 
 <literallayout>

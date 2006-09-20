@@ -557,3 +557,74 @@ void eta(void)
     }
 			
 }
+
+#if BSD_BUG_FOR_BUG
+/*
+ *	A visual scan is made in a particular direction of three sectors
+ *	in the general direction specified.  This takes time, and
+ *	Klingons can attack you, so it should be done only when sensors
+ * 	are out.  Code swiped from BSD-Trek.  Not presently used, as we
+ *	automatically display all adjacent sectors on the short-range
+ *	scan even when short-range sensors are out.
+ */
+
+/* This struct[] has the delta x, delta y for particular directions */
+coord visdelta[] =
+{
+    {-1,-1},
+    {-1, 0},
+    {-1, 1},
+    {0,	 1},
+    {1,	 1},
+    {1,	 0},
+    {1,	-1},
+    {0,	-1},
+    {-1,-1},
+    {-1, 0},
+    {-1, 1},
+};
+
+void visual(void)
+{
+    int		co, ix, iy;
+    coord	*v;
+
+    if (scan() != IHREAL) {
+	chew();
+	proutn(_("Direction? "));
+	if (scan()!=IHREAL) {
+	    huh();
+	    return;
+	}
+    }
+    if (aaitem < 0.0 || aaitem > 360.0)
+	return;
+    co = (aaitem + 22) / 45;
+    v = &visdelta[co];
+    ix = game.sector.x + v->x;
+    iy = game.sector.y + v->y;
+    if (ix < 0 || ix >= QUADSIZE || iy < 0 || iy >= QUADSIZE)
+	co = '?';
+    else
+	co = game.quad[ix][iy];
+    printf("%d,%d %c ", ix, iy, co);
+    v++;
+    ix = game.sector.x + v->x;
+    iy = game.sector.y + v->y;
+    if (ix < 0 || ix >= QUADSIZE || iy < 0 || iy >= QUADSIZE)
+	co = '?';
+    else
+	co = game.quad[ix][iy];
+    printf("%c ", co);
+    v++;
+    ix = game.sector.x + v->x;
+    iy = game.sector.y + v->y;
+    if (ix < 0 || ix >= QUADSIZE || iy < 0 || iy >= QUADSIZE)
+	co = '?';
+    else
+	co = game.quad[ix][iy];
+    printf("%c %d,%d\n", co, ix, iy);
+    game.optime = 0.5;
+    game.ididit = true;
+}
+#endif

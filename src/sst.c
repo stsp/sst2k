@@ -291,6 +291,10 @@ commands[] = {
 	{"HELP",	HELP,		0},
 #define SEED	37
 	{"SEED",	SEED,		0},
+#if BSD_BUG_FOR_BUG
+#define VISUAL	38
+	{"VISUAL",	VISUAL,		0},
+#endif
 };
 
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
@@ -572,6 +576,11 @@ static void makemoves(void)
 	    if (key == IHREAL)
 		seed = (int)aaitem;
 	    break;
+#if BSD_BUG_FOR_BUG
+	case VISUAL:
+	    visual();			// perform visual scan
+	    break;
+#endif
 	}
 	commandhook(commands[i].name, false);
 	for (;;) {
