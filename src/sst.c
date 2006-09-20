@@ -469,8 +469,8 @@ static void makemoves(void)
 	    }
 	    break;
 	case DOCK:			// dock
-	    dock(1);
-	    if (game.ididit) attack(0);
+	    dock(true);
+	    if (game.ididit) attack(false);
 	    break;
 	case DAMAGES:			// damages
 	    dreprt();
@@ -586,7 +586,7 @@ static void makemoves(void)
 		continue;
 	    }
 	    if (hitme && !game.justin) {
-		attack(2);
+		attack(true);
 		if (game.alldone) break;
 		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) {	// went NOVA! 
 		    atover(false);

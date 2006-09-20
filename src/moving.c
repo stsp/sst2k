@@ -63,7 +63,7 @@ void imove(void)
 		     * are present and your skill is good.
 		     */
 		    if (game.skill > SKILL_GOOD && game.klhere > 0 && !game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
-			attack(0);
+			attack(false);
 		    if (game.alldone) return;
 		}
 		/* compute final position -- new quadrant and sector */
@@ -116,7 +116,7 @@ void imove(void)
 		prout(_("Entering %s."), cramlc(quadrant, game.quadrant));
 		game.quad[game.sector.x][game.sector.y] = game.ship;
 		newqad(false);
-		if (game.skill>SKILL_NOVICE) attack(0);
+		if (game.skill>SKILL_NOVICE) attack(false);
 		return;
 	    }
 	    iquad = game.quad[w.x][w.y];
@@ -198,7 +198,7 @@ no_quad_change:
 	}
 	sortkl();
 	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova && game.iattak == 0)
-	    attack(0);
+	    attack(false);
 	for_local_enemies(m) game.kavgd[m] = game.kdist[m];
     }
     newcnd();

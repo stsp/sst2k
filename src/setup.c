@@ -407,7 +407,7 @@ void setup(bool needprompt)
     waitfor();
     newqad(false);
     if (game.nenhere-iqhere-game.ithere) game.shldup = true;
-    if (game.neutz) attack(0);	// bad luck to start in a Romulan Neutral Zone
+    if (game.neutz) attack(false);	// bad luck to start in a Romulan Neutral Zone
 }
 
 bool choose(bool needprompt) 

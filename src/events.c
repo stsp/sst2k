@@ -244,7 +244,7 @@ void events(void)
 	    newqad(false);
 	    /* Adjust finish time to time of tractor beaming */
 	    fintim = game.state.date+game.optime;
-	    attack(0);
+	    attack(false);
 	    if (game.state.remcom <= 0) unschedule(FTBEAM);
 	    else schedule(FTBEAM, game.optime+expran(1.5*game.intime/game.state.remcom));
 	    break;
@@ -585,7 +585,7 @@ void wait(void)
 	    if (rtime < temp) temp = rtime;
 	    game.optime = temp;
 	}
-	if (game.optime < delay) attack(0);
+	if (game.optime < delay) attack(false);
 	if (game.alldone) return;
 	events();
 	game.ididit = true;
