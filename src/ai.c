@@ -208,7 +208,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 		/* See if we should ram ship */
 		if (game.quad[lookx][looky] == game.ship &&
 		    (ienm == IHC || ienm == IHS)) {
-		    ram(1, ienm, com);
+		    ram(true, ienm, com);
 		    return;
 		}
 		if (krawlx != mx && my != 0) {

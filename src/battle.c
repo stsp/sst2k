@@ -153,7 +153,7 @@ void ram(bool ibumpd, int ienm, coord w)
     crmena(false, ienm, sector, w);
     if (ibumpd) proutn(_(" (original position)"));
     skip(1);
-    deadkl(w, ienm, game.sector.x, game.sector.y);
+    deadkl(w, ienm, game.sector);
     proutn("***");
     crmshp();
     prout(_(" heavily damaged."));
@@ -178,7 +178,7 @@ void ram(bool ibumpd, int ienm, coord w)
     return;
 }
 
-void torpedo(double course, double r, int inx, int iny, double *hit, int i, int n)
+void torpedo(double course, double r, coord in, double *hit, int i, int n)
 /* let a photon torpedo fly */
 {
     int l, iquad=0, ll;
@@ -186,7 +186,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     double ac=course + 0.25*r;
     double angle = (15.0-ac)*0.5235988;
     double bullseye = (15.0 - course)*0.5235988;
-    double deltax=-sin(angle), deltay=cos(angle), x=inx, y=iny, bigger;
+    double deltax=-sin(angle), deltay=cos(angle), x=in.x, y=in.y, bigger;
     double ang, temp, xx, yy, kp, h1;
     struct quadrant *q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
     coord w, jw;
@@ -221,8 +221,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    crmshp();
 	    prout(".");
 	    *hit = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
-		fabs(sin(bullseye-angle));
+		1000.0 * distance(w, in) * fabs(sin(bullseye-angle));
 	    *hit = fabs(*hit);
 	    newcnd(); /* we're blown out of dock */
 	    /* We may be displaced. */
@@ -243,8 +242,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		/* can't move into object */
 		return;
 	    }
-	    game.sector.x = jw.x;
-	    game.sector.y = jw.y;
+	    game.sector = jw;
 	    crmshp();
 	    shoved = true;
 	    break;
@@ -261,16 +259,16 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	case IHK:
 	    /* find the enemy */
 	    for_local_enemies(ll)
-		if (w.x==game.ks[ll].x && w.y==game.ks[ll].y) break;
+		if (same(w, game.ks[ll]))
+		    break;
 	    kp = fabs(game.kpower[ll]);
 	    h1 = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
-		fabs(sin(bullseye-angle));
+		1000.0 * distance(w, in) * fabs(sin(bullseye-angle));
 	    h1 = fabs(h1);
 	    if (kp < h1) h1 = kp;
 	    game.kpower[ll] -= (game.kpower[ll]<0 ? -h1 : h1);
 	    if (game.kpower[ll] == 0) {
-		deadkl(w, iquad, w.x, w.y);
+		deadkl(w, iquad, w);
 		return;
 	    }
 	    crmena(true, iquad, sector, w);
@@ -288,7 +286,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    }
 	    if (game.quad[jw.x][jw.y]==IHBLANK) {
 		prout(_(" buffeted into black hole."));
-		deadkl(w, iquad, jw.x, jw.y);
+		deadkl(w, iquad, jw);
 		return;
 	    }
 	    if (game.quad[jw.x][jw.y]!=IHDOT) {
@@ -297,8 +295,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		return;
 	    }
 	    proutn(_(" damaged--"));
-	    game.ks[ll].x = jw.x;
-	    game.ks[ll].y = jw.y;
+	    game.ks[ll] = jw;
 	    shoved = true;
 	    break;
 	case IHB: /* Hit a base */
@@ -366,7 +363,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 		proutn(_("Mr. Spock-"));
 		prouts(_("  \"Fascinating!\""));
 		skip(1);
-		deadkl(w, iquad, w.x, w.y);
+		deadkl(w, iquad, w);
 	    } else {
 		/*
 		 * Stas Sergeev added the possibility that
@@ -388,14 +385,13 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    return;
 	case IHT:  /* Hit a Tholian */
 	    h1 = 700.0 + 100.0*Rand() -
-		1000.0*sqrt(square(w.x-inx)+square(w.y-iny))*
-		fabs(sin(bullseye-angle));
+		1000.0 * distance(w, in) * fabs(sin(bullseye-angle));
 	    h1 = fabs(h1);
 	    if (h1 >= 600) {
 		game.quad[w.x][w.y] = IHDOT;
 		game.ithere = false;
 		game.tholian.x = game.tholian.y = 0;
-		deadkl(w, iquad, w.x, w.y);
+		deadkl(w, iquad, w);
 		return;
 	    }
 	    skip(1);
@@ -536,7 +532,7 @@ void attack(bool torps_ok)
 	    prout("  ");
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[loop]*r;
-	    torpedo(course, r, jay.x, jay.y, &hit, 1, 1);
+	    torpedo(course, r, jay, &hit, 1, 1);
 	    if (KLINGREM==0) 
 		finish(FWON); /* Klingons did themselves in! */
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.alldone) 
@@ -619,14 +615,12 @@ void attack(bool torps_ok)
     return;
 }
 		
-void deadkl(coord w, int type, int ixx, int iyy)
+void deadkl(coord w, int type, coord mv)
 /* kill a Klingon, Tholian, Romulan, or Thingy */
 {
-    /* Added ixx and iyy allow enemy to "move" before dying */
-    coord mv;
+    /* Added mv to allow enemy to "move" before dying */
     int i,j;
 
-    mv.x = ixx; mv.y = iyy;
     skip(1);
     crmena(true, type, sector, mv);
     /* Decide what kind of enemy it is and update approriately */
@@ -847,7 +841,7 @@ void photon(void)
 	}
 	if (game.shldup || game.condit == IHDOCKED) 
 	    r *= 1.0 + 0.0001*game.shield;
-	torpedo(course[i], r, game.sector.x, game.sector.y, &dummy, i, n);
+	torpedo(course[i], r, game.sector, &dummy, i, n);
 	if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 	    return;
     }
@@ -1236,7 +1230,7 @@ void hittem(double *hits)
 	crmena(false,ienm,sector,w);
 	skip(1);
 	if (kpow == 0) {
-	    deadkl(w, ienm, w.x, w.y);
+	    deadkl(w, ienm, w);
 	    if (KLINGREM==0) finish(FWON);
 	    if (game.alldone) return;
 	    kk--; /* don't do the increment */

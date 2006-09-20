@@ -171,7 +171,7 @@ void events(void)
 		 (game.torps < 5 || damaged(DPHOTON)))) {
 		/* Tractor-beam her! */
 		istract = true;
-		yank = square(game.state.kscmdr.x-game.quadrant.x) + square(game.state.kscmdr.y-game.quadrant.y);
+		yank = distance(game.state.kscmdr, game.quadrant);
 		/********* fall through to FTBEAM code ***********/
 	    }
 	    else return;
@@ -714,7 +714,7 @@ void nova(coord nov)
 			kount++;
 			break;
 		    case IHK: /* kill klingon */
-			deadkl(scratch,iquad, scratch.x, scratch.y);
+			deadkl(scratch,iquad, scratch);
 			break;
 		    case IHC: /* Damage/destroy big enemies */
 		    case IHS:
@@ -723,7 +723,7 @@ void nova(coord nov)
 			    if (same(game.ks[ll], scratch)) break;
 			game.kpower[ll] -= 800.0; /* If firepower is lost, die */
 			if (game.kpower[ll] <= 0.0) {
-			    deadkl(scratch, iquad, scratch.x, scratch.y);
+			    deadkl(scratch, iquad, scratch);
 			    break;
 			}
 			newc.x = scratch.x + scratch.x - hits[mm][1];
@@ -740,7 +740,7 @@ void nova(coord nov)
 			    proutn(_(", blasted into "));
 			    crmena(false, IHBLANK, sector, newc);
 			    skip(1);
-			    deadkl(scratch, iquad, newc.x, newc.y);
+			    deadkl(scratch, iquad, newc);
 			    break;
 			}
 			if (iquad1 != IHDOT) {

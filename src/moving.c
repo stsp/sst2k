@@ -131,7 +131,7 @@ void imove(void)
 		case IHR:
 		case IHQUEST:
 		    game.sector = w;
-		    ram(0, iquad, game.sector);
+		    ram(false, iquad, game.sector);
 		    final = game.sector;
 		    break;
 		case IHBLANK:
