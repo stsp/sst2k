@@ -175,8 +175,8 @@ static void setup_names(void)
 /* Sets up some arrays with localized names.
  * Must be done after iostart() for localization to work. */
 {
-    char *tmp1[] = SYSTEM_NAMES;
-    char *tmp2[] = DEVICE_NAMES;
+    char *tmp1[ARRAY_SIZE(systnames)] = SYSTEM_NAMES;
+    char *tmp2[ARRAY_SIZE(device)] = DEVICE_NAMES;
 
     memcpy(systnames, tmp1, sizeof(systnames));
     memcpy(device, tmp2, sizeof(device));

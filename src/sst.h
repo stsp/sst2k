@@ -203,6 +203,8 @@ extern double scheduled(int);
 
 #define SSTMAGIC	"SST2.0\n"
 
+#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+
 struct game {
     char magic[sizeof(SSTMAGIC)];
     unsigned long options;
