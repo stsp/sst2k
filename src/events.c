@@ -153,7 +153,7 @@ void events(void)
 	game.optime -= xtime;
 	switch (evcode) {
 	case FSNOVA: /* Supernova */
-	    if (!ipage) pause_game(1);
+	    if (!ipage) pause_game(true);
 	    ipage=true;
 	    snova(false, NULL);
 	    schedule(FSNOVA, expran(0.5*game.intime));
@@ -192,7 +192,7 @@ void events(void)
 	    }
 	    /* tractor beaming cases merge here */
 	    yank = sqrt(yank);
-	    if (!ipage) pause_game(1);
+	    if (!ipage) pause_game(true);
 	    ipage=true;
 	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 	    ictbeam = 1;
@@ -224,7 +224,7 @@ void events(void)
 		game.quadrant = game.state.kscmdr;
 	    else
 		game.quadrant = game.state.kcmdr[i];
-	    game.sector = iran(QUADSIZE);
+	    game.sector = randplace(QUADSIZE);
 	    crmshp();
 	    proutn(_(" is pulled to "));
 	    proutn(cramlc(quadrant, game.quadrant));
@@ -236,7 +236,7 @@ void events(void)
 	    }
 	    if (!game.shldup) {
 		if (!damaged(DSHIELD) && game.shield > 0) {
-		    doshield(2); /* Shldsup */
+		    doshield(true); /* raise shields */
 		    game.shldchg=0;
 		}
 		else prout(_("(Shields not currently useable.)"));
@@ -287,7 +287,7 @@ void events(void)
 	    if (!damaged(DRADIO) && game.condition != docked) 
 		break; /* No warning :-( */
 	    game.iseenit = true;
-	    if (!ipage) pause_game(1);
+	    if (!ipage) pause_game(true);
 	    ipage = true;
 	    skip(1);
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
@@ -335,7 +335,7 @@ void events(void)
 	    else if (game.state.rembase != 1 &&
 		     (!damaged(DRADIO) || game.condition == docked)) {
 		/* Get word via subspace radio */
-		if (!ipage) pause_game(1);
+		if (!ipage) pause_game(true);
 		ipage = true;
 		skip(1);
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Command reports that"));
@@ -381,7 +381,7 @@ void events(void)
 		    game.state.galaxy[game.probec.x][game.probec.y].supernova) {
 		    // Left galaxy or ran into supernova
 		    if (!damaged(DRADIO) || game.condition == docked) {
-			if (ipage==0) pause_game(1);
+			if (ipage==0) pause_game(true);
 			ipage = 1;
 			skip(1);
 			proutn(_("Lt. Uhura-  \"The deep space probe "));
@@ -395,7 +395,7 @@ void events(void)
 		    break;
 		}
 		if (!damaged(DRADIO) || game.condition == docked) {
-		    if (ipage==0) pause_game(1);
+		    if (ipage==0) pause_game(true);
 		    ipage = 1;
 		    skip(1);
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in "));
@@ -432,7 +432,7 @@ void events(void)
 		   which has some stars which are inhabited and
 		   not already under attack, which is not
 		   supernova'ed, and which has some Klingons in it */
-		w = iran(GALSIZE);
+		w = randplace(GALSIZE);
 		q = &game.state.galaxy[w.x][w.y];
 	    } while (--i &&
 		     (same(game.quadrant, w) || q->planet == NOPLANET ||

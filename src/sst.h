@@ -58,6 +58,27 @@ typedef struct {
 
 #define DESTROY(pl)	memset(pl, '\0', sizeof(planet))
 
+typedef enum {
+    IHR = 'R',
+    IHK = 'K',
+    IHC = 'C',
+    IHS = 'S',
+    IHSTAR = '*',
+    IHP = 'P',
+    IHW = '@',
+    IHB = 'B',
+    IHBLANK = ' ',
+    IHDOT = '.',
+    IHQUEST = '?',
+    IHE = 'E',
+    IHF = 'F',
+    IHT = 'T',
+    IHWEB = '#',
+    IHMATER0 = '-',
+    IHMATER1 = 'o',
+    IHMATER2 = '0',
+} feature;
+
 typedef struct {
     int snap,		// snapshot taken
 	crew,		// crew complement
@@ -193,7 +214,7 @@ struct game {
     unsigned long options;
     snapshot state;
     snapshot snapsht;
-    char quad[QUADSIZE+1][QUADSIZE+1];		// contents of our quadrant
+    feature quad[QUADSIZE+1][QUADSIZE+1];		// contents of our quadrant
     double kpower[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy energy levels
     double kdist[(QUADSIZE+1)*(QUADSIZE+1)];		// enemy distances
     double kavgd[(QUADSIZE+1)*(QUADSIZE+1)];		// average distances
@@ -227,11 +248,11 @@ struct game {
 	iseenit,	// seen base attack report
 	thawed;		// thawed game
     enum {
-	green = 'G',
-	yellow = 'Y',
-	red = 'R',
-	docked = 'D',
-	dead = 'Z',
+	green,
+	yellow,
+	red,
+	docked,
+	dead,
     } condition;		// condition (red/yellow/green/docked)
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
@@ -302,31 +323,22 @@ extern FILE *logfp, *replayfp;
 extern coord thing;
 extern bool iqhere, iqengry;
 
-typedef enum {FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
-              FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
-			  FMATERIALIZE, FPHASER, FLOST, FMINING, FDPLANET,
-			  FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
-	      FHOLE, FCREW} FINTYPE ;
+typedef enum {
+    FWON, FDEPLETE, FLIFESUP, FNRG, FBATTLE,
+    FNEG3, FNOVA, FSNOVAED, FABANDN, FDILITHIUM,
+    FMATERIALIZE, FPHASER, FLOST, FMINING, FDPLANET,
+    FPNOVA, FSSC, FSTRACTOR, FDRAY, FTRIBBLE,
+    FHOLE, FCREW
+} FINTYPE ;
+
 enum loctype {neither, quadrant, sector};
 
-#define IHR 'R'
-#define IHK 'K'
-#define IHC 'C'
-#define IHS 'S'
-#define IHSTAR '*'
-#define IHP 'P'
-#define IHW '@'
-#define IHB 'B'
-#define IHBLANK ' '
-#define IHDOT '.'
-#define IHQUEST '?'
-#define IHE 'E'
-#define IHF 'F'
-#define IHT 'T'
-#define IHWEB '#'
-#define IHMATER0 '-'
-#define IHMATER1 'o'
-#define IHMATER2 '0'
+typedef enum {
+    SCAN_FULL,
+    SCAN_REQUEST,
+    SCAN_STATUS,
+    SCAN_NO_LEFTSIDE,
+} scantype;
 
 /* Function prototypes */
 void prelim(void);
@@ -335,12 +347,12 @@ bool choose(bool);
 void setup(bool);
 void score(void);
 void atover(bool);
-int srscan(int);
+void srscan(scantype);
 void lrscan(void);
 void phasers(void);
 void photon(void);
 void warp(bool);
-void doshield(int);
+void doshield(bool);
 void dock(bool);
 void dreprt(void);
 void chart(bool);
@@ -371,30 +383,30 @@ void proutn(char *, ...);
 void stars(void);
 void newqad(bool);
 bool ja(void);
-void cramen(int);
+void cramen(feature);
 void crmshp(void);
 char *cramlc(enum loctype, coord w);
 double expran(double);
 double Rand(void);
-coord iran(int);
-coord dropin(int);
+coord randplace(int);
+coord dropin(feature);
 void newcnd(void);
 void sortkl(void);
 void imove(void);
-void ram(bool, int, coord);
-void crmena(bool, int, enum loctype, coord w);
-void deadkl(coord, int, coord);
+void ram(bool, feature, coord);
+void crmena(bool, feature, enum loctype, coord w);
+void deadkl(coord, feature, coord);
 void timwrp(void);
 void movcom(void);
 void torpedo(double, double, coord, double *, int, int);
 void huh(void);
-void pause_game(int);
+void pause_game(bool);
 void nova(coord);
 void snova(bool, coord *);
 void scom(bool *);
 void hittem(double *);
 void prouts(char *, ...);
-int isit(char *);
+bool isit(char *);
 void preport(void);
 void orbit(void);
 void sensor(void);
@@ -422,12 +434,6 @@ void enqueue(char *);
 char *systemname(int);
 coord newkling(int);
 
-/* mode arguments for srscan() */
-#define SCAN_FULL		1
-#define SCAN_REQUEST		2
-#define SCAN_STATUS		3
-#define SCAN_NO_LEFTSIDE	4
-
 extern WINDOW *curwnd;
 extern WINDOW *fullscreen_window;
 extern WINDOW *srscan_window;
@@ -438,7 +444,7 @@ extern WINDOW *prompt_window;
 
 extern void clreol(void);
 extern void clrscr(void);
-extern void textcolor(int color);
+extern void textcolor(int);
 extern void highvideo(void);
 
 enum COLORS {

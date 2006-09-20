@@ -9,7 +9,8 @@ void imove(void)
 {
     double angle, deltax, deltay, bigger, x, y,
         finald, stopegy, probf;
-    int n, m, kink, kinks, iquad;
+    int n, m, kink, kinks;
+    feature iquad;
     coord w, final;
     bool trbeam = false;
 

@@ -1,6 +1,6 @@
 #include "sst.h"
 
-void doshield(int i) 
+void doshield(bool raise) 
 /* change shield status */
 {
     int key;
@@ -8,7 +8,8 @@ void doshield(int i)
 
     game.ididit = false;
 
-    if (i == 2) action = SHUP;
+    if (raise) 
+	action = SHUP;
     else {
 	key = scan();
 	if (key == IHALPHA) {
@@ -130,10 +131,10 @@ void doshield(int i)
     }
 }
 
-void ram(bool ibumpd, int ienm, coord w)
+void ram(bool ibumpd, feature ienm, coord w)
 /* make our ship ram something */
 {
-    double type = 1.0, extradm;
+    double hardness, extradm;
     int icas, m;
 	
     prouts(_("***RED ALERT!  RED ALERT!"));
@@ -143,11 +144,12 @@ void ram(bool ibumpd, int ienm, coord w)
     proutn("***");
     crmshp();
     switch (ienm) {
-    case IHR: type = 1.5; break;
-    case IHC: type = 2.0; break;
-    case IHS: type = 2.5; break;
-    case IHT: type = 0.5; break;
-    case IHQUEST: type = 4.0; break;
+    case IHR: hardness = 1.5; break;
+    case IHC: hardness = 2.0; break;
+    case IHS: hardness = 2.5; break;
+    case IHT: hardness = 0.5; break;
+    case IHQUEST: hardness = 4.0; break;
+    default: hardness = 1.0; break;
     }
     proutn(ibumpd ? _(" rammed by ") : _(" rams "));
     crmena(false, ienm, sector, w);
@@ -166,12 +168,12 @@ void ram(bool ibumpd, int ienm, coord w)
 	    continue; // Don't damage deathray 
 	if (game.damage[m] < 0) 
 	    continue;
-	extradm = (10.0*type*Rand()+1.0)*game.damfac;
+	extradm = (10.0*hardness*Rand()+1.0)*game.damfac;
 	game.damage[m] += game.optime + extradm; /* Damage for at least time of travel! */
     }
     game.shldup = false;
     if (KLINGREM) {
-	pause_game(2);
+	pause_game(true);
 	dreprt();
     }
     else finish(FWON);
@@ -613,7 +615,7 @@ void attack(bool torps_ok)
     return;
 }
 		
-void deadkl(coord w, int type, coord mv)
+void deadkl(coord w, feature type, coord mv)
 /* kill a Klingon, Tholian, Romulan, or Thingy */
 {
     /* Added mv to allow enemy to "move" before dying */
@@ -663,6 +665,9 @@ void deadkl(coord w, int type, coord mv)
 	    game.state.kscmdr.x = game.state.kscmdr.y = game.isatb = game.iscate = 0;
 	    unschedule(FSCMOVE);
 	    unschedule(FSCDBAS);
+	    break;
+	default:	/* avoids a gcc warning */
+	    prout("*** Internal error, deadkl() called on %c\n", type);
 	    break;
 	}
     }

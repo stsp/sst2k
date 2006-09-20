@@ -85,11 +85,11 @@ void waitfor(void)
 	getch();
 }
 
-void pause_game(int i) 
+void pause_game(bool announcement) 
 {
     char *prompt;
     char buf[BUFSIZ];
-    if (i==1) {
+    if (announcement) {
 	if (game.skill > SKILL_FAIR)
 	    prompt = _("[ANOUNCEMENT ARRIVING...]");
 	else
@@ -115,7 +115,7 @@ void pause_game(int i)
 	putchar('\n');
 	proutn(prompt);
 	fgets(buf, sizeof(buf), stdin);
-	if (i != 0) {
+	if (announcement) {
 	    int j;
 	    for (j = 0; j < rows; j++)
 		putchar('\n');
@@ -130,7 +130,7 @@ void skip(int i)
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
 	    if (curwnd == message_window && linecount >= getmaxy(curwnd) - 3) {
-		pause_game(0);
+		pause_game(false);
 		clrscr();
 	    } else {
 		proutn("\n");
@@ -140,7 +140,7 @@ void skip(int i)
 	} else {
 	    linecount++;
 	    if (linecount >= rows)
-		pause_game(0);
+		pause_game(false);
 	    else
 		putchar('\n');
 	}

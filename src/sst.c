@@ -460,7 +460,7 @@ static void makemoves(void)
 	    warp(false);
 	    break;
 	case SHIELDS:			// shields
-	    doshield(1);
+	    doshield(false);
 	    if (game.ididit) {
 		hitme=true;
 		game.shldchg = 0;
@@ -675,7 +675,7 @@ int main(int argc, char **argv)
 }
 
 
-void cramen(int i) 
+void cramen(feature i) 
 /* print the name of an enemy */
 {
     /* return an enemy */
@@ -709,7 +709,7 @@ char *cramlc(enum loctype key, coord w)
     return buf;
 }
 
-void crmena(bool stars, int enemy, enum loctype key, coord w) 
+void crmena(bool stars, feature enemy, enum loctype key, coord w) 
 /* print an enemy and his location */
 {
     if (stars) proutn("***");
@@ -747,7 +747,7 @@ double Rand(void)
     return rand()/(1.0 + (double)RAND_MAX);
 }
 
-coord iran(int size)
+coord randplace(int size)
 /* choose a random location */ 
 {
     coord w;
@@ -845,7 +845,7 @@ void huh(void)
     prout("Beg your pardon, Captain?");
 }
 
-int isit(char *s) 
+bool isit(char *s) 
 /* compares s to citem and returns true if it matches to the length of s */
 {
     return strncasecmp(s, citem, max(1, strlen(citem))) == 0;

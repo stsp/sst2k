@@ -244,8 +244,8 @@ void setup(bool needprompt)
     game.shldup = false;
     game.inlsr = 4.0;
     game.lsupres = 4.0;
-    game.quadrant = iran(GALSIZE);
-    game.sector = iran(QUADSIZE);
+    game.quadrant = randplace(GALSIZE);
+    game.sector = randplace(QUADSIZE);
     game.torps = game.intorps = 10;
     game.nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
     game.warpfac = 5.0;
@@ -306,7 +306,7 @@ void setup(bool needprompt)
     for (i = 1; i <= game.inbase; i++) {
 	bool contflag;
 	do {
-	    do w = iran(GALSIZE);
+	    do w = randplace(GALSIZE);
 	    while (game.state.galaxy[w.x][w.y].starbase);
 	    contflag = false;
 	    for (j = i-1; j > 0; j--) {
@@ -339,7 +339,7 @@ void setup(bool needprompt)
 	int klump = (1.0 - r*r)*klumper;
 	if (klump > krem) klump = krem;
 	krem -= klump;
-	do w = iran(GALSIZE);
+	do w = randplace(GALSIZE);
 	while (game.state.galaxy[w.x][w.y].supernova ||
 		game.state.galaxy[w.x][w.y].klingons + klump > 9);
 	game.state.galaxy[w.x][w.y].klingons += klump;
@@ -358,7 +358,7 @@ void setup(bool needprompt)
 		}
 		else
 #endif /* ODEBUG */
-		    w = iran(GALSIZE);
+		    w = randplace(GALSIZE);
 	    }
 	    while ((!game.state.galaxy[w.x][w.y].klingons && Rand() < 0.75)||
 		   game.state.galaxy[w.x][w.y].supernova||
@@ -372,7 +372,7 @@ void setup(bool needprompt)
     }
     // Locate planets in galaxy
     for (i = 0; i < game.inplan; i++) {
-	do w = iran(GALSIZE); 
+	do w = randplace(GALSIZE); 
 	while (game.state.galaxy[w.x][w.y].planet != NOPLANET);
 	game.state.plnets[i].w = w;
 	if (i < NINHAB) {
@@ -391,19 +391,19 @@ void setup(bool needprompt)
     }
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
-	w = iran(GALSIZE);
+	w = randplace(GALSIZE);
 	game.state.galaxy[w.x][w.y].romulans = 1;
     }
     // Locate the Super Commander
     if (game.state.nscrem > 0) {
-	do w = iran(GALSIZE);
+	do w = randplace(GALSIZE);
 	while (game.state.galaxy[w.x][w.y].supernova || game.state.galaxy[w.x][w.y].klingons > 8);
 	game.state.kscmdr = w;
 	game.state.galaxy[w.x][w.y].klingons++;
     }
     // Place thing (in tournament game, thingx == -1, don't want one!)
     if (thing.x != -1) {
-	thing = iran(GALSIZE);
+	thing = randplace(GALSIZE);
     }
     else {
 	thing.x = thing.y = 0;
@@ -566,11 +566,11 @@ bool choose(bool needprompt)
     return false;
 }
 
-coord dropin(int iquad)
+coord dropin(feature iquad)
 /* drop a feature on a random dot in the current quadrant */
 {
     coord w;
-    do w = iran(QUADSIZE);
+    do w = randplace(QUADSIZE);
     while (game.quad[w.x][w.y] != IHDOT);
     game.quad[w.x][w.y] = iquad;
     return w;
@@ -707,7 +707,7 @@ void newqad(bool shutup)
 	// Put in THING if needed
 	if (same(thing, game.quadrant)) {
 	    w = dropin(IHQUEST);
-	    thing = iran(GALSIZE);
+	    thing = randplace(GALSIZE);
 	    game.nenhere++;
 	    iqhere=1;
 	    game.ks[game.nenhere] = w;

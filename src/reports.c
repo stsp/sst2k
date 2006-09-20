@@ -337,7 +337,7 @@ static void status(int req)
     }
 }
 		
-int srscan(int l)
+void srscan(scantype type)
 /* short-range scan */
 {
     /* the "sy" request is undocumented */
@@ -346,7 +346,7 @@ int srscan(int l)
     
     int i, j, jj, req=0;
     int goodScan=true, leftside=true, rightside=true, title=false; 
-    switch (l) {
+    switch (type) {
     case SCAN_FULL: // SRSCAN
 	if (damaged(DSRSENS)) {
 	    /* Allow base's sensors if docked */
@@ -381,7 +381,7 @@ int srscan(int l)
 	    prout(_("UNRECOGNIZED REQUEST. Legal requests are:"));
 	    prout(_("  date, condition, position, lsupport, warpfactor,"));
 	    prout(_("  energy, torpedoes, shields, klingons, time, system, bases."));
-	    return false;
+	    return;
 	}
 	// no break
     case SCAN_STATUS: // STATUS
@@ -405,11 +405,10 @@ int srscan(int l)
 	if (rightside)
 	    status(jj);
 	if (i<sizeof(requests)/sizeof(requests[0])) skip(1);
-	if (req!=0) return(goodScan);
+	if (req!=0) return;
     }
     prout("");
     if (title) chart(true);
-    return(goodScan);
 }
 			
 			

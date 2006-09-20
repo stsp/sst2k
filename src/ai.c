@@ -28,7 +28,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
        We know this if either short or long range sensors are working */
     if (!damaged(DSRSENS) || !damaged(DLRSENS) ||
 	game.condition == docked) {
-	crmena(1, ienm, sector, game.ks[loccom]);
+	crmena(true, ienm, sector, game.ks[loccom]);
 	prout(_(" escapes to %s (and regains strength)."),
 	      cramlc(quadrant, iq));
     }
@@ -66,7 +66,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
 }
 
 
-static void movebaddy(coord com, int loccom, int ienm)
+static void movebaddy(coord com, int loccom, feature ienm)
 /* tactical movement for the bad guys */
 {
     int motion, mdist, nsteps, mx, my, ll;
@@ -335,7 +335,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
-		if (*ipage==0) pause_game(1);
+		if (*ipage==0) pause_game(true);
 		*ipage = 1;
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
 		proutn(_("   a planet in "));
@@ -490,7 +490,7 @@ void scom(bool *ipage)
 	    if (damaged(DRADIO) && game.condition != docked)
 		return; /* no warning */
 	    game.iseenit = true;
-	    if (*ipage == 0)  pause_game(1);
+	    if (*ipage == 0)  pause_game(true);
 	    *ipage=1;
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    proutn(cramlc(quadrant, game.state.kscmdr));
@@ -513,7 +513,7 @@ void scom(bool *ipage)
 	 (damaged(DRADIO) && game.condition != docked) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
-    if (*ipage==0) pause_game(1);
+    if (*ipage==0) pause_game(true);
     *ipage = 1;
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
     proutn(_("   the Super-commander is in "));
