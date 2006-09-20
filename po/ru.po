@@ -2805,7 +2805,7 @@ msgstr "База к тому моменту уже будет уничтожен
 
 #: src/reports.c:594
 msgid "Direction? "
-msgstr ""
+msgstr "Направление? "
 
 #: src/setup.c:15
 msgid "-SUPER- STAR TREK"
@@ -3037,7 +3037,7 @@ msgstr "Компьютер"
 
 #: src/setup.c:167
 msgid "Navigation System"
-msgstr ""
+msgstr "Навигационная Система"
 
 #: src/setup.c:168
 msgid "Transporter"
