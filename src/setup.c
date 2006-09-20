@@ -121,7 +121,7 @@ void abandn(void)
     struct quadrant *q;
 
     chew();
-    if (game.condit==IHDOCKED) {
+    if (game.condition==docked) {
 	if (game.ship!=IHE) {
 	    prout("You cannot abandon Ye Faerie Queene.");
 	    return;
@@ -213,7 +213,7 @@ void abandn(void)
     game.imine = false;
     game.iscraft=0; /* Galileo disappears */
     /* Resupply ship */
-    game.condit=IHDOCKED;
+    game.condition=docked;
     for (l = 0; l < NDEVICES; l++) 
 	game.damage[l] = 0.0;
     game.damage[DSHUTTL] = -1;
@@ -579,11 +579,11 @@ coord dropin(int iquad)
 void newcnd(void)
 /* update our alert status */
 {
-    game.condit = IHGREEN;
-    if (game.energy < 1000.0) game.condit = IHYELLOW;
+    game.condition = green;
+    if (game.energy < 1000.0) game.condition = yellow;
     if (game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons || game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans)
-	game.condit = IHRED;
-    if (!game.alive) game.condit=IHDEAD;
+	game.condition = red;
+    if (!game.alive) game.condition=dead;
 }
 
 coord newkling(int i)
@@ -684,7 +684,7 @@ void newqad(bool shutup)
 	else
 	    game.plnet = dropin(IHW);
     }
-    // Check for game.condition
+    // Check for condition
     newcnd();
     // And finally the stars
     for (i = 1; i <= q->stars; i++) 

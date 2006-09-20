@@ -27,7 +27,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     /* print escape message and move out of quadrant.
        We know this if either short or long range sensors are working */
     if (!damaged(DSRSENS) || !damaged(DLRSENS) ||
-	game.condit == IHDOCKED) {
+	game.condition == docked) {
 	crmena(1, ienm, sector, game.ks[loccom]);
 	prout(_(" escapes to %s (and regains strength)."),
 	      cramlc(quadrant, iq));
@@ -40,7 +40,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     game.kdist[loccom] = game.kdist[game.nenhere];
     game.klhere--;
     game.nenhere--;
-    if (game.condit != IHDOCKED) newcnd();
+    if (game.condition != docked) newcnd();
     /* Handle global matters related to escape */
     game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons--;
     game.state.galaxy[iq.x][iq.y].klingons++;
@@ -85,7 +85,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 
     /* If SC, check with spy to see if should hi-tail it */
     if (ienm==IHS &&
-	(game.kpower[loccom] <= 500.0 || (game.condit==IHDOCKED && !damaged(DPHOTON)))) {
+	(game.kpower[loccom] <= 500.0 || (game.condition==docked && !damaged(DPHOTON)))) {
 	irun = true;
 	motion = -QUADSIZE;
     }
@@ -146,12 +146,12 @@ static void movebaddy(coord com, int loccom, int ienm)
 	    forces += 1000.0;
 	}
 	motion = 0;
-	if (forces <= 1000.0 && game.condit != IHDOCKED) /* Typical situation */
+	if (forces <= 1000.0 && game.condition != docked) /* Typical situation */
 	    motion = ((forces+200.0*Rand())/150.0) - 5.0;
 	else {
 	    if (forces > 1000.0) /* Very strong -- move in for kill */
 		motion = (1.0-square(Rand()))*dist1 + 1.0;
-	    if (game.condit==IHDOCKED && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
+	    if (game.condition==docked && (game.options & OPTION_BASE)) /* protected by base -- back off ! */
 		motion -= game.skill*(2.0-square(Rand()));
 	}
 	if (idebug)
@@ -239,7 +239,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 	/* it moved */
 	game.ks[loccom] = next;
 	game.kdist[loccom] = game.kavgd[loccom] = distance(game.sector, next);
-	if (!damaged(DSRSENS) || game.condit == IHDOCKED) {
+	if (!damaged(DSRSENS) || game.condition == docked) {
 	    proutn("***");
 	    cramen(ienm);
 	    proutn(_(" from %s"), cramlc(2, com));
@@ -324,7 +324,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	game.kpower[i] = game.kpower[game.nenhere];
 	game.klhere--;
 	game.nenhere--;
-	if (game.condit!=IHDOCKED) newcnd();
+	if (game.condition!=docked) newcnd();
 	sortkl();
     }
     /* check for a helpful planet */
@@ -334,7 +334,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
-	    if (!damaged(DRADIO) || game.condit == IHDOCKED) {
+	    if (!damaged(DRADIO) || game.condition == docked) {
 		if (*ipage==0) pause_game(1);
 		*ipage = 1;
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
@@ -487,7 +487,7 @@ void scom(bool *ipage)
 	    schedule(FSCDBAS, 1.0 +2.0*Rand());
 	    if (is_scheduled(FCDBAS)) 
 		postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
-	    if (damaged(DRADIO) && game.condit != IHDOCKED)
+	    if (damaged(DRADIO) && game.condition != docked)
 		return; /* no warning */
 	    game.iseenit = true;
 	    if (*ipage == 0)  pause_game(1);
@@ -510,7 +510,7 @@ void scom(bool *ipage)
     if (
 	!idebug &&
 	(Rand() > 0.2 ||
-	 (damaged(DRADIO) && game.condit != IHDOCKED) ||
+	 (damaged(DRADIO) && game.condition != docked) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
     if (*ipage==0) pause_game(1);

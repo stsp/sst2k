@@ -71,7 +71,7 @@ void report(void)
 	prout(_(" destroyed, %d remaining."), game.state.rembase);
     }
     else prout(_("There are %d bases."), game.inbase);
-    if (!damaged(DRADIO) || game.condit == IHDOCKED || game.iseenit) {
+    if (!damaged(DRADIO) || game.condition == docked || game.iseenit) {
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
 	attakreport(false);
@@ -89,7 +89,7 @@ void report(void)
 	if (game.nprobes!=1) proutn(_("s"));
 	prout(".");
     }
-    if ((!damaged(DRADIO) || game.condit == IHDOCKED)
+    if ((!damaged(DRADIO) || game.condition == docked)
 		&& is_scheduled(FDSPROB)) {
 	if (game.isarmed) 
 	    proutn(_("An armed deep space probe is in"));
@@ -122,7 +122,7 @@ void lrscan(void)
     chew();
     if (damaged(DLRSENS)) {
 	/* Now allow base's sensors if docked */
-	if (game.condit != IHDOCKED) {
+	if (game.condition != docked) {
 	    prout(_("LONG-RANGE SENSORS DAMAGED."));
 	    return;
 	}
@@ -198,7 +198,7 @@ void chart(bool title)
     if (!damaged(DRADIO))
 	rechart();
 
-    if (game.lastchart < game.state.date && game.condit == IHDOCKED) {
+    if (game.lastchart < game.state.date && game.condition == docked) {
 	prout(_("Spock-  \"I revised the Star Chart from the starbase's records.\""));
 	rechart();
     }
@@ -241,12 +241,12 @@ static void sectscan(int goodScan, int i, int j)
 {
     if (goodScan || (abs(i-game.sector.x)<= 1 && abs(j-game.sector.y) <= 1)){
 	if ((game.quad[i][j]==IHMATER0)||(game.quad[i][j]==IHMATER1)||(game.quad[i][j]==IHMATER2)||(game.quad[i][j]==IHE)||(game.quad[i][j]==IHF)){
-	    switch (game.condit) {
-	    case IHRED: textcolor(RED); break;
-	    case IHGREEN: textcolor(GREEN); break;
-	    case IHYELLOW: textcolor(YELLOW); break;
-	    case IHDOCKED: textcolor(CYAN); break;
-	    case IHDEAD: textcolor(BROWN);
+	    switch (game.condition) {
+	    case red: textcolor(RED); break;
+	    case green: textcolor(GREEN); break;
+	    case yellow: textcolor(YELLOW); break;
+	    case docked: textcolor(CYAN); break;
+	    case dead: textcolor(BROWN);
 	    }
 	    if (game.quad[i][j] != game.ship) 
 		highvideo();
@@ -268,13 +268,13 @@ static void status(int req)
 	proutn(_("Stardate      %.1f, Time Left %.2f"), game.state.date, game.state.remtime);
 	break;
     case 2:
-	if (game.condit != IHDOCKED) newcnd();
-	switch (game.condit) {
-	case IHRED: cp = "RED"; break;
-	case IHGREEN: cp = "GREEN"; break;
-	case IHYELLOW: cp = "YELLOW"; break;
-	case IHDOCKED: cp = "DOCKED"; break;
-	case IHDEAD: cp="DEAD"; break;
+	if (game.condition != docked) newcnd();
+	switch (game.condition) {
+	case red: cp = "RED"; break;
+	case green: cp = "GREEN"; break;
+	case yellow: cp = "YELLOW"; break;
+	case docked: cp = "DOCKED"; break;
+	case dead: cp="DEAD"; break;
 	}
 	for (t=0;t<NDEVICES;t++)
 	    if (game.damage[t]>0) 
@@ -288,7 +288,7 @@ static void status(int req)
     case 4:
 	proutn(_("Life Support  "));
 	if (damaged(DLIFSUP)) {
-	    if (game.condit == IHDOCKED)
+	    if (game.condition == docked)
 		proutn(_("DAMAGED, Base provides"));
 	    else
 		proutn(_("DAMAGED, reserves=%4.2f"), game.lsupres);
@@ -350,7 +350,7 @@ int srscan(int l)
     case SCAN_FULL: // SRSCAN
 	if (damaged(DSRSENS)) {
 	    /* Allow base's sensors if docked */
-	    if (game.condit != IHDOCKED) {
+	    if (game.condition != docked) {
 		prout(_("   S.R. SENSORS DAMAGED!"));
 		goodScan=false;
 	    }
@@ -393,7 +393,7 @@ int srscan(int l)
 	leftside=false;
 	break;
     }
-    if (game.condit != IHDOCKED) newcnd();
+    if (game.condition != docked) newcnd();
     for (i = 1; i <= max(QUADSIZE, sizeof(requests)/sizeof(requests[0])); i++) {
 	jj = (req!=0 ? req : i);
 	if (leftside && i <= QUADSIZE) {

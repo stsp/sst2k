@@ -226,6 +226,13 @@ struct game {
 	icrystl,	// dilithium crystals aboard
 	iseenit,	// seen base attack report
 	thawed;		// thawed game
+    enum {
+	green = 'G',
+	yellow = 'Y',
+	red = 'R',
+	docked = 'D',
+	dead = 'Z',
+    } condition;		// condition (red/yellow/green/docked)
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
 	incom,		// initial number of commanders
@@ -233,7 +240,6 @@ struct game {
 	inrom,		// initial number of commanders
 	instar,		// initial stars
 	intorps,	// initial/Max torpedoes
-	condit,		// condition (red/yellow/green/docked)
 	torps,		// number of torpedoes
 	ship,		// ship type -- 'E' is Enterprise
 	abandoned,	// count of crew abandoned in space
@@ -318,15 +324,9 @@ enum loctype {neither, quadrant, sector};
 #define IHF 'F'
 #define IHT 'T'
 #define IHWEB '#'
-#define IHGREEN 'G'
-#define IHYELLOW 'Y'
-#define IHRED 'R'
-#define IHDOCKED 'D'
-#define IHDEAD 'Z'
 #define IHMATER0 '-'
 #define IHMATER1 'o'
 #define IHMATER2 '0'
-
 
 /* Function prototypes */
 void prelim(void);

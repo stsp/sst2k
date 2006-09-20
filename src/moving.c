@@ -33,7 +33,7 @@ void imove(void)
     /* If tractor beam is to occur, don't move full distance */
     if (game.state.date+game.optime >= scheduled(FTBEAM)) {
 	trbeam = true;
-	game.condit = IHRED;
+	game.condition = red;
 	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1;
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5;
     }
@@ -57,7 +57,7 @@ void imove(void)
 			game.kavgd[m] = 0.5 * (finald + game.kdist[m]);
 		    }
 		    /*
-		     * Stas Sergeev added the game.condition
+		     * Stas Sergeev added the condition
 		     * that attacks only happen if Klingons
 		     * are present and your skill is good.
 		     */
@@ -211,7 +211,7 @@ void dock(bool verbose)
 /* dock our ship at a starbase */
 {
     chew();
-    if (game.condit == IHDOCKED && verbose) {
+    if (game.condition == docked && verbose) {
 	prout(_("Already docked."));
 	return;
     }
@@ -224,7 +224,7 @@ void dock(bool verbose)
 	prout(_(" not adjacent to base."));
 	return;
     }
-    game.condit = IHDOCKED;
+    game.condition = docked;
     if (verbose) prout(_("Docked."));
     game.ididit = true;
     if (game.energy < game.inenrg) game.energy = game.inenrg;
@@ -857,7 +857,7 @@ void probe(void)
     if (is_scheduled(FDSPROB)) {
 	chew();
 	skip(1);
-	if (damaged(DRADIO) && game.condit != IHDOCKED) {
+	if (damaged(DRADIO) && game.condition != docked) {
 	    prout(_("Spock-  \"Records show the previous probe has not yet"));
 	    prout(_("   reached its destination.\""));
 	}
@@ -914,8 +914,8 @@ void mayday(void)
     int line = 0, m, ix, iy;
 
     chew();
-    /* Test for game.conditions which prevent calling for help */
-    if (game.condit == IHDOCKED) {
+    /* Test for conditions which prevent calling for help */
+    if (game.condition == docked) {
 	prout(_("Lt. Uhura-  \"But Captain, we're already docked.\""));
 	return;
     }

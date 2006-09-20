@@ -62,7 +62,7 @@ void doshield(int i)
 	}
 	game.shldup = true;
 	game.shldchg = 1;
-	if (game.condit != IHDOCKED) game.energy -= 50.0;
+	if (game.condition != docked) game.energy -= 50.0;
 	prout(_("Shields raised."));
 	if (game.energy <= 0) {
 	    skip(1);
@@ -196,7 +196,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
     if (fabs(deltay) > bigger) bigger = fabs(deltay);
     deltax /= bigger;
     deltay /= bigger;
-    if (!damaged(DSRSENS) || game.condit==IHDOCKED) 
+    if (!damaged(DSRSENS) || game.condition==docked) 
 	setwnd(srscan_window);
     else 
 	setwnd(message_window);
@@ -225,7 +225,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    *hit = fabs(*hit);
 	    newcnd(); /* we're blown out of dock */
 	    /* We may be displaced. */
-	    if (game.landed==1 || game.condit==IHDOCKED) return; /* Cheat if on a planet */
+	    if (game.landed==1 || game.condition==docked) return; /* Cheat if on a planet */
 	    ang = angle + 2.5*(Rand()-0.5);
 	    temp = fabs(sin(ang));
 	    if (fabs(cos(ang)) > temp) temp = fabs(cos(ang));
@@ -500,7 +500,7 @@ void attack(bool torps_ok)
 	/* compute hit strength and diminsh shield power */
 	r = Rand();
 	/* Increase chance of photon torpedos if docked or enemy energy low */
-	if (game.condit == IHDOCKED) r *= 0.25;
+	if (game.condition == docked) r *= 0.25;
 	if (game.kpower[loop] < 500) r *= 0.25; 
 	jay = game.ks[loop];
 	iquad = game.quad[jay.x][jay.y];
@@ -512,7 +512,7 @@ void attack(bool torps_ok)
 	    (iquad==IHQUEST && r > 0.05);
 	if (itflag) {
 	    /* Enemy uses phasers */
-	    if (game.condit == IHDOCKED) continue; /* Don't waste the effort! */
+	    if (game.condition == docked) continue; /* Don't waste the effort! */
 	    attempt = true; /* Attempt to attack */
 	    dustfac = 0.8+0.05*Rand();
 	    hit = game.kpower[loop]*pow(dustfac,game.kavgd[loop]);
@@ -537,9 +537,9 @@ void attack(bool torps_ok)
 		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
-	if (game.shldup || game.shldchg != 0 || game.condit==IHDOCKED) {
+	if (game.shldup || game.shldchg != 0 || game.condition==docked) {
 	    /* shields will take hits */
-	    double absorb, hitsh, propor = pfac*game.shield*(game.condit==IHDOCKED ? 2.1 : 1.0);
+	    double absorb, hitsh, propor = pfac*game.shield*(game.condition==docked ? 2.1 : 1.0);
 	    if(propor < 0.1) propor = 0.1;
 	    hitsh = propor*chgfac*hit+1.0;
 	    atackd = true;
@@ -547,7 +547,7 @@ void attack(bool torps_ok)
 	    if (absorb > game.shield) absorb = game.shield;
 	    game.shield -= absorb;
 	    hit -= hitsh;
-	    if (game.condit==IHDOCKED) dock(false);
+	    if (game.condition==docked) dock(false);
 	    if (propor > 0.1 && hit < 0.005*game.energy) continue;
 	}
 	/* It's a hit -- print out hit size */
@@ -570,7 +570,7 @@ void attack(bool torps_ok)
 	hittot += hit;
 	fry(hit);
 	game.energy -= hit;
-	if (game.condit==IHDOCKED) 
+	if (game.condition==docked) 
 	    dock(false);
     }
     if (game.energy <= 0) {
@@ -578,7 +578,7 @@ void attack(bool torps_ok)
 	finish(FBATTLE);
 	return;
     }
-    if (!attempt && game.condit == IHDOCKED)
+    if (!attempt && game.condition == docked)
 	prout(_("***Enemies decide against attacking your ship."));
     if (!atackd) return;
     percent = 100.0*pfac*game.shield+0.5;
@@ -674,7 +674,7 @@ void deadkl(coord w, int type, coord mv)
 
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
-    /* Remove enemy ship from arrays describing local game.conditions */
+    /* Remove enemy ship from arrays describing local conditions */
     if (is_scheduled(FCDBAS) && game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y && type==IHC)
 	unschedule(FCDBAS);
     for_local_enemies(i)
@@ -818,7 +818,7 @@ void photon(void)
     /* Loop for moving <n> torpedoes */
     osuabor = false;
     for (i = 1; i <= n && !osuabor; i++) {
-	if (game.condit != IHDOCKED) game.torps--;
+	if (game.condition != docked) game.torps--;
 	r = (Rand()+Rand())*0.5 -0.5;
 	if (fabs(r) >= 0.47) {
 	    /* misfire! */
@@ -837,7 +837,7 @@ void photon(void)
 		break;
 	    }
 	}
-	if (game.shldup || game.condit == IHDOCKED) 
+	if (game.shldup || game.condition == docked) 
 	    r *= 1.0 + 0.0001*game.shield;
 	torpedo(course[i], r, game.sector, &dummy, i, n);
 	if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
@@ -917,7 +917,7 @@ void phasers(void)
     skip(1);
     /* SR sensors and Computer */
     if (damaged(DSRSENS) || damaged(DCOMPTR)) ipoop = false;
-    if (game.condit == IHDOCKED) {
+    if (game.condition == docked) {
 	prout(_("Phasers can't be fired through base shields."));
 	chew();
 	return;

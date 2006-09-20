@@ -235,7 +235,7 @@ void usecrystals(void)
     }
     if (game.energy >= 1000) {
 	prout(_("Spock-  \"Captain, Starfleet Regulations prohibit such an operation"));
-	prout(_("  except when condition Yellow exists."));
+	prout(_("  except when Condition Yellow exists."));
 	return;
     }
     prout(_("Spock- \"Captain, I must warn you that loading"));
@@ -306,7 +306,7 @@ void shuttle(void)
 	prout(_("You will have to beam down to retrieve the shuttle craft."));
 	return;
     }
-    if (game.shldup || game.condit == IHDOCKED) {
+    if (game.shldup || game.condition == docked) {
 	prout(_("Shuttle craft cannot pass through shields."));
 	return;
     }

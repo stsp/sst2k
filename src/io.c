@@ -397,7 +397,7 @@ void tracktorpedo(coord w, int l, int i, int n, int iquad)
 	    skip(1);
 	proutn("%d - %d   ", w.x, w.y);
     } else {
-	if (!damaged(DSRSENS) || game.condit==IHDOCKED) {
+	if (!damaged(DSRSENS) || game.condition==docked) {
 	    if (i != 1 && l == 1) {
 		drawmaps(2);
 		delay(400);
