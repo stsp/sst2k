@@ -639,7 +639,7 @@ int main(int argc, char **argv)
 	}
     }
     /* where to save the input in case of bugs */
-    logfp = fopen("sst-input.log", "w");
+    logfp = fopen("/usr/tmp/sst-input.log", "w");
     setlinebuf(logfp);
     fprintf(logfp, "seed %d\n", seed);
     srand(seed);

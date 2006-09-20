@@ -72,7 +72,7 @@ mode (all features enabled).</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>sst-input.log</term>
+<term>/usr/tmp/sst-input.log</term>
 <listitem>
 <para>Where user input is saved to (send this with your bug reports).</para>
 </listitem>
