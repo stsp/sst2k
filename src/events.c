@@ -93,6 +93,7 @@ void events(void)
 
     radio_was_broken = damaged(DRADIO);
 
+    hold.x = hold.y = 0;
     for (;;) {
 	/* Select earliest extraneous event, evcode==0 if no events */
 	evcode = FSPY;
@@ -223,7 +224,7 @@ void events(void)
 		game.quadrant = game.state.kscmdr;
 	    else
 		game.quadrant = game.state.kcmdr[i];
-	    iran(QUADSIZE, &game.sector.x, &game.sector.y);
+	    game.sector = iran(QUADSIZE);
 	    crmshp();
 	    proutn(_(" is pulled to "));
 	    proutn(cramlc(quadrant, game.quadrant));
@@ -431,7 +432,7 @@ void events(void)
 		   which has some stars which are inhabited and
 		   not already under attack, which is not
 		   supernova'ed, and which has some Klingons in it */
-		iran(GALSIZE, &w.x, &w.y);
+		w = iran(GALSIZE);
 		q = &game.state.galaxy[w.x][w.y];
 	    } while (--i &&
 		     (same(game.quadrant, w) || q->planet == NOPLANET ||
@@ -521,7 +522,7 @@ void events(void)
 	    game.state.remkl++;
 	    q->klingons++;
 	    if (same(game.quadrant, w))
-		newkling(++game.klhere, &hold);
+		newkling(++game.klhere);
 
 	    /* recompute time left */
 	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
@@ -752,8 +753,7 @@ void nova(coord nov)
 			game.quad[scratch.x][scratch.y] = IHDOT;
 			game.quad[newc.x][newc.y] = iquad;
 			game.ks[ll] = newc;
-			game.kavgd[ll] = sqrt(square(game.sector.x-newc.x)+square(game.sector.y-newc.y));
-			game.kdist[ll] = game.kavgd[ll];
+			game.kdist[ll] = game.kavgd[ll] = distance(game.sector, newc);
 			skip(1);
 			break;
 		    }
@@ -849,7 +849,7 @@ void snova(bool induced, coord *w)
 	    prouts("***************");
 	    skip(1);
 	    stars();
-	    game.alldone=1;
+	    game.alldone = true;
 	}
     }
 

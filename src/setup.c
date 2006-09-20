@@ -8,7 +8,8 @@ struct stat buf;
     return buf.st_size;
 }
 
-void prelim(void) 
+void prelim(void)
+/* issue a historically correct banner */
 {
     skip(2);
     prout("-SUPER- STAR TREK");
@@ -19,7 +20,8 @@ void prelim(void)
 #endif /* __HISTORICAL__ */
 }
 
-void freeze(bool boss) 
+void freeze(bool boss)
+/* save game */
 {
     FILE *fp;
     int key;
@@ -50,12 +52,11 @@ void freeze(bool boss)
     fwrite(&game, sizeof(game), 1, fp);
 
     fclose(fp);
-
-    /* I hope that's enough! */
 }
 
 
-int thaw(void) 
+bool thaw(void) 
+/* retrieve saved game */
 {
     FILE *fp;
     int key;
@@ -67,7 +68,7 @@ int thaw(void)
     }
     if (key != IHALPHA) {
 	huh();
-	return 1;
+	return true;
     }
     chew();
     if (strchr(citem, '.') == NULL) {
@@ -89,7 +90,7 @@ int thaw(void)
 
     fclose(fp);
 
-    return 0;
+    return false;
 }
 
 /*
@@ -114,6 +115,7 @@ int thaw(void)
 */
 
 void abandn(void) 
+/* abandon ship */
 {
     int nb, l;
     struct quadrant *q;
@@ -226,9 +228,10 @@ void abandn(void)
 }
 	
 void setup(bool needprompt) 
+/* prepare to play, set up cosmos */
 {
     int i,j, krem, klumper;
-    int ix, iy;
+    coord w;
     //  Decide how many of everything
     if (choose(needprompt)) return; // frozen game
     // Prepare the Enterprise
@@ -241,8 +244,8 @@ void setup(bool needprompt)
     game.shldup = false;
     game.inlsr = 4.0;
     game.lsupres = 4.0;
-    iran(GALSIZE, &game.quadrant.x, &game.quadrant.y);
-    iran(QUADSIZE, &game.sector.x, &game.sector.y);
+    game.quadrant = iran(GALSIZE);
+    game.sector = iran(QUADSIZE);
     game.torps = game.intorps = 10;
     game.nprobes = (int)(3.0*Rand() + 2.0);	/* Give them 2-4 of these wonders */
     game.warpfac = 5.0;
@@ -303,16 +306,16 @@ void setup(bool needprompt)
     for (i = 1; i <= game.inbase; i++) {
 	bool contflag;
 	do {
-	    do iran(GALSIZE, &ix, &iy);
-	    while (game.state.galaxy[ix][iy].starbase);
+	    do w = iran(GALSIZE);
+	    while (game.state.galaxy[w.x][w.y].starbase);
 	    contflag = false;
 	    for (j = i-1; j > 0; j--) {
 		/* Improved placement algorithm to spread out bases */
-		double distq = square(ix-game.state.baseq[j].x) + square(iy-game.state.baseq[j].y);
+		double distq = square(w.x-game.state.baseq[j].x) + square(w.y-game.state.baseq[j].y);
 		if (distq < 6.0*(BASEMAX+1-game.inbase) && Rand() < 0.75) {
 		    contflag = true;
 		    if (idebug)
-			prout("=== Abandoning base #%d at %d-%d", i, ix, iy);
+			prout("=== Abandoning base #%d at %d-%d", i, w.x, w.y);
 		    break;
 		}
 		else if (distq < 6.0 * (BASEMAX+1-game.inbase)) {
@@ -322,10 +325,9 @@ void setup(bool needprompt)
 	    }
 	} while (contflag);
 			
-	game.state.baseq[i].x = ix;
-	game.state.baseq[i].y = iy;
-	game.state.galaxy[ix][iy].starbase = 1;
-	game.state.chart[ix][iy].starbase = 1;
+	game.state.baseq[i] = w;
+	game.state.galaxy[w.x][w.y].starbase = 1;
+	game.state.chart[w.x][w.y].starbase = 1;
     }
     // Position ordinary Klingon Battle Cruisers
     krem = game.inkling;
@@ -337,10 +339,10 @@ void setup(bool needprompt)
 	int klump = (1.0 - r*r)*klumper;
 	if (klump > krem) klump = krem;
 	krem -= klump;
-	do iran(GALSIZE,&ix,&iy);
-	while (game.state.galaxy[ix][iy].supernova ||
-		game.state.galaxy[ix][iy].klingons + klump > 9);
-	game.state.galaxy[ix][iy].klingons += klump;
+	do w = iran(GALSIZE);
+	while (game.state.galaxy[w.x][w.y].supernova ||
+		game.state.galaxy[w.x][w.y].klingons + klump > 9);
+	game.state.galaxy[w.x][w.y].klingons += klump;
     } while (krem > 0);
     // Position Klingon Commander Ships
 #ifdef ODEBUG
@@ -351,30 +353,28 @@ void setup(bool needprompt)
 	    do { /* IF debugging, put commanders by bases, always! */
 #ifdef ODEBUG
 		if (game.idebug && klumper <= game.inbase) {
-		    ix = game.state.baseq[klumper].x;
-		    iy = game.state.baseq[klumper].y;
+		    w = game.state.baseq[klumper];
 		    klumper++;
 		}
 		else
 #endif /* ODEBUG */
-		    iran(GALSIZE, &ix, &iy);
+		    w = iran(GALSIZE);
 	    }
-	    while ((!game.state.galaxy[ix][iy].klingons && Rand() < 0.75)||
-		   game.state.galaxy[ix][iy].supernova||
-		   game.state.galaxy[ix][iy].klingons > 8);
+	    while ((!game.state.galaxy[w.x][w.y].klingons && Rand() < 0.75)||
+		   game.state.galaxy[w.x][w.y].supernova||
+		   game.state.galaxy[w.x][w.y].klingons > 8);
 	    // check for duplicate
 	    for (j = 1; j < i; j++)
-		if (game.state.kcmdr[j].x==ix && game.state.kcmdr[j].y==iy) break;
+		if (game.state.kcmdr[j].x==w.x && game.state.kcmdr[j].y==w.y) break;
 	} while (j < i);
-	game.state.galaxy[ix][iy].klingons++;
-	game.state.kcmdr[i].x = ix;
-	game.state.kcmdr[i].y = iy;
+	game.state.galaxy[w.x][w.y].klingons++;
+	game.state.kcmdr[i] = w;
     }
     // Locate planets in galaxy
     for (i = 0; i < game.inplan; i++) {
-	do iran(GALSIZE, &ix, &iy); while (game.state.galaxy[ix][iy].planet != NOPLANET);
-	game.state.plnets[i].w.x = ix;
-	game.state.plnets[i].w.y = iy;
+	do w = iran(GALSIZE); 
+	while (game.state.galaxy[w.x][w.y].planet != NOPLANET);
+	game.state.plnets[i].w = w;
 	if (i < NINHAB) {
 	    game.state.plnets[i].pclass = M;	// All inhabited planets are class M
 	    game.state.plnets[i].crystals = 0;
@@ -387,24 +387,23 @@ void setup(bool needprompt)
 	    game.state.plnets[i].inhabited = UNINHABITED;
 	}
 	if ((game.options & OPTION_WORLDS) || i >= NINHAB)
-	    game.state.galaxy[ix][iy].planet = i;
+	    game.state.galaxy[w.x][w.y].planet = i;
     }
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
-	iran(GALSIZE, &ix, &iy);
-	game.state.galaxy[ix][iy].romulans = 1;
+	w = iran(GALSIZE);
+	game.state.galaxy[w.x][w.y].romulans = 1;
     }
     // Locate the Super Commander
     if (game.state.nscrem > 0) {
-	do iran(GALSIZE, &ix, &iy);
-	while (game.state.galaxy[ix][iy].supernova || game.state.galaxy[ix][iy].klingons > 8);
-	game.state.kscmdr.x = ix;
-	game.state.kscmdr.y = iy;
-	game.state.galaxy[ix][iy].klingons++;
+	do w = iran(GALSIZE);
+	while (game.state.galaxy[w.x][w.y].supernova || game.state.galaxy[w.x][w.y].klingons > 8);
+	game.state.kscmdr = w;
+	game.state.galaxy[w.x][w.y].klingons++;
     }
     // Place thing (in tournament game, thingx == -1, don't want one!)
     if (thing.x != -1) {
-	iran(GALSIZE, &thing.x, &thing.y);
+	thing = iran(GALSIZE);
     }
     else {
 	thing.x = thing.y = 0;
@@ -455,10 +454,11 @@ void setup(bool needprompt)
 }
 
 bool choose(bool needprompt) 
+/* choose your game type */
 {
     for(;;) {
 	game.tourn = 0;
-	game.thawed = 0;
+	game.thawed = false;
 	game.skill = SKILL_NONE;
 	game.length = 0;
 	if (needprompt) /* Can start with command line options */
@@ -566,14 +566,18 @@ bool choose(bool needprompt)
     return false;
 }
 
-void dropin(int iquad, coord *w) 
+coord dropin(int iquad)
+/* drop a feature on a random dot in the current quadrant */
 {
-    do iran(QUADSIZE, &w->x, &w->y);
-    while (game.quad[w->x][w->y] != IHDOT);
-    game.quad[w->x][w->y] = iquad;
+    coord w;
+    do w = iran(QUADSIZE);
+    while (game.quad[w.x][w.y] != IHDOT);
+    game.quad[w.x][w.y] = iquad;
+    return w;
 }
 
-void newcnd(void) 
+void newcnd(void)
+/* update our alert status */
 {
     game.condit = IHGREEN;
     if (game.energy < 1000.0) game.condit = IHYELLOW;
@@ -582,16 +586,18 @@ void newcnd(void)
     if (!game.alive) game.condit=IHDEAD;
 }
 
-void newkling(int i, coord *pi)
+coord newkling(int i)
 /* drop new Klingon into current quadrant */
 {
-    dropin(IHK, pi);
-    game.ks[i] = *pi;
-    game.kdist[i] = game.kavgd[i] = sqrt(square(game.sector.x-pi->x) + square(game.sector.y-pi->y));
+    coord pi = dropin(IHK);
+    game.ks[i] = pi;
+    game.kdist[i] = game.kavgd[i] = distance(game.sector, pi);
     game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill;
+    return pi;
 }
 
-void newqad(bool shutup) 
+void newqad(bool shutup)
+/* set up a new state of quadrant, for when we enter or re-enter it */
 {
     int i, j;
     coord w;
@@ -636,12 +642,14 @@ void newqad(bool shutup)
     game.quad[game.sector.x][game.sector.y] = game.ship;
 
     if (q->klingons) {
+	w.x = w.y = 0;	/* quiet a gcc warning */
 	// Position ordinary Klingons
 	for (i = 1; i <= game.klhere; i++)
-	    newkling(i, &w);
+	    w = newkling(i);
 	// If we need a commander, promote a Klingon
 	for_commanders(i)
-	    if (game.state.kcmdr[i].x==game.quadrant.x && game.state.kcmdr[i].y==game.quadrant.y) break;
+	    if (same(game.state.kcmdr[i], game.quadrant))
+		break;
 			
 	if (i <= game.state.remcom) {
 	    game.quad[w.x][w.y] = IHC;
@@ -650,7 +658,7 @@ void newqad(bool shutup)
 	}
 
 	// If we need a super-commander, promote a Klingon
-	if (game.quadrant.x == game.state.kscmdr.x && game.quadrant.y == game.state.kscmdr.y) {
+	if (same(game.quadrant, game.state.kscmdr)) {
 	    game.quad[game.ks[1].x][game.ks[1].y] = IHS;
 	    game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*game.skill;
 	    game.iscate = game.state.remkl>1;
@@ -659,28 +667,28 @@ void newqad(bool shutup)
     }
     // Put in Romulans if needed
     for (i = game.klhere+1; i <= game.nenhere; i++) {
-	dropin(IHR, &w);
+	w = dropin(IHR);
 	game.ks[i] = w;
-	game.kdist[i] = game.kavgd[i] = sqrt(square(game.sector.x-w.x) + square(game.sector.y-w.y));
+	game.kdist[i] = game.kavgd[i] = distance(game.sector, w);
 	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*game.skill;
     }
     // If quadrant needs a starbase, put it in
     if (q->starbase)
-	dropin(IHB, &game.base);
+	game.base = dropin(IHB);
 	
     // If quadrant needs a planet, put it in
     if (q->planet != NOPLANET) {
 	game.iplnet = q->planet;
 	if (game.state.plnets[q->planet].inhabited == UNINHABITED)
-	    dropin(IHP, &game.plnet);
+	    game.plnet = dropin(IHP);
 	else
-	    dropin(IHW, &game.plnet);
+	    game.plnet = dropin(IHW);
     }
     // Check for game.condition
     newcnd();
     // And finally the stars
     for (i = 1; i <= q->stars; i++) 
-	dropin(IHSTAR, &w);
+	dropin(IHSTAR);
 
     // Check for RNZ
     if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.plnets[q->planet].inhabited == UNINHABITED)) {
@@ -698,13 +706,13 @@ void newqad(bool shutup)
     if (shutup==0) {
 	// Put in THING if needed
 	if (same(thing, game.quadrant)) {
-	    dropin(IHQUEST, &w);
-	    iran(GALSIZE, &thing.x, &thing.y);
+	    w = dropin(IHQUEST);
+	    thing = iran(GALSIZE);
 	    game.nenhere++;
 	    iqhere=1;
 	    game.ks[game.nenhere] = w;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
-		sqrt(square(game.sector.x-w.x) + square(game.sector.y-w.y));
+		distance(game.sector, w);
 	    game.kpower[game.nenhere] = Rand()*6000.0 +500.0 +250.0*game.skill;
 	    if (!damaged(DSRSENS)) {
 		skip(1);
@@ -730,7 +738,7 @@ void newqad(bool shutup)
 	    game.ks[game.nenhere].x = game.tholian.x;
 	    game.ks[game.nenhere].y = game.tholian.y;
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] =
-		sqrt(square(game.sector.x-game.tholian.x) + square(game.sector.y-game.tholian.y));
+		distance(game.sector, game.tholian);
 	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill;
 	    /* Reserve unocupied corners */
 	    if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
@@ -745,7 +753,7 @@ void newqad(bool shutup)
     // Put in a few black holes
     for (i = 1; i <= 3; i++)
 	if (Rand() > 0.5) 
-	    dropin(IHBLANK, &w);
+	    dropin(IHBLANK);
 
     // Take out X's in corners if Tholian present
     if (game.ithere) {
@@ -757,6 +765,7 @@ void newqad(bool shutup)
 }
 
 void sortkl(void) 
+/* sort Klingons by distance from us */
 {
     double t;
     int j, k;
@@ -790,7 +799,8 @@ void sortkl(void)
     } while (sw);
 }
 
-void setpassword(void) 
+void setpassword(void)
+/* set the self-destruct password */
 {
     if (!(game.options & OPTION_CURSES)) {
 	while (TRUE) {

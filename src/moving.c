@@ -945,12 +945,12 @@ void mayday(void)
     game.nhelp++;
     if (game.base.x!=0) {
 	/* There's one in this quadrant */
-	ddist = sqrt(square(game.base.x-game.sector.x)+square(game.base.y-game.sector.y));
+	ddist = distance(game.base, game.sector);
     }
     else {
 	ddist = FOREVER;
 	for_starbases(m) {
-	    xdist=10.0*sqrt(square(game.state.baseq[m].x-game.quadrant.x)+square(game.state.baseq[m].y-game.quadrant.y));
+	    xdist = QUADSIZE * distance(game.state.baseq[m], game.quadrant);
 	    if (xdist < ddist) {
 		ddist = xdist;
 		line = m;

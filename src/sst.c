@@ -290,7 +290,9 @@ commands[] = {
 #define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
 #define ACCEPT(i)	(!commands[i].option || (commands[i].option & game.options))
 
-static void listCommands(void) {
+static void listCommands(void) 
+/* generate a list of legal commands */
+{
     int i, k = 0;
     proutn("LEGAL COMMANDS ARE:");
     for (i = 0; i < NUMCOMMANDS; i++) {
@@ -304,7 +306,8 @@ static void listCommands(void) {
     skip(1);
 }
 
-static void helpme(void) 
+static void helpme(void)
+/* browse on-line help */
 {
     int i, j;
     char cmdbuf[32], *cp;
@@ -383,12 +386,14 @@ static void helpme(void)
     fclose(fp);
 }
 
-void enqueue(char *s) 
+void enqueue(char *s)
+/* enqueue input for the command parser */
 {
     strcpy(line, s);
 }
 
-static void makemoves(void) 
+static void makemoves(void)
+/* command-interpretation loop */
 {
     int key, i, v = 0;
     bool hitme;
@@ -551,7 +556,7 @@ static void makemoves(void)
 	    if (game.ididit) hitme = true;
 	    break;
 	case QUIT:
-	    game.alldone = 1;		// quit the game
+	    game.alldone = true;		// quit the game
 	    break;
 	case HELP:
 	    helpme();			// get help
@@ -647,7 +652,7 @@ int main(int argc, char **argv)
 	setup(line[0] == '\0');
 	if (game.alldone) {
 	    score();
-	    game.alldone = 0;
+	    game.alldone = false;
 	}
 	else makemoves();
 	skip(1);
@@ -671,6 +676,7 @@ int main(int argc, char **argv)
 
 
 void cramen(int i) 
+/* print the name of an enemy */
 {
     /* return an enemy */
     char *s;
@@ -693,6 +699,7 @@ void cramen(int i)
 }
 
 char *cramlc(enum loctype key, coord w)
+/* name a location */
 {
     static char buf[32];
     buf[0] = '\0';
@@ -703,6 +710,7 @@ char *cramlc(enum loctype key, coord w)
 }
 
 void crmena(bool stars, int enemy, enum loctype key, coord w) 
+/* print an enemy and his location */
 {
     if (stars) proutn("***");
     cramen(enemy);
@@ -710,7 +718,8 @@ void crmena(bool stars, int enemy, enum loctype key, coord w)
     proutn(cramlc(key, w));
 }
 
-void crmshp(void) 
+void crmshp(void)
+/* print our ship name */
 {
     char *s;
     switch (game.ship) {
@@ -721,7 +730,8 @@ void crmshp(void)
     proutn(s);
 }
 
-void stars(void) 
+void stars(void)
+/* print a line of stars */
 {
     prouts("******************************************************");
     skip(1);
@@ -737,10 +747,13 @@ double Rand(void)
     return rand()/(1.0 + (double)RAND_MAX);
 }
 
-void iran(int size, int *i, int *j) 
+coord iran(int size)
+/* choose a random location */ 
 {
-    *i = Rand()*(size*1.0) + 1.0;
-    *j = Rand()*(size*1.0) + 1.0;
+    coord w;
+    w.x = Rand()*(size*1.0) + 1.0;
+    w.y = Rand()*(size*1.0) + 1.0;
+    return w;
 }
 
 void chew(void)
@@ -811,7 +824,8 @@ int scan(void)
     return IHALPHA;
 }
 
-bool ja(void) 
+bool ja(void)
+/* yes-or-no confirmation */
 {
     chew();
     for(;;) {
@@ -823,7 +837,8 @@ bool ja(void)
     }
 }
 
-void huh(void) 
+void huh(void)
+/* complain about unparseable input */
 {
     chew();
     skip(1);
@@ -831,15 +846,13 @@ void huh(void)
 }
 
 int isit(char *s) 
+/* compares s to citem and returns true if it matches to the length of s */
 {
-    /* New function -- compares s to scanned citem and returns true if it
-       matches to the length of s */
-
     return strncasecmp(s, citem, max(1, strlen(citem))) == 0;
-
 }
 
-void debugme(void) 
+void debugme(void)
+/* access to the internals for debugging */
 {
     proutn("Reset levels? ");
     if (ja() == true) {

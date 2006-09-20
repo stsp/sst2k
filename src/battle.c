@@ -409,10 +409,7 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
 	    game.ithere = false;
 	    game.tholian.x = game.tholian.y = 0;
 	    game.nenhere--;
-	    {
-		coord dummy;
-		dropin(IHBLANK, &dummy);
-	    }
+	    dropin(IHBLANK);
 	    return;
 					
 	default: /* Problem! */
@@ -430,9 +427,10 @@ void torpedo(double course, double r, int inx, int iny, double *hit, int i, int 
     if (shoved) {
 	game.quad[w.x][w.y]=IHDOT;
 	game.quad[jx][jy]=iquad;
+	w.x = jx; w.y = jy;
 	prout(_(" displaced by blast to %s "), cramlc(sector, w));
 	for_local_enemies(ll)
-	    game.kdist[ll] = game.kavgd[ll] = sqrt(square(game.sector.x-game.ks[ll].x)+square(game.sector.y-game.ks[ll].y));
+	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll]);
 	sortkl();
 	return;
     }

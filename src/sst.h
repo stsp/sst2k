@@ -42,7 +42,9 @@
 
 typedef struct {int x; int y;} coord;
 
-#define same(c1, c2)	(c1.x == c2.x && c1.y == c2.y)
+#define square(i)		((i)*(i))
+#define same(c1, c2)		((c1.x == c2.x) && (c1.y == c2.y))
+#define distance(c1, c2)	sqrt(square(c1.x - c2.x) + square(c1.y - c2.y))
 
 typedef struct {
     coord w;
@@ -355,7 +357,7 @@ void finish(FINTYPE);
 void selfdestruct(void);
 void kaboom(void);
 void freeze(bool);
-int thaw(void);
+bool thaw(void);
 void plaque(void);
 int scan(void);
 #define IHEOL (0)
@@ -374,9 +376,8 @@ void crmshp(void);
 char *cramlc(enum loctype, coord w);
 double expran(double);
 double Rand(void);
-void iran(int, int *, int *);
-#define square(i) ((i)*(i))
-void dropin(int, coord*);
+coord iran(int);
+coord dropin(int);
 void newcnd(void);
 void sortkl(void);
 void imove(void);
@@ -419,7 +420,7 @@ void commandhook(char *, bool);
 void makechart(void);
 void enqueue(char *);
 char *systemname(int);
-void newkling(int, coord *);
+coord newkling(int);
 
 /* mode arguments for srscan() */
 #define SCAN_FULL		1

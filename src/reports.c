@@ -416,7 +416,7 @@ int srscan(int l)
 void eta(void)
 /* use computer to get estimated time of arrival for a warp jump */
 {
-    int ix1, ix2, iy1, iy2;
+    coord w1, w2;
     bool wfl, prompt = false;
     double ttime, twarp, tpower;
     if (damaged(DCOMPTR)) {
@@ -433,33 +433,33 @@ void eta(void)
 	    return;
 	}
     }
-    iy1 = aaitem +0.5;
+    w1.y = aaitem +0.5;
     if (scan() != IHREAL) {
 	huh();
 	return;
     }
-    ix1 = aaitem + 0.5;
+    w1.x = aaitem + 0.5;
     if (scan() == IHREAL) {
-	iy2 = aaitem + 0.5;
+	w2.y = aaitem + 0.5;
 	if (scan() != IHREAL) {
 	    huh();
 	    return;
 	}
-	ix2 = aaitem + 0.5;
+	w2.x = aaitem + 0.5;
     }
     else {
-	if (game.quadrant.y>ix1) ix2 = 1;
-	else ix2=QUADSIZE;
-	if (game.quadrant.x>iy1) iy2 = 1;
-	else iy2=QUADSIZE;
+	if (game.quadrant.y>w1.x) w2.x = 1;
+	else w2.x=QUADSIZE;
+	if (game.quadrant.x>w1.y) w2.y = 1;
+	else w2.y=QUADSIZE;
     }
 
-    if (!VALID_QUADRANT(ix1, iy1) || !VALID_SECTOR(ix2, iy2)) {
+    if (!VALID_QUADRANT(w1.x, w1.y) || !VALID_SECTOR(w2.x, w2.y)) {
 	huh();
 	return;
     }
-    game.dist = sqrt(square(iy1-game.quadrant.x+0.1*(iy2-game.sector.x))+
-		square(ix1-game.quadrant.y+0.1*(ix2-game.sector.y)));
+    game.dist = sqrt(square(w1.y-game.quadrant.y+0.1*(w2.y-game.sector.y))+
+		square(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x)));
     wfl = false;
 
     if (prompt) prout(_("Answer \"no\" if you don't know the value:"));
@@ -537,9 +537,9 @@ void eta(void)
 	    prout(_("Unfortunately, the Federation will be destroyed by then."));
 	if (twarp > 6.0)
 	    prout(_("You'll be taking risks at that speed, Captain"));
-	if ((game.isatb==1 && game.state.kscmdr.y == iy1 && game.state.kscmdr.x == ix1 &&
+	if ((game.isatb==1 && same(game.state.kscmdr, w1) &&
 	     scheduled(FSCDBAS)< ttime+game.state.date)||
-	    (scheduled(FCDBAS)<ttime+game.state.date && game.battle.y==iy1 && game.battle.x == ix1))
+	    (scheduled(FCDBAS)<ttime+game.state.date && same(game.battle, w1)))
 	    prout(_("The starbase there will be destroyed by then."));
 	proutn(_("New warp factor to try? "));
 	if (scan() == IHREAL) {

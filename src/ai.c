@@ -241,8 +241,7 @@ static void movebaddy(coord com, int loccom, int ienm)
 	/* it moved */
 	game.ks[loccom].x = next.x;
 	game.ks[loccom].y = next.y;
-	game.kdist[loccom] = game.kavgd[loccom] =
-	    sqrt(square(game.sector.x-next.x)+square(game.sector.y-next.y));
+	game.kdist[loccom] = game.kavgd[loccom] = distance(game.sector, next);
 	if (!damaged(DSRSENS) || game.condit == IHDOCKED) {
 	    proutn("***");
 	    cramen(ienm);
@@ -387,9 +386,7 @@ void scom(bool *ipage)
 	sc = game.state.kscmdr;
 	for_starbases(i) {
 	    basetbl[i] = i;
-	    ibq.x = game.state.baseq[i].x;
-	    ibq.y = game.state.baseq[i].y;
-	    bdist[i] = sqrt(square(ibq.x-sc.x) + square(ibq.y-sc.y));
+	    bdist[i] = distance(game.state.baseq[i], sc);
 	}
 	if (game.state.rembase > 1) {
 	    /* sort into nearest first order */
@@ -532,7 +529,6 @@ void movetho(void)
 /* move the Tholian */
 {
     int idx, idy, im, i;
-    coord dummy;
     /* Move the Tholian */
     if (!game.ithere || game.justin) return;
 
@@ -586,7 +582,7 @@ void movetho(void)
     }
     /* All plugged up -- Tholian splits */
     game.quad[game.tholian.x][game.tholian.y]=IHWEB;
-    dropin(IHBLANK, &dummy);
+    dropin(IHBLANK);
     crmena(true, IHT, sector, game.tholian);
     prout(_(" completes web."));
     game.ithere = false;
