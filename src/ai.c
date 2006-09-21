@@ -301,7 +301,8 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     if (flag) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
 	for_starbases(i)
-	    if (game.state.baseq[i].x==iq.x && game.state.baseq[i].y==iq.y) return 1;
+	    if (same(game.state.baseq[i], iq)) 
+		return true;
     }
     if (game.justin && !game.iscate) return true;
     /* do the move */
@@ -329,7 +330,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     }
     /* check for a helpful planet */
     for (i = 0; i < game.inplan; i++) {
-	if (game.state.plnets[i].w.x==game.state.kscmdr.x && game.state.plnets[i].w.y==game.state.kscmdr.y &&
+	if (same(game.state.plnets[i].w, game.state.kscmdr) &&
 	    game.state.plnets[i].crystals == 1) {
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);

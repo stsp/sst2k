@@ -324,7 +324,8 @@ void setup(bool needprompt)
 		   game.state.galaxy[w.x][w.y].klingons > 8);
 	    // check for duplicate
 	    for (j = 1; j < i; j++)
-		if (game.state.kcmdr[j].x==w.x && game.state.kcmdr[j].y==w.y) break;
+		if (same(game.state.kcmdr[j], w))
+		    break;
 	} while (j < i);
 	game.state.galaxy[w.x][w.y].klingons++;
 	game.state.kcmdr[i] = w;
