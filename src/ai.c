@@ -331,7 +331,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     /* check for a helpful planet */
     for (i = 0; i < game.inplan; i++) {
 	if (same(game.state.plnets[i].w, game.state.kscmdr) &&
-	    game.state.plnets[i].crystals == 1) {
+	    game.state.plnets[i].crystals == present) {
 	    /* destroy the planet */
 	    DESTROY(&game.state.plnets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;

@@ -337,12 +337,12 @@ void setup(bool needprompt)
 	game.state.plnets[i].w = w;
 	if (i < NINHAB) {
 	    game.state.plnets[i].pclass = M;	// All inhabited planets are class M
-	    game.state.plnets[i].crystals = 0;
+	    game.state.plnets[i].crystals = absent;
 	    game.state.plnets[i].known = known;
 	    game.state.plnets[i].inhabited = i;
 	} else {
 	    game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
-	    game.state.plnets[i].crystals = 1.5*Rand();		// 1 in 3 chance of crystals
+	    game.state.plnets[i].crystals = Rand()*1.5;		// 1 in 3 chance of crystals
 	    game.state.plnets[i].known = unknown;
 	    game.state.plnets[i].inhabited = UNINHABITED;
 	}

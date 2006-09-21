@@ -539,29 +539,49 @@ void attack(bool torps_ok)
 {
     /* torps_ok == false forces use of phasers in an attack */
     int percent, loop, iquad;
-    bool itflag, atackd = false, attempt = false, ihurt = false;
+    bool usephasers, atackd = false, attempt = false, ihurt = false;
     double hit, pfac, dustfac, hitmax=0.0, hittot=0.0, chgfac=1.0, r;
     coord jay;
     enum loctype where = neither;
 
-    if (game.alldone) return;
-    if (idebug) prout("=== ATTACK!");
+    /* game could be over at this point, check */
+    if (game.alldone) 
+	return;
 
-    if (game.ithere) movetho();
+    if (idebug) 
+	prout("=== ATTACK!");
 
+    /* Tholian gewts to move before attacking */
+    if (game.ithere) 
+	movetho();
+
+    /* if you have just entered the RNZ, you'll get a warning */
     if (game.neutz) { /* The one chance not to be attacked */
 	game.neutz = false;
 	return;
     }
-    if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) movcom();
-    if (game.nenhere==0 || (game.nenhere==1 && iqhere && !iqengry)) return;
+
+    /* commanders get a chance to tac-move towards you */
+    if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) 
+	movcom();
+
+    /* if no enemies remain after movement, we're done */
+    if (game.nenhere==0 || (game.nenhere==1 && iqhere && !iqengry)) 
+	return;
+
+    /* set up partial hits if attack happens during shield status change */
     pfac = 1.0/game.inshld;
     if (game.shldchg) chgfac = 0.25+0.5*Rand();
+
     skip(1);
-    if (game.skill <= SKILL_FAIR) where = sector;
+
+    /* message verbosity control */
+    if (game.skill <= SKILL_FAIR) 
+	where = sector;
+
     for_local_enemies(loop) {
 	if (game.kpower[loop] < 0) continue;	/* too weak to attack */
-	/* compute hit strength and diminsh shield power */
+	/* compute hit strength and diminish shield power */
 	r = Rand();
 	/* Increase chance of photon torpedos if docked or enemy energy low */
 	if (game.condition == docked) r *= 0.25;
@@ -569,20 +589,21 @@ void attack(bool torps_ok)
 	jay = game.ks[loop];
 	iquad = game.quad[jay.x][jay.y];
 	if (iquad==IHT || (iquad==IHQUEST && !iqengry)) continue;
-	itflag = (iquad == IHK && r > 0.0005) || !torps_ok ||
+	/* different enemies have different probabilities of throwing a torp */
+	usephasers = !torps_ok || \
+	    (iquad == IHK && r > 0.0005) || 
 	    (iquad==IHC && r > 0.015) ||
 	    (iquad==IHR && r > 0.3) ||
 	    (iquad==IHS && r > 0.07) ||
 	    (iquad==IHQUEST && r > 0.05);
-	if (itflag) {
-	    /* Enemy uses phasers */
+	if (usephasers) {	    /* Enemy uses phasers */
 	    if (game.condition == docked) continue; /* Don't waste the effort! */
 	    attempt = true; /* Attempt to attack */
 	    dustfac = 0.8+0.05*Rand();
 	    hit = game.kpower[loop]*pow(dustfac,game.kavgd[loop]);
 	    game.kpower[loop] *= 0.75;
 	}
-	else { /* Enemy used photon torpedo */
+	else { /* Enemy uses photon torpedo */
 	    double course = 1.90985*atan2((double)game.sector.y-jay.y, (double)jay.x-game.sector.x);
 	    hit = 0;
 	    proutn(_("***TORPEDO INCOMING"));
@@ -601,30 +622,31 @@ void attack(bool torps_ok)
 		return; /* Supernova or finished */
 	    if (hit == 0) continue;
 	}
+	/* incoming phaser or torpedo, shields may dissipate it */
 	if (game.shldup || game.shldchg || game.condition==docked) {
 	    /* shields will take hits */
 	    double absorb, hitsh, propor = pfac*game.shield*(game.condition==docked ? 2.1 : 1.0);
-	    if(propor < 0.1) propor = 0.1;
+	    if (propor < 0.1) propor = 0.1;
 	    hitsh = propor*chgfac*hit+1.0;
-	    atackd = true;
 	    absorb = 0.8*hitsh;
 	    if (absorb > game.shield) absorb = game.shield;
 	    game.shield -= absorb;
 	    hit -= hitsh;
-	    if (game.condition==docked) dock(false);
-	    if (propor > 0.1 && hit < 0.005*game.energy) continue;
+	    /* taking a hit blasts us out of a starbase dock */
+	    if (game.condition == docked)
+		dock(false);
+	    /* but the shields may take care of it */
+	    if (propor > 0.1 && hit < 0.005*game.energy) 
+		continue;
 	}
-	/* It's a hit -- print out hit size */
-	atackd = true; /* We weren't going to check casualties, etc. if
-		       shields were down for some strange reason. This
-		       doesn't make any sense, so I've fixed it */
+	/* hit from this opponent got through shields, so take damage */
 	ihurt = true;
 	proutn(_("%d unit hit"), (int)hit);
-	if ((damaged(DSRSENS) && itflag) || game.skill<=SKILL_FAIR) {
+	if ((damaged(DSRSENS) && usephasers) || game.skill<=SKILL_FAIR) {
 	    proutn(_(" on the "));
 	    crmshp();
 	}
-	if (!damaged(DSRSENS) && itflag) {
+	if (!damaged(DSRSENS) && usephasers) {
 	    proutn(_(" from "));
 	    crmena(false, iquad, where, jay);
 	}
@@ -634,8 +656,6 @@ void attack(bool torps_ok)
 	hittot += hit;
 	fry(hit);
 	game.energy -= hit;
-	if (game.condition==docked) 
-	    dock(false);
     }
     if (game.energy <= 0) {
 	/* Returning home upon your shield, not with it... */
@@ -685,7 +705,7 @@ void deadkl(coord w, feature type, coord mv)
 
     skip(1);
     crmena(true, type, sector, mv);
-    /* Decide what kind of enemy it is and update approriately */
+    /* Decide what kind of enemy it is and update appropriately */
     if (type == IHR) {
 	/* chalk up a Romulan */
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans--;
@@ -709,7 +729,8 @@ void deadkl(coord w, feature type, coord mv)
 	case IHC:
 	    game.comhere = false;
 	    for_commanders (i)
-		if (game.state.kcmdr[i].x==game.quadrant.x && game.state.kcmdr[i].y==game.quadrant.y) break;
+		if (same(game.state.kcmdr[i], game.quadrant)) 
+		    break;
 	    game.state.kcmdr[i] = game.state.kcmdr[game.state.remcom];
 	    game.state.kcmdr[game.state.remcom].x = 0;
 	    game.state.kcmdr[game.state.remcom].y = 0;
@@ -743,7 +764,7 @@ void deadkl(coord w, feature type, coord mv)
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
 
     /* Remove enemy ship from arrays describing local conditions */
-    if (is_scheduled(FCDBAS) && game.battle.x==game.quadrant.x && game.battle.y==game.quadrant.y && type==IHC)
+    if (is_scheduled(FCDBAS) && same(game.battle, game.quadrant) && type==IHC)
 	unschedule(FCDBAS);
     for_local_enemies(i)
 	if (same(game.ks[i], w)) break;

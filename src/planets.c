@@ -23,7 +23,7 @@ void preport(void)
     skip(1);
     for (i = 0; i < game.inplan; i++) {
 	if ((game.state.plnets[i].known != unknown
-	    && game.state.plnets[i].crystals != 0)
+	    && game.state.plnets[i].crystals != absent)
 	    || (idebug && game.state.plnets[i].w.x !=0)
 	    ) {
 	    iknow = true;
@@ -33,7 +33,7 @@ void preport(void)
 	    proutn(_("   class "));
 	    proutn(classes[game.state.plnets[i].pclass]);
 	    proutn("   ");
-	    if (game.state.plnets[i].crystals <= 0) proutn(_("no "));
+	    if (game.state.plnets[i].crystals != present) proutn(_("no "));
 	    prout(_("dilithium crystals present."));
 	    if (game.state.plnets[i].known==shuttle_down) 
 		prout(_("    Shuttle Craft Galileo on surface."));
@@ -93,7 +93,7 @@ void sensor(void)
 	if (game.state.plnets[game.iplnet].known==shuttle_down) 
 	    prout(_("         Sensors show Galileo still on surface."));
 	proutn(_("         Readings indicate"));
-	if (game.state.plnets[game.iplnet].crystals == 0) proutn(_(" no"));
+	if (game.state.plnets[game.iplnet].crystals != present) proutn(_(" no"));
 	prout(_(" dilithium crystals present.\""));
 	if (game.state.plnets[game.iplnet].known == unknown) game.state.plnets[game.iplnet].known = known;
     }
@@ -147,7 +147,7 @@ void beam(void)
     }
     else {
 	/* Going to planet */
-	if (game.state.plnets[game.iplnet].crystals==0) {
+	if (game.state.plnets[game.iplnet].crystals==absent) {
 	    prout(_("Spock-  \"Captain, I fail to see the logic in"));
 	    prout(_("  exploring a planet with no dilithium crystals."));
 	    proutn(_("  Are you sure this is wise?\" "));
@@ -197,11 +197,11 @@ void mine(void)
 	prout(_("Mining party not on planet."));
 	return;
     }
-    if (game.state.plnets[game.iplnet].crystals == MINED) {
+    if (game.state.plnets[game.iplnet].crystals == mined) {
 	prout(_("This planet has already been strip-mined for dilithium."));
 	return;
     }
-    else if (game.state.plnets[game.iplnet].crystals == 0) {
+    else if (game.state.plnets[game.iplnet].crystals == absent) {
 	prout(_("No dilithium crystals on this planet."));
 	return;
     }
@@ -219,7 +219,7 @@ void mine(void)
     game.optime = (0.1+0.2*Rand())*game.state.plnets[game.iplnet].pclass;
     if (consumeTime()) return;
     prout(_("Mining operation complete."));
-    game.state.plnets[game.iplnet].crystals = MINED;
+    game.state.plnets[game.iplnet].crystals = mined;
     game.imine = game.ididit = true;
 }
 

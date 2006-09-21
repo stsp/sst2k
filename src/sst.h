@@ -51,8 +51,7 @@ typedef struct {
     enum {M=0, N=1, O=2} pclass;
     int inhabited;	/* if NZ, an index into a name array */
 #define UNINHABITED	-1
-    int crystals; /* has crystals */
-#define MINED	-1	/* used to have crystals, but they were mined out */
+    enum {mined=-1, present=0, absent=1} crystals; /* has crystals */
     enum {unknown, known, shuttle_down} known;
 } planet;
 
