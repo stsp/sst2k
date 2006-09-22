@@ -341,7 +341,7 @@ complicated, but you will learn the abbreviations quickly enough.</para>
 </orderedlist>
 
 <para>If you are part way through entering a command and you change your
-minde, you can cancel the command by typing -1 as one of the
+mind, you can cancel the command by typing -1 as one of the
 parameters, with the exception of the manual move command.</para>
 
 <para>If anything is not clear to you, experiment.  The worst you can do is
@@ -1685,6 +1685,10 @@ in 1973-1974 was like Mayfield's original and most later versions in
 BASIC, in that it used used polar coordinates (a clockface angle
 and a distance) for manual navigation.</para>
 
+<para>Tom Almy writes: "I've received further information that the
+black holes, Tholian web, Super Commander, and Emeritus mode were
+added by Marc Newman."</para>
+
 <para>At the time the UT FORTRAN source was last translated to C it emitted
 the message "Latest update-21 Sept 78".  Thus, it actually predated
 (and may have influenced) the best-known BASIC version, the "Super
@@ -1950,6 +1954,9 @@ derived from a still earlier version in use at Penn State University.</para>
 </sect1>
 <sect1><title>References</title>
 
+<para>These are the original references by Dave Matuszek and Paul
+Reynolds:</para>
+
 <orderedlist>
 <listitem><para><citetitle>Star Trek</citetitle> (the original television
 series), produced and directed by Gene Rodenberry.</para></listitem>
@@ -1969,9 +1976,9 @@ Books)</para></listitem>
 David Gerrold.  Similiar in scope to the above book.
 (Bantam)</para></listitem>
 
-<listitem><para><citetitle>The Star Trek Guide</citetitle>, third revision 4/17/67, by Gene
-Roddenberry.  The original writer's guide for the television
-series, but less comprehensive than (3) above.
+<listitem><para><citetitle>The Star Trek Guide</citetitle>, third
+revision 4/17/67, by Gene Roddenberry.  The original writer's guide
+for the television series, but less comprehensive than (3) above.
 (Norway Productions)</para></listitem>
 
 <listitem><para><citetitle>The Trouble With Tribbles</citetitle>, by
@@ -1994,4 +2001,66 @@ shops.</para></listitem>
 
 </sect1>
 </chapter>
+
+<appendix><title>Setting the Wayback Machine</title>
+
+<para>SSTK and its ancestors have a long history.  One of the
+objectives of this project is to make that history available.
+Accordingly, here is a timeline of the development of SST2K and
+its ancestors, as closely as we can reconstruct it.  Someday this
+may become the basis for a "wayback machine" switch that enables
+feature sets by year.</para>
+
+<itemizedlist>
+<listitem><para>1971 &mdash; Mike Mayfield's original BASIC Star
+Trek.</para></listitem>
+
+<listitem><para>5 April 1973 &mdash; Grady Hicks's BASIC version fot
+the Taurus.</para></listitem>
+
+<listitem><para>Summer 1973 &mdash; Dave Matuszek, Paul Reynolds, and
+the Austin crew begin work on the UT FORTRAN version.</para></listitem>
+
+<listitem><para>1974 &mdash; Dave Matuszek gets distracted by other
+things, notably a job change and the birth of his first
+child.</para></listitem>
+
+<listitem><para>c.1977 &mdash; Tom Almy translates the UT FORTAN
+version to PDP-11 FORTRAN.</para></listitem>
+
+<listitem><para>21 September 1978 &mdash; This was the date on the
+first version Tom Almy saw, on which he based his C
+translation.</para></listitem>
+
+<listitem><para>1979 &mdash; Marc Newman adds Tholians, black holes,
+super-commanders, and Emeritus mode.</para></listitem>
+
+<listitem><para>1995-1996 &mdash; Tom Almy translates his FORTRAN
+port to ANSI C.</para></listitem>
+
+<listitem><para>1997 &mdash; Tom Almy finds the sources for the UT
+FORTRAN on the Web and merges in features new since the 1978 version:
+EMEXIT, Tholian Web, improved death ray.  He adds deep-space probes
+from the DECUS version.</para></listitem>
+
+<listitem><para>10 October 2004 &mdash; ESR starts hacking on Almy's C
+translation, de-FORTRANIZING the code. HELP/CALL/SOS becomes MAYDAY.
+</para></listitem>
+
+<listitem><para>30 October 2004 &mdash; SST2K project started on
+Berlios.</para></listitem>
+
+<listitem><para>18 January 2005 &mdash; First changes merged in from Stas
+Sergeev. The curses interface is added.</para></listitem>
+
+<listitem><para>September 2006 &mdash; BSD features merged
+in. Inhabited-worlds features and weighted critical hits date from
+this time.</para></listitem>
+</itemizedlist>
+
+<para>One as-yet unanswered question is when the code changed from
+distance/direction navigation to coordinate offsets.  Dave Matuszek
+believes it must have been after he stopped working on the game in
+1974.</para>
+</appendix>
 </book>
