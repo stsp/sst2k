@@ -387,7 +387,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    q->planet = NOPLANET;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
-	    game.plnet.x = game.plnet.y = 0;
+	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;
 	    if (game.landed) {
 		/* captain perishes on planet */
@@ -401,7 +401,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    q->planet = NOPLANET;
 	    DESTROY(&game.state.plnets[game.iplnet]);
 	    game.iplnet = 0;
-	    game.plnet.x = game.plnet.y = 0;
+	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;
 	    if (game.landed) {
 		/* captain perishes on planet */
@@ -719,7 +719,7 @@ void deadkl(coord w, feature type, coord mv)
     else if (type == IHQUEST) {
 	/* Killed a Thingy */
 	iqhere = iqengry = false;
-	thing.x =thing.y = 0;
+	invalidate(thing);
     }
     else {
 	/* Some type of a Klingon */

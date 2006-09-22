@@ -219,7 +219,7 @@ void dock(bool verbose)
 	prout(_("You must first leave standard orbit."));
 	return;
     }
-    if (game.base.x==0 || abs(game.sector.x-game.base.x) > 1 || abs(game.sector.y-game.base.y) > 1) {
+    if (!is_valid(game.base) || abs(game.sector.x-game.base.x) > 1 || abs(game.sector.y-game.base.y) > 1) {
 	crmshp();
 	prout(_(" not adjacent to base."));
 	return;
@@ -793,7 +793,7 @@ void timwrp()
 	game.isatb = 0;
 	unschedule(FCDBAS);
 	unschedule(FSCDBAS);
-	game.battle.x = game.battle.y = 0;
+	invalidate(game.battle);
 
 	/* Make sure Galileo is consistant -- Snapshot may have been taken
 	   when on planet, which would give us two Galileos! */
@@ -987,7 +987,7 @@ void mayday(void)
 	    break;
 	}
     }
-    if (game.sector.x==0){
+    if (!is_valid(game.sector)){
 	prout(_("You have been lost in space..."));
 	finish(FMATERIALIZE);
 	return;

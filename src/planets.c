@@ -55,7 +55,7 @@ void orbit(void)
 	prout(_("Both warp and impulse engines damaged."));
 	return;
     }
-    if (game.plnet.x == 0 || abs(game.sector.x-game.plnet.x) > 1 || abs(game.sector.y-game.plnet.y) > 1) {
+    if (!is_valid(game.plnet) || abs(game.sector.x-game.plnet.x) > 1 || abs(game.sector.y-game.plnet.y) > 1) {
 	crmshp();
 	prout(_(" not adjacent to planet."));
 	skip(1);

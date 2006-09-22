@@ -317,7 +317,7 @@ void events(void)
 		if (i > game.state.remcom || game.state.rembase == 0 ||
 		    !game.state.galaxy[game.battle.x][game.battle.y].starbase) {
 		    /* No action to take after all */
-		    game.battle.x = game.battle.y = 0;
+		    invalidate(game.battle);
 		    break;
 		}
 	    }
@@ -358,9 +358,8 @@ void events(void)
 		game.battle = hold;
 		game.isatb = 0;
 	    }
-	    else {
-		game.battle.x = game.battle.y = 0;
-	    }
+	    else
+		invalidate(game.battle);
 	    break;
 	case FSCMOVE: /* Supercommander moves */
 	    schedule(FSCMOVE, 0.2777);
@@ -676,7 +675,8 @@ void nova(coord nov)
 			crmena(true, IHP, sector, scratch);
 			prout(_(" destroyed."));
 			DESTROY(&game.state.plnets[game.iplnet]);
-			game.iplnet = game.plnet.x = game.plnet.y = 0;
+			game.iplnet = 0;
+			invalidate(game.plnet);
 			if (game.landed) {
 			    finish(FPNOVA);
 			    return;
@@ -690,7 +690,7 @@ void nova(coord nov)
 				break;
 			game.state.baseq[i] = game.state.baseq[game.state.rembase];
 			game.state.rembase--;
-			game.base.x = game.base.y = 0;
+			invalidate(game.base);
 			game.state.basekl++;
 			newcnd();
 			crmena(true, IHB, sector, scratch);
@@ -875,7 +875,7 @@ void snova(bool induced, coord *w)
 	for (l = 1; l <= maxloop; l++) {
 	    if (same(game.state.kcmdr[l], nq)) {
 		game.state.kcmdr[l] = game.state.kcmdr[game.state.remcom];
-		game.state.kcmdr[game.state.remcom].x = game.state.kcmdr[game.state.remcom].y = 0;
+		invalidate(game.state.kcmdr[game.state.remcom]);
 		game.state.remcom--;
 		kldead--;
 		if (game.state.remcom==0) unschedule(FTBEAM);
@@ -902,7 +902,7 @@ void snova(bool induced, coord *w)
 	for (loop = 1; loop <= maxloop; loop++)
 	    if (same(game.state.baseq[loop], nq)) {
 		game.state.baseq[loop] = game.state.baseq[game.state.rembase];
-		game.state.baseq[game.state.rembase].x = game.state.baseq[game.state.rembase].y = 0;
+		invalidate(game.state.baseq[game.state.rembase]);
 		game.state.rembase--;
 		break;
 	    }

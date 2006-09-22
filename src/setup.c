@@ -212,7 +212,7 @@ void setup(bool needprompt)
     for (i=0; i < NDEVICES; i++) 
 	game.damage[i] = 0.0;
     // Set up assorted game parameters
-    game.battle.x = game.battle.y = 0;
+    invalidate(game.battle);
     game.state.date = game.indate = 100.0*(int)(31.0*Rand()+20.0);
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0;
     game.iscate = game.resting = game.imine = game.icrystl = game.icraft = false;
@@ -366,7 +366,7 @@ void setup(bool needprompt)
 	thing = randplace(GALSIZE);
     }
     else
-	thing.x = thing.y = 0;
+	invalidate(thing);
 
     skip(2);
     game.state.snap = false;
@@ -562,10 +562,10 @@ void newqad(bool shutup)
     struct quadrant *q;
 
     game.justin = true;
-    game.base.x = game.base.y = 0;
+    invalidate(game.base);
     game.klhere = 0;
     game.comhere = false;
-    game.plnet.x = game.plnet.y = 0;
+    invalidate(game.plnet);
     game.ishere = false;
     game.irhere = 0;
     game.iplnet = 0;
