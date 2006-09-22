@@ -180,7 +180,7 @@ static void instantiate_main(int argc, char **argv)
     misclabel  = XtVaCreateManagedWidget("misclabel", 
 					 labelWidgetClass, misc,
 					 NULL); 
-    for (cp = commands; cp < commands + sizeof(commands)/sizeof(commands[0]); cp++) {
+    for (cp = commands; cp < commands + ARRAY_SIZE(commands); cp++) {
 	cp->widget = XtVaCreateManagedWidget(cp->name, 
 					     commandWidgetClass, 
 					     *cp->parent, 

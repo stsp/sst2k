@@ -276,7 +276,8 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	if (iquad==IHDOT) continue;
 	/* hit something */
 	setwnd(message_window);
-	skip(1);	/* start new line after text track */
+	if (damaged(DSRSENS) && !game.condition==docked)
+	    skip(1);	/* start new line after text track */
 	switch(iquad) {
 	case IHE: /* Hit our ship */
 	case IHF:
@@ -703,7 +704,6 @@ void deadkl(coord w, feature type, coord mv)
     /* Added mv to allow enemy to "move" before dying */
     int i,j;
 
-    skip(1);
     crmena(true, type, sector, mv);
     /* Decide what kind of enemy it is and update appropriately */
     if (type == IHR) {
@@ -1098,7 +1098,7 @@ void phasers(void)
 	}
 	if (key != IHREAL && game.nenhere != 0) {
 	    prout(_("Phasers locked on target. Energy available: %.2f"),
-		  ifast?game.energy-200.0:game.energy,1,2);
+		  ifast?game.energy-200.0:game.energy);
 	}
 	irec=0;
 	do {
@@ -1169,7 +1169,7 @@ void phasers(void)
 	chew();
 	key = IHEOL;
 	if (damaged(DCOMPTR))
-	    prout(_("Battle computer damaged, manual file only."));
+	    prout(_("Battle computer damaged, manual fire only."));
 	else {
 	    skip(1);
 	    prouts(_("---WORKING---"));
@@ -1326,7 +1326,7 @@ void hittem(double *hits)
 	else /* decide whether or not to emasculate klingon */
 	    if (kpow > 0 && Rand() >= 0.9 &&
 		kpow <= ((0.4 + 0.4*Rand())*kpini)) {
-		prout(_("***Mr. Spock-  \"Captain, the vessel at "),
+		prout(_("***Mr. Spock-  \"Captain, the vessel at %s"),
 		      cramlc(sector, w));
 		prout(_("   has just lost its firepower.\""));
 		game.kpower[kk] = -kpow;

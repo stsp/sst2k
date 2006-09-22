@@ -13,11 +13,13 @@ void attakreport(bool curt)
 	    prout(_("It can hold out until Stardate %d."),
 		  (int)scheduled(FCDBAS));
 	}
-	if (game.isatb == 1) {
+	else if (game.isatb == 1) {
 	    prout(_("Starbase in %s is under Super-commander attack."),
 		  cramlc(quadrant, game.state.kscmdr));
 	    prout(_("It can hold out until Stardate %d."),
 		  (int)scheduled(FSCDBAS));
+	} else {
+	    prout(_("No Starbase is currently under attack."));
 	}
     } else {
         if (is_scheduled(FCDBAS))
@@ -50,7 +52,7 @@ void report(void)
     case SKILL_EMERITUS: s3=_("emeritus"); break;
     default: s3=_("skilled"); break;
     }
-    prout("");
+    skip(1);
     prout(_("You %s a %s%s %s game."),
 	  game.alldone? _("were playing") : _("are playing"), s1, s2, s3);
     if (game.skill>SKILL_GOOD && game.thawed && !game.alldone) prout(_("No plaque is allowed."));
@@ -119,7 +121,6 @@ void lrscan(void)
 /* long-range sensor scan */
 {
     int x, y;
-    chew();
     if (damaged(DLRSENS)) {
 	/* Now allow base's sensors if docked */
 	if (game.condition != docked) {
@@ -189,7 +190,7 @@ void rechart(void)
 	    }
 }
 
-void chart(bool title)
+void chart(void)
 /* display the star chart */ 
 {
     int i,j;
@@ -203,7 +204,7 @@ void chart(bool title)
 	rechart();
     }
 
-    if (!title) prout(_("       STAR CHART FOR THE KNOWN GALAXY"));
+    prout(_("       STAR CHART FOR THE KNOWN GALAXY"));
     if (game.state.date > game.lastchart)
 	prout(_("(Last surveillance update %d stardates ago)."),
 	      (int)(game.state.date-game.lastchart));
@@ -233,7 +234,6 @@ void chart(bool title)
 	proutn("  |");
 	if (i<GALSIZE) skip(1);
     }
-    prout("");
 }
 
 static void sectscan(int goodScan, int i, int j) 
@@ -258,157 +258,147 @@ static void sectscan(int goodScan, int i, int j)
 	proutn("- ");
 }
 
-static void status(int req)
+void status(int req)
 /* print status report lines */
 {
-    char *cp = NULL;
+#define RQ(n, a) if (!req || req == n) do { a } while(0)
+    char *cp = NULL, s[256];
     int t, dam = 0;
-    switch (req) {
-    case 1:
-	proutn(_("Stardate      %.1f, Time Left %.2f"), game.state.date, game.state.remtime);
-	break;
-    case 2:
+
+    RQ(1,
+	prstat(_("Stardate"), _("%.1f, Time Left %.2f"), game.state.date, game.state.remtime);
+    );
+
+    RQ(2,
 	if (game.condition != docked) newcnd();
 	switch (game.condition) {
-	case red: cp = _("RED"); break;
-	case green: cp = _("GREEN"); break;
-	case yellow: cp = _("YELLOW"); break;
-	case docked: cp = _("DOCKED"); break;
-	case dead: cp = _("DEAD"); break;
+	    case red: cp = _("RED"); break;
+	    case green: cp = _("GREEN"); break;
+	    case yellow: cp = _("YELLOW"); break;
+	    case docked: cp = _("DOCKED"); break;
+	    case dead: cp = _("DEAD"); break;
 	}
 	for (t=0;t<NDEVICES;t++)
 	    if (game.damage[t]>0) 
 		dam++;
-	proutn(_("Condition     %s, %i DAMAGES"), cp, dam);
-	break;
-    case 3:
-	proutn(_("Position      %d - %d , %d - %d"),
-	       game.quadrant.x, game.quadrant.y, game.sector.x, game.sector.y);
-	break;
-    case 4:
-	proutn(_("Life Support  "));
+	prstat(_("Condition"), _("%s, %i DAMAGES"), cp, dam);
+    );
+
+    RQ(3,
+	prstat(_("Position"), "%d - %d , %d - %d",
+	      game.quadrant.x, game.quadrant.y, game.sector.x, game.sector.y);
+    );
+
+    RQ(4,
 	if (damaged(DLIFSUP)) {
 	    if (game.condition == docked)
-		proutn(_("DAMAGED, Base provides"));
+		sprintf(s, _("DAMAGED, Base provides"));
 	    else
-		proutn(_("DAMAGED, reserves=%4.2f"), game.lsupres);
+		sprintf(s, _("DAMAGED, reserves=%4.2f"), game.lsupres);
 	}
 	else
-	    proutn(_("ACTIVE"));
-	break;
-    case 5:
-	proutn(_("Warp Factor   %.1f"), game.warpfac);
-	break;
-    case 6:
-	proutn(_("Energy        %.2f"), game.energy);
-	if (game.icrystl && (game.options & OPTION_SHOWME))	/* ESR */
-	    proutn(_(" (have crystals)"));
-	break;
-    case 7:
-	proutn(_("Torpedoes     %d"), game.torps);
-	break;
-    case 8:
-	proutn(_("Shields       "));
+	    sprintf(s, _("ACTIVE"));
+	prstat(_("Life Support"), s);
+    );
+
+    RQ(5,
+	prstat(_("Warp Factor"), "%.1f", game.warpfac);
+    );
+
+    RQ(6,
+	prstat(_("Energy"), "%.2f%s", game.energy,
+		(game.icrystl && (game.options & OPTION_SHOWME)) ? /* ESR */
+		_(" (have crystals)") : "");
+    );
+
+    RQ(7,
+	prstat(_("Torpedoes"), "%d", game.torps);
+    );
+
+    RQ(8,
 	if (damaged(DSHIELD))
-	    proutn(_("DAMAGED,"));
+	    strcpy(s, _("DAMAGED,"));
 	else if (game.shldup)
-	    proutn(_("UP,"));
+	    strcpy(s, _("UP,"));
 	else
-	    proutn(_("DOWN,"));
-	proutn(_(" %d%% %.1f units"),
+	    strcpy(s, _("DOWN,"));
+	sprintf(s + strlen(s), _(" %d%% %.1f units"),
 	       (int)((100.0*game.shield)/game.inshld + 0.5), game.shield);
-	break;
-    case 9:
-	proutn(_("Klingons Left %d"), KLINGREM);
-	break;
-    case 10:
+	prstat(_("Shields"), s);
+    );
+
+    RQ(9,
+        prstat(_("Klingons Left"), "%d", KLINGREM);
+    );
+
+    RQ(10,
 	if (game.options & OPTION_WORLDS) {
 	    int plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
 	    if (plnet != NOPLANET && game.state.plnets[plnet].inhabited != UNINHABITED)
-		proutn(_("Major system  %s"), systnames[plnet]);
+		prstat(_("Major system"), "%s", systnames[plnet]);
 	    else
-		proutn(_("Sector is uninhabited"));
+		prout(_("Sector is uninhabited"));
 	}
+    );
 
-	break;
-    case 11:
-	attakreport(true);
-	break;
+    RQ(11,
+	attakreport(!req);
+    );
+
+#undef RQ
+}
+
+void request(void)
+{
+    int req;
+    static char requests[][3] =
+	{"da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
+
+    while (scan() == IHEOL)
+	proutn(_("Information desired? "));
+    chew();
+    for (req = 0; req < ARRAY_SIZE(requests); req++)
+	if (strncmp(citem, requests[req], min(2,strlen(citem)))==0)
+	    break;
+    if (req >= ARRAY_SIZE(requests)) {
+	prout(_("UNRECOGNIZED REQUEST. Legal requests are:"));
+	prout(("  date, condition, position, lsupport, warpfactor,"));
+	prout(("  energy, torpedoes, shields, klingons, system, time."));
+	return;
     }
+    status(req + 1);
 }
 		
-void srscan(scantype type)
+void srscan(void)
 /* short-range scan */
 {
-    /* the "sy" request is undocumented */
-    static char requests[][3] =
-	{"","da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
-    
-    int i, j, jj, req=0;
-    int goodScan=true, leftside=true, rightside=true, title=false; 
-    switch (type) {
-    case SCAN_FULL: // SRSCAN
-	if (damaged(DSRSENS)) {
-	    /* Allow base's sensors if docked */
-	    if (game.condition != docked) {
-		prout(_("   S.R. SENSORS DAMAGED!"));
-		goodScan=false;
-	    }
-	    else
-		prout(_("  [Using Base's sensors]"));
+    int i, j;
+    int goodScan=true;
+    if (damaged(DSRSENS)) {
+	/* Allow base's sensors if docked */
+	if (game.condition != docked) {
+	    prout(_("   S.R. SENSORS DAMAGED!"));
+	    goodScan=false;
 	}
-	else prout(_("     Short-range scan"));
-	if (goodScan && !damaged(DRADIO)) { 
-	    game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
-	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
-	    game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
-	}
-	scan();
-	if (isit("chart")) title = true;
-	if (isit("no")) rightside = false;
-	chew();
-	prout("    1 2 3 4 5 6 7 8 9 10");
-	break;
-    case SCAN_REQUEST:
-	while (scan() == IHEOL)
-	    proutn(_("Information desired? "));
-	chew();
-	for (req = 1; req <= sizeof(requests)/sizeof(requests[0]); req++)
-	    if (strncmp(citem,requests[req],min(2,strlen(citem)))==0)
-		break;
-	if (req > sizeof(requests)/sizeof(requests[0])) {
-	    prout(_("UNRECOGNIZED REQUEST. Legal requests are:"));
-	    prout(("  date, condition, position, lsupport, warpfactor,"));
-	    prout(("  energy, torpedoes, shields, klingons, time, system, bases."));
-	    return;
-	}
-	// no break
-    case SCAN_STATUS: // STATUS
-	chew();
-	leftside = false;
-	skip(1);
-	// no break
-    case SCAN_NO_LEFTSIDE: // REQUEST
-	leftside=false;
-	break;
+	else
+	    prout(_("  [Using Base's sensors]"));
     }
+    else prout(_("     Short-range scan"));
+    if (goodScan && !damaged(DRADIO)) { 
+	game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
+	game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
+	game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
+    }
+    prout("    1 2 3 4 5 6 7 8 9 10");
     if (game.condition != docked) newcnd();
-    for (i = 1; i <= max(QUADSIZE, sizeof(requests)/sizeof(requests[0])); i++) {
-	jj = (req!=0 ? req : i);
-	if (leftside && i <= QUADSIZE) {
-	    proutn("%2d  ", i);
-	    for_sectors(j) {
-		sectscan(goodScan, i, j);
-	    }
+    for (i = 1; i <= QUADSIZE; i++) {
+	proutn("%2d  ", i);
+	for_sectors(j) {
+	    sectscan(goodScan, i, j);
 	}
-	if (rightside)
-	    status(jj);
-	if (i<sizeof(requests)/sizeof(requests[0])) skip(1);
-	if (req!=0) return;
+	skip(1);
     }
-    prout("");
-    if (title) chart(true);
 }
 			
 			

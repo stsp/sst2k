@@ -850,7 +850,7 @@ void snova(bool induced, coord *w)
 	skip(1);
 	prouts(_("***RED ALERT!  RED ALERT!"));
 	skip(1);
-	prout(_("***Incipient supernova detected at "), cramlc(sector, ns));
+	prout(_("***Incipient supernova detected at %s"), cramlc(sector, ns));
 	if (square(ns.x-game.sector.x) + square(ns.y-game.sector.y) <= 2.1) {
 	    proutn(_("Emergency override attempts t"));
 	    prouts("***************");

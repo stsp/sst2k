@@ -973,7 +973,6 @@ void mayday(void)
     /* dematerialize starship */
     game.quad[game.sector.x][game.sector.y]=IHDOT;
     proutn(_("Starbase in %s responds--"), cramlc(quadrant, game.quadrant));
-    proutn("");
     crmshp();
     prout(_(" dematerializes."));
     game.sector.x=0;
@@ -1083,7 +1082,7 @@ void abandn(void)
 	    return;
 	}
 	if (game.landed) {
-	    prout(_("You must be aboard the Enterprise."));
+	    prout(_("You must be aboard the ship."));
 	    return;
 	}
 	if (game.iscraft != onship) {
@@ -1111,7 +1110,8 @@ void abandn(void)
 	    prout(_("Remainder of ship's complement beam down"));
 	    prout(_("to %s."), systnames[q->planet]);
 	} else {
-	    prout(_("Entire crew of %d left to die in outer space."));
+	    prout(_("Entire crew of %d left to die in outer space."),
+		    game.state.crew);
 	    game.casual += game.state.crew;
 	    game.abandoned += game.state.crew;
 	}

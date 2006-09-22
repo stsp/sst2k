@@ -282,7 +282,7 @@ commands[] = {
 #endif
 };
 
-#define NUMCOMMANDS	sizeof(commands)/sizeof(commands[0])
+#define NUMCOMMANDS	ARRAY_SIZE(commands)
 #define ACCEPT(i)	(!commands[i].option || (commands[i].option & game.options))
 
 static void listCommands(void) 
@@ -387,13 +387,6 @@ static void helpme(void)
     fclose(fp);
 }
 
-void enqueue(char *s)
-/* enqueue input for the command parser */
-{
-    chew();
-    strcpy(line, s);
-}
-
 static void makemoves(void)
 /* command-interpretation loop */
 {
@@ -413,7 +406,8 @@ static void makemoves(void)
 	    clrscr();
 	    proutn("COMMAND> ");
 	    if (scan() == IHEOL) {
-		makechart();
+		if (game.options & OPTION_CURSES)
+		    makechart();
 		continue;
 	    }
 	    game.ididit = false;
@@ -439,13 +433,13 @@ static void makemoves(void)
 	commandhook(commands[i].name, true);
 	switch (v) { /* command switch */
 	case SRSCAN:                 // srscan
-	    srscan(SCAN_FULL);
+	    srscan();
 	    break;
 	case STATUS:                 // status
-	    srscan(SCAN_STATUS);
+	    status(0);
 	    break;
 	case REQUEST:			// status request 
-	    srscan(SCAN_REQUEST);
+	    request();
 	    break;
 	case LRSCAN:			// lrscan
 	    lrscan();
@@ -476,7 +470,7 @@ static void makemoves(void)
 	    dreprt();
 	    break;
 	case CHART:			// chart
-	    chart(false);
+	    makechart();
 	    break;
 	case IMPULSE:			// impulse
 	    impuls();

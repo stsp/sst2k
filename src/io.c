@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <wchar.h>
 
 #include "config.h"
 #include "sst.h"
@@ -11,6 +12,7 @@ WINDOW *curwnd;
 WINDOW *fullscreen_window;
 WINDOW *srscan_window;
 WINDOW *report_window;
+WINDOW *status_window;
 WINDOW *lrscan_window;
 WINDOW *message_window;
 WINDOW *prompt_window;
@@ -42,7 +44,8 @@ void iostart(void)
 	exit(1);
     }
     if (!(game.options & OPTION_CURSES)) {
-	rows = atoi(getenv("LINES"));
+	char *ln_env = getenv("LINES");
+	rows = ln_env ? atoi(ln_env) : 25;
     } else {
 	(void)initscr();
 #ifdef KEY_MIN
@@ -67,7 +70,8 @@ void iostart(void)
 	//(void)noecho();
 	fullscreen_window = stdscr;
 	srscan_window     = newwin(12, 25, 0,       0);
-	report_window     = newwin(10, 0,  1,       25);
+	report_window     = newwin(11, 0,  1,       25);
+	status_window     = newwin(10, 0,  1,       39);
 	lrscan_window     = newwin(10, 0,  0,       64); 
 	message_window    = newwin(0,  0,  12,      0);
 	prompt_window     = newwin(1,  0,  LINES-2, 0); 
@@ -129,13 +133,11 @@ void skip(int i)
 {
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
-	    if (curwnd == message_window && linecount >= getmaxy(curwnd) - 3) {
+	    if (curwnd == message_window && getcury(curwnd) >= getmaxy(curwnd) - 3) {
 		pause_game(false);
 		clrscr();
 	    } else {
 		proutn("\n");
-		if (curwnd == message_window)
-		    linecount++;
 	    }
 	} else {
 	    linecount++;
@@ -147,7 +149,7 @@ void skip(int i)
     }
 }
 
-static void vproutn(char *fmt, va_list ap) 
+static void vproutn(const char *fmt, va_list ap) 
 {
     if (game.options & OPTION_CURSES) {
 	vwprintw(curwnd, fmt, ap);
@@ -157,7 +159,7 @@ static void vproutn(char *fmt, va_list ap)
 	vprintf(fmt, ap);
 }
 
-void proutn(char *fmt, ...) 
+void proutn(const char *fmt, ...) 
 {
     va_list ap;
     va_start(ap, fmt);
@@ -165,7 +167,7 @@ void proutn(char *fmt, ...)
     va_end(ap);
 }
 
-void prout(char *fmt, ...) 
+void prout(const char *fmt, ...) 
 {
     va_list ap;
     va_start(ap, fmt);
@@ -174,25 +176,32 @@ void prout(char *fmt, ...)
     skip(1);
 }
 
-void prouts(char *fmt, ...) 
+void prouts(const char *fmt, ...) 
 /* print slowly! */
 {
-    char *s, buf[BUFSIZ];
+    char buf[BUFSIZ];
+    wchar_t *s, mbuf[BUFSIZ];
     va_list ap;
     va_start(ap, fmt);
     vsprintf(buf, fmt, ap);
     va_end(ap);
-    for (s = buf; *s; s++) {
+    mbstowcs(mbuf, buf, BUFSIZ);
+    for (s = mbuf; *s; s++) {
+	/* HOW to convince ncurses to use wchar_t?? */
+	/* WHY putwchar() doesn't work?? */
+	/* OK then, convert back to mbs... */
+	char c[MB_CUR_MAX*2];
+	int n;
+	n = wctomb(c, *s);
+	c[n] = 0;
 	delay(30);
-	if (game.options & OPTION_CURSES) {
-	    waddch(curwnd, *s);
+	proutn(c);
+	if (game.options & OPTION_CURSES)
 	    wrefresh(curwnd);
-	}
-	else {
-	    putchar(*s);
+	else
 	    fflush(stdout);
-	}
     }
+    delay(300);
 }
 
 void cgetline(char *line, int max)
@@ -221,7 +230,7 @@ void setwnd(WINDOW *wnd)
     }
 }
 
-void clreol (void)
+void clreol(void)
 /* clear to end of line -- can be a no-op in tty mode */
 {
    if (game.options & OPTION_CURSES) {
@@ -230,7 +239,7 @@ void clreol (void)
    }
 }
 
-void clrscr (void)
+void clrscr(void)
 /* clear screen -- can be a no-op in tty mode */
 {
    if (game.options & OPTION_CURSES) {
@@ -241,7 +250,7 @@ void clrscr (void)
    linecount = 0;
 }
 
-void textcolor (int color)
+void textcolor(int color)
 {
 #ifdef A_COLOR
     if (game.options & OPTION_CURSES) {
@@ -302,7 +311,7 @@ void textcolor (int color)
 #endif /* A_COLOR */
 }
 
-void highvideo (void)
+void highvideo(void)
 {
     if (game.options & OPTION_CURSES) {
 	wattron(curwnd, A_REVERSE);
@@ -324,17 +333,18 @@ void drawmaps(int mode)
 	    sensor();
         setwnd(srscan_window);
         wmove(curwnd, 0, 0);
-        enqueue("no");
-        srscan(SCAN_FULL);
+        srscan();
 	if (mode != 2) {
+	    setwnd(status_window);
+	    wclear(status_window);
+	    wmove(status_window, 0, 0);
 	    setwnd(report_window);
 	    wclear(report_window);
 	    wmove(report_window, 0, 0);
-	    srscan(SCAN_NO_LEFTSIDE);
+	    status(0);
 	    setwnd(lrscan_window);
 	    wclear(lrscan_window);
 	    wmove(lrscan_window, 0, 0);
-	    enqueue("l");
 	    lrscan();
 	}
     }
@@ -429,6 +439,31 @@ void makechart(void)
     if (game.options & OPTION_CURSES) {
 	setwnd(message_window);
 	wclear(message_window);
-	chart(false);
     }
+    chart();
+    if (game.options & OPTION_TTY) {
+	skip(1);
+    }
+}
+
+void prstat(const char *txt, const char *fmt, ...)
+{
+#define NSYM 14
+    int i;
+    va_list args;
+    proutn(txt);
+    if (game.options & OPTION_CURSES) {
+	skip(1);
+    } else  {
+	for (i = mblen(txt, strlen(txt)); i < NSYM; i++)
+	    proutn(" ");
+    }
+    if (game.options & OPTION_CURSES)
+	setwnd(status_window);
+    va_start(args, fmt);
+    vproutn(fmt, args);
+    va_end(args);
+    skip(1);
+    if (game.options & OPTION_CURSES)
+	setwnd(report_window);
 }

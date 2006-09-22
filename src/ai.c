@@ -231,7 +231,7 @@ static void movebaddy(coord com, int loccom, feature ienm)
 	
     }
     if (idebug)
-	prout("");
+	skip(1);
     /* Put commander in place within same quadrant */
     game.quad[com.x][com.y] = IHDOT;
     game.quad[next.x][next.y] = ienm;

@@ -341,13 +341,6 @@ typedef enum {
 
 enum loctype {neither, quadrant, sector};
 
-typedef enum {
-    SCAN_FULL,
-    SCAN_REQUEST,
-    SCAN_STATUS,
-    SCAN_NO_LEFTSIDE,
-} scantype;
-
 /* Function prototypes */
 void prelim(void);
 void attack(bool);
@@ -355,7 +348,7 @@ bool choose(bool);
 void setup(bool);
 void score(void);
 void atover(bool);
-void srscan(scantype);
+void srscan(void);
 void lrscan(void);
 void phasers(void);
 void photon(void);
@@ -363,7 +356,7 @@ void warp(bool);
 void doshield(bool);
 void dock(bool);
 void dreprt(void);
-void chart(bool);
+void chart(void);
 void rechart(void);
 void impuls(void);
 void wait(void);
@@ -380,14 +373,19 @@ void freeze(bool);
 bool thaw(void);
 void plaque(void);
 int scan(void);
+void status(int req);
+void request(void);
 #define IHEOL (0)
 #define IHALPHA (1)
 #define IHREAL (2)
 void chew(void);
 void chew2(void);
 void skip(int);
-void prout(char *, ...);
-void proutn(char *, ...);
+void prout(const char *, ...) __attribute__((format(printf, 1, 2)));
+void proutn(const char *, ...) __attribute__((format(printf, 1, 2)));
+void prouts(const char *, ...) __attribute__((format(printf, 1, 2)));
+void prstat(const char *txt, const char *fmt, ...)
+	__attribute__((format(printf, 2, 3)));
 void stars(void);
 void newqad(bool);
 bool ja(void);
@@ -413,7 +411,6 @@ void nova(coord);
 void snova(bool, coord *);
 void scom(bool *);
 void hittem(double *);
-void prouts(char *, ...);
 bool isit(char *);
 void preport(void);
 void orbit(void);
@@ -438,7 +435,6 @@ void waitfor(void);
 void setpassword(void);
 void commandhook(char *, bool);
 void makechart(void);
-void enqueue(char *);
 coord newkling(int);
 #if BSD_BUG_FOR_BUG
 void visual(void);

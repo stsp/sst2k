@@ -7,11 +7,6 @@ Short-term items:
 * Complete, polish, improve, complete, polish, improve the
   gettextization and the translation! Right now it just sucks.
 
-* Probably a separate window for status in ncurses mode
-  (right now status uses srscan window)
-
-* srscan() really needs to be restructured and cleaned up.
-
 
 Long-term items:
 

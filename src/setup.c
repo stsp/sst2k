@@ -380,13 +380,13 @@ void setup(bool needprompt)
 	      INKLINGTOT);
 	prout(_("You have an initial allotment of %d stardates to complete"), (int)game.intime);
 	prout(_("your mission.  As you proceed you may be given more time."));
-	prout("");
+	skip(1);
 	prout(_("You will have %d supporting starbases."), game.inbase);
 	proutn(_("Starbase locations-  "));
     }
     else {
 	prout(_("Stardate %d."), (int)game.state.date);
-	prout("");
+	skip(1);
 	prout(_("%d Klingons."), INKLINGTOT);
 	prout(_("An unknown number of Romulans."));
 	if (game.state.nscrem) prout(_("And one (GULP) Super-Commander."));
@@ -758,13 +758,13 @@ void sortkl(void)
 void setpassword(void)
 /* set the self-destruct password */
 {
-    if (!(game.options & OPTION_CURSES)) {
+    if (game.options & OPTION_PLAIN) {
 	while (TRUE) {
+	    chew();
+	    proutn(_("Please type in a secret password- "));
 	    scan();
 	    strcpy(game.passwd, citem);
-	    chew();
 	    if (*game.passwd != 0) break;
-	    proutn(_("Please type in a secret password-"));
 	}
     } else {
 	int i;
