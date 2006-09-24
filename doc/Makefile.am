@@ -9,7 +9,7 @@ sst.6: sst.xml
 sst-doc.txt: sst-doc.xml
 	xmlto -m sst-layer.xsl txt sst-doc.xml
 sst.doc: sst-doc.txt
-	makehelp.py >sst.doc
+	./makehelp.py >sst.doc
 
 sst-doc.html: sst-doc.xml
 	xmlto xhtml-nochunks sst-doc.xml
