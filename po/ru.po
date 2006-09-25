@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sst 2.0\n"
 "Report-Msgid-Bugs-To: stsp\n"
-"POT-Creation-Date: 2006-09-22 20:54+0400\n"
+"POT-Creation-Date: 2006-09-25 10:36+0400\n"
 "PO-Revision-Date: 2006-09-15 11:01+0400\n"
 "Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -567,13 +567,12 @@ msgid "Very small hit on "
 msgstr "Очень слабый удар по "
 
 #: src/battle.c:1329
-#, fuzzy, c-format
 msgid "***Mr. Spock-  \"Captain, the vessel at %s"
-msgstr "***Мистер Спок- \"Капитан, корабль на "
+msgstr "***Мистер Спок- \"Капитан, посудина в %s "
 
 #: src/battle.c:1331
 msgid "   has just lost its firepower.\""
-msgstr "   потерял боеспособность.\""
+msgstr "   потеряла боеспособность.\""
 
 #: src/events.c:141
 msgid "Lt. Uhura- \"Captain, the sub-space radio is working and"
@@ -716,9 +715,9 @@ msgid "     Supernova in %s; caution advised."
 msgstr "     Взрыв сверхновой в %s; соблюдайте осторожность."
 
 #: src/events.c:853
-#, fuzzy, c-format
+#, c-format
 msgid "***Incipient supernova detected at %s"
-msgstr "***Зарегистрировано появление сверхновой в "
+msgstr "***Зарегистрирован взрыв сверхновой в %s"
 
 #: src/events.c:855
 msgid "Emergency override attempts t"
@@ -2588,7 +2587,7 @@ msgstr "Спок- \"Я обновил звёздную карту по запи�
 
 #: src/reports.c:207
 msgid "       STAR CHART FOR THE KNOWN GALAXY"
-msgstr "       ЗВЁЗДНАЯ КАРТА ИССЛЕДОВАННЫХ УЧАСТКОВ"
+msgstr "     ЗВЁЗДНАЯ КАРТА ИССЛЕДОВАННЫХ УЧАСТКОВ"
 
 #: src/reports.c:209
 #, c-format
@@ -2723,11 +2722,11 @@ msgstr "  [Используются сенсоры Базы]"
 
 #: src/reports.c:386
 msgid "     Short-range scan"
-msgstr "     Ближний обзор"
+msgstr "       Ближний обзор"
 
 #: src/reports.c:412
 msgid "COMPUTER DAMAGED, USE A POCKET CALCULATOR."
-msgstr "КОМПЬЬЮТЕР СЛОМАН, ВОСПОЛЬЗУЙТЕСЬ КАЛЬКУЛЯТОРОМ."
+msgstr "КОМПЬЮТЕР СЛОМАН, ВОСПОЛЬЗУЙТЕСЬ КАЛЬКУЛЯТОРОМ."
 
 #: src/reports.c:419
 msgid "Destination quadrant and/or sector? "
@@ -3218,90 +3217,90 @@ msgstr "Спок- \"Капитан, я нашёл кое-какую информ
 msgid "WARNING--Saved games produce no plaques!"
 msgstr "ПРЕДУПРЕЖДЕНИЕ--Сохранённые игры не дают грамоты!"
 
-#: src/sst.c:664
+#: src/sst.c:666
 msgid "Do you want your score recorded?"
 msgstr "Хотите записать свой счёт? "
 
-#: src/sst.c:670
+#: src/sst.c:672
 msgid "Do you want to play again? "
 msgstr "Хотите сыграть снова? "
 
-#: src/sst.c:674
+#: src/sst.c:676
 msgid "May the Great Bird of the Galaxy roost upon your home planet."
 msgstr "И пусть Великая Птица Галактики нагадит на твою планету."
 
-#: src/sst.c:686
+#: src/sst.c:688
 msgid "Romulan"
 msgstr "Ромулан"
 
-#: src/sst.c:687
+#: src/sst.c:689
 msgid "Klingon"
 msgstr "Клингон"
 
-#: src/sst.c:688
+#: src/sst.c:690
 msgid "Commander"
 msgstr "Командир"
 
-#: src/sst.c:689
+#: src/sst.c:691
 msgid "Super-commander"
 msgstr "Глав-ком"
 
-#: src/sst.c:690
+#: src/sst.c:692
 msgid "Star"
 msgstr "Звезда"
 
-#: src/sst.c:691
+#: src/sst.c:693
 msgid "Planet"
 msgstr "Планета"
 
-#: src/sst.c:692
+#: src/sst.c:694
 msgid "Starbase"
 msgstr "База"
 
-#: src/sst.c:693
+#: src/sst.c:695
 msgid "Black hole"
 msgstr "Чёрная дыра"
 
-#: src/sst.c:694
+#: src/sst.c:696
 msgid "Tholian"
 msgstr "Толиан"
 
-#: src/sst.c:695
+#: src/sst.c:697
 msgid "Tholian web"
 msgstr "Толианская сеть"
 
-#: src/sst.c:696
+#: src/sst.c:698
 msgid "Stranger"
 msgstr "Странник"
 
-#: src/sst.c:697
+#: src/sst.c:699
 msgid "Inhabited World"
 msgstr "Обитаемый Мир"
 
-#: src/sst.c:708
+#: src/sst.c:710
 msgid "Quadrant "
 msgstr "Квадрант "
 
-#: src/sst.c:709
+#: src/sst.c:711
 msgid "Sector "
 msgstr "Сектор "
 
-#: src/sst.c:719
+#: src/sst.c:721
 msgid " at "
 msgstr " в "
 
-#: src/sst.c:728
+#: src/sst.c:730
 msgid "Enterprise"
 msgstr "Энтерпрайз"
 
-#: src/sst.c:729
+#: src/sst.c:731
 msgid "Faerie Queene"
 msgstr "Волшебная Королева"
 
-#: src/sst.c:838
+#: src/sst.c:840
 msgid "Please answer with \"y\" or \"n\": "
 msgstr "Пожалуйста отвечайте Да (\"y\") или Нет (\"n\"): "
 
-#: src/sst.c:847
+#: src/sst.c:849
 msgid "Beg your pardon, Captain?"
 msgstr "Прошу прощения, Капитан?"

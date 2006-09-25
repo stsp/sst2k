@@ -634,11 +634,12 @@ int main(int argc, char **argv)
     }
     /* where to save the input in case of bugs */
     logfp = fopen("/usr/tmp/sst-input.log", "w");
-    setlinebuf(logfp);
-    fprintf(logfp, "seed %d\n", seed);
+    if (logfp) {
+	setlinebuf(logfp);
+	fprintf(logfp, "seed %d\n", seed);
+    }
     srand(seed);
 
-    srand(seed);
     iostart();
 
     line[0] = '\0';

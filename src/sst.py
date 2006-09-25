@@ -503,7 +503,7 @@ def movebaddy(ship):
             if ship.distance() < dist1:
                 prout(" advances to sector %s" % ship.location)
             else:
-                proutn(" retreats to sector %s" % ship.location)
+                prout(" retreats to sector %s" % ship.location)
         ship.sectormove(next)
 
 def movcom(): 

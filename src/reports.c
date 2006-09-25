@@ -26,8 +26,8 @@ void attakreport(bool curt)
 	    proutn(_("Base in %i - %i attacked by C. Alive until %.1f"), game.battle.x, game.battle.y, scheduled(FCDBAS));
         if (game.isatb)
 	    proutn(_("Base in %i - %i attacked by S. Alive until %.1f"), game.state.kscmdr.x, game.state.kscmdr.y, scheduled(FSCDBAS));
+	clreol();
     }
-    clreol();
 }
 	
 

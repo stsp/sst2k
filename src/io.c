@@ -47,13 +47,13 @@ void iostart(void)
 	char *ln_env = getenv("LINES");
 	rows = ln_env ? atoi(ln_env) : 25;
     } else {
-	(void)initscr();
+	initscr();
 #ifdef KEY_MIN
 	keypad(stdscr, TRUE);
 #endif /* KEY_MIN */
-	(void)saveterm();
-	(void)nonl();
-	(void)cbreak();
+	saveterm();
+	nonl();
+	cbreak();
 #ifdef A_COLOR
 	{
 	    start_color();
@@ -67,7 +67,7 @@ void iostart(void)
 	    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
 	}
 #endif /* A_COLOR */
-	//(void)noecho();
+	//noecho();
 	fullscreen_window = stdscr;
 	srscan_window     = newwin(12, 25, 0,       0);
 	report_window     = newwin(11, 0,  1,       25);
