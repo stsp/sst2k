@@ -23,7 +23,7 @@ void preport(void)
     skip(1);
     for (i = 0; i < game.inplan; i++) {
 	if ((game.state.plnets[i].known != unknown
-	    && game.state.plnets[i].crystals != absent)
+	    && game.state.plnets[i].inhabited == UNINHABITED)
 	    || (idebug && game.state.plnets[i].w.x !=0)
 	    ) {
 	    iknow = true;
@@ -386,7 +386,7 @@ void shuttle(void)
 	game.state.plnets[game.iplnet].known = shuttle_down;
 	game.landed = true;
 	game.icraft = false;
-	prout(_("Trip complete"));
+	prout(_("Trip complete."));
 	return;
     }
 }

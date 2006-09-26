@@ -94,9 +94,9 @@ void report(void)
     if ((!damaged(DRADIO) || game.condition == docked)
 		&& is_scheduled(FDSPROB)) {
 	if (game.isarmed) 
-	    proutn(_("An armed deep space probe is in"));
+	    proutn(_("An armed deep space probe is in "));
 	else
-	    proutn(_("A deep space probe is in"));
+	    proutn(_("A deep space probe is in "));
 	proutn(cramlc(quadrant, game.probec));
 	prout(".");
     }
@@ -163,11 +163,11 @@ void dreprt(void)
     for (i = 0; i < NDEVICES; i++) {
 	if (damaged(i)) {
 	    if (!jdam) {
-		prout(_("DEVICE            -REPAIR TIMES-"));
-		prout(_("                IN FLIGHT   DOCKED"));
+		prout(_("\tDEVICE\t\t\t-REPAIR TIMES-"));
+		prout(_("\t\t\tIN FLIGHT\t\tDOCKED"));
 		jdam = true;
 	    }
-	    prout("  %16s %8.2f  %8.2f", 
+	    prout("  %-26s\t%8.2f\t\t%8.2f", 
 		  device[i],
 		  game.damage[i]+0.05,
 		  game.docfac*game.damage[i]+0.005);

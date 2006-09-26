@@ -72,7 +72,7 @@ void iostart(void)
 	srscan_window     = newwin(12, 25, 0,       0);
 	report_window     = newwin(11, 0,  1,       25);
 	status_window     = newwin(10, 0,  1,       39);
-	lrscan_window     = newwin(10, 0,  0,       64); 
+	lrscan_window     = newwin(5,  0,  0,       64); 
 	message_window    = newwin(0,  0,  12,      0);
 	prompt_window     = newwin(1,  0,  LINES-2, 0); 
 	scrollok(message_window, TRUE);

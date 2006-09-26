@@ -812,7 +812,6 @@ void photon(void)
     double targ[4][3], course[4];
     double r, dummy;
     int key, n, i;
-    bool osuabor;
 
     game.ididit = false;
 
@@ -905,8 +904,7 @@ void photon(void)
     }
     game.ididit = true;
     /* Loop for moving <n> torpedoes */
-    osuabor = false;
-    for (i = 1; i <= n && !osuabor; i++) {
+    for (i = 1; i <= n; i++) {
 	if (game.condition != docked) game.torps--;
 	r = (Rand()+Rand())*0.5 -0.5;
 	if (fabs(r) >= 0.47) {
@@ -919,12 +917,11 @@ void photon(void)
 	    skip(1);
 	    if (i < n)
 		prout(_("  Remainder of burst aborted."));
-	    osuabor = true;
 	    if (Rand() <= 0.2) {
 		prout(_("***Photon tubes damaged by misfire."));
 		game.damage[DPHOTON] = game.damfac*(1.0+2.0*Rand());
-		break;
 	    }
+	    break;
 	}
 	if (game.shldup || game.condition == docked) 
 	    r *= 1.0 + 0.0001*game.shield;
