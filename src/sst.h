@@ -46,7 +46,7 @@ typedef struct {int x; int y;} coord;
 #define same(c1, c2)		((c1.x == c2.x) && (c1.y == c2.y))
 #define distance(c1, c2)	sqrt(square(c1.x - c2.x) + square(c1.y - c2.y))
 #define invalidate(w)		w.x = w.y = 0
-#define is_valid(w)		(w.x != 0 || w.y != 0)
+#define is_valid(w)		(w.x != 0 && w.y != 0)
 
 typedef struct {
     coord w;
