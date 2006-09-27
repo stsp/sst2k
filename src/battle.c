@@ -520,8 +520,8 @@ static void fry(double hit)
 	extradm = (hit*game.damfac)/(ncrit*(75.0+25.0*Rand()));
 	game.damage[j] += extradm;
 	if (loop1 > 0) {
-	    for (loop2=2; loop2<=loop1 && j != cdam[loop2-1]; loop2++) ;
-	    if (loop2<=loop1) continue;
+	    for (loop2 = 0; loop2 < loop1 && j != cdam[loop2]; loop2++) ;
+	    if (loop2 < loop1) continue;
 	    ktr += 1;
 	    if (ktr==3) skip(1);
 	    proutn(_(" and "));

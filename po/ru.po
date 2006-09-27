@@ -2658,7 +2658,7 @@ msgstr "Скорость"
 
 #: src/reports.c:309
 msgid "Energy"
-msgstr ""
+msgstr "Энергия"
 
 #: src/reports.c:311
 msgid " (have crystals)"
