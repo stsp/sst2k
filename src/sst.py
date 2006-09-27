@@ -1,5 +1,15 @@
 """
 sst.py =-- Super Star Trek in Python
+
+Control flow of this translation is pretty much identical to the C version
+(and thus like the ancestral FORTRAN) but the data structures are
+radically different -- the Python code makes heavy use of objects.
+
+Note that the game.quad, game.snap.galaxy and game.snap.chart members
+are not actually arrays but dictioaries indixed by coord tuples.  Be setting
+the hash of a coord exual to the hash of a literal tuple containing its
+coordinate data, we ensure these can be indexed both ways.
+
 """
 import math
 
@@ -14,6 +24,11 @@ FULLCREW	= 428	 # BSD Trek was 387, that's wrong
 MAXKLGAME	= 127
 MAXKLQUAD	= 9
 FOREVER 	= 1e30
+
+# These macros hide the difference between 0-origin and 1-origin addressing.
+# They're a step towards de-FORTRANizing the code.
+def VALID_QUADRANT(x,y): ((x)>=1 and (x)<=GALSIZE and (y)>=1 and (y)<=GALSIZE)
+def VALID_SECTOR(x, y):	((x)>=1 and (x)<=QUADSIZE and (y)>=1 and (y)<=QUADSIZE)
 
 # These types have not been dealt with yet 
 IHQUEST = '?',
@@ -49,11 +64,17 @@ class feature:
     "A feature in the current quadrant (ship, star, black hole, etc)." 
     def __init__(self):
         self.type = None	# name of feature type
-        self.location = None	# location
+        self.sector = None	# sector location
     def distance(self):
-        return self.location.distance(game.sector)
+        return self.sector.distance(game.sector)
     def __str__(self):
         return self.name[0]
+    def sectormove(self, dest):
+        "Move this feature within the current quadrant." 
+        if self.sector:
+            game.quad[self.sector] = None
+        game.quad[dest] = self
+        self.sector = dest
 
 empty = None	# Value of empty space in game.quad
 
@@ -73,12 +94,6 @@ class ship(feature):
             game.remkl -= 1
         elif self.type == "Romulan":
             game.romrem -= 1
-    def sectormove(self, dest):
-        "Move this ship within the current quadrant." 
-        if self.location:
-            game.quad[self.location] = None
-        game.quad[dest] = self
-        self.location = dest
 
 class planet(feature):
     "A planet.  May be inhabited or not, may hold dilithium crystals or not."
@@ -116,13 +131,17 @@ class blackhole(feature):
         return '*'
 
 class starbase(feature):
-    "Starbases also have no features."
-    def __init(self):
+    "Starbases also have no features, just a location."
+    def __init(self, quadrant):
         feature.__init__(self)
+        self.quadrant = quadrant
+        game.state.bases.append(self)
     def __del__(self):
-        game.state.bases.remove(self.location)
+        game.state.bases.remove(self)
     def __str__(self):
         return 'B'
+    def __del__(self):
+        feature.__del__(self)
 
 class quadrant:
     def __init__(self):
@@ -158,7 +177,6 @@ class snapshot:
 	self.remkl = None	# remaining klingons
 	self.remcom = None	# remaining commanders
 	self.nscrem = None	# remaining super commanders
-	self.rembase = None	# remaining bases
 	self.starkl = None	# destroyed stars
 	self.basekl = None	# destroyed bases
 	self.nromrem = None	# Romulans remaining
@@ -291,8 +309,8 @@ def tryexit(look, ship, irun):
     iq.y = game.quadrant.y+(look.y+(QUADSIZE-1))/QUADSIZE - 1
     if not valid_quadrant(iq) or \
 	game.state.galaxy[iq].supernova or \
-        game.state.galaxy[iq].klingons > 8:
-	return False;	# no can do -- neg energy, supernovae, or >8 Klingons
+        game.state.galaxy[iq].klingons > MAXKLQUAD-1:
+	return False;	# no can do -- neg energy, supernovae, or >MAXKLQUAD-1 Klingons
     if ship.type == "Romulan":
         return False	# Romulans cannot escape
     if not irun:
@@ -530,7 +548,7 @@ def movescom(ship, avoid):
     global ipage
     if game.state.kscmdr == game.quadrant or \
 	game.state.galaxy[iq].supernova or \
-        game.state.galaxy[iq].klingons > 8: 
+        game.state.galaxy[iq].klingons > MAXKLQUAD-1: 
 	return True
     if avoid:
 	# Avoid quadrants with bases if we want to avoid Enterprise
@@ -595,7 +613,7 @@ def scom():
 	# without too many Klingons, and not already under attack.
         nearest = filter(game.starbases,
                          lambda x: game.state.galaxy[x].supernova \
-                         and game.state.galaxy[x].klingons <= 8)
+                         and game.state.galaxy[x].klingons <= MAXKLQUAD-1)
         if game.quadrant in nearest:
             nearest.remove(game.quadrant)
         if game.battle in nearest:
@@ -636,7 +654,7 @@ def scom():
 		iq.x = game.state.kscmdr.x
 		movescom(iq, passive)
     # check for a base
-    if game.state.rembase == 0:
+    if len(game.state.bases) == 0:
 	unschedule("FSCMOVE")
     else:
         for ibq in game.bases:

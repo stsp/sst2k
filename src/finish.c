@@ -219,7 +219,7 @@ void finish(FINTYPE ifin)
 	break;
     case FMATERIALIZE:
 	prout(_("Starbase was unable to re-materialize your starship."));
-	prout(_("Sic transit gloria muntdi"));
+	prout(_("Sic transit gloria mundi"));
 	break;
     case FPHASER:
 	proutn(_("The "));

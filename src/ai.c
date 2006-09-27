@@ -10,8 +10,8 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     iq.y = game.quadrant.y+(look.y+(QUADSIZE-1))/QUADSIZE - 1;
     if (!VALID_QUADRANT(iq.x,iq.y) ||
 	game.state.galaxy[iq.x][iq.y].supernova ||
-	game.state.galaxy[iq.x][iq.y].klingons > 8)
-	return false; /* no can do -- neg energy, supernovae, or >8 Klingons */
+	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1)
+	return false; /* no can do -- neg energy, supernovae, or >MAXKLQUAD-1 Klingons */
     if (ienm == IHR) return false; /* Romulans cannot escape! */
     if (!irun) {
 	/* avoid intruding on another commander's territory */
@@ -155,7 +155,7 @@ static void movebaddy(coord com, int loccom, feature ienm)
 		motion -= game.skill*(2.0-square(Rand()));
 	}
 	if (idebug)
-	    proutn("=== MOTION = %1.2f, FORCES = %1.2f, ", motion, forces);
+	    proutn("=== MOTION = %d, FORCES = %1.2f, ", motion, forces);
 	/* don't move if no motion */
 	if (motion==0) return;
 	/* Limit motion according to skill */
@@ -296,7 +296,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 
     if (same(iq, game.quadrant) || !VALID_QUADRANT(iq.x, iq.y) ||
 	game.state.galaxy[iq.x][iq.y].supernova ||
-	game.state.galaxy[iq.x][iq.y].klingons > 8) 
+	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1) 
 	return 1;
     if (flag) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
@@ -413,7 +413,7 @@ void scom(bool *ipage)
 	    ibq = game.state.baseq[i];
 	    if (same(ibq, game.quadrant) || same(ibq, game.battle) ||
 		game.state.galaxy[ibq.x][ibq.y].supernova ||
-		game.state.galaxy[ibq.x][ibq.y].klingons > 8) 
+		game.state.galaxy[ibq.x][ibq.y].klingons > MAXKLQUAD-1) 
 		continue;
 	    /* if there is a commander, an no other base is appropriate,
 	       we will take the one with the commander */
