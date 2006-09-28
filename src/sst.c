@@ -472,13 +472,13 @@ static void makemoves(void)
 		attack(false);		
 	    break;
 	case DAMAGES:			// damages
-	    dreprt();
+	    damagereport();
 	    break;
 	case CHART:			// chart
 	    makechart();
 	    break;
 	case IMPULSE:			// impulse
-	    impuls();
+	    impulse();
 	    break;
 	case REST:			// rest
 	    wait();
@@ -486,7 +486,7 @@ static void makemoves(void)
 		hitme = true;
 	    break;
 	case WARP:			// warp
-	    setwrp();
+	    setwarp();
 	    break;
 	case SCORE:           	 	// score
 	    score();
@@ -518,7 +518,7 @@ static void makemoves(void)
 		hitme = true;
 	    break;
 	case PLANETS:			// Planet list
-	    preport();
+	    survey();
 	    break;
 	case REPORT:			// Game Report 
 	    report();
@@ -540,7 +540,7 @@ static void makemoves(void)
 		hitme = true;
 	    break;
 	case ABANDON:			// Abandon Ship
-	    abandn();
+	    abandon();
 	    break;
 	case DESTRUCT:			// Self Destruct
 	    selfdestruct();

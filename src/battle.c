@@ -241,7 +241,7 @@ void ram(bool ibumpd, feature ienm, coord w)
     prout(_("***Shields are down."));
     if (KLINGREM) {
 	pause_game(true);
-	dreprt();
+	damagereport();
     }
     else
 	finish(FWON);
@@ -503,7 +503,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	prout(_(" displaced by blast to %s "), cramlc(sector, jw));
 	for_local_enemies(ll)
 	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll]);
-	sortkl();
+	sortklings();
 	return;
     }
     skip(1);
@@ -570,7 +570,7 @@ void attack(bool torps_ok)
 
     /* Tholian gewts to move before attacking */
     if (game.ithere) 
-	movetho();
+	movetholian();
 
     /* if you have just entered the RNZ, you'll get a warning */
     if (game.neutz) { /* The one chance not to be attacked */
@@ -724,7 +724,7 @@ void attack(bool torps_ok)
     /* After attack, reset average distance to enemies */
     for_local_enemies(loop)
 	game.kavgd[loop] = game.kdist[loop];
-    sortkl();
+    sortklings();
     return;
 }
 		

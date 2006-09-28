@@ -273,7 +273,7 @@ static void movebaddy(coord com, int loccom, feature ienm)
 }
 
 void moveklings(void) 
-/* move a commander */
+/* Klingon tactical movement */
 {
     coord w; 
     int i;
@@ -309,7 +309,7 @@ void moveklings(void)
 		movebaddy(w, i, game.quad[w.x][w.y]);
 	}
 
-    sortkl();
+    sortklings();
 }
 
 static bool movescom(coord iq, bool flag) 
@@ -352,7 +352,7 @@ static bool movescom(coord iq, bool flag)
 	game.nenhere--;
 	if (game.condition!=docked)
 	    newcnd();
-	sortkl();
+	sortklings();
     }
     /* check for a helpful planet */
     for (i = 0; i < game.inplan; i++) {
@@ -375,7 +375,7 @@ static bool movescom(coord iq, bool flag)
     return false; /* looks good! */
 }
 			
-void scom(void)
+void supercommander(void)
 /* move the Super Commander */
 {
     int i, i2, j, ideltax, ideltay, ifindit, iwhichb;
@@ -385,7 +385,7 @@ void scom(void)
     bool flag;
 
     if (idebug)
-	prout("== SCOM");
+	prout("== SUPERCOMMANDER");
 
     /* Decide on being active or passive */
     flag = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
@@ -555,11 +555,10 @@ void scom(void)
     return;
 }
 
-void movetho(void)
+void movetholian(void)
 /* move the Tholian */
 {
     int idx, idy, im, i;
-    /* Move the Tholian */
     if (!game.ithere || game.justin)
 	return;
 

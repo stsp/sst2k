@@ -147,7 +147,7 @@ void events(void)
 	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
 	    if (!game.iseenit) {
-		attakreport(false);
+		attackreport(false);
 		game.iseenit = true;
 	    }
 	    rechart();
@@ -159,7 +159,7 @@ void events(void)
 	switch (evcode) {
 	case FSNOVA: /* Supernova */
 	    pause_game(true);
-	    snova(false, NULL);
+	    supernova(false, NULL);
 	    schedule(FSNOVA, expran(0.5*game.intime));
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 		return;
@@ -374,7 +374,7 @@ void events(void)
 	    schedule(FSCMOVE, 0.2777);
 	    if (!game.ientesc && !istract && game.isatb != 1 &&
 			(!game.iscate || !game.justin)) 
-		scom();
+		supercommander();
 	    break;
 	case FDSPROB: /* Move deep space probe */
 	    schedule(FDSPROB, 0.01);
@@ -423,7 +423,7 @@ void events(void)
 	    game.proben--; // One less to travel
 	    if (game.proben == 0 && game.isarmed && pdest->stars) {
 		/* lets blow the sucker! */
-		snova(true, &game.probec);
+		supernova(true, &game.probec);
 		unschedule(FDSPROB);
 		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) 
 		    return;
@@ -635,7 +635,7 @@ void nova(coord nov)
 
     if (Rand() < 0.05) {
 	/* Wow! We've supernova'ed */
-	snova(false, &nov);
+	supernova(false, &nov);
 	return;
     }
 
@@ -674,7 +674,7 @@ void nova(coord nov)
 		    case IHSTAR: /* Affect another star */
 			if (Rand() < 0.05) {
 			    /* This star supernovas */
-			    snova(false, &scratch);
+			    supernova(false, &scratch);
 			    return;
 			}
 			top2++;
@@ -814,7 +814,7 @@ void nova(coord nov)
 }
 	
 	
-void snova(bool induced, coord *w) 
+void supernova(bool induced, coord *w) 
 /* star goes supernova */
 {
     int num = 0, nrmdead, npdead, kldead;

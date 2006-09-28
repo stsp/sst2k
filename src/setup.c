@@ -731,7 +731,7 @@ void newqad(bool shutup)
 	}
     }
 
-    sortkl();
+    sortklings();
 
     // Put in a few black holes
     for (i = 1; i <= 3; i++)
@@ -751,7 +751,7 @@ void newqad(bool shutup)
     }		
 }
 
-void sortkl(void) 
+void sortklings(void) 
 /* sort Klingons by distance from us */
 {
     double t;

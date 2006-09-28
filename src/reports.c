@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void attakreport(bool curt)
+void attackreport(bool curt)
 /* report status of bases under attack */
 {
     if (!curt) {
@@ -84,7 +84,7 @@ void report(void)
     if (!damaged(DRADIO) || game.condition == docked || game.iseenit) {
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
-	attakreport(false);
+	attackreport(false);
 	game.iseenit = true;
     }
     if (game.casual) 
@@ -166,7 +166,7 @@ void lrscan(void)
     }
 }
 
-void dreprt(void) 
+void damagereport(void) 
 /* damage report */
 {
     bool jdam = false;
@@ -358,7 +358,7 @@ void status(int req)
     );
 
     RQ(11,
-	attakreport(!req);
+	attackreport(!req);
     );
 
 #undef RQ

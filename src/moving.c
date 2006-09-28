@@ -200,7 +200,7 @@ no_quad_change:
 	    game.kavgd[m] = 0.5 * (finald+game.kdist[m]);
 	    game.kdist[m] = finald;
 	}
-	sortkl();
+	sortklings();
 	if (!game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 	    attack(false);
 	for_local_enemies(m) game.kavgd[m] = game.kdist[m];
@@ -242,7 +242,7 @@ void dock(bool verbose)
 	(is_scheduled(FCDBAS) || game.isatb == 1) && !game.iseenit) {
 	/* get attack report from base */
 	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""));
-	attakreport(false);
+	attackreport(false);
 	game.iseenit = true;
     }
 }
@@ -438,7 +438,7 @@ static void getcd(bool isprobe, int akey)
 		
 
 
-void impuls(void) 
+void impulse(void) 
 /* move under impulse power */
 {
     double power;
@@ -646,7 +646,7 @@ void warp(bool timewarp)
 
 
 
-void setwrp(void) 
+void setwarp(void) 
 /* change the warp factor */
 {
     int key;
@@ -1086,7 +1086,7 @@ void mayday(void)
 **
 */
 
-void abandn(void) 
+void abandon(void) 
 /* abandon ship */
 {
     int nb, l;

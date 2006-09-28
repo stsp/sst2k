@@ -12,7 +12,7 @@ static bool consumeTime(void)
     return false;
 }
 
-void preport(void) 
+void survey(void) 
 /* report on (uninhabited) planets in the galaxy */
 {
     bool iknow = false;
