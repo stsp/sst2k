@@ -297,7 +297,7 @@ class game:
 
 def communicating():
     "Are we in communication with Starfleet Command?"
-    return (not damaged("DRADIO")) or game.condition == docked
+    return (not damaged("DRADIO")) or game.condition == "docked"
 
 # Code corresponding to ai.c begins here
 
@@ -523,7 +523,7 @@ def movebaddy(ship):
                 prout(" retreats to sector %s" % ship.location)
         ship.sectormove(next)
 
-def movcom(): 
+def moveklings(): 
     "Allow enemies to move."
     for enemy in self.quad.enemies():
         if enemy.type == "Commander":

@@ -335,17 +335,17 @@ void setup(bool needprompt)
     for (i = 0; i < game.inplan; i++) {
 	do w = randplace(GALSIZE); 
 	while (game.state.galaxy[w.x][w.y].planet != NOPLANET);
-	game.state.plnets[i].w = w;
+	game.state.planets[i].w = w;
 	if (i < NINHAB) {
-	    game.state.plnets[i].pclass = M;	// All inhabited planets are class M
-	    game.state.plnets[i].crystals = absent;
-	    game.state.plnets[i].known = known;
-	    game.state.plnets[i].inhabited = i;
+	    game.state.planets[i].pclass = M;	// All inhabited planets are class M
+	    game.state.planets[i].crystals = absent;
+	    game.state.planets[i].known = known;
+	    game.state.planets[i].inhabited = i;
 	} else {
-	    game.state.plnets[i].pclass = Rand()*3.0; // Planet class M N or O
-	    game.state.plnets[i].crystals = Rand()*1.5;		// 1 in 3 chance of crystals
-	    game.state.plnets[i].known = unknown;
-	    game.state.plnets[i].inhabited = UNINHABITED;
+	    game.state.planets[i].pclass = Rand()*3.0; // Planet class M N or O
+	    game.state.planets[i].crystals = Rand()*1.5;		// 1 in 3 chance of crystals
+	    game.state.planets[i].known = unknown;
+	    game.state.planets[i].inhabited = UNINHABITED;
 	}
 	if ((game.options & OPTION_WORLDS) || i >= NINHAB)
 	    game.state.galaxy[w.x][w.y].planet = i;
@@ -657,7 +657,7 @@ void newqad(bool shutup)
     // If quadrant needs a planet, put it in
     if (q->planet != NOPLANET) {
 	game.iplnet = q->planet;
-	if (game.state.plnets[q->planet].inhabited == UNINHABITED)
+	if (game.state.planets[q->planet].inhabited == UNINHABITED)
 	    game.plnet = dropin(IHP);
 	else
 	    game.plnet = dropin(IHW);
@@ -669,7 +669,7 @@ void newqad(bool shutup)
 	dropin(IHSTAR);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.plnets[q->planet].inhabited == UNINHABITED)) {
+    if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.planets[q->planet].inhabited == UNINHABITED)) {
 	game.neutz = true;
 	if (!damaged(DRADIO)) {
 	    skip(1);

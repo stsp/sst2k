@@ -701,7 +701,7 @@ void nova(coord nov)
 			game.state.nplankl++;
 			crmena(true, IHP, sector, scratch);
 			prout(_(" destroyed."));
-			DESTROY(&game.state.plnets[game.iplnet]);
+			DESTROY(&game.state.planets[game.iplnet]);
 			game.iplnet = 0;
 			invalidate(game.plnet);
 			if (game.landed) {
@@ -931,8 +931,8 @@ void snova(bool induced, coord *w)
     if (npdead) {
 	int loop;
 	for (loop = 0; loop < game.inplan; loop++)
-	    if (same(game.state.plnets[loop].w, nq)) {
-		DESTROY(&game.state.plnets[loop]);
+	    if (same(game.state.planets[loop].w, nq)) {
+		DESTROY(&game.state.planets[loop]);
 	    }
     }
     /* Destroy any base in supernovaed quadrant */

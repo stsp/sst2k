@@ -350,7 +350,7 @@ void status(int req)
     RQ(10,
 	if (game.options & OPTION_WORLDS) {
 	    int plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet;
-	    if (plnet != NOPLANET && game.state.plnets[plnet].inhabited != UNINHABITED)
+	    if (plnet != NOPLANET && game.state.planets[plnet].inhabited != UNINHABITED)
 		prstat(_("Major system"), "%s", systnames[plnet]);
 	    else
 		prout(_("Sector is uninhabited"));

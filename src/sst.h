@@ -81,8 +81,8 @@ typedef enum {
 } feature;
 
 typedef struct {
-    bool snap;		// snapshot taken
-    int crew,		// crew complement
+    bool snap;			// snapshot taken
+    int crew,			// crew complement
 #define FULLCREW	428	/* BSD Trek was 387, that's wrong */
 	remkl,			// remaining klingons
 	remcom,			// remaining commanders
@@ -93,9 +93,9 @@ typedef struct {
 	nromrem,		// Romulans remaining
 	nplankl,		// destroyed uninhabited planets
 	nworldkl;		// destroyed inhabited planets
-    planet plnets[PLNETMAX];  // Planet information
+    planet planets[PLNETMAX];	// Planet information
     double date,		// stardate
-	remres,		// remaining resources
+	remres,			// remaining resources
 	remtime;		// remaining time
     coord baseq[BASEMAX+1];	// Base quadrant coordinates
     coord kcmdr[QUADSIZE+1];	// Commander quadrant coordinates
@@ -403,7 +403,7 @@ void ram(bool, feature, coord);
 void crmena(bool, feature, enum loctype, coord w);
 void deadkl(coord, feature, coord);
 void timwrp(void);
-void movcom(void);
+void moveklings(void);
 void torpedo(double, double, coord, double *, int, int);
 void huh(void);
 void pause_game(bool);

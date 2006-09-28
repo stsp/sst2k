@@ -399,7 +399,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
 	    q->planet = NOPLANET;
-	    DESTROY(&game.state.plnets[game.iplnet]);
+	    DESTROY(&game.state.planets[game.iplnet]);
 	    game.iplnet = 0;
 	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;
@@ -413,7 +413,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    prout(_(" destroyed."));
 	    game.state.nworldkl++;
 	    q->planet = NOPLANET;
-	    DESTROY(&game.state.plnets[game.iplnet]);
+	    DESTROY(&game.state.planets[game.iplnet]);
 	    game.iplnet = 0;
 	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;
@@ -579,7 +579,7 @@ void attack(bool torps_ok)
 
     /* commanders get a chance to tac-move towards you */
     if ((((game.comhere || game.ishere) && !game.justin) || game.skill == SKILL_EMERITUS) && torps_ok) 
-	movcom();
+	moveklings();
 
     /* if no enemies remain after movement, we're done */
     if (game.nenhere==0 || (game.nenhere==1 && iqhere && !iqengry)) 

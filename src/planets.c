@@ -22,21 +22,21 @@ void preport(void)
     prout(_("Spock-  \"Planet report follows, Captain.\""));
     skip(1);
     for (i = 0; i < game.inplan; i++) {
-	if ((game.state.plnets[i].known != unknown
-	    && game.state.plnets[i].inhabited == UNINHABITED)
-	    || (idebug && game.state.plnets[i].w.x !=0)
+	if ((game.state.planets[i].known != unknown
+	    && game.state.planets[i].inhabited == UNINHABITED)
+	    || (idebug && game.state.planets[i].w.x !=0)
 	    ) {
 	    iknow = true;
-	    if (idebug && game.state.plnets[i].known==unknown)
+	    if (idebug && game.state.planets[i].known==unknown)
 		proutn("(Unknown) ");
-	    proutn(cramlc(quadrant, game.state.plnets[i].w));
+	    proutn(cramlc(quadrant, game.state.planets[i].w));
 	    proutn(_("   class "));
-	    proutn(classes[game.state.plnets[i].pclass]);
+	    proutn(classes[game.state.planets[i].pclass]);
 	    proutn("   ");
-	    if (game.state.plnets[i].crystals != present)
+	    if (game.state.planets[i].crystals != present)
 		proutn(_("no "));
 	    prout(_("dilithium crystals present."));
-	    if (game.state.plnets[i].known==shuttle_down) 
+	    if (game.state.planets[i].known==shuttle_down) 
 		prout(_("    Shuttle Craft Galileo on surface."));
 	}
     }
@@ -87,20 +87,20 @@ void sensor(void)
 	prout(_("Spock- \"No planet in this quadrant, Captain.\""));
 	return;
     }
-    if ((game.plnet.x != 0)&& (game.state.plnets[game.iplnet].known == unknown)) {
+    if ((game.plnet.x != 0)&& (game.state.planets[game.iplnet].known == unknown)) {
 	prout(_("Spock-  \"Sensor scan for %s-"), cramlc(quadrant, game.quadrant));
 	skip(1);
 	prout(_("         Planet at %s is of class %s."),
 	      cramlc(sector,game.plnet),
-	      classes[game.state.plnets[game.iplnet].pclass]);
-	if (game.state.plnets[game.iplnet].known==shuttle_down) 
+	      classes[game.state.planets[game.iplnet].pclass]);
+	if (game.state.planets[game.iplnet].known==shuttle_down) 
 	    prout(_("         Sensors show Galileo still on surface."));
 	proutn(_("         Readings indicate"));
-	if (game.state.plnets[game.iplnet].crystals != present)
+	if (game.state.planets[game.iplnet].crystals != present)
 	    proutn(_(" no"));
 	prout(_(" dilithium crystals present.\""));
-	if (game.state.plnets[game.iplnet].known == unknown)
-	    game.state.plnets[game.iplnet].known = known;
+	if (game.state.planets[game.iplnet].known == unknown)
+	    game.state.planets[game.iplnet].known = known;
     }
 }
 
@@ -111,7 +111,7 @@ void beam(void)
     skip(1);
     if (damaged(DTRANSP)) {
 	prout(_("Transporter damaged."));
-	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == onship)) {
+	if (!damaged(DSHUTTL) && (game.state.planets[game.iplnet].known==shuttle_down || game.iscraft == onship)) {
 	    skip(1);
 	    proutn(_("Spock-  \"May I suggest the shuttle craft, Sir?\" "));
 	    if (ja() == true)
@@ -128,7 +128,7 @@ void beam(void)
 	prout(_("Impossible to transport through shields."));
 	return;
     }
-    if (game.state.plnets[game.iplnet].known==unknown) {
+    if (game.state.planets[game.iplnet].known==unknown) {
 	prout(_("Spock-  \"Captain, we have no information on this planet"));
 	prout(_("  and Starfleet Regulations clearly state that in this situation"));
 	prout(_("  you may not go down.\""));
@@ -136,7 +136,7 @@ void beam(void)
     }
     if (game.landed) {
 	/* Coming from planet */
-	if (game.state.plnets[game.iplnet].known==shuttle_down) {
+	if (game.state.planets[game.iplnet].known==shuttle_down) {
 	    proutn(_("Spock-  \"Wouldn't you rather take the Galileo?\" "));
 	    if (ja() == true) {
 		chew();
@@ -153,7 +153,7 @@ void beam(void)
     }
     else {
 	/* Going to planet */
-	if (game.state.plnets[game.iplnet].crystals==absent) {
+	if (game.state.planets[game.iplnet].crystals==absent) {
 	    prout(_("Spock-  \"Captain, I fail to see the logic in"));
 	    prout(_("  exploring a planet with no dilithium crystals."));
 	    proutn(_("  Are you sure this is wise?\" "));
@@ -183,7 +183,7 @@ void beam(void)
     skip(2);
     prout(_("Transport complete."));
     game.landed = !game.landed;
-    if (game.landed && game.state.plnets[game.iplnet].known==shuttle_down) {
+    if (game.landed && game.state.planets[game.iplnet].known==shuttle_down) {
 	prout(_("The shuttle craft Galileo is here!"));
     }
     if (!game.landed && game.imine) {
@@ -203,11 +203,11 @@ void mine(void)
 	prout(_("Mining party not on planet."));
 	return;
     }
-    if (game.state.plnets[game.iplnet].crystals == mined) {
+    if (game.state.planets[game.iplnet].crystals == mined) {
 	prout(_("This planet has already been strip-mined for dilithium."));
 	return;
     }
-    else if (game.state.plnets[game.iplnet].crystals == absent) {
+    else if (game.state.planets[game.iplnet].crystals == absent) {
 	prout(_("No dilithium crystals on this planet."));
 	return;
     }
@@ -222,11 +222,11 @@ void mine(void)
 	prout(_("there's no reason to mine more at this time."));
 	return;
     }
-    game.optime = (0.1+0.2*Rand())*game.state.plnets[game.iplnet].pclass;
+    game.optime = (0.1+0.2*Rand())*game.state.planets[game.iplnet].pclass;
     if (consumeTime())
 	return;
     prout(_("Mining operation complete."));
-    game.state.plnets[game.iplnet].crystals = mined;
+    game.state.planets[game.iplnet].crystals = mined;
     game.imine = game.ididit = true;
 }
 
@@ -289,7 +289,7 @@ void shuttle(void)
     skip(1);
     if(damaged(DSHUTTL)) {
 	if (game.damage[DSHUTTL] == -1.0) {
-	    if (game.inorbit && game.state.plnets[game.iplnet].known == shuttle_down)
+	    if (game.inorbit && game.state.planets[game.iplnet].known == shuttle_down)
 		prout(_("Ye Faerie Queene has no shuttle craft bay to dock it at."));
 	    else
 		prout(_("Ye Faerie Queene had no shuttle craft."));
@@ -305,11 +305,11 @@ void shuttle(void)
 	prout(_(" not in standard orbit."));
 	return;
     }
-    if ((game.state.plnets[game.iplnet].known != shuttle_down) && game.iscraft != onship) {
+    if ((game.state.planets[game.iplnet].known != shuttle_down) && game.iscraft != onship) {
 	prout(_("Shuttle craft not currently available."));
 	return;
     }
-    if (!game.landed && game.state.plnets[game.iplnet].known==shuttle_down) {
+    if (!game.landed && game.state.planets[game.iplnet].known==shuttle_down) {
 	prout(_("You will have to beam down to retrieve the shuttle craft."));
 	return;
     }
@@ -317,7 +317,7 @@ void shuttle(void)
 	prout(_("Shuttle craft cannot pass through shields."));
 	return;
     }
-    if (game.state.plnets[game.iplnet].known==unknown) {
+    if (game.state.planets[game.iplnet].known==unknown) {
 	prout(_("Spock-  \"Captain, we have no information on this planet"));
 	prout(_("  and Starfleet Regulations clearly state that in this situation"));
 	prout(_("  you may not fly down.\""));
@@ -354,7 +354,7 @@ void shuttle(void)
 	    skip(1);
 	    if (consumeTime())
 		return;
-	    game.state.plnets[game.iplnet].known=shuttle_down;
+	    game.state.planets[game.iplnet].known=shuttle_down;
 	    prout(_("Trip complete."));
 	    return;
 	}
@@ -364,7 +364,7 @@ void shuttle(void)
 	    prout(_("shuttle craft for the trip back to the Enterprise."));
 	    skip(1);
 	    prout(_("The short hop begins . . ."));
-	    game.state.plnets[game.iplnet].known=known;
+	    game.state.planets[game.iplnet].known=known;
 	    game.icraft = true;
 	    skip(1);
 	    game.landed = false;
@@ -393,7 +393,7 @@ void shuttle(void)
 	game.iscraft = offship;
 	if (consumeTime())
 	    return;
-	game.state.plnets[game.iplnet].known = shuttle_down;
+	game.state.planets[game.iplnet].known = shuttle_down;
 	game.landed = true;
 	game.icraft = false;
 	prout(_("Trip complete."));

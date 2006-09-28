@@ -267,7 +267,7 @@ static void movebaddy(coord com, int loccom, feature ienm)
     }
 }
 
-void movcom(void) 
+void moveklings(void) 
 /* move a commander */
 {
     coord w; 
@@ -351,10 +351,10 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     }
     /* check for a helpful planet */
     for (i = 0; i < game.inplan; i++) {
-	if (same(game.state.plnets[i].w, game.state.kscmdr) &&
-	    game.state.plnets[i].crystals == present) {
+	if (same(game.state.planets[i].w, game.state.kscmdr) &&
+	    game.state.planets[i].crystals == present) {
 	    /* destroy the planet */
-	    DESTROY(&game.state.plnets[i]);
+	    DESTROY(&game.state.planets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
 		if (!*ipage)
