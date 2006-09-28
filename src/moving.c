@@ -250,7 +250,7 @@ void dock(bool verbose)
 /* 
  * This program originally required input in terms of a (clock)
  * direction and distance. Somewhere in history, it was changed to
- * cartesian coordinates. So we need to convert. I think
+ * cartesian coordinates. So we need to convert.  Probably
  * "manual" input should still be done this way -- it's a real
  * pain if the computer isn't working! Manual mode is still confusing
  * because it involves giving x and y motions, yet the coordinates
@@ -268,9 +268,8 @@ static void getcd(bool isprobe, int akey)
     coord incr;
     bool iprompt = false;
 
-    /* Get course direction and distance. If user types bad values, return
-       with DIREC = -1.0. */
-
+    // Get course direction and distance. If user types bad values, return
+    // with DIREC = -1.0.
     game.direc = -1.0;
 	
     if (game.landed && !isprobe) {
@@ -836,8 +835,8 @@ void timwrp()
 		}
 	    }
 	}
-	/* Likewise, if in the original time the Galileo was abandoned, but
-	   was on ship earlier, it would have vanished -- lets restore it */
+	// Likewise, if in the original time the Galileo was abandoned, but
+	// was on ship earlier, it would have vanished -- let's restore it.
 	if (game.iscraft == offship && !gotit && game.damage[DSHUTTL] >= 0.0) {
 	    prout(_("Checkov-  \"Security reports the Galileo has reappeared in the dock!\""));
 	    game.iscraft = onship;
@@ -1066,25 +1065,25 @@ void mayday(void)
 }
 
 /*
-**  Abandon Ship
-**
-**	The ship is abandoned.  If your current ship is the Faire
-**	Queene, or if your shuttlecraft is dead, you're out of
-**	luck.  You need the shuttlecraft in order for the captain
-**	(that's you!!) to escape.
-**
-**	Your crew can beam to an inhabited starsystem in the
-**	quadrant, if there is one and if the transporter is working.
-**	If there is no inhabited starsystem, or if the transporter
-**	is out, they are left to die in outer space.
-**
-**	If there are no starbases left, you are captured by the
-**	Klingons, who torture you mercilessly.  However, if there
-**	is at least one starbase, you are returned to the
-**	Federation in a prisoner of war exchange.  Of course, this
-**	can't happen unless you have taken some prisoners.
-**
-*/
+ *  Abandon Ship
+ *
+ *	The ship is abandoned.  If your current ship is the Faire
+ *	Queene, or if your shuttlecraft is dead, you're out of
+ *	luck.  You need the shuttlecraft in order for the captain
+ *	(that's you!!) to escape.
+ *
+ *	Your crew can beam to an inhabited starsystem in the
+ *	quadrant, if there is one and if the transporter is working.
+ *	If there is no inhabited starsystem, or if the transporter
+ *	is out, they are left to die in outer space.
+ *
+ *	If there are no starbases left, you are captured by the
+ *	Klingons, who torture you mercilessly.  However, if there
+ *	is at least one starbase, you are returned to the
+ *	Federation in a prisoner of war exchange.  Of course, this
+ *	can't happen unless you have taken some prisoners.
+ *
+ */
 
 void abandon(void) 
 /* abandon ship */

@@ -28,8 +28,8 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
 	if (game.kpower[loccom] > 1000.0)
 	    return false;
     }
-    /* print escape message and move out of quadrant.
-       We know this if either short or long range sensors are working */
+    // print escape message and move out of quadrant.
+    // We know this if either short or long range sensors are working
     if (!damaged(DSRSENS) || !damaged(DLRSENS) ||
 	game.condition == docked) {
 	crmena(true, ienm, sector, game.ks[loccom]);
@@ -70,6 +70,45 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     return true; /* success */
 }
 
+/*************************************************************************
+The bad-guy movement algorithm:
+
+1. Enterprise has "force" based on condition of phaser and photon torpedoes.
+If both are operating full strength, force is 1000. If both are damaged,
+force is -1000. Having shields down subtracts an additional 1000.
+
+2. Enemy has forces equal to the energy of the attacker plus
+100*(K+R) + 500*(C+S) - 400 for novice through good levels OR
+346*K + 400*R + 500*(C+S) - 400 for expert and emeritus.
+
+Attacker Initial energy levels (nominal):
+Klingon   Romulan   Commander   Super-Commander
+Novice    400        700        1200        
+Fair      425        750        1250
+Good      450        800        1300        1750
+Expert    475        850        1350        1875
+Emeritus  500        900        1400        2000
+VARIANCE   75        200         200         200
+
+Enemy vessels only move prior to their attack. In Novice - Good games
+only commanders move. In Expert games, all enemy vessels move if there
+is a commander present. In Emeritus games all enemy vessels move.
+
+3. If Enterprise is not docked, an agressive action is taken if enemy
+forces are 1000 greater than Enterprise.
+
+Agressive action on average cuts the distance between the ship and
+the enemy to 1/4 the original.
+
+4.  At lower energy advantage, movement units are proportional to the
+advantage with a 650 advantage being to hold ground, 800 to move forward
+1, 950 for two, 150 for back 4, etc. Variance of 100.
+
+If docked, is reduced by roughly 1.75*game.skill, generally forcing a
+retreat, especially at high skill levels.
+
+5.  Motion is limited to skill level, except for SC hi-tailing it out.
+**************************************************************************/
 
 static void movebaddy(coord com, int loccom, feature ienm)
 /* tactical movement for the bad guys */
@@ -96,44 +135,6 @@ static void movebaddy(coord com, int loccom, feature ienm)
     }
     else {
 	/* decide whether to advance, retreat, or hold position */
-/* Algorithm:
- * Enterprise has "force" based on condition of phaser and photon torpedoes.
- If both are operating full strength, force is 1000. If both are damaged,
- force is -1000. Having shields down subtracts an additional 1000.
-
- * Enemy has forces equal to the energy of the attacker plus
- 100*(K+R) + 500*(C+S) - 400 for novice through good levels OR
- 346*K + 400*R + 500*(C+S) - 400 for expert and emeritus.
-
- Attacker Initial energy levels (nominal):
- Klingon   Romulan   Commander   Super-Commander
- Novice    400        700        1200        
- Fair      425        750        1250
- Good      450        800        1300        1750
- Expert    475        850        1350        1875
- Emeritus  500        900        1400        2000
- VARIANCE   75        200         200         200
-
- Enemy vessels only move prior to their attack. In Novice - Good games
- only commanders move. In Expert games, all enemy vessels move if there
- is a commander present. In Emeritus games all enemy vessels move.
-
- *  If Enterprise is not docked, an agressive action is taken if enemy
- forces are 1000 greater than Enterprise.
-
- Agressive action on average cuts the distance between the ship and
- the enemy to 1/4 the original.
-
- *  At lower energy advantage, movement units are proportional to the
- advantage with a 650 advantage being to hold ground, 800 to move forward
- 1, 950 for two, 150 for back 4, etc. Variance of 100.
-
- If docked, is reduced by roughly 1.75*game.skill, generally forcing a
- retreat, especially at high skill levels.
-
- *  Motion is limited to skill level, except for SC hi-tailing it out.
- */
-
 	forces = game.kpower[loccom]+100.0*game.nenhere+400*(nbaddys-1);
 	if (!game.shldup)
 	    forces += 1000; /* Good for enemy if shield is down! */
@@ -281,8 +282,8 @@ void moveklings(void)
     if (idebug)
 	prout("== MOVCOM");
 
-    /* Figure out which Klingon is the commander (or Supercommander)
-       and do move */
+    // Figure out which Klingon is the commander (or Supercommander)
+    //   and do move
     if (game.comhere) 
 	for_local_enemies(i) {
 	    w = game.ks[i];
@@ -299,9 +300,9 @@ void moveklings(void)
 		break;
 	    }
 	}
-    /* if skill level is high, move other Klingons and Romulans too!
-       Move these last so they can base their actions on what the
-       commander(s) do. */
+    // if skill level is high, move other Klingons and Romulans too!
+    // Move these last so they can base their actions on what the
+    // commander(s) do.
     if (game.skill >= SKILL_EXPERT && (game.options & OPTION_MVBADDY)) 
 	for_local_enemies(i) {
 	    w = game.ks[i];
@@ -312,7 +313,7 @@ void moveklings(void)
     sortklings();
 }
 
-static bool movescom(coord iq, bool flag) 
+static bool movescom(coord iq, bool avoid) 
 /* commander movement helper */
 {
     int i;
@@ -321,7 +322,7 @@ static bool movescom(coord iq, bool flag)
 	game.state.galaxy[iq.x][iq.y].supernova ||
 	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1) 
 	return 1;
-    if (flag) {
+    if (avoid) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
 	for_starbases(i)
 	    if (same(game.state.baseq[i], iq)) 
@@ -382,15 +383,15 @@ void supercommander(void)
     coord iq, sc, ibq;
     int basetbl[BASEMAX+1];
     double bdist[BASEMAX+1];
-    bool flag;
+    bool avoid;
 
     if (idebug)
 	prout("== SUPERCOMMANDER");
 
     /* Decide on being active or passive */
-    flag = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
+    avoid = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
 	    (game.state.date-game.indate) < 3.0);
-    if (!game.iscate && flag) {
+    if (!game.iscate && avoid) {
 	/* compute move away from Enterprise */
 	ideltax = game.state.kscmdr.x-game.quadrant.x;
 	ideltay = game.state.kscmdr.y-game.quadrant.y;
@@ -441,7 +442,7 @@ void supercommander(void)
 		game.state.galaxy[ibq.x][ibq.y].supernova ||
 		game.state.galaxy[ibq.x][ibq.y].klingons > MAXKLQUAD-1) 
 		continue;
-	    /* if there is a commander, an no other base is appropriate,
+	    /* if there is a commander, and no other base is appropriate,
 	       we will take the one with the commander */
 	    for_commanders (j) {
 		if (same(ibq, game.state.kcmdr[j]) && ifindit!= 2) {
@@ -476,32 +477,32 @@ void supercommander(void)
     /* try moving in both x and y directions */
     iq.x = game.state.kscmdr.x + ideltax;
     iq.y = game.state.kscmdr.y + ideltax;
-    if (movescom(iq, flag)) {
+    if (movescom(iq, avoid)) {
 	/* failed -- try some other maneuvers */
 	if (ideltax==0 || ideltay==0) {
 	    /* attempt angle move */
 	    if (ideltax != 0) {
 		iq.y = game.state.kscmdr.y + 1;
-		if (movescom(iq, flag)) {
+		if (movescom(iq, avoid)) {
 		    iq.y = game.state.kscmdr.y - 1;
-		    movescom(iq, flag);
+		    movescom(iq, avoid);
 		}
 	    }
 	    else {
 		iq.x = game.state.kscmdr.x + 1;
-		if (movescom(iq, flag)) {
+		if (movescom(iq, avoid)) {
 		    iq.x = game.state.kscmdr.x - 1;
-		    movescom(iq, flag);
+		    movescom(iq, avoid);
 		}
 	    }
 	}
 	else {
 	    /* try moving just in x or y */
 	    iq.y = game.state.kscmdr.y;
-	    if (movescom(iq, flag)) {
+	    if (movescom(iq, avoid)) {
 		iq.y = game.state.kscmdr.y + ideltay;
 		iq.x = game.state.kscmdr.x;
-		movescom(iq, flag);
+		movescom(iq, avoid);
 	    }
 	}
     }
@@ -513,7 +514,7 @@ void supercommander(void)
 	ibq = game.state.baseq[i];
 	if (same(ibq, game.state.kscmdr) && same(game.state.kscmdr, game.battle)) {
 	    /* attack the base */
-	    if (flag)
+	    if (avoid)
 		return; /* no, don't attack base! */
 	    game.iseenit = false;
 	    game.isatb = 1;
@@ -580,7 +581,7 @@ void movetholian(void)
 	return;
     }
 
-    /* Do nothing if we are blocked */
+    /* do nothing if we are blocked */
     if (game.quad[idx][idy]!= IHDOT && game.quad[idx][idy]!= IHWEB)
 	return;
     game.quad[game.tholian.x][game.tholian.y] = IHWEB;

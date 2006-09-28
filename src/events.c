@@ -434,10 +434,10 @@ void events(void)
 	    /* try a whole bunch of times to find something suitable */
 	    i = 100;
 	    do {
-		/* need a quadrant which is not the current one,
-		   which has some stars which are inhabited and
-		   not already under attack, which is not
-		   supernova'ed, and which has some Klingons in it */
+		// need a quadrant which is not the current one,
+		// which has some stars which are inhabited and
+		// not already under attack, which is not
+		// supernova'ed, and which has some Klingons in it
 		w = randplace(GALSIZE);
 		q = &game.state.galaxy[w.x][w.y];
 	    } while (--i &&
@@ -488,10 +488,8 @@ void events(void)
 	    }
 	    break;
 	case FREPRO:		/* Klingon reproduces */
-	    /*
-	     * If we ever switch to a real event queue, we'll need to
-	     * explicitly retrieve and restore the x and y.
-	     */
+	    // If we ever switch to a real event queue, we'll need to
+	    // explicitly retrieve and restore the x and y.
 	    ev = schedule(FREPRO, expran(1.0 * game.intime));
 	    /* see if current distress call still active */
 	    q = &game.state.galaxy[ev->quadrant.x][ev->quadrant.y];

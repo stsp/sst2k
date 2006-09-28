@@ -82,8 +82,8 @@ void report(void)
     else
 	prout(_("There are %d bases."), game.inbase);
     if (!damaged(DRADIO) || game.condition == docked || game.iseenit) {
-	/* Don't report this if not seen and
-	   either the radio is dead or not at base! */
+	// Don't report this if not seen and
+	// either the radio is dead or not at base!
 	attackreport(false);
 	game.iseenit = true;
     }
