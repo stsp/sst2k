@@ -62,10 +62,12 @@ void events(void)
 {
     int evcode, i=0, j, k, l;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
-    bool radio_was_broken, ictbeam = false, ipage = false, istract = false;
+    bool radio_was_broken, ictbeam = false, istract = false;
     struct quadrant *pdest, *q;
     coord w, hold;
     event *ev, *ev2;
+
+    pause_reset();
 
     if (idebug) {
 	prout("=== EVENTS from %.2f to %.2f:", game.state.date, fintim);
@@ -156,9 +158,7 @@ void events(void)
 	game.optime -= xtime;
 	switch (evcode) {
 	case FSNOVA: /* Supernova */
-	    if (!ipage)
-		pause_game(true);
-	    ipage=true;
+	    pause_game(true);
 	    snova(false, NULL);
 	    schedule(FSNOVA, expran(0.5*game.intime));
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
@@ -198,9 +198,7 @@ void events(void)
 	    }
 	    /* tractor beaming cases merge here */
 	    yank = sqrt(yank);
-	    if (!ipage)
-		pause_game(true);
-	    ipage=true;
+	    pause_game(true);
 	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 	    ictbeam = true;
 	    skip(1);
@@ -299,9 +297,7 @@ void events(void)
 	    if (!damaged(DRADIO) && game.condition != docked) 
 		break; /* No warning :-( */
 	    game.iseenit = true;
-	    if (!ipage)
-		pause_game(true);
-	    ipage = true;
+	    pause_game(true);
 	    skip(1);
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    prout(cramlc(quadrant, game.battle));
@@ -348,9 +344,7 @@ void events(void)
 	    else if (game.state.rembase != 1 &&
 		     (!damaged(DRADIO) || game.condition == docked)) {
 		/* Get word via subspace radio */
-		if (!ipage)
-		    pause_game(true);		    
-		ipage = true;
+		pause_game(true);		    
 		skip(1);
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Command reports that"));
 		proutn(_("   the starbase in "));
@@ -380,7 +374,7 @@ void events(void)
 	    schedule(FSCMOVE, 0.2777);
 	    if (!game.ientesc && !istract && game.isatb != 1 &&
 			(!game.iscate || !game.justin)) 
-		scom(&ipage);
+		scom();
 	    break;
 	case FDSPROB: /* Move deep space probe */
 	    schedule(FDSPROB, 0.01);
@@ -395,9 +389,7 @@ void events(void)
 		    game.state.galaxy[game.probec.x][game.probec.y].supernova) {
 		    // Left galaxy or ran into supernova
 		    if (!damaged(DRADIO) || game.condition == docked) {
-			if (!ipage)
-			    pause_game(true);
-			ipage = true;
+			pause_game(true);
 			skip(1);
 			proutn(_("Lt. Uhura-  \"The deep space probe "));
 			if (!VALID_QUADRANT(j, i))
@@ -410,9 +402,7 @@ void events(void)
 		    break;
 		}
 		if (!damaged(DRADIO) || game.condition == docked) {
-		    if (!ipage)
-			pause_game(true);
-		    ipage = true;
+		    pause_game(true);
 		    skip(1);
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in "));
 		    proutn(cramlc(quadrant, game.probec));

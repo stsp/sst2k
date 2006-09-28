@@ -7,6 +7,7 @@
 #include "sstlinux.h"
 
 static int rows, linecount;	/* for paging */
+static bool pause_latch;
 
 WINDOW *curwnd;
 WINDOW *fullscreen_window;
@@ -89,42 +90,52 @@ void waitfor(void)
 	getch();
 }
 
+void pause_reset(void)
+{
+    pause_latch = false;
+}
+
 void pause_game(bool announcement) 
 {
-    char *prompt;
-    char buf[BUFSIZ];
-    if (announcement) {
-	if (game.skill > SKILL_FAIR)
-	    prompt = _("[ANOUNCEMENT ARRIVING...]");
-	else
-	    prompt = _("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
-    }
+    if (pause_latch)
+	return;
     else {
-	if (game.skill > SKILL_FAIR)
-	    prompt = _("[CONTINUE?]");
-	else
-	    prompt = _("[PRESS ENTER TO CONTINUE]");
-
-    }
-    if (game.options & OPTION_CURSES) {
-	drawmaps(0);
-	setwnd(prompt_window);
-	wclear(prompt_window);
-	waddstr(prompt_window, prompt);
-	wgetnstr(prompt_window, buf, sizeof(buf));
-	wclear(prompt_window);
-	wrefresh(prompt_window);
-	setwnd(message_window);
-    } else {
-	putchar('\n');
-	proutn(prompt);
-	fgets(buf, sizeof(buf), stdin);
+	char *prompt;
+	char buf[BUFSIZ];
 	if (announcement) {
-	    int j;
-	    for (j = 0; j < rows; j++)
-		putchar('\n');
+	    if (game.skill > SKILL_FAIR)
+		prompt = _("[ANOUNCEMENT ARRIVING...]");
+	    else
+		prompt = _("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
 	}
-	linecount = 0;
+	else {
+	    if (game.skill > SKILL_FAIR)
+		prompt = _("[CONTINUE?]");
+	    else
+		prompt = _("[PRESS ENTER TO CONTINUE]");
+
+	}
+	if (game.options & OPTION_CURSES) {
+	    drawmaps(0);
+	    setwnd(prompt_window);
+	    wclear(prompt_window);
+	    waddstr(prompt_window, prompt);
+	    wgetnstr(prompt_window, buf, sizeof(buf));
+	    wclear(prompt_window);
+	    wrefresh(prompt_window);
+	    setwnd(message_window);
+	} else {
+	    putchar('\n');
+	    proutn(prompt);
+	    fgets(buf, sizeof(buf), stdin);
+	    if (announcement) {
+		int j;
+		for (j = 0; j < rows; j++)
+		    putchar('\n');
+	    }
+	    linecount = 0;
+	}
+	pause_latch = true;
     }
 }
 

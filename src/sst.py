@@ -544,7 +544,6 @@ def moveklings():
 
 def movescom(ship, avoid):
     # commander movement helper
-    global ipage
     if game.state.kscmdr == game.quadrant or \
 	game.state.galaxy[iq].supernova or \
         game.state.galaxy[iq].klingons > MAXKLQUAD-1: 
@@ -575,9 +574,7 @@ def movescom(ship, avoid):
 	    # destroy the planet
 	    del planet
             if communicating():
-                if not ipage:
                     pause_game(True)
-		ipage = true
 		prout("Lt. Uhura-  \"Captain, Starfleet Intelligence reports")
 		proutn(_("   a planet in "))
 		proutn(cramlc(quadrant, game.state.kscmdr))
@@ -669,9 +666,7 @@ def scom():
                 if not communicating():
                     return # no warning
                 game.iseenit = True
-                if not ipage:
-                    pause_game(true)
-                ipage = True
+                pause_game(true)
                 proutn(_("Lt. Uhura-  \"Captain, the starbase in "))
                 proutn(cramlc(quadrant, game.state.kscmdr))
                 skip(1)
@@ -690,9 +685,7 @@ def scom():
     if (Rand() > 0.2 or not communicating() or
         not game.state.galaxy[game.state.kscmdr].charted):
 	return
-    if ipage:
-        pause_game(true)
-        ipage = true
+    pause_game(true)
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
     proutn(_("   the Super-commander is in "))
     proutn(cramlc(quadrant, game.state.kscmdr))

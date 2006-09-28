@@ -307,7 +307,7 @@ void moveklings(void)
     sortkl();
 }
 
-static bool movescom(coord iq, bool flag, bool *ipage) 
+static bool movescom(coord iq, bool flag) 
 /* commander movement helper */
 {
     int i;
@@ -357,9 +357,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
 	    DESTROY(&game.state.planets[i]);
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
-		if (!*ipage)
-		    pause_game(true);
-		*ipage = true;
+		pause_game(true);
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
 		proutn(_("   a planet in "));
 		proutn(cramlc(quadrant, game.state.kscmdr));
@@ -372,7 +370,7 @@ static bool movescom(coord iq, bool flag, bool *ipage)
     return false; /* looks good! */
 }
 			
-void scom(bool *ipage)
+void scom(void)
 /* move the Super Commander */
 {
     int i, i2, j, ideltax, ideltay, ifindit, iwhichb;
@@ -472,32 +470,32 @@ void scom(bool *ipage)
     /* try moving in both x and y directions */
     iq.x = game.state.kscmdr.x + ideltax;
     iq.y = game.state.kscmdr.y + ideltax;
-    if (movescom(iq, flag, ipage)) {
+    if (movescom(iq, flag)) {
 	/* failed -- try some other maneuvers */
 	if (ideltax==0 || ideltay==0) {
 	    /* attempt angle move */
 	    if (ideltax != 0) {
 		iq.y = game.state.kscmdr.y + 1;
-		if (movescom(iq, flag, ipage)) {
+		if (movescom(iq, flag)) {
 		    iq.y = game.state.kscmdr.y - 1;
-		    movescom(iq, flag, ipage);
+		    movescom(iq, flag);
 		}
 	    }
 	    else {
 		iq.x = game.state.kscmdr.x + 1;
-		if (movescom(iq, flag, ipage)) {
+		if (movescom(iq, flag)) {
 		    iq.x = game.state.kscmdr.x - 1;
-		    movescom(iq, flag, ipage);
+		    movescom(iq, flag);
 		}
 	    }
 	}
 	else {
 	    /* try moving just in x or y */
 	    iq.y = game.state.kscmdr.y;
-	    if (movescom(iq, flag, ipage)) {
+	    if (movescom(iq, flag)) {
 		iq.y = game.state.kscmdr.y + ideltay;
 		iq.x = game.state.kscmdr.x;
-		movescom(iq, flag, ipage);
+		movescom(iq, flag);
 	    }
 	}
     }
@@ -518,9 +516,7 @@ void scom(bool *ipage)
 	    if (damaged(DRADIO) && game.condition != docked)
 		return; /* no warning */
 	    game.iseenit = true;
-	    if (!*ipage)
-		pause_game(true);
-	    *ipage = true;
+	    pause_game(true);
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    proutn(cramlc(quadrant, game.state.kscmdr));
 	    skip(1);
@@ -544,9 +540,7 @@ void scom(bool *ipage)
 	 (damaged(DRADIO) && game.condition != docked) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
-    if (!*ipage)
-	pause_game(true);
-    *ipage = true;
+    pause_game(true);
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
     proutn(_("   the Super-commander is in "));
     proutn(cramlc(quadrant, game.state.kscmdr));
