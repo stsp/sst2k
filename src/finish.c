@@ -50,7 +50,8 @@ void selfdestruct(void)
 void kaboom(void) 
 {
     stars();
-    if (game.ship==IHE) prouts("***");
+    if (game.ship==IHE)
+	prouts("***");
     prouts(_("********* Entropy of "));
     crmshp();
     prouts(_(" maximized *********"));
@@ -91,9 +92,12 @@ void finish(FINTYPE ifin)
 	    double badpt;
 	    badpt = 5.0*game.state.starkl + game.casual + 10.0*game.state.nplankl +
 		45.*game.nhelp+100.*game.state.basekl+3.*game.abandoned;
-	    if (game.ship == IHF) badpt += 100.0;
-	    else if (game.ship == 0) badpt += 200.0;
-	    if (badpt < 100.0) badpt = 0.0;	// Close enough!
+	    if (game.ship == IHF)
+		badpt += 100.0;
+	    else if (game.ship == 0)
+		badpt += 200.0;
+	    if (badpt < 100.0)
+		badpt = 0.0;	// Close enough!
 	    if (game.state.date-game.indate < 5.0 ||
 		// killsPerDate >= RateMax
 		KLINGKILLED/(game.state.date-game.indate) >=
@@ -154,7 +158,8 @@ void finish(FINTYPE ifin)
 	    prout(_("LIVE LONG AND PROSPER."));
 	}
 	score();
-	if (igotit) plaque();
+	if (igotit)
+	    plaque();	    
 	return;
     case FDEPLETE: // Federation Resources Depleted
 	prout(_("Your time has run out and the Federation has been"));
@@ -286,8 +291,10 @@ void finish(FINTYPE ifin)
 	prout(_("Your last crew member has died."));
 	break;
     }
-    if (game.ship==IHF) game.ship= 0;
-    else if (game.ship == IHE) game.ship = IHF;
+    if (game.ship==IHF)
+	game.ship= 0;
+    else if (game.ship == IHE)
+	game.ship = IHF;
     game.alive = false;
     if (KLINGREM != 0) {
 	double goodies = game.state.remres/game.inresor;
@@ -323,19 +330,26 @@ void score(void)
     int ithperd, iwon, klship;
 
     iskill = game.skill;
-    if ((timused == 0 || KLINGREM != 0) && timused < 5.0) timused = 5.0;
+    if ((timused == 0 || KLINGREM != 0) && timused < 5.0)
+	timused = 5.0;
     perdate = KLINGKILLED/timused;
     ithperd = 500*perdate + 0.5;
     iwon = 0;
-    if (game.gamewon) iwon = 100*game.skill;
-    if (game.ship == IHE) klship = 0;
-    else if (game.ship == IHF) klship = 1;
-    else klship = 2;
-    if (!game.gamewon) game.state.nromrem = 0; // None captured if no win
+    if (game.gamewon)
+	iwon = 100*game.skill;
+    if (game.ship == IHE) 
+	klship = 0;
+    else if (game.ship == IHF) 
+	klship = 1;
+    else
+	klship = 2;
+    if (!game.gamewon)
+	game.state.nromrem = 0; // None captured if no win
     iscore = 10*NKILLK + 50*NKILLC + ithperd + iwon
 	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
 	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
-    if (!game.alive) iscore -= 200;
+    if (!game.alive)
+	iscore -= 200;
     skip(2);
     prout(_("Your score --"));
     if (NKILLROM)
@@ -408,7 +422,6 @@ void plaque(void)
 	char winner[128];
 
 	skip(2);
-	
 	while (fp == NULL) {
                 proutn(_("File or device name for your plaque: "));
                 cgetline(winner, sizeof(winner));

@@ -7,7 +7,7 @@ radically different -- the Python code makes heavy use of objects.
 
 Note that the game.quad, game.snap.galaxy and game.snap.chart members
 are not actually arrays but dictioaries indixed by coord tuples.  Be setting
-the hash of a coord exual to the hash of a literal tuple containing its
+the hash of a coord equal to the hash of a literal tuple containing its
 coordinate data, we ensure these can be indexed both ways.
 
 """
@@ -61,13 +61,14 @@ class coord:
         return "%d - %d" % (self.x, self.y)
 
 class feature:
-    "A feature in the current quadrant (ship, star, black hole, etc)." 
+    "A feature in the current quadrant (ship, star, black hole, base, etc)." 
     def __init__(self):
         self.type = None	# name of feature type
         self.sector = None	# sector location
     def distance(self):
         return self.sector.distance(game.sector)
     def __str__(self):
+        "This will be overridden by subclasses."
         return self.name[0]
     def sectormove(self, dest):
         "Move this feature within the current quadrant." 
@@ -76,15 +77,14 @@ class feature:
         game.quad[dest] = self
         self.sector = dest
 
-empty = None	# Value of empty space in game.quad
-
 class ship(feature):
-    "An enemy ship in the current quadrant." 
-    def __init__(self):
+    "A starship, frindly or enemy." 
+    def __init__(self, type, power):
         feature.__init__(self)
-        self.type = None	# klingon, romulan, commander,
-        			# supercommander, tholian
-        self.power = None	# power
+        self.type = type	# klingon, romulan, commander,
+        			# supercommander, tholian,
+                                # enterprise, faerie queene.
+        self.power = power	# power
         if self.type in ("Klingon", "Commander", "Super-Commander"):
             game.remkl += 1
         elif self.type == "Romulan":
@@ -95,6 +95,16 @@ class ship(feature):
         elif self.type == "Romulan":
             game.romrem -= 1
 
+class space(feature):
+    "Empty space.  Has no state, just knows how to identify iself."
+    def __str__(self):
+        return '*'
+
+class star(feature):
+    "A star.  Has no state, just knows how to identify iself."
+    def __str__(self):
+        return '*'
+
 class planet(feature):
     "A planet.  May be inhabited or not, may hold dilithium crystals or not."
     def __init(self):
@@ -103,32 +113,24 @@ class planet(feature):
         self.crystals = None	# "absent", "present", or "mined"
         self.inhabited = False
         self.known = "unknown"	# Other values: "known" and "shuttle down"
+        game.state.planets.append(self)
+    def __del__(self):
+        game.state.planets.remove(self)
     def __str__(self):
         if self.inhabited:
             return '@'
         else:
             return 'P'
 
-class star(feature):
-    "A star.  Has no state, just knows how to identify iself."
-    def __init(self):
-        feature.__init__(self)
-    def __str__(self):
-        return '*'
-
 class web(feature):
     "A bit of Tholian web.  Has no state, just knows how to identify iself."
-    def __init(self):
-        feature.__init__(self)
     def __str__(self):
         return '*'
 
 class blackhole(feature):
     "A black hole.  Has no hair, just knows how to identify iself."
-    def __init(self):
-        feature.__init__(self)
     def __str__(self):
-        return '*'
+        return ' '
 
 class starbase(feature):
     "Starbases also have no features, just a location."
@@ -140,8 +142,6 @@ class starbase(feature):
         game.state.bases.remove(self)
     def __str__(self):
         return 'B'
-    def __del__(self):
-        feature.__del__(self)
 
 class quadrant:
     def __init__(self):
@@ -180,9 +180,8 @@ class snapshot:
 	self.starkl = None	# destroyed stars
 	self.basekl = None	# destroyed bases
 	self.nromrem = None	# Romulans remaining
-	self.nplankl = None	# destroyed uninhabited planets
-	self.nworldkl = None	# destroyed inhabited planets
-        self.plnets = [];	# List of planets known
+	self.nplankl = None	# destroyed uninhabited planets self.nworldkl = None	# destroyed inhabited planets
+        self.planets = [];	# List of planets known
         self.date = None	# stardate
 	self.remres = None	# remaining resources
 	self. remtime = None	# remaining time
@@ -571,10 +570,10 @@ def movescom(ship, avoid):
     game.state.kscmdr = iq
     game.state.galaxy[game.state.kscmdr].klingons += 1
     # check for a helpful planet in the destination quadrant
-    for planet in game.state.plnets:
+    for planet in game.state.planets:
 	if planet.location == game.state.kscmdr and planet.crystals=="present":
 	    # destroy the planet
-	    game.state.plnets.remove(planet)
+	    del planet
             if communicating():
                 if not ipage:
                     pause_game(True)
@@ -596,12 +595,12 @@ def scom():
     passive = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) \
                or (game.state.date-game.indate) < 3.0)
     if not game.iscate and passive:
-	# compute move away from Enterprise
-	idelta = game.state.kscmdr - game.quadrant
+	# coxmpute move away from Enterprise
+	delta = game.state.kscmdr - game.quadrant
         if distance(game.state.kscmdr) > 2.0:
 	    # circulate in space
-	    idelta,x = game.state.kscmdr.y-game.quadrant.y
-	    idelta,y = game.quadrant.x-game.state.kscmdr.x
+	    delta.x = game.state.kscmdr.y-game.quadrant.y
+	    delta.y = game.quadrant.x-game.state.kscmdr.x
     else:
         if len(game.state.bases):
             unschedule("FSCMOVE")
@@ -627,16 +626,16 @@ def scom():
         if len(nearest) == 0:
             return	# Nothing suitable -- wait until next time
 	# decide how to move toward base
-	idelta = ibq - game.state.kscmdr
+	delta = ibq - game.state.kscmdr
     # maximum movement is 1 quadrant in either or both axis
     delta = delta.sgn()
     # try moving in both x and y directions
-    iq = game.state.kscmdr + idelta
+    iq = game.state.kscmdr + delta
     if movescom(iq, passive):
 	# failed -- try some other maneuvers
-        if ideltax==0 or ideltay==0:
+        if delta.x==0 or delta.y==0:
 	    # attempt angle move
-            if ideltax != 0:
+            if delta.x != 0:
 		iq.y = game.state.kscmdr.y + 1
                 if movescom(iq, passive):
 		    iq.y = game.state.kscmdr.y - 1
@@ -650,7 +649,7 @@ def scom():
 	    # try moving just in x or y
 	    iq.y = game.state.kscmdr.y
             if movescom(iq, passive):
-		iq.y = game.state.kscmdr.y + ideltay
+		iq.y = game.state.kscmdr.y + delta.y
 		iq.x = game.state.kscmdr.x
 		movescom(iq, passive)
     # check for a base
@@ -720,7 +719,7 @@ def movetho(void):
 	game.tholian = None
 	return
     # Do nothing if we are blocked
-    if game.quad[next] != empty and not isinstance(game.quad[next]. web):
+    if not (isinstance(game.quad[next], space) or isinstance(game.quad[next], web)):
         return
     # Now place some web
     im = (next - game.tholian.location).sgn()
@@ -728,13 +727,13 @@ def movetho(void):
 	# move in x axis
 	while game.tholian.location.x != next.x:
 	    game.tholian.location.x += im.x
-            if game.quad[game.tholian.location] == empty:
+            if isinstance(game.quad[game.tholian.location], space):
                 game.quad[game.tholian.location] = web()
     elif game.tholian.y != next.y:
 	# move in y axis
 	while game.tholian.y != next.y:
 	    game.tholian.y += im.y
-            if game.quad[game.tholian.location] == empty:
+            if isinstance(game.quad[game.tholian.location], space):
                 game.quad[game.tholian.location] = web()
     # web is done, move ship
     game.tholian.movesector(next)

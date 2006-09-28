@@ -55,40 +55,53 @@ void report(void)
     skip(1);
     prout(_("You %s a %s%s %s game."),
 	  game.alldone? _("were playing") : _("are playing"), s1, s2, s3);
-    if (game.skill>SKILL_GOOD && game.thawed && !game.alldone) prout(_("No plaque is allowed."));
-    if (game.tourn) prout(_("This is tournament game %d."), game.tourn);
+    if (game.skill>SKILL_GOOD && game.thawed && !game.alldone)
+	prout(_("No plaque is allowed."));
+    if (game.tourn)
+	prout(_("This is tournament game %d."), game.tourn);
     prout(_("Your secret password is \"%s\""),game.passwd);
     proutn(_("%d of %d Klingons have been killed"), KLINGKILLED, INKLINGTOT);
-    if (NKILLC) prout(_(", including %d Commander%s."), NKILLC, NKILLC==1?"":_("s"));
-    else if (NKILLK + NKILLSC > 0) prout(_(", but no Commanders."));
-    else prout(".");
-    if (game.skill > SKILL_FAIR) prout(_("The Super Commander has %sbeen destroyed."),
-				  game.state.nscrem?_("not "):"");
+    if (NKILLC)
+	prout(_(", including %d Commander%s."), NKILLC, NKILLC==1?"":_("s"));
+    else if (NKILLK + NKILLSC > 0)
+	prout(_(", but no Commanders."));
+    else
+	prout(".");
+    if (game.skill > SKILL_FAIR)
+	prout(_("The Super Commander has %sbeen destroyed."),
+	      game.state.nscrem?_("not "):"");
     if (game.state.rembase != game.inbase) {
 	proutn(_("There "));
-	if (game.inbase-game.state.rembase==1) proutn(_("has been 1 base"));
+	if (game.inbase-game.state.rembase==1)
+	    proutn(_("has been 1 base"));
 	else {
 	    proutn(_("have been %d bases"), game.inbase-game.state.rembase);
 	}
 	prout(_(" destroyed, %d remaining."), game.state.rembase);
     }
-    else prout(_("There are %d bases."), game.inbase);
+    else
+	prout(_("There are %d bases."), game.inbase);
     if (!damaged(DRADIO) || game.condition == docked || game.iseenit) {
 	/* Don't report this if not seen and
 	   either the radio is dead or not at base! */
 	attakreport(false);
 	game.iseenit = true;
     }
-    if (game.casual) prout(_("%d casualt%s suffered so far."),
-		      game.casual, game.casual==1? "y" : "ies");
-    if (game.nhelp) prout(_("There were %d call%s for help."),
-		     game.nhelp, game.nhelp==1 ? "" : _("s"));
+    if (game.casual) 
+	prout(_("%d casualt%s suffered so far."),
+	      game.casual, game.casual==1? "y" : "ies");
+    if (game.nhelp)
+	prout(_("There were %d call%s for help."),
+	      game.nhelp, game.nhelp==1 ? "" : _("s"));
     if (game.ship == IHE) {
 	proutn(_("You have "));
-	if (game.nprobes) proutn("%d", game.nprobes);
-	else proutn(_("no"));
+	if (game.nprobes)
+	    proutn("%d", game.nprobes);
+	else
+	    proutn(_("no"));
 	proutn(_(" deep space probe"));
-	if (game.nprobes!=1) proutn(_("s"));
+	if (game.nprobes!=1)
+	    proutn(_("s"));
 	prout(".");
     }
     if ((!damaged(DRADIO) || game.condition == docked)
@@ -173,7 +186,8 @@ void dreprt(void)
 		  game.docfac*game.damage[i]+0.005);
 	}
     }
-    if (!jdam) prout(_("All devices functional."));
+    if (!jdam)
+	prout(_("All devices functional."));
 }
 
 void rechart(void)
@@ -232,7 +246,8 @@ void chart(void)
 		proutn(" ");
 	}
 	proutn("  |");
-	if (i<GALSIZE) skip(1);
+	if (i<GALSIZE)
+	    skip(1);
     }
 }
 
@@ -270,7 +285,8 @@ void status(int req)
     );
 
     RQ(2,
-	if (game.condition != docked) newcnd();
+	if (game.condition != docked)
+	    newcnd();
 	switch (game.condition) {
 	    case red: cp = _("RED"); break;
 	    case green: cp = _("GREEN"); break;
@@ -383,7 +399,8 @@ void srscan(void)
 	else
 	    prout(_("  [Using Base's sensors]"));
     }
-    else prout(_("     Short-range scan"));
+    else
+	prout(_("     Short-range scan"));
     if (goodScan && !damaged(DRADIO)) { 
 	game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
 	game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
@@ -391,7 +408,8 @@ void srscan(void)
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
     }
     prout("    1 2 3 4 5 6 7 8 9 10");
-    if (game.condition != docked) newcnd();
+    if (game.condition != docked)
+	newcnd();
     for (i = 1; i <= QUADSIZE; i++) {
 	proutn("%2d  ", i);
 	for_sectors(j) {
@@ -437,10 +455,14 @@ void eta(void)
 	w2.x = aaitem + 0.5;
     }
     else {
-	if (game.quadrant.y>w1.x) w2.x = 1;
-	else w2.x=QUADSIZE;
-	if (game.quadrant.x>w1.y) w2.y = 1;
-	else w2.y=QUADSIZE;
+	if (game.quadrant.y>w1.x)
+	    w2.x = 1;
+	else
+	    w2.x=QUADSIZE;
+	if (game.quadrant.x>w1.y)
+	    w2.y = 1;
+	else
+	    w2.y=QUADSIZE;
     }
 
     if (!VALID_QUADRANT(w1.x, w1.y) || !VALID_SECTOR(w2.x, w2.y)) {
@@ -451,7 +473,8 @@ void eta(void)
 		square(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x)));
     wfl = false;
 
-    if (prompt) prout(_("Answer \"no\" if you don't know the value:"));
+    if (prompt)
+	prout(_("Answer \"no\" if you don't know the value:"));
     for (;;) {
 	chew();
 	proutn(_("Time or arrival date? "));
@@ -464,7 +487,8 @@ void eta(void)
 		chew();
 		return;
 	    }
-	    if (twarp < 1.0) twarp = 1.0;
+	    if (twarp < 1.0)
+		twarp = 1.0;
 	    break;
 	}
 	chew();
@@ -487,7 +511,8 @@ void eta(void)
 	if (tpower >= game.energy) {
 	    prout(_("Insufficient energy, sir."));
 	    if (!game.shldup || tpower > game.energy*2.0) {
-		if (!wfl) return;
+		if (!wfl)
+		    return;
 		proutn(_("New warp factor to try? "));
 		if (scan() == IHREAL) {
 		    wfl = true;

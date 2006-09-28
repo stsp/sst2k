@@ -296,7 +296,8 @@ void setup(bool needprompt)
     do {
 	double r = Rand();
 	int klump = (1.0 - r*r)*klumper;
-	if (klump > krem) klump = krem;
+	if (klump > krem)
+	    klump = krem;
 	krem -= klump;
 	do w = randplace(GALSIZE);
 	while (game.state.galaxy[w.x][w.y].supernova ||
@@ -389,7 +390,8 @@ void setup(bool needprompt)
 	skip(1);
 	prout(_("%d Klingons."), INKLINGTOT);
 	prout(_("An unknown number of Romulans."));
-	if (game.state.nscrem) prout(_("And one (GULP) Super-Commander."));
+	if (game.state.nscrem)
+	    prout(_("And one (GULP) Super-Commander."));
 	prout(_("%d stardates."),(int)game.intime);
 	proutn(_("%d starbases in "), game.inbase);
     }
@@ -404,11 +406,14 @@ void setup(bool needprompt)
     proutn(cramlc(sector, game.sector));
     skip(2);
     prout(_("Good Luck!"));
-    if (game.state.nscrem) prout(_("  YOU'LL NEED IT."));
+    if (game.state.nscrem)
+	prout(_("  YOU'LL NEED IT."));
     waitfor();
     newqad(false);
-    if (game.nenhere-iqhere-game.ithere) game.shldup = true;
-    if (game.neutz) attack(false);	// bad luck to start in a Romulan Neutral Zone
+    if (game.nenhere-iqhere-game.ithere)
+	game.shldup = true;
+    if (game.neutz)	// bad luck to start in a Romulan Neutral Zone
+	attack(false);
 }
 
 bool choose(bool needprompt) 
@@ -437,15 +442,19 @@ bool choose(bool needprompt)
 	    break;
 	}
 	if (isit("saved") || isit("frozen")) {
-	    if (thaw()) continue;
+	    if (thaw())
+		continue;
 	    chew();
-	    if (*game.passwd==0) continue;
-	    if (!game.alldone) game.thawed = 1; // No plaque if not finished
+	    if (*game.passwd==0)
+		continue;
+	    if (!game.alldone)
+		game.thawed = true; // No plaque if not finished
 	    report();
 	    waitfor();
 	    return true;
 	}
-	if (isit("regular")) break;
+	if (isit("regular"))
+	    break;
 	proutn(_("What is \""));
 	proutn(citem);
 	prout("\"?");
@@ -453,14 +462,22 @@ bool choose(bool needprompt)
     }
     while (game.length==0 || game.skill==SKILL_NONE) {
 	if (scan() == IHALPHA) {
-	    if (isit("short")) game.length = 1;
-	    else if (isit("medium")) game.length = 2;
-	    else if (isit("long")) game.length = 4;
-	    else if (isit("novice")) game.skill = SKILL_NOVICE;
-	    else if (isit("fair")) game.skill = SKILL_FAIR;
-	    else if (isit("good")) game.skill = SKILL_GOOD;
-	    else if (isit("expert")) game.skill = SKILL_EXPERT;
-	    else if (isit("emeritus")) game.skill = SKILL_EMERITUS;
+	    if (isit("short"))
+		game.length = 1;
+	    else if (isit("medium"))
+		game.length = 2;
+	    else if (isit("long"))
+		game.length = 4;
+	    else if (isit("novice"))
+		game.skill = SKILL_NOVICE;
+	    else if (isit("fair"))
+		game.skill = SKILL_FAIR;
+	    else if (isit("good"))
+		game.skill = SKILL_GOOD;
+	    else if (isit("expert"))
+		game.skill = SKILL_EXPERT;
+	    else if (isit("emeritus"))
+		game.skill = SKILL_EMERITUS;
 	    else {
 		proutn(_("What is \""));
 		proutn(citem);
@@ -469,8 +486,10 @@ bool choose(bool needprompt)
 	}
 	else {
 	    chew();
-	    if (game.length==0) proutn(_("Would you like a Short, Medium, or Long game? "));
-	    else if (game.skill == SKILL_NONE) proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "));
+	    if (game.length==0)
+		proutn(_("Would you like a Short, Medium, or Long game? "));
+	    else if (game.skill == SKILL_NONE)
+		proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "));
 	}
     }
     // Choose game options -- added by ESR for SST2K
@@ -538,10 +557,12 @@ void newcnd(void)
 /* update our alert status */
 {
     game.condition = green;
-    if (game.energy < 1000.0) game.condition = yellow;
+    if (game.energy < 1000.0)
+	game.condition = yellow;
     if (game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons || game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans)
 	game.condition = red;
-    if (!game.alive) game.condition=dead;
+    if (!game.alive)
+	game.condition=dead;
 }
 
 coord newkling(int i)
@@ -697,10 +718,14 @@ void newqad(bool shutup)
 		distance(game.sector, game.tholian);
 	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill;
 	    /* Reserve unocupied corners */
-	    if (game.quad[1][1]==IHDOT) game.quad[1][1] = 'X';
-	    if (game.quad[1][QUADSIZE]==IHDOT) game.quad[1][QUADSIZE] = 'X';
-	    if (game.quad[QUADSIZE][1]==IHDOT) game.quad[QUADSIZE][1] = 'X';
-	    if (game.quad[QUADSIZE][QUADSIZE]==IHDOT) game.quad[QUADSIZE][QUADSIZE] = 'X';
+	    if (game.quad[1][1]==IHDOT)
+		game.quad[1][1] = 'X';
+	    if (game.quad[1][QUADSIZE]==IHDOT)
+		game.quad[1][QUADSIZE] = 'X';
+	    if (game.quad[QUADSIZE][1]==IHDOT)
+		game.quad[QUADSIZE][1] = 'X';
+	    if (game.quad[QUADSIZE][QUADSIZE]==IHDOT)
+		game.quad[QUADSIZE][QUADSIZE] = 'X';
 	}
     }
 
@@ -713,10 +738,14 @@ void newqad(bool shutup)
 
     // Take out X's in corners if Tholian present
     if (game.ithere) {
-	if (game.quad[1][1]=='X') game.quad[1][1] = IHDOT;
-	if (game.quad[1][QUADSIZE]=='X') game.quad[1][QUADSIZE] = IHDOT;
-	if (game.quad[QUADSIZE][1]=='X') game.quad[QUADSIZE][1] = IHDOT;
-	if (game.quad[QUADSIZE][QUADSIZE]=='X') game.quad[QUADSIZE][QUADSIZE] = IHDOT;
+	if (game.quad[1][1]=='X')
+	    game.quad[1][1] = IHDOT;
+	if (game.quad[1][QUADSIZE]=='X')
+	    game.quad[1][QUADSIZE] = IHDOT;
+	if (game.quad[QUADSIZE][1]=='X')
+	    game.quad[QUADSIZE][1] = IHDOT;
+	if (game.quad[QUADSIZE][QUADSIZE]=='X')
+	    game.quad[QUADSIZE][QUADSIZE] = IHDOT;
     }		
 }
 
@@ -729,7 +758,8 @@ void sortkl(void)
 
     // The author liked bubble sort. So we will use it. :-(
 
-    if (game.nenhere-iqhere-game.ithere < 2) return;
+    if (game.nenhere-iqhere-game.ithere < 2)
+	return;
 
     do {
 	sw = false;
@@ -764,11 +794,13 @@ void setpassword(void)
 	    proutn(_("Please type in a secret password- "));
 	    scan();
 	    strcpy(game.passwd, citem);
-	    if (*game.passwd != 0) break;
+	    if (*game.passwd != 0)
+		break;
 	}
     } else {
 	int i;
-        for(i=0;i<3;i++) game.passwd[i]=(char)(97+(int)(Rand()*25));
+        for(i=0;i<3;i++)
+	    game.passwd[i]=(char)(97+(int)(Rand()*25));
         game.passwd[3]=0;
     }
 }

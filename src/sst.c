@@ -318,14 +318,16 @@ static void helpme(void)
 	    key = scan();
 	}
 	setwnd(message_window);
-	if (key == IHEOL) return;
+	if (key == IHEOL)
+	    return;
 	for (i = 0; i < NUMCOMMANDS; i++) {
 	    if (ACCEPT(i) && strcasecmp(commands[i].name, citem)==0) {
 		i = commands[i].value;
 		break;
 	    }
 	}
-	if (i != NUMCOMMANDS) break;
+	if (i != NUMCOMMANDS)
+	    break;
 	skip(1);
 	listCommands();
 	key = IHEOL;
@@ -446,11 +448,13 @@ static void makemoves(void)
 	    break;
 	case PHASERS:			// phasers
 	    phasers();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case TORPEDO:			// photons
 	    photon();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case MOVE:			// move
 	    warp(false);
@@ -464,7 +468,8 @@ static void makemoves(void)
 	    break;
 	case DOCK:			// dock
 	    dock(true);
-	    if (game.ididit) attack(false);
+	    if (game.ididit)
+		attack(false);		
 	    break;
 	case DAMAGES:			// damages
 	    dreprt();
@@ -477,7 +482,8 @@ static void makemoves(void)
 	    break;
 	case REST:			// rest
 	    wait();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case WARP:			// warp
 	    setwrp();
@@ -490,22 +496,26 @@ static void makemoves(void)
 	    break;
 	case ORBIT:			// orbit
 	    orbit();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case TRANSPORT:			// transport "beam"
 	    beam();
 	    break;
 	case MINE:			// mine
 	    mine();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case CRYSTALS:			// crystals
 	    usecrystals();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case SHUTTLE:			// shuttle
 	    shuttle();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case PLANETS:			// Planet list
 	    preport();
@@ -526,7 +536,8 @@ static void makemoves(void)
 	    break;
 	case PROBE:
 	    probe();			// Launch probe
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case ABANDON:			// Abandon Ship
 	    abandn();
@@ -542,14 +553,16 @@ static void makemoves(void)
 	    break;
 	case DEATHRAY:			// Try a desparation measure
 	    deathray();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case DEBUGCMD:			// What do we want for debug???
 	    debugme();
 	    break;
 	case MAYDAY:			// Call for help
 	    mayday();
-	    if (game.ididit) hitme = true;
+	    if (game.ididit)
+		hitme = true;
 	    break;
 	case QUIT:
 	    game.alldone = true;		// quit the game
@@ -581,7 +594,8 @@ static void makemoves(void)
 	    }
 	    if (hitme && !game.justin) {
 		attack(true);
-		if (game.alldone) break;
+		if (game.alldone)
+		    break;
 		if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) {	// went NOVA! 
 		    atover(false);
 		    hitme = true;
@@ -590,9 +604,11 @@ static void makemoves(void)
 	    }
 	    break;
 	}
-	if (game.alldone) break;
+	if (game.alldone)
+	    break;
     }
-    if (idebug) prout("=== Ending");
+    if (idebug)
+	prout("=== Ending");
 }
 
 
@@ -613,11 +629,11 @@ int main(int argc, char **argv)
 	    replayfp = fopen(optarg, "r");
 	    if (replayfp == NULL) {
 		fprintf(stderr, "sst: can't open replay file %s\n", optarg);
-		exit(1);	
+		exit(1);
 	    }
 	    if (fscanf(replayfp, "seed %d\n", &seed) != 1) {
 		fprintf(stderr, "sst: replay file %s is ill-formed\n", optarg);
-		exit(1);	
+		exit(1);
 	    }
 	    /* FALL THROUGH */
 	case 't':
@@ -656,7 +672,8 @@ int main(int argc, char **argv)
 	    score();
 	    game.alldone = false;
 	}
-	else makemoves();
+	else
+	    makemoves();
 	skip(1);
 	stars();
 	skip(1);
@@ -669,7 +686,8 @@ int main(int argc, char **argv)
 	    }
 	}
 	proutn(_("Do you want to play again? "));
-	if (!ja()) break;
+	if (!ja())
+	    break;
     }
     skip(1);
     prout(_("May the Great Bird of the Galaxy roost upon your home planet."));
@@ -706,8 +724,10 @@ char *cramlc(enum loctype key, coord w)
 {
     static char buf[32];
     buf[0] = '\0';
-    if (key == quadrant) strcpy(buf, _("Quadrant "));
-    else if (key == sector) strcpy(buf, _("Sector "));
+    if (key == quadrant)
+	strcpy(buf, _("Quadrant "));
+    else if (key == sector)
+	strcpy(buf, _("Sector "));
     sprintf(buf+strlen(buf), "%d - %d", w.x, w.y);
     return buf;
 }
@@ -715,7 +735,8 @@ char *cramlc(enum loctype key, coord w)
 void crmena(bool stars, feature enemy, enum loctype key, coord w) 
 /* print an enemy and his location */
 {
-    if (stars) proutn("***");
+    if (stars)
+	proutn("***");
     cramen(enemy);
     proutn(_(" at "));
     proutn(cramlc(key, w));
@@ -820,7 +841,8 @@ int scan(void)
     // Treat as alpha
     cp = citem;
     while (*linep && *linep!=' ') {
-	if ((cp - citem) < 9) *cp++ = tolower(*linep);
+	if ((cp - citem) < 9)
+	    *cp++ = tolower(*linep);
 	linep++;
     }
     *cp = 0;
@@ -834,8 +856,10 @@ bool ja(void)
     for(;;) {
 	scan();
 	chew();
-	if (*citem == 'y') return true;
-	if (*citem == 'n') return false;
+	if (*citem == 'y')
+	    return true;
+	if (*citem == 'n')
+	    return false;
 	proutn(_("Please answer with \"y\" or \"n\": "));
     }
 }
@@ -859,7 +883,8 @@ void debugme(void)
 {
     proutn("Reset levels? ");
     if (ja() == true) {
-	if (game.energy < game.inenrg) game.energy = game.inenrg;
+	if (game.energy < game.inenrg)
+	    game.energy = game.inenrg;
 	game.shield = game.inshld;
 	game.torps = game.intorps;
 	game.lsupres = game.inlsr;
@@ -874,8 +899,10 @@ void debugme(void)
     proutn("Toggle debug flag? ");
     if (ja() == true) {
 	idebug = !idebug;
-	if (idebug) prout("Debug output ON");
-	else prout("Debug output OFF");
+	if (idebug)
+	    prout("Debug output ON");	    
+	else
+	    prout("Debug output OFF");
     }
     proutn("Cause selective damage? ");
     if (ja() == true) {

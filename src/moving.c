@@ -64,7 +64,8 @@ void imove(bool novapush)
 		     */
 		    if (game.skill > SKILL_GOOD && game.klhere > 0 && !game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 			attack(false);
-		    if (game.alldone) return;
+		    if (game.alldone)
+			return;
 		}
 		/* compute final position -- new quadrant and sector */
 		x = QUADSIZE*(game.quadrant.x-1)+game.sector.x;
@@ -91,7 +92,8 @@ void imove(bool novapush)
 			w.y = (GALSIZE*QUADSIZE*2)+1 - w.y;
 			kink = 1;
 		    }
-		    if (kink) kinks = 1;
+		    if (kink)
+			kinks = 1;
 		} while (kink);
 
 		if (kinks) {
@@ -116,7 +118,8 @@ void imove(bool novapush)
 		prout(_("Entering %s."), cramlc(quadrant, game.quadrant));
 		game.quad[game.sector.x][game.sector.y] = game.ship;
 		newqad(false);
-		if (game.skill>SKILL_NOVICE) attack(false);
+		if (game.skill>SKILL_NOVICE)
+		    attack(false);  
 		return;
 	    }
 	    iquad = game.quad[w.x][w.y];
@@ -225,9 +228,11 @@ void dock(bool verbose)
 	return;
     }
     game.condition = docked;
-    if (verbose) prout(_("Docked."));
+    if (verbose)
+	prout(_("Docked."));
     game.ididit = true;
-    if (game.energy < game.inenrg) game.energy = game.inenrg;
+    if (game.energy < game.inenrg)
+	game.energy = game.inenrg;
     game.shield = game.inshld;
     game.torps = game.intorps;
     game.lsupres = game.inlsr;
@@ -387,7 +392,8 @@ static void getcd(bool isprobe, int akey)
 			  cramlc(sector, incr));
 		}
 	    }
-	    else prout(_("Ensign Chekov- \"Course laid in, Captain.\""));
+	    else
+		prout(_("Ensign Chekov- \"Course laid in, Captain.\""));
 	}
 	deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y);
 	deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y);
@@ -423,7 +429,8 @@ static void getcd(bool isprobe, int akey)
     }
     game.dist = sqrt(deltax*deltax + deltay*deltay);
     game.direc = atan2(deltax, deltay)*1.90985932;
-    if (game.direc < 0.0) game.direc += 12.0;
+    if (game.direc < 0.0)
+	game.direc += 12.0;
     chew();
     return;
 }
@@ -445,7 +452,8 @@ void impuls(void)
 
     if (game.energy > 30.0) {
 	getcd(false, 0);
-	if (game.direc == -1.0) return;
+	if (game.direc == -1.0)
+	    return;
 	power = 20.0 + 100.0*game.dist;
     }
     else
@@ -473,16 +481,19 @@ void impuls(void)
 	prout(_("First Officer Spock- \"Captain, our speed under impulse"));
 	prout(_("power is only 0.95 sectors per stardate. Are you sure"));
 	proutn(_("we dare spend the time?\" "));
-	if (ja() == false) return;
+	if (ja() == false)
+	    return;
     }
     /* Activate impulse engines and pay the cost */
     imove(false);
     game.ididit = true;
-    if (game.alldone) return;
+    if (game.alldone)
+	return;
     power = 20.0 + 100.0*game.dist;
     game.energy -= power;
     game.optime = game.dist/0.095;
-    if (game.energy <= 0) finish(FNRG);
+    if (game.energy <= 0)
+	finish(FNRG);
     return;
 }
 
@@ -512,7 +523,8 @@ void warp(bool timewarp)
 			
 	/* Read in course and distance */
 	getcd(false, 0);
-	if (game.direc == -1.0) return;
+	if (game.direc == -1.0)
+	    return;
 
 	/* Make sure starship has enough energy for the trip */
 	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1);
@@ -564,11 +576,13 @@ void warp(bool timewarp)
 	    game.dist = Rand()*game.dist;
 	}
 	/* Decide if time warp will occur */
-	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand()) twarp = true;
+	if (0.5*game.dist*pow(7.0,game.warpfac-10.0) > Rand())
+	    twarp = true;
 	if (idebug && game.warpfac==10 && !twarp) {
 	    blooey = false;
 	    proutn("=== Force time warp? ");
-	    if (ja() == true) twarp = true;
+	    if (ja() == true)
+		twarp = true;
 	}
 	if (blooey || twarp) {
 	    /* If time warp or engine damage, check path */
@@ -593,7 +607,8 @@ void warp(bool timewarp)
 		ix = x + 0.5;
 		y += deltay;
 		iy = y +0.5;
-		if (!VALID_SECTOR(ix, iy)) break;
+		if (!VALID_SECTOR(ix, iy))
+		    break;
 		if (game.quad[ix][iy] != IHDOT) {
 		    blooey = false;
 		    twarp = false;
@@ -605,11 +620,14 @@ void warp(bool timewarp)
 
     /* Activate Warp Engines and pay the cost */
     imove(false);
-    if (game.alldone) return;
+    if (game.alldone)
+	return;
     game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1);
-    if (game.energy <= 0) finish(FNRG);
+    if (game.energy <= 0)
+	finish(FNRG);
     game.optime = 10.0*game.dist/game.wfacsq;
-    if (twarp) timwrp();
+    if (twarp)
+	timwrp();
     if (blooey) {
 	game.damage[DWARPEN] = game.damfac*(3.0*Rand()+1.0);
 	skip(1);
@@ -711,11 +729,14 @@ void atover(bool igrab)
 	    }
 	}
     }
-    if (igrab) return;
+    if (igrab)
+	return;
 
     /* Check to see if captain in shuttle craft */
-    if (game.icraft) finish(FSTRACTOR);
-    if (game.alldone) return;
+    if (game.icraft)
+	finish(FSTRACTOR);
+    if (game.alldone)
+	return;
 
     /* Inform captain of attempt to reach safety */
     skip(1);
@@ -748,7 +769,8 @@ void atover(bool igrab)
 	power = 0.75*game.energy;
 	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1));
 	distreq = 1.4142+Rand();
-	if (distreq < game.dist) game.dist = distreq;
+	if (distreq < game.dist)
+	    game.dist = distreq;
 	game.optime = 10.0*game.dist/game.wfacsq;
 	game.direc = 12.0*Rand();	/* How dumb! */
 	game.justin = false;
@@ -756,7 +778,8 @@ void atover(bool igrab)
 	warp(true);
 	if (!game.justin) {
 	    /* This is bad news, we didn't leave quadrant. */
-	    if (game.alldone) return;
+	    if (game.alldone)
+		return;
 	    skip(1);
 	    prout(_("Insufficient energy to leave quadrant."));
 	    finish(FSNOVAED);
@@ -789,7 +812,8 @@ void timwrp()
 	/* next snapshot will be sooner */
 	schedule(FSNAP, expran(0.25*game.state.remtime));
 				
-	if (game.state.nscrem) schedule(FSCMOVE, 0.2777);
+	if (game.state.nscrem)
+	    schedule(FSCMOVE, 0.2777);	    
 	game.isatb = 0;
 	unschedule(FCDBAS);
 	unschedule(FSCDBAS);
@@ -869,7 +893,8 @@ void probe(void)
 	/* slow mode, so let Kirk know how many probes there are left */
 	prout(game.nprobes==1 ? _("%d probe left.") : _("%d probes left."), game.nprobes);
 	proutn(_("Are you sure you want to fire a probe? "));
-	if (ja() == false) return;
+	if (ja() == false)
+	    return;
     }
 
     game.isarmed = false;
@@ -882,7 +907,8 @@ void probe(void)
 	game.isarmed = ja();
     }
     getcd(true, key);
-    if (game.direc == -1.0) return;
+    if (game.direc == -1.0)
+	return;
     game.nprobes--;
     angle = ((15.0 - game.direc) * 0.5235988);
     game.probeinx = -sin(angle);
@@ -1011,7 +1037,8 @@ void mayday(void)
 	}
 	textcolor(RED);
 	warble();
-	if (Rand() > probf) break;
+	if (Rand() > probf)
+	    break;
 	prout(_("fails."));
 	delay(500);
 	textcolor(DEFAULT);
@@ -1150,7 +1177,8 @@ void abandn(void)
     prout(_("Starfleet puts you in command of another ship,"));
     prout(_("the Faerie Queene, which is antiquated but,"));
     prout(_("still useable."));
-    if (game.icrystl) prout(_("The dilithium crystals have been moved."));
+    if (game.icrystl)
+	prout(_("The dilithium crystals have been moved."));
     game.imine = false;
     game.iscraft = offship; /* Galileo disappears */
     /* Resupply ship */

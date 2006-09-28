@@ -33,13 +33,15 @@ void preport(void)
 	    proutn(_("   class "));
 	    proutn(classes[game.state.plnets[i].pclass]);
 	    proutn("   ");
-	    if (game.state.plnets[i].crystals != present) proutn(_("no "));
+	    if (game.state.plnets[i].crystals != present)
+		proutn(_("no "));
 	    prout(_("dilithium crystals present."));
 	    if (game.state.plnets[i].known==shuttle_down) 
 		prout(_("    Shuttle Craft Galileo on surface."));
 	}
     }
-    if (!iknow) prout(_("No information available."));
+    if (!iknow)
+	prout(_("No information available."));
 }
 
 void orbit(void)
@@ -64,7 +66,8 @@ void orbit(void)
     game.optime = 0.02+0.03*Rand();
     prout(_("Helmsman Sulu-  \"Entering standard orbit, Sir.\""));
     newcnd();
-    if (consumeTime()) return;
+    if (consumeTime())
+	return;
     game.height = (1400.0+7200.0*Rand());
     prout(_("Sulu-  \"Entered orbit at altitude %.2f kilometers.\""), game.height);
     game.inorbit = true;
@@ -93,9 +96,11 @@ void sensor(void)
 	if (game.state.plnets[game.iplnet].known==shuttle_down) 
 	    prout(_("         Sensors show Galileo still on surface."));
 	proutn(_("         Readings indicate"));
-	if (game.state.plnets[game.iplnet].crystals != present) proutn(_(" no"));
+	if (game.state.plnets[game.iplnet].crystals != present)
+	    proutn(_(" no"));
 	prout(_(" dilithium crystals present.\""));
-	if (game.state.plnets[game.iplnet].known == unknown) game.state.plnets[game.iplnet].known = known;
+	if (game.state.plnets[game.iplnet].known == unknown)
+	    game.state.plnets[game.iplnet].known = known;
     }
 }
 
@@ -109,7 +114,8 @@ void beam(void)
 	if (!damaged(DSHUTTL) && (game.state.plnets[game.iplnet].known==shuttle_down || game.iscraft == onship)) {
 	    skip(1);
 	    proutn(_("Spock-  \"May I suggest the shuttle craft, Sir?\" "));
-	    if (ja() == true) shuttle();
+	    if (ja() == true)
+		shuttle();
 	}
 	return;
     }
@@ -217,7 +223,8 @@ void mine(void)
 	return;
     }
     game.optime = (0.1+0.2*Rand())*game.state.plnets[game.iplnet].pclass;
-    if (consumeTime()) return;
+    if (consumeTime())
+	return;
     prout(_("Mining operation complete."));
     game.state.plnets[game.iplnet].crystals = mined;
     game.imine = game.ididit = true;
@@ -345,7 +352,8 @@ void shuttle(void)
 	    prout(_(" boards Galileo and swoops toward planet surface."));
 	    game.iscraft = offship;
 	    skip(1);
-	    if (consumeTime()) return;
+	    if (consumeTime())
+		return;
 	    game.state.plnets[game.iplnet].known=shuttle_down;
 	    prout(_("Trip complete."));
 	    return;
@@ -360,7 +368,8 @@ void shuttle(void)
 	    game.icraft = true;
 	    skip(1);
 	    game.landed = false;
-	    if (consumeTime()) return;
+	    if (consumeTime())
+		return;
 	    game.iscraft = onship;
 	    game.icraft = false;
 	    if (game.imine) {
@@ -382,7 +391,8 @@ void shuttle(void)
 	skip(1);
 	game.icraft = true;
 	game.iscraft = offship;
-	if (consumeTime()) return;
+	if (consumeTime())
+	    return;
 	game.state.plnets[game.iplnet].known = shuttle_down;
 	game.landed = true;
 	game.icraft = false;
@@ -414,7 +424,8 @@ void deathray(void)
     prout(_("Spock-  \"Captain, the 'Experimental Death Ray'"));
     prout(_("  is highly unpredictible.  Considering the alternatives,"));
     proutn(_("  are you sure this is wise?\" "));
-    if (ja() == false) return;
+    if (ja() == false)
+	return;
     prout(_("Spock-  \"Acknowledged.\""));
     skip(1);
     game.ididit = true;
@@ -438,7 +449,8 @@ void deathray(void)
 	while (game.nenhere > 0)
 	    deadkl(game.ks[1], game.quad[game.ks[1].x][game.ks[1].y],game.ks[1]);
 	prout(_("Ensign Chekov-  \"Congratulations, Captain!\""));
-	if (KLINGREM == 0) finish(FWON);
+	if (KLINGREM == 0)
+	    finish(FWON);    
 	if ((game.options & OPTION_PLAIN) == 0) {
 	    prout(_("Spock-  \"Captain, I believe the `Experimental Death Ray'"));
 	    if (Rand() <= 0.05) {
@@ -489,7 +501,8 @@ void deathray(void)
 	prout(_(" Mr. Sulu."));
 	for_sectors(i)
 	    for_sectors(j)
-		if (game.quad[i][j] == IHDOT) game.quad[i][j] = IHQUEST;
+		if (game.quad[i][j] == IHDOT)
+		    game.quad[i][j] = IHQUEST;
 	prout(_("  Captain, our quadrant is now infested with"));
 	prouts(_(" - - - - - -  *THINGS*."));
 	skip(1);
