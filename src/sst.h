@@ -20,13 +20,15 @@
 #define min(x, y)	((x)<(y)?(x):(y))
 #define max(x, y)	((x)>(y)?(x):(y))
 
-#define PHASEFAC (2.0)
-#define GALSIZE	(8)
-#define NINHAB (GALSIZE * GALSIZE / 2)
-#define MAXUNINHAB (10)
-#define PLNETMAX (NINHAB + MAXUNINHAB)
-#define QUADSIZE (10)
-#define BASEMAX	(5)
+#define PHASEFAC	2.0
+#define GALSIZE		8
+#define NINHAB		(GALSIZE * GALSIZE / 2)
+#define MAXUNINHAB	10
+#define PLNETMAX	(NINHAB + MAXUNINHAB)
+#define QUADSIZE	10
+#define BASEMAX		(GALSIZE * GALSIZE / 12)
+#define MAXKLGAME	127
+#define MAXKLQUAD	9
 
 /*
  * These macros hide the difference between 0-origin and 1-origin addressing.
@@ -117,9 +119,6 @@ typedef struct {
 	int klingons;
     } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
-
-#define MAXKLGAME	127
-#define MAXKLQUAD	9
 
 #define NKILLK (game.inkling - game.state.remkl)
 #define NKILLC (game.incom - game.state.remcom)
