@@ -583,10 +583,12 @@ static void makemoves(void)
 	}
 	commandhook(commands[i].name, false);
 	for (;;) {
-	    if (game.alldone) break;		// Game has ended
+	    if (game.alldone)
+		break;		// Game has ended
 	    if (game.optime != 0.0) {
 		events();
-		if (game.alldone) break;	// Events did us in
+		if (game.alldone)
+		    break;	// Events did us in
 	    }
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova) { // Galaxy went Nova!
 		atover(false);

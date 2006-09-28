@@ -480,7 +480,8 @@ void eta(void)
 	proutn(_("Time or arrival date? "));
 	if (scan()==IHREAL) {
 	    ttime = aaitem;
-	    if (ttime > game.state.date) ttime -= game.state.date; // Actually a star date
+	    if (ttime > game.state.date)
+		ttime -= game.state.date; // Actually a star date
 	    if (ttime <= 1e-10 ||
 		(twarp=(floor(sqrt((10.0*game.dist)/ttime)*10.0)+1.0)/10.0) > 10) {
 		prout(_("We'll never make it, sir."));

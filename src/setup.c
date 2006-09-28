@@ -192,7 +192,8 @@ void setup(bool needprompt)
     setup_names();
 
     //  Decide how many of everything
-    if (choose(needprompt)) return; // frozen game
+    if (choose(needprompt))
+	return; // frozen game
     // Prepare the Enterprise
     game.alldone = game.gamewon = false;
     game.ship = IHE;
@@ -427,7 +428,8 @@ bool choose(bool needprompt)
 	if (needprompt) /* Can start with command line options */
 	    proutn(_("Would you like a regular, tournament, or saved game? "));
 	scan();
-	if (strlen(citem)==0) continue; // Try again
+	if (strlen(citem)==0) // Try again
+	    continue;
 	if (isit("tournament")) {
 	    while (scan() == IHEOL) {
 		proutn(_("Type in tournament number-"));

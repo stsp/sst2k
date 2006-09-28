@@ -109,7 +109,8 @@ void imove(bool novapush)
 		    prout(_("YOU WILL BE DESTROYED."));
 		}
 		/* Compute final position in new quadrant */
-		if (trbeam) return; /* Don't bother if we are to be beamed */
+		if (trbeam) /* Don't bother if we are to be beamed */
+		    return;
 		game.quadrant.x = (w.x+(QUADSIZE-1))/QUADSIZE;
 		game.quadrant.y = (w.y+(QUADSIZE-1))/QUADSIZE;
 		game.sector.x = w.x - QUADSIZE*(game.quadrant.x-1);
@@ -564,7 +565,11 @@ void warp(bool timewarp)
 		   100.0*game.optime/game.state.remtime);
 	    prout(_(" percent of our"));
 	    proutn(_("  remaining time.  Are you sure this is wise?\" "));
-	    if (ja() == false) { game.ididit = false; game.optime=0; return;}
+	    if (ja() == false) {
+		game.ididit = false;
+		game.optime=0; 
+		return;
+	    }
 	}
     }
     /* Entry WARPX */
@@ -1165,7 +1170,8 @@ void abandn(void)
 		if (VALID_SECTOR(game.sector.x, game.sector.y) &&
 		    game.quad[game.sector.x][game.sector.y] == IHDOT) break;
 	    }
-	    if (l < QUADSIZE+1) break; /* found a spot */
+	    if (l < QUADSIZE+1)
+		break; /* found a spot */
 	    game.sector.x=QUADSIZE/2;
 	    game.sector.y=QUADSIZE/2;
 	    newqad(true);

@@ -538,7 +538,8 @@ static void fry(double hit)
 	    if (loop2 < loop1)
 		continue;
 	    ktr += 1;
-	    if (ktr==3) skip(1);
+	    if (ktr==3)
+		skip(1);
 	    proutn(_(" and "));
 	}
 	proutn(device[j]);
@@ -597,7 +598,8 @@ void attack(bool torps_ok)
 	where = sector;
 
     for_local_enemies(loop) {
-	if (game.kpower[loop] < 0) continue;	/* too weak to attack */
+	if (game.kpower[loop] < 0)
+	    continue;	/* too weak to attack */
 	/* compute hit strength and diminish shield power */
 	r = Rand();
 	/* Increase chance of photon torpedos if docked or enemy energy low */
@@ -617,7 +619,8 @@ void attack(bool torps_ok)
 	    (iquad==IHS && r > 0.07) ||
 	    (iquad==IHQUEST && r > 0.05);
 	if (usephasers) {	    /* Enemy uses phasers */
-	    if (game.condition == docked) continue; /* Don't waste the effort! */
+	    if (game.condition == docked)
+		continue; /* Don't waste the effort! */
 	    attempt = true; /* Attempt to attack */
 	    dustfac = 0.8+0.05*Rand();
 	    hit = game.kpower[loop]*pow(dustfac,game.kavgd[loop]);

@@ -12,7 +12,8 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
 	game.state.galaxy[iq.x][iq.y].supernova ||
 	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1)
 	return false; /* no can do -- neg energy, supernovae, or >MAXKLQUAD-1 Klingons */
-    if (ienm == IHR) return false; /* Romulans cannot escape! */
+    if (ienm == IHR)
+	return false; /* Romulans cannot escape! */
     if (!irun) {
 	/* avoid intruding on another commander's territory */
 	if (ienm == IHC) {
@@ -134,7 +135,8 @@ static void movebaddy(coord com, int loccom, feature ienm)
  */
 
 	forces = game.kpower[loccom]+100.0*game.nenhere+400*(nbaddys-1);
-	if (!game.shldup) forces += 1000; /* Good for enemy if shield is down! */
+	if (!game.shldup)
+	    forces += 1000; /* Good for enemy if shield is down! */
 	if (!damaged(DPHASER) || !damaged(DPHOTON)) {
 	    if (damaged(DPHASER)) /* phasers damaged */
 		forces += 300.0;
@@ -169,9 +171,12 @@ static void movebaddy(coord com, int loccom, feature ienm)
     }
     /* calculate preferred number of steps */
     nsteps = motion < 0 ? -motion : motion;
-    if (motion > 0 && nsteps > mdist) nsteps = mdist; /* don't overshoot */
-    if (nsteps > QUADSIZE) nsteps = QUADSIZE; /* This shouldn't be necessary */
-    if (nsteps < 1) nsteps = 1; /* This shouldn't be necessary */
+    if (motion > 0 && nsteps > mdist)
+	nsteps = mdist; /* don't overshoot */
+    if (nsteps > QUADSIZE)
+	nsteps = QUADSIZE; /* This shouldn't be necessary */
+    if (nsteps < 1)
+	nsteps = 1; /* This shouldn't be necessary */
     if (idebug) {
 	proutn("NSTEPS = %d:", nsteps);
     }
@@ -451,7 +456,8 @@ void scom(void)
 		break;
 	    }
 	}
-	if (ifindit==0) return; /* Nothing suitable -- wait until next time*/
+	if (ifindit==0)
+	    return; /* Nothing suitable -- wait until next time*/
 	ibq = game.state.baseq[iwhichb];
 	/* decide how to move toward base */
 	ideltax = ibq.x - game.state.kscmdr.x;
@@ -507,7 +513,8 @@ void scom(void)
 	ibq = game.state.baseq[i];
 	if (same(ibq, game.state.kscmdr) && same(game.state.kscmdr, game.battle)) {
 	    /* attack the base */
-	    if (flag) return; /* no, don't attack base! */
+	    if (flag)
+		return; /* no, don't attack base! */
 	    game.iseenit = false;
 	    game.isatb = 1;
 	    schedule(FSCDBAS, 1.0 +2.0*Rand());

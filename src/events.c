@@ -832,7 +832,8 @@ void snova(bool induced, coord *w)
 		stars += game.state.galaxy[nq.x][nq.y].stars;
 	    }
 	}
-	if (stars == 0) return; /* nothing to supernova exists */
+	if (stars == 0)
+	    return; /* nothing to supernova exists */
 	num = Rand()*stars + 1;
 	for_quadrants(nq.x) {
 	    for_quadrants(nq.y) {
