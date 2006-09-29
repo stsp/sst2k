@@ -55,8 +55,8 @@ class coord:
 
 class planet:
     def __init(self):
-        self.name = None	# String-valued if inhabited
-        self.w = None
+        self.name = None	# string-valued if inhabited
+        self.w = coord()	# quadrant located
         self.pclass = None	# could be ""M", "N", "O", or "destroyed"
         self.crystals = None	# could be "mined", "present", "absent"
         self.known = None	# could be "unknown", "known", "shuttle_down"
@@ -93,6 +93,12 @@ class quadrant:
 	self.charted = None
         self.status = None	# Could be "secure", "distressed", "enslaved"
 
+class page:
+    def __init(self):
+	self.stars = None
+	self.starbase = None
+	self.klingons = None
+
 class snapshot:
     def __init(self):
         self.snap = False	# snapshot taken
@@ -107,14 +113,28 @@ class snapshot:
 	self.nplankl = None	# destroyed uninhabited planets
 	self.nworldkl = None	# destroyed inhabited planets
         self.planets = []	# Planet information
+        for i in range(PLNETMAX):
+            self.planets.append(planet())
         self.date = None	# stardate
 	self.remres = None	# remaining resources
 	self.remtime = None	# remaining time
         self.baseq = [] 	# Base quadrant coordinates
+        for i in range(BASEMAX+1):
+            self.baseq.append(coord())
         self.kcmdr = [] 	# Commander quadrant coordinates
-	self.kscmdr = None	# Supercommander quadrant coordinates
-        self.galaxy = None 	# The Galaxy (subscript 0 not used)
-    	self.chart = None 	# the starchart (subscript 0 not used)
+        for i in range(QUADSIZE+1):
+            self.kcmdr.append(coord())
+	self.kscmdr = coord()	# Supercommander quadrant coordinates
+        self.galaxy = [] 	# The Galaxy (subscript 0 not used)
+        for i in range(GALSIZE+1):
+            self.chart.append([])
+            for j in range(GALSIZE+1):
+                self.galaxy[i].append(quadrant())
+    	self.chart = [] 	# the starchart (subscript 0 not used)
+        for i in range(GALSIZE+1):
+            self.chart.append([])
+            for j in range(GALSIZE+1):
+                self.chart[i].append(page())
 
 class event:
     def __init__(self):
@@ -192,7 +212,9 @@ class gamestate:
         self.kdist = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy distances
         self.kavgd = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# average distances
         self.damage = [0] * NDEVICES	# damage encountered
-        self.future = [None] * NEVENTS	# future events
+        self.future = [0.0] * NEVENTS	# future events
+        for i in range(NEVENTS):
+            self.future.append(event())
         self.passwd  = None;		# Self Destruct password
         self.ks = [[None * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy sector locations
         self.quadrant = None	# where we are in the large
@@ -273,5 +295,4 @@ class gamestate:
         self.probeinx = 0.0	# probe x,y increment
         self.probeiny = 0.0	#
         self.height = 0.0	# height of orbit around planet
-
 
