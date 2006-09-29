@@ -1,41 +1,34 @@
 """
 sst.py =-- Super Star Trek in Python
 
-Control flow of this translation is pretty much identical to the C version
-(and thus like the ancestral FORTRAN) but the data structures are
-radically different -- the Python code makes heavy use of objects.
-
-Note that the game.quad, game.snap.galaxy and game.snap.chart members
-are not actually arrays but dictioaries indixed by coord tuples.  Be setting
-the hash of a coord equal to the hash of a literal tuple containing its
-coordinate data, we ensure these can be indexed both ways.
-
 """
-import math
+import os, sys, math, curses
+
+SSTDOC = "/usr/share/doc/sst/sst.doc"
+
+# Stub to be replaced
+def _(str): return str
 
 PHASEFAC	= 2.0
 GALSIZE 	= 8
-NINHAB  	= GALSIZE * GALSIZE / 2
+NINHAB  	= (GALSIZE * GALSIZE / 2)
 MAXUNINHAB	= 10
-PLNETMAB	= NINHAB + MAXUNINHAB
+PLNETMAX	= (NINHAB + MAXUNINHAB)
 QUADSIZE	= 10
-BASEMAX 	= 5
-FULLCREW	= 428	 # BSD Trek was 387, that's wrong
+BASEMAX 	= (GALSIZE * GALSIZE / 12)
 MAXKLGAME	= 127
 MAXKLQUAD	= 9
+FULLCREW	= 428	# BSD Trek was 387, that's wrong 
 FOREVER 	= 1e30
 
-# These macros hide the difference between 0-origin and 1-origin addressing.
-# They're a step towards de-FORTRANizing the code.
-def VALID_QUADRANT(x,y): ((x)>=1 and (x)<=GALSIZE and (y)>=1 and (y)<=GALSIZE)
-def VALID_SECTOR(x, y):	((x)>=1 and (x)<=QUADSIZE and (y)>=1 and (y)<=QUADSIZE)
+# These functions hide the difference between 0-origin and 1-origin addressing.
+def VALID_QUADRANT(x, y):	return ((x)>=1 and (x)<=GALSIZE and (y)>=1 and (y)<=GALSIZE)
+def VALID_SECTOR(x, y):	return ((x)>=1 and (x)<=QUADSIZE and (y)>=1 and (y)<=QUADSIZE)
 
-# These types have not been dealt with yet 
-IHQUEST = '?',
-IHWEB = '#',
-IHMATER0 = '-',
-IHMATER1 = 'o',
-IHMATER2 = '0',
+def square(i):		return ((i)*(i))
+def distance(c1, c2):	return math.sqrt(square(c1.x - c2.x) + square(c1.y - c2.y))
+def invalidate(w):	w.x = w.y = 0
+def is_valid(w):	return (w.x != 0 and w.y != 0)
 
 class coord:
     def __init(self, x=None, y=None):
@@ -60,239 +53,225 @@ class coord:
     def __str__(self):
         return "%d - %d" % (self.x, self.y)
 
-class feature:
-    "A feature in the current quadrant (ship, star, black hole, base, etc)." 
-    def __init__(self):
-        self.type = None	# name of feature type
-        self.sector = None	# sector location
-    def distance(self):
-        return self.sector.distance(game.sector)
-    def __str__(self):
-        "This will be overridden by subclasses."
-        return self.name[0]
-    def sectormove(self, dest):
-        "Move this feature within the current quadrant." 
-        if self.sector:
-            game.quad[self.sector] = None
-        game.quad[dest] = self
-        self.sector = dest
-
-class ship(feature):
-    "A starship, frindly or enemy." 
-    def __init__(self, type, power):
-        feature.__init__(self)
-        self.type = type	# klingon, romulan, commander,
-        			# supercommander, tholian,
-                                # enterprise, faerie queene.
-        self.power = power	# power
-        if self.type in ("Klingon", "Commander", "Super-Commander"):
-            game.remkl += 1
-        elif self.type == "Romulan":
-            game.romrem += 1
-    def __del__(self):
-        if self.type in ("Klingon", "Commander", "Super-Commander"):
-            game.remkl -= 1
-        elif self.type == "Romulan":
-            game.romrem -= 1
-
-class space(feature):
-    "Empty space.  Has no state, just knows how to identify iself."
-    def __str__(self):
-        return '*'
-
-class star(feature):
-    "A star.  Has no state, just knows how to identify iself."
-    def __str__(self):
-        return '*'
-
-class planet(feature):
-    "A planet.  May be inhabited or not, may hold dilithium crystals or not."
+class planet:
     def __init(self):
-        feature.__init__(self)
-        self.name = None
-        self.crystals = None	# "absent", "present", or "mined"
-        self.inhabited = False
-        self.known = "unknown"	# Other values: "known" and "shuttle down"
-        game.state.planets.append(self)
-    def __del__(self):
-        game.state.planets.remove(self)
-    def __str__(self):
-        if self.inhabited:
-            return '@'
-        else:
-            return 'P'
+        self.name = None	# String-valued if inhabited
+        self.w = None
+        self.pclass = None	# could be ""M", "N", "O", or "destroyed"
+        self.crystals = None	# could be "mined", "present", "absent"
+        self.known = None	# could be "unknown", "known", "shuttle_down"
 
-class web(feature):
-    "A bit of Tholian web.  Has no state, just knows how to identify iself."
-    def __str__(self):
-        return '*'
+# How to represent features
+IHR = 'R',
+IHK = 'K',
+IHC = 'C',
+IHS = 'S',
+IHSTAR = '*',
+IHP = 'P',
+IHW = '@',
+IHB = 'B',
+IHBLANK = ' ',
+IHDOT = '.',
+IHQUEST = '?',
+IHE = 'E',
+IHF = 'F',
+IHT = 'T',
+IHWEB = '#',
+IHMATER0 = '-',
+IHMATER1 = 'o',
+IHMATER2 = '0'
 
-class blackhole(feature):
-    "A black hole.  Has no hair, just knows how to identify iself."
-    def __str__(self):
-        return ' '
-
-class starbase(feature):
-    "Starbases also have no features, just a location."
-    def __init(self, quadrant):
-        feature.__init__(self)
-        self.quadrant = quadrant
-        game.state.bases.append(self)
-    def __del__(self):
-        game.state.bases.remove(self)
-    def __str__(self):
-        return 'B'
-
+NOPLANET = None
 class quadrant:
-    def __init__(self):
+    def __init(self):
         self.stars = None
         self.planet = None
-        self.starbase = None
-        self.klingons = None
-        self.romulans = None
-        self.supernova = None
-        self.charted = None
-        self.status = "secure"	# Other valuues: "distressed", "enslaved"
-    def enemies(self):
-        "List enemies in this quadrant."
-        lst = []
-        for feature in self.quad.values:
-            if not isinstance(feature, ship):
-                continue
-            if feature.name not in ("Enterprise", "Faerie Queene"):
-                lst.append(feature)
-        return lst
-
-class page:
-    "A chart page.  The starchart is a 2D array of these."
-    def __init__(self):
-	self.stars = None	# Will hold a number
-	self.starbase = None	# Will hold a bool
-	self.klingons = None	# Will hold a number
+	self.starbase = None
+	self.klingons = None
+	self.romulans = None
+	self.supernova = None
+	self.charted = None
+        self.status = None	# Could be "secure", "distressed", "enslaved"
 
 class snapshot:
-    "State of the universe.  The galaxy is a 2D array of these."
-    def __init__(self):
+    def __init(self):
+        self.snap = False	# snapshot taken
         self.crew = None	# crew complement
 	self.remkl = None	# remaining klingons
 	self.remcom = None	# remaining commanders
 	self.nscrem = None	# remaining super commanders
+	self.rembase = None	# remaining bases
 	self.starkl = None	# destroyed stars
 	self.basekl = None	# destroyed bases
 	self.nromrem = None	# Romulans remaining
-	self.nplankl = None	# destroyed uninhabited planets self.nworldkl = None	# destroyed inhabited planets
-        self.planets = [];	# List of planets known
+	self.nplankl = None	# destroyed uninhabited planets
+	self.nworldkl = None	# destroyed inhabited planets
+        self.planets = []	# Planet information
         self.date = None	# stardate
 	self.remres = None	# remaining resources
-	self. remtime = None	# remaining time
-        self.bases = [] 	# Base quadrant coordinates
+	self.remtime = None	# remaining time
+        self.baseq = [] 	# Base quadrant coordinates
         self.kcmdr = [] 	# Commander quadrant coordinates
-        self.kscmdr = None	# Supercommander quadrant coordinates
-        self.galaxy = {}	# Dictionary of quadrant objects
-        self.chart = {}		# Dictionary of page objects
-
-def damaged(dev):
-    return game.damage[dev] != 0.0
+	self.kscmdr = None	# Supercommander quadrant coordinates
+        self.galaxy = None 	# The Galaxy (subscript 0 not used)
+    	self.chart = None 	# the starchart (subscript 0 not used)
 
 class event:
     def __init__(self):
-        self.date = None	# The only mandatory attribute
+        self.date = None	# A real number
+        self.quadrant = None	# A coord structure
 
-class game:
+# game options 
+OPTION_ALL	= 0xffffffff
+OPTION_TTY	= 0x00000001	# old interface 
+OPTION_CURSES	= 0x00000002	# new interface 
+OPTION_IOMODES	= 0x00000003	# cover both interfaces 
+OPTION_PLANETS	= 0x00000004	# planets and mining 
+OPTION_THOLIAN	= 0x00000008	# Tholians and their webs 
+OPTION_THINGY	= 0x00000010	# Space Thingy can shoot back 
+OPTION_PROBE	= 0x00000020	# deep-space probes 
+OPTION_SHOWME	= 0x00000040	# bracket Enterprise in chart 
+OPTION_RAMMING	= 0x00000080	# enemies may ram Enterprise 
+OPTION_MVBADDY	= 0x00000100	# more enemies can move 
+OPTION_BLKHOLE	= 0x00000200	# black hole may timewarp you 
+OPTION_BASE	= 0x00000400	# bases have good shields 
+OPTION_WORLDS	= 0x00000800	# logic for inhabited worlds 
+OPTION_PLAIN	= 0x01000000	# user chose plain game 
+OPTION_ALMY	= 0x02000000	# user chose Almy variant 
+
+# Define devices 
+DSRSENS	= 0
+DLRSENS	= 1
+DPHASER	= 2
+DPHOTON	= 3
+DLIFSUP	= 4
+DWARPEN	= 5
+DIMPULS	= 6
+DSHIELD	= 7
+DRADIO	= 0
+DSHUTTL = 9
+DCOMPTR = 10
+DNAVSYS	= 11
+DTRANSP = 12
+DSHCTRL	= 13
+DDRAY	= 14
+DDSP	= 15
+NDEVICES= 16	# Number of devices
+
+def damaged(dev):	return (game.damage[dev] != 0.0)
+
+# Define future events 
+FSPY	= 0	# Spy event happens always (no future[] entry)
+		# can cause SC to tractor beam Enterprise
+FSNOVA  = 1	# Supernova
+FTBEAM  = 2	# Commander tractor beams Enterprise
+FSNAP   = 3	# Snapshot for time warp
+FBATTAK = 4	# Commander attacks base
+FCDBAS  = 5	# Commander destroys base
+FSCMOVE = 6	# Supercommander moves (might attack base)
+FSCDBAS = 7	# Supercommander destroys base
+FDSPROB = 8	# Move deep space probe
+FDISTR	= 9	# Emit distress call from an inhabited world 
+FENSLV	= 10	# Inhabited word is enslaved */
+FREPRO	= 11	# Klingons build a ship in an enslaved system
+NEVENTS	= 12
+
+#
+# abstract out the event handling -- underlying data structures will change
+# when we implement stateful events
+# 
+def findevent(evtype):	return game.future[evtype]
+
+class gamestate:
     def __init__(self):
-        self.options = []		# List of option strings
-        self.state = snapshot()		# State of the universe
-        self.snapsht = snapshot()	# For backwards timetravel
-        self.quad = {}			# contents of our quadrant
-        self.kpower = {}		# enemy energy levels
-        self.kdist = {}			# enemy distances
-        self.kavgd = {}			# average distances
-        self.damage = {}		# damage encountered
-        self.future = []		# future events
-        self.passwd = None		# Self Destruct password
-        # Coordinate members start here
-	self.enemies = {}			# enemy sector locations
-	self.quadrant = None		# where we are
-        self.sector = None
-	self.tholian = None		# coordinates of Tholian
-	self.base = None		# position of base in current quadrant
-	self.battle = None		# base coordinates being attacked
-	self.plnet = None		# location of planet in quadrant
-	self.probec = None		# current probe quadrant
-        # Flag members start here
-	self.gamewon = None		# Finished!
-	self.ididit = None		# action taken -- allows enemy to attack
-	self.alive = None		# we are alive (not killed)
-	self.justin = None		# just entered quadrant
-	self.shldup = None		# shields are up
-	self.shldchg = None		# shield changing (affects efficiency)
-	self.comhere = None		# commander here
-	self.ishere = None		# super-commander in quadrant
-	self.iscate = None		# super commander is here
-	self.ientesc = None		# attempted escape from supercommander
-	self.ithere = None		# Tholian is here 
-	self.resting = None		# rest time
-	self.icraft = None		# Kirk in Galileo
-	self.landed = None		# party on planet or on ship
-	self.alldone = None		# game is now finished
-	self.neutz = None		# Romulan Neutral Zone
-	self.isarmed = None		# probe is armed
-	self.inorbit = None		# orbiting a planet
-	self.imine = None		# mining
-	self.icrystl = None		# dilithium crystals aboard
-	self.iseenit = None		# seen base attack report
-	self.thawed = None		# thawed game
-        # String members start here
-        self.condition = None		# green, yellow, red, docked, dead,
-        self.iscraft = None		# onship, offship, removed
-        self.skill = None		# levels: none, novice, fair, good,
-        				# expert, emeritus
-        # Integer nembers sart here
-x	self.inkling = None		# initial number of klingons
-	self.inbase = None		# initial number of bases
-	self.incom = None		# initial number of commanders
-	self.inscom = None		# initial number of commanders
-	self.inrom = None		# initial number of commanders
-	self.instar = None		# initial stars
-	self.intorps = None		# initial/max torpedoes
-	self.torps = None		# number of torpedoes
-	self.ship = None		# ship type -- 'E' is Enterprise
-	self.abandoned = None		# count of crew abandoned in space
-	self.length = None		# length of game
-	self.klhere = None		# klingons here
-	self.casual = None		# causalties
-	self.nhelp = None		# calls for help
-	self.nkinks = None		# count of energy-barrier crossings
-	self.iplnet = None		# planet # in quadrant
-	self.inplan = None		# initial planets
-	self.irhere = None		# Romulans in quadrant
-	self.isatb = None		# =1 if super commander is attacking base
-	self.tourn = None		# tournament number
-	self.proben = None		# number of moves for probe
-	self.nprobes = None		# number of probes available
-        # Float members start here
-	self.inresor = None		# initial resources
-	self.intime = None		# initial time
-	self.inenrg = None		# initial/max energy
-	self.inshld = None		# initial/max shield
-	self.inlsr = None		# initial life support resources
-	self.indate = None		# initial date
-	self.energy = None		# energy level
-	self.shield = None		# shield level
-	self.warpfac = None		# warp speed
-	self.wfacsq = None		# squared warp factor
-	self.lsupres = None		# life support reserves
-	self.dist = None		# movement distance
-	self.direc = None		# movement direction
-	self.optime = None		# time taken by current operation
-	self.docfac = None		# repair factor when docking (constant?)
-	self.damfac = None		# damage factor
-	self.lastchart = None		# time star chart was last updated
-	self.cryprob = None		# probability that crystal will work
-	self.probex = None		# location of probe
-	self.probey = None		#
-	self.probeinx = None		# probe x,y increment
-	self.probeiny = None		#
-	self.height = None		# height of orbit around planet
+        self.options = None	# Game options
+        self.state = None	# A snapshot structure
+        self.snapsht = None	# Last snapshot taken for time-travel purposes
+        self.quad = [[IHDOT * (QUADSIZE+1)] * (QUADSIZE+1)]	# contents of our quadrant
+        self.kpower = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy energy levels
+        self.kdist = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy distances
+        self.kavgd = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# average distances
+        self.damage = [0] * NDEVICES	# damage encountered
+        self.future = [None] * NEVENTS	# future events
+        self.passwd  = None;		# Self Destruct password
+        self.ks = [[None * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy sector locations
+        self.quadrant = None	# where we are in the large
+        self.sector = None	# where we are in the small
+        self.tholian = None	# coordinates of Tholian
+        self.base = None	# position of base in current quadrant
+        self.battle = None	# base coordinates being attacked
+        self.plnet = None	# location of planet in quadrant
+        self.probec = None	# current probe quadrant
+        self.gamewon = False	# Finished!
+        self.ididit = False	# action taken -- allows enemy to attack
+        self.alive = False	# we are alive (not killed)
+        self.justin = False	# just entered quadrant
+        self.shldup = False	# shields are up
+        self.shldchg = False	# shield is changing (affects efficiency)
+        self.comhere = False	# commander here
+        self.ishere = False	# super-commander in quadrant
+        self.iscate = False	# super commander is here
+        self.ientesc = False	# attempted escape from supercommander
+        self.ithere = False	# Tholian is here 
+        self.resting = False	# rest time
+        self.icraft = False	# Kirk in Galileo
+        self.landed = False	# party on planet (true), on ship (false)
+        self.alldone = False	# game is now finished
+        self.neutz = False	# Romulan Neutral Zone
+        self.isarmed = False	# probe is armed
+        self.inorbit = False	# orbiting a planet
+        self.imine = False	# mining
+        self.icrystl = False	# dilithium crystals aboard
+        self.iseenit = False	# seen base attack report
+        self.thawed = False	# thawed game
+        self.condition = None	# "green", "yellow", "red", "docked", "dead"
+        self.iscraft = None	# "onship", "offship", "removed"
+        self.skill = None	# Player skill level
+        self.inkling = 0	# initial number of klingons
+        self.inbase = 0		# initial number of bases
+        self.incom = 0		# initial number of commanders
+        self.inscom = 0		# initial number of commanders
+        self.inrom = 0		# initial number of commanders
+        self.instar = 0		# initial stars
+        self.intorps = 0	# initial/max torpedoes
+        self.torps = 0		# number of torpedoes
+        self.ship = 0		# ship type -- 'E' is Enterprise
+        self.abandoned = 0	# count of crew abandoned in space
+        self.length = 0		# length of game
+        self.klhere = 0		# klingons here
+        self.casual = 0		# causalties
+        self.nhelp = 0		# calls for help
+        self.nkinks = 0		# count of energy-barrier crossings
+        self.iplnet = 0		# planet # in quadrant
+        self.inplan = 0		# initial planets
+        self.nenhere = 0	# number of enemies in quadrant
+        self.irhere = 0		# Romulans in quadrant
+        self.isatb = 0		# =1 if super commander is attacking base
+        self.tourn = 0		# tournament number
+        self.proben = 0		# number of moves for probe
+        self.nprobes = 0	# number of probes available
+        self.inresor = 0.0	# initial resources
+        self.intime = 0.0	# initial time
+        self.inenrg = 0.0	# initial/max energy
+        self.inshld = 0.0	# initial/max shield
+        self.inlsr = 0.0	# initial life support resources
+        self.indate = 0.0	# initial date
+        self.energy = 0.0	# energy level
+        self.shield = 0.0	# shield level
+        self.warpfac = 0.0	# warp speed
+        self.wfacsq = 0.0	# squared warp factor
+        self.lsupres = 0.0	# life support reserves
+        self.dist = 0.0		# movement distance
+        self.direc = 0.0	# movement direction
+        self.optime = 0.0	# time taken by current operation
+        self.docfac = 0.0	# repair factor when docking (constant?)
+        self.damfac = 0.0	# damage factor
+        self.lastchart = 0.0	# time star chart was last updated
+        self.cryprob = 0.0	# probability that crystal will work
+        self.probex = 0.0	# location of probe
+        self.probey = 0.0	#
+        self.probeinx = 0.0	# probe x,y increment
+        self.probeiny = 0.0	#
+        self.height = 0.0	# height of orbit around planet
 
 
