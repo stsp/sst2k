@@ -22,10 +22,11 @@ void survey(void)
     prout(_("Spock-  \"Planet report follows, Captain.\""));
     skip(1);
     for (i = 0; i < game.inplan; i++) {
+	if (game.state.planets[i].pclass == destroyed)
+	    continue;
 	if ((game.state.planets[i].known != unknown
-	    && game.state.planets[i].inhabited == UNINHABITED)
-	    || (idebug && game.state.planets[i].w.x !=0)
-	    ) {
+	     && game.state.planets[i].inhabited == UNINHABITED)
+	    || idebug) {
 	    iknow = true;
 	    if (idebug && game.state.planets[i].known==unknown)
 		proutn("(Unknown) ");

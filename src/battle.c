@@ -399,7 +399,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    prout(_(" destroyed."));
 	    game.state.nplankl++;
 	    q->planet = NOPLANET;
-	    DESTROY(&game.state.planets[game.iplnet]);
+	    game.state.planets[game.iplnet].pclass = destroyed;
 	    game.iplnet = 0;
 	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;
@@ -413,7 +413,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    prout(_(" destroyed."));
 	    game.state.nworldkl++;
 	    q->planet = NOPLANET;
-	    DESTROY(&game.state.planets[game.iplnet]);
+	    game.state.planets[game.iplnet].pclass = destroyed;
 	    game.iplnet = 0;
 	    invalidate(game.plnet);
 	    game.quad[w.x][w.y] = IHDOT;

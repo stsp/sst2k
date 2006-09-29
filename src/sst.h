@@ -47,14 +47,12 @@ typedef struct {int x; int y;} coord;
 
 typedef struct {
     coord w;
-    enum {M=0, N=1, O=2} pclass;
+    enum {destroyed= -1, M=0, N=1, O=2} pclass;
     int inhabited;	/* if NZ, an index into a name array */
 #define UNINHABITED	-1
     enum {mined=-1, present=0, absent=1} crystals; /* has crystals */
     enum {unknown, known, shuttle_down} known;
 } planet;
-
-#define DESTROY(pl)	memset(pl, '\0', sizeof(planet))
 
 typedef enum {
     IHR = 'R',

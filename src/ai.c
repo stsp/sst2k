@@ -360,7 +360,7 @@ static bool movescom(coord iq, bool avoid)
 	if (same(game.state.planets[i].w, game.state.kscmdr) &&
 	    game.state.planets[i].crystals == present) {
 	    /* destroy the planet */
-	    DESTROY(&game.state.planets[i]);
+	    game.state.planets[i].pclass = destroyed;
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
 		pause_game(true);
