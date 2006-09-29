@@ -195,8 +195,8 @@ void rechart(void)
 {
     int i, j;
     game.lastchart = game.state.date;
-    for_quadrants(i)
-	for_quadrants(j) 
+    for (i = 1; i <= GALSIZE; i++)
+	for (j = 1; j <= GALSIZE; j++)
 	    if (game.state.galaxy[i][j].charted) {
 		game.state.chart[i][j].klingons = game.state.galaxy[i][j].klingons;
 		game.state.chart[i][j].starbase = game.state.galaxy[i][j].starbase;
@@ -223,9 +223,9 @@ void chart(void)
 	prout(_("(Last surveillance update %d stardates ago)."),
 	      (int)(game.state.date-game.lastchart));
     prout("      1    2    3    4    5    6    7    8");
-    for_quadrants(i) {
+    for (i = 1; i <= GALSIZE; i++) {
 	proutn("%d |", i);
-	for_quadrants(j) {
+	for (j = 1; j <= GALSIZE; j++) {
 	    char buf[4];
 	    if ((game.options & OPTION_SHOWME) && i == game.quadrant.x && j == game.quadrant.y)
 		proutn("<");
@@ -412,7 +412,7 @@ void srscan(void)
 	newcnd();
     for (i = 1; i <= QUADSIZE; i++) {
 	proutn("%2d  ", i);
-	for_sectors(j) {
+	for (j = 1; j <= QUADSIZE; j++) {
 	    sectscan(goodScan, i, j);
 	}
 	skip(1);

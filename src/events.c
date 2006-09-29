@@ -270,8 +270,8 @@ void events(void)
 		break;
 	    }
 	    i = 0;
-	    for_starbases(j) {
-		for_commanders(k)
+	    for (j = 1; j <= game.state.rembase; j++) {
+		for (k = 1; k <= game.state.remcom; k++)
 		    if (same(game.state.baseq[j], game.state.kcmdr[k]) &&
 			!same(game.state.baseq[j], game.quadrant) &&
 			!same(game.state.baseq[j], game.state.kscmdr)) {
@@ -320,7 +320,7 @@ void events(void)
 	    if (evcode==FCDBAS) {
 		unschedule(FCDBAS);
 		/* find the lucky pair */
-		for_commanders(i)
+		for (i = 1; i <= game.state.remcom; i++)
 		    if (same(game.state.kcmdr[i], game.battle)) 
 			break;
 		if (i > game.state.remcom || game.state.rembase == 0 ||
@@ -358,7 +358,7 @@ void events(void)
 	    }
 	    /* Remove Starbase from galaxy */
 	    game.state.galaxy[game.battle.x][game.battle.y].starbase = false;
-	    for_starbases(i)
+	    for (i = 1; i <= game.state.rembase; i++)
 		if (same(game.state.baseq[i], game.battle))
 		    game.state.baseq[i] = game.state.baseq[game.state.rembase];
 	    game.state.rembase--;
@@ -700,7 +700,7 @@ void nova(coord nov)
 			break;
 		    case IHB: /* Destroy base */
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase = false;
-			for_starbases(i)
+			for (i = 1; i <= game.state.rembase; i++)
 			    if (same(game.state.baseq[i], game.quadrant)) 
 				break;
 			game.state.baseq[i] = game.state.baseq[game.state.rembase];
@@ -744,7 +744,7 @@ void nova(coord nov)
 		    case IHC: /* Damage/destroy big enemies */
 		    case IHS:
 		    case IHR:
-			for_local_enemies(ll)
+			for (ll = 1; ll <= game.nenhere; ll++)
 			    if (same(game.ks[ll], scratch))
 				break;
 			game.kpower[ll] -= 800.0; /* If firepower is lost, die */
@@ -825,16 +825,14 @@ void supernova(bool induced, coord *w)
 	/* Scheduled supernova -- select star */
 	/* logic changed here so that we won't favor quadrants in top
 	   left of universe */
-	for_quadrants(nq.x) {
-	    for_quadrants(nq.y) {
+	for (nq.x = 1; nq.x <= GALSIZE; nq.x++)
+	    for (nq.y = 1; nq.y <= GALSIZE; nq.y++)
 		stars += game.state.galaxy[nq.x][nq.y].stars;
-	    }
-	}
 	if (stars == 0)
 	    return; /* nothing to supernova exists */
 	num = Rand()*stars + 1;
-	for_quadrants(nq.x) {
-	    for_quadrants(nq.y) {
+	for (nq.x = 1; nq.x <= GALSIZE; nq.x++) {
+	    for (nq.y = 1; nq.y <= GALSIZE; nq.y++) {
 		num -= game.state.galaxy[nq.x][nq.y].stars;
 		if (num <= 0)
 		    break;
@@ -862,8 +860,8 @@ void supernova(bool induced, coord *w)
 	coord ns;
 	/* we are in the quadrant! */
 	num = Rand()* game.state.galaxy[nq.x][nq.y].stars + 1;
-	for_sectors(ns.x) {
-	    for_sectors(ns.y) {
+	for (ns.x = 1; ns.x <= QUADSIZE; ns.x++) {
+	    for (ns.y = 1; ns.y <= QUADSIZE; ns.y++) {
 		if (game.quad[ns.x][ns.y]==IHSTAR) {
 		    num--;
 		    if (num==0)

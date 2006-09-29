@@ -499,8 +499,8 @@ void deathray(void)
 	proutn(_("Spock-  \"I believe the word is"));
 	prouts(_(" *ASTONISHING*"));
 	prout(_(" Mr. Sulu."));
-	for_sectors(i)
-	    for_sectors(j)
+	for (i = 1; i <= QUADSIZE; i++)
+	    for (j = 1; j <= QUADSIZE; j++)
 		if (game.quad[i][j] == IHDOT)
 		    game.quad[i][j] = IHQUEST;
 	prout(_("  Captain, our quadrant is now infested with"));

@@ -223,9 +223,9 @@ void setup(bool needprompt)
     game.landed = false;
     game.alive = true;
     game.docfac = 0.25;
-    for_quadrants(i)
-	for_quadrants(j) {
-	struct quadrant *quad = &game.state.galaxy[i][j];
+    for (i = 1; i <= GALSIZE; i++)
+	for (j = 1; j <= GALSIZE; j++) {
+	    struct quadrant *quad = &game.state.galaxy[i][j];
 	    quad->charted = 0;
 	    quad->planet = NOPLANET;
 	    quad->romulans = 0;
@@ -256,8 +256,8 @@ void setup(bool needprompt)
     game.lastchart = FOREVER;
     // Put stars in the galaxy
     game.instar = 0;
-    for_quadrants(i)
-	for_quadrants(j) {
+    for (i = 1; i <= GALSIZE; i++)
+	for (j = 1; j <= GALSIZE; j++) {
 	    int k = Rand()*9.0 + 1.0;
 	    game.instar += k;
 	    game.state.galaxy[i][j].stars = k;
@@ -607,8 +607,8 @@ void newqad(bool shutup)
 	game.ientesc = true;
     }
     // Clear quadrant
-    for_sectors(i)
-	for_sectors(j) 
+    for (i = 1; i <= QUADSIZE; i++)
+	for (j = 1; j <= QUADSIZE; j++)
 	    game.quad[i][j] = IHDOT;
     q = &game.state.galaxy[game.quadrant.x][game.quadrant.y];
     // cope with supernova
@@ -627,7 +627,7 @@ void newqad(bool shutup)
 	for (i = 1; i <= game.klhere; i++)
 	    w = newkling(i);
 	// If we need a commander, promote a Klingon
-	for_commanders(i)
+	for (i = 1; i <= game.state.remcom; i++)
 	    if (same(game.state.kcmdr[i], game.quadrant))
 		break;
 			

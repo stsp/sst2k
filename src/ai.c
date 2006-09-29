@@ -17,7 +17,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
     if (!irun) {
 	/* avoid intruding on another commander's territory */
 	if (ienm == IHC) {
-	    for_commanders(n)
+	    for (n = 1; n <= game.state.remcom; n++)
 		if (same(game.state.kcmdr[n],iq))
 		    return false;
 	    /* refuse to leave if currently attacking starbase */
@@ -59,7 +59,7 @@ static bool tryexit(coord look, int ienm, int loccom, bool irun)
 	game.state.kscmdr=iq;
     }
     else {
-	for_commanders(n) {
+	for (n = 1; n <= game.state.remcom; n++) {
 	    if (same(game.state.kcmdr[n], game.quadrant)) {
 		game.state.kcmdr[n]=iq;
 		break;
@@ -285,7 +285,7 @@ void moveklings(void)
     // Figure out which Klingon is the commander (or Supercommander)
     //   and do move
     if (game.comhere) 
-	for_local_enemies(i) {
+	for (i = 1; i <= game.nenhere; i++) {
 	    w = game.ks[i];
 	    if (game.quad[w.x][w.y] == IHC) {
 		movebaddy(w, i, IHC);
@@ -293,7 +293,7 @@ void moveklings(void)
 	    }
 	}
     if (game.ishere) 
-	for_local_enemies(i) {
+	for (i = 1; i <= game.nenhere; i++) {
 	    w = game.ks[i];
 	    if (game.quad[w.x][w.y] == IHS) {
 		movebaddy(w, i, IHS);
@@ -304,7 +304,7 @@ void moveklings(void)
     // Move these last so they can base their actions on what the
     // commander(s) do.
     if (game.skill >= SKILL_EXPERT && (game.options & OPTION_MVBADDY)) 
-	for_local_enemies(i) {
+	for (i = 1; i <= game.nenhere; i++) {
 	    w = game.ks[i];
 	    if (game.quad[w.x][w.y] == IHK || game.quad[w.x][w.y] == IHR)
 		movebaddy(w, i, game.quad[w.x][w.y]);
@@ -324,7 +324,7 @@ static bool movescom(coord iq, bool avoid)
 	return 1;
     if (avoid) {
 	/* Avoid quadrants with bases if we want to avoid Enterprise */
-	for_starbases(i)
+	for (i = 1; i <= game.state.rembase; i++)
 	    if (same(game.state.baseq[i], iq)) 
 		return true;
     }
@@ -341,7 +341,7 @@ static bool movescom(coord iq, bool avoid)
 	game.ishere = false;
 	game.ientesc = false;
 	unschedule(FSCDBAS);
-	for_local_enemies(i) 
+	for (i = 1; i <= game.nenhere; i++) 
 	    if (game.quad[game.ks[i].x][game.ks[i].y] == IHS)
 		break;
 	game.quad[game.ks[i].x][game.ks[i].y] = IHDOT;
@@ -409,7 +409,7 @@ void supercommander(void)
 	    return;
 	}
 	sc = game.state.kscmdr;
-	for_starbases(i) {
+	for (i = 1; i <= game.state.rembase; i++) {
 	    basetbl[i] = i;
 	    bdist[i] = distance(game.state.baseq[i], sc);
 	}
@@ -435,16 +435,16 @@ void supercommander(void)
 	   without too many Klingons, and not already under attack. */
 	ifindit = iwhichb = 0;
 
-	for_starbases(i2) {
+	for (i2 = 1; i2 <= game.state.rembase; i2++) {
 	    i = basetbl[i2];	/* bug in original had it not finding nearest*/
 	    ibq = game.state.baseq[i];
 	    if (same(ibq, game.quadrant) || same(ibq, game.battle) ||
 		game.state.galaxy[ibq.x][ibq.y].supernova ||
 		game.state.galaxy[ibq.x][ibq.y].klingons > MAXKLQUAD-1) 
 		continue;
-	    /* if there is a commander, and no other base is appropriate,
-	       we will take the one with the commander */
-	    for_commanders (j) {
+	    // if there is a commander, and no other base is appropriate,
+	    //   we will take the one with the commander
+	    for (j = 1; j <= game.state.remcom; j++) {
 		if (same(ibq, game.state.kcmdr[j]) && ifindit!= 2) {
 		    ifindit = 2;
 		    iwhichb = i;
@@ -510,35 +510,37 @@ void supercommander(void)
     if (game.state.rembase == 0) {
 	unschedule(FSCMOVE);
     }
-    else for_starbases(i) {
-	ibq = game.state.baseq[i];
-	if (same(ibq, game.state.kscmdr) && same(game.state.kscmdr, game.battle)) {
-	    /* attack the base */
-	    if (avoid)
-		return; /* no, don't attack base! */
-	    game.iseenit = false;
-	    game.isatb = 1;
-	    schedule(FSCDBAS, 1.0 +2.0*Rand());
-	    if (is_scheduled(FCDBAS)) 
-		postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
-	    if (damaged(DRADIO) && game.condition != docked)
-		return; /* no warning */
-	    game.iseenit = true;
-	    pause_game(true);
-	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
-	    proutn(cramlc(quadrant, game.state.kscmdr));
-	    skip(1);
-	    prout(_("   reports that it is under attack from the Klingon Super-commander."));
-	    proutn(_("   It can survive until stardate %d.\""),
-		   (int)scheduled(FSCDBAS));
-	    if (!game.resting)
+    else {
+	for (i = 1; i <= game.state.rembase; i++) {
+	    ibq = game.state.baseq[i];
+	    if (same(ibq, game.state.kscmdr) && same(game.state.kscmdr, game.battle)) {
+		/* attack the base */
+		if (avoid)
+		    return; /* no, don't attack base! */
+		game.iseenit = false;
+		game.isatb = 1;
+		schedule(FSCDBAS, 1.0 +2.0*Rand());
+		if (is_scheduled(FCDBAS)) 
+		    postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date);
+		if (damaged(DRADIO) && game.condition != docked)
+		    return; /* no warning */
+		game.iseenit = true;
+		pause_game(true);
+		proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
+		proutn(cramlc(quadrant, game.state.kscmdr));
+		skip(1);
+		prout(_("   reports that it is under attack from the Klingon Super-commander."));
+		proutn(_("   It can survive until stardate %d.\""),
+		       (int)scheduled(FSCDBAS));
+		if (!game.resting)
+		    return;
+		prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
+		if (ja() == false)
+		    return;
+		game.resting = false;
+		game.optime = 0.0; /* actually finished */
 		return;
-	    prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""));
-	    if (ja() == false)
-		return;
-	    game.resting = false;
-	    game.optime = 0.0; /* actually finished */
-	    return;
+	    }
 	}
     }
     /* Check for intelligence report */
@@ -608,7 +610,7 @@ void movetholian(void)
     game.ks[game.nenhere] = game.tholian;
 
     /* check to see if all holes plugged */
-    for_sectors(i) {
+    for (i = 1; i <= QUADSIZE; i++) {
 	if (game.quad[1][i]!=IHWEB && game.quad[1][i]!=IHT)
 	    return;
 	if (game.quad[QUADSIZE][i]!=IHWEB && game.quad[QUADSIZE][i]!=IHT)

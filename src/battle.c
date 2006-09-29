@@ -335,7 +335,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	case IHR: /* Hit a regular enemy */
 	case IHK:
 	    /* find the enemy */
-	    for_local_enemies(ll)
+	    for (ll = 1; ll <= game.nenhere; ll++)
 		if (same(w, game.ks[ll]))
 		    break;
 	    kp = fabs(game.kpower[ll]);
@@ -380,7 +380,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	case IHB: /* Hit a base */
 	    skip(1);
 	    prout(_("***STARBASE DESTROYED.."));
-	    for_starbases(ll) {
+	    for (ll = 1; ll <= game.state.rembase; ll++) {
 		if (same(game.state.baseq[ll], game.quadrant)) {
 		    game.state.baseq[ll]=game.state.baseq[game.state.rembase];
 		    break;
@@ -501,7 +501,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	game.quad[w.x][w.y]=IHDOT;
 	game.quad[jw.x][jw.y]=iquad;
 	prout(_(" displaced by blast to %s "), cramlc(sector, jw));
-	for_local_enemies(ll)
+	for (ll = 1; ll <= game.nenhere; ll++)
 	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll]);
 	sortklings();
 	return;
@@ -597,7 +597,7 @@ void attack(bool torps_ok)
     if (game.skill <= SKILL_FAIR) 
 	where = sector;
 
-    for_local_enemies(loop) {
+    for (loop = 1; loop <= game.nenhere; loop++) {
 	if (game.kpower[loop] < 0)
 	    continue;	/* too weak to attack */
 	/* compute hit strength and diminish shield power */
@@ -722,7 +722,7 @@ void attack(bool torps_ok)
 	}
     }
     /* After attack, reset average distance to enemies */
-    for_local_enemies(loop)
+    for (loop = 1; loop <= game.nenhere; loop++)
 	game.kavgd[loop] = game.kdist[loop];
     sortklings();
     return;
@@ -758,7 +758,7 @@ void deadkl(coord w, feature type, coord mv)
 	switch (type) {
 	case IHC:
 	    game.comhere = false;
-	    for_commanders (i)
+	    for (i = 1; i <= game.state.remcom; i++)
 		if (same(game.state.kcmdr[i], game.quadrant)) 
 		    break;
 	    game.state.kcmdr[i] = game.state.kcmdr[game.state.remcom];
@@ -797,7 +797,7 @@ void deadkl(coord w, feature type, coord mv)
     /* Remove enemy ship from arrays describing local conditions */
     if (is_scheduled(FCDBAS) && same(game.battle, game.quadrant) && type==IHC)
 	unschedule(FCDBAS);
-    for_local_enemies(i)
+    for (i = 1; i <= game.nenhere; i++)
 	if (same(game.ks[i], w))
 	    break;
     game.nenhere--;
@@ -1138,9 +1138,10 @@ void phasers(void)
 	irec=0;
 	do {
 	    chew();
-	    if (!kz) for_local_enemies(i)
-		irec+=fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
-		    (1.01+0.05*Rand()) + 1.0;
+	    if (!kz)
+		for (i = 1; i <= game.nenhere; i++)
+		    irec += fabs(game.kpower[i])/(PHASEFAC*pow(0.90,game.kdist[i]))*
+			(1.01+0.05*Rand()) + 1.0;
 	    kz=1;
 	    proutn(_("%d units required. "), irec);
 	    chew();
@@ -1175,7 +1176,7 @@ void phasers(void)
 	if (game.nenhere) {
 	    extra = 0.0;
 	    powrem = rpow;
-	    for_local_enemies(i) {
+	    for (i = 1; i <= game.nenhere; i++) {
 		hits[i] = 0.0;
 		if (powrem <= 0)
 		    continue;
