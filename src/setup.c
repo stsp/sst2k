@@ -379,7 +379,7 @@ void setup(bool needprompt)
 	prout(_("a deadly Klingon invasion force. As captain of the United"));
 	prout(_("Starship U.S.S. Enterprise, it is your mission to seek out"));
 	prout(_("and destroy this invasion force of %d battle cruisers."),
-	      INKLINGTOT);
+	      (game.inkling + game.incom + game.inscom));
 	prout(_("You have an initial allotment of %d stardates to complete"), (int)game.intime);
 	prout(_("your mission.  As you proceed you may be given more time."));
 	skip(1);
@@ -389,7 +389,7 @@ void setup(bool needprompt)
     else {
 	prout(_("Stardate %d."), (int)game.state.date);
 	skip(1);
-	prout(_("%d Klingons."), INKLINGTOT);
+	prout(_("%d Klingons."), game.inkling + game.incom + game.inscom);
 	prout(_("An unknown number of Romulans."));
 	if (game.state.nscrem)
 	    prout(_("And one (GULP) Super-Commander."));

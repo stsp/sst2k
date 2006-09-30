@@ -943,7 +943,7 @@ void supernova(bool induced, coord *w)
     if (same(game.quadrant, nq) || !damaged(DRADIO) || game.condition == docked)
 	game.state.galaxy[nq.x][nq.y].supernova = true;
     /* If supernova destroys last Klingons give special message */
-    if (KLINGREM==0 && !same(nq, game.quadrant)) {
+    if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0 && !same(nq, game.quadrant)) {
 	skip(2);
 	if (!induced)
 	    prout(_("Lucky you!"));

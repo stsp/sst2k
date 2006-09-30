@@ -60,10 +60,12 @@ void report(void)
     if (game.tourn)
 	prout(_("This is tournament game %d."), game.tourn);
     prout(_("Your secret password is \"%s\""),game.passwd);
-    proutn(_("%d of %d Klingons have been killed"), KLINGKILLED, INKLINGTOT);
-    if (NKILLC)
-	prout(_(", including %d Commander%s."), NKILLC, NKILLC==1?"":_("s"));
-    else if (NKILLK + NKILLSC > 0)
+    proutn(_("%d of %d Klingons have been killed"), 
+	   ((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem)), 
+	   (game.inkling + game.incom + game.inscom));
+    if (game.incom - game.state.remcom)
+	prout(_(", including %d Commander%s."), game.incom - game.state.remcom, (game.incom - game.state.remcom)==1?"":_("s"));
+    else if (game.inkling - game.state.remkl + (game.inscom - game.state.nscrem) > 0)
 	prout(_(", but no Commanders."));
     else
 	prout(".");
@@ -344,7 +346,7 @@ void status(int req)
     );
 
     RQ(9,
-        prstat(_("Klingons Left"), "%d", KLINGREM);
+        prstat(_("Klingons Left"), "%d", game.state.remkl + game.state.remcom + game.state.nscrem);
     );
 
     RQ(10,

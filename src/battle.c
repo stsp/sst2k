@@ -239,7 +239,7 @@ void ram(bool ibumpd, feature ienm, coord w)
     }
     game.shldup = false;
     prout(_("***Shields are down."));
-    if (KLINGREM) {
+    if (game.state.remkl + game.state.remcom + game.state.nscrem) {
 	pause_game(true);
 	damagereport();
     }
@@ -639,7 +639,7 @@ void attack(bool torps_ok)
 	    r = (Rand()+Rand())*0.5 -0.5;
 	    r += 0.002*game.kpower[loop]*r;
 	    torpedo(course, r, jay, &hit, 1, 1);
-	    if (KLINGREM==0) 
+	    if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0) 
 		finish(FWON); /* Klingons did themselves in! */
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova || game.alldone) 
 		return; /* Supernova or finished */
@@ -789,7 +789,7 @@ void deadkl(coord w, feature type, coord mv)
     /* For each kind of enemy, finish message to player */
     prout(_(" destroyed."));
     game.quad[w.x][w.y] = IHDOT;
-    if (KLINGREM==0)
+    if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0)
 	return;
 
     game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
@@ -966,7 +966,7 @@ void photon(void)
 	if (game.alldone || game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
 	    return;
     }
-    if (KLINGREM==0)
+    if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0)
 	finish(FWON);
 }
 
@@ -1368,7 +1368,7 @@ void hittem(double *hits)
 	skip(1);
 	if (kpow == 0) {
 	    deadkl(w, ienm, w);
-	    if (KLINGREM==0)
+	    if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0)
 		finish(FWON);		
 	    if (game.alldone)
 		return;

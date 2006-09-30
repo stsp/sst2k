@@ -113,14 +113,6 @@ typedef struct {
     } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
 
-#define NKILLK (game.inkling - game.state.remkl)
-#define NKILLC (game.incom - game.state.remcom)
-#define NKILLSC (game.inscom - game.state.nscrem)
-#define NKILLROM (game.inrom - game.state.nromrem)
-#define KLINGREM (game.state.remkl + game.state.remcom + game.state.nscrem)
-#define INKLINGTOT (game.inkling + game.incom + game.inscom)
-#define KLINGKILLED (INKLINGTOT - KLINGREM)
-
 /* game options */
 #define OPTION_ALL	0xffffffff
 #define OPTION_TTY	0x00000001	/* old interface */

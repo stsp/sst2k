@@ -389,7 +389,7 @@ void supercommander(void)
 	prout("== SUPERCOMMANDER");
 
     /* Decide on being active or passive */
-    avoid = ((NKILLC+NKILLK)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
+    avoid = ((game.incom - game.state.remcom + game.inkling - game.state.remkl)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) ||
 	    (game.state.date-game.indate) < 3.0);
     if (!game.iscate && avoid) {
 	/* compute move away from Enterprise */

@@ -100,7 +100,7 @@ void finish(FINTYPE ifin)
 		badpt = 0.0;	// Close enough!
 	    if (game.state.date-game.indate < 5.0 ||
 		// killsPerDate >= RateMax
-		KLINGKILLED/(game.state.date-game.indate) >=
+		((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem))/(game.state.date-game.indate) >=
 		0.1*game.skill*(game.skill+1.0) + 0.1 + 0.008*badpt) {
 		skip(1);
 		prout(_("In fact, you have done so well that Starfleet Command"));
@@ -166,7 +166,7 @@ void finish(FINTYPE ifin)
 	prout(_("conquered.  Your starship is now Klingon property,"));
 	prout(_("and you are put on trial as a war criminal.  On the"));
 	proutn(_("basis of your record, you are "));
-	if (KLINGREM*3.0 > INKLINGTOT) {
+	if ((game.state.remkl + game.state.remcom + game.state.nscrem)*3.0 > (game.inkling + game.incom + game.inscom)) {
 	    prout(_("acquitted."));
 	    skip(1);
 	    prout(_("LIVE LONG AND PROSPER."));
@@ -296,7 +296,7 @@ void finish(FINTYPE ifin)
     else if (game.ship == IHE)
 	game.ship = IHF;
     game.alive = false;
-    if (KLINGREM != 0) {
+    if ((game.state.remkl + game.state.remcom + game.state.nscrem) != 0) {
 	double goodies = game.state.remres/game.inresor;
 	double baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom);
 	if (goodies/baddies >= 1.0+0.5*Rand()) {
@@ -330,9 +330,9 @@ void score(void)
     int ithperd, iwon, klship;
 
     iskill = game.skill;
-    if ((timused == 0 || KLINGREM != 0) && timused < 5.0)
+    if ((timused == 0 || (game.state.remkl + game.state.remcom + game.state.nscrem) != 0) && timused < 5.0)
 	timused = 5.0;
-    perdate = KLINGKILLED/timused;
+    perdate = ((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem))/timused;
     ithperd = 500*perdate + 0.5;
     iwon = 0;
     if (game.gamewon)
@@ -345,28 +345,28 @@ void score(void)
 	klship = 2;
     if (!game.gamewon)
 	game.state.nromrem = 0; // None captured if no win
-    iscore = 10*NKILLK + 50*NKILLC + ithperd + iwon
+    iscore = 10*(game.inkling - game.state.remkl) + 50*(game.incom - game.state.remcom) + ithperd + iwon
 	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
-	+ 20*NKILLROM + 200*NKILLSC - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
+	+ 20*(game.inrom - game.state.nromrem) + 200*(game.inscom - game.state.nscrem) - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
     if (!game.alive)
 	iscore -= 200;
     skip(2);
     prout(_("Your score --"));
-    if (NKILLROM)
+    if (game.inrom - game.state.nromrem)
 	prout(_("%6d Romulans destroyed                 %5d"),
-	      NKILLROM,20*NKILLROM);
+	      game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem));
     if (game.state.nromrem)
 	prout(_("%6d Romulans captured                  %5d"),
 	      game.state.nromrem, game.state.nromrem);
-    if (NKILLK)
+    if (game.inkling - game.state.remkl)
 	prout(_("%6d ordinary Klingons destroyed        %5d"),
-	      NKILLK, 10*NKILLK);
-    if (NKILLC)
+	      game.inkling - game.state.remkl, 10*(game.inkling - game.state.remkl));
+    if (game.incom - game.state.remcom)
 	prout(_("%6d Klingon commanders destroyed       %5d"),
-	      NKILLC, 50*NKILLC);
-    if (NKILLSC)
+	      game.incom - game.state.remcom, 50*(game.incom - game.state.remcom));
+    if (game.inscom - game.state.nscrem)
 	prout(_("%6d Super-Commander destroyed          %5d"),
-	      NKILLSC, 200*NKILLSC);
+	      game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem));
     if (ithperd)
 	prout(_("%6.2f Klingons per stardate              %5d"),
 	      perdate, ithperd);

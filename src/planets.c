@@ -450,7 +450,7 @@ void deathray(void)
 	while (game.nenhere > 0)
 	    deadkl(game.ks[1], game.quad[game.ks[1].x][game.ks[1].y],game.ks[1]);
 	prout(_("Ensign Chekov-  \"Congratulations, Captain!\""));
-	if (KLINGREM == 0)
+	if ((game.state.remkl + game.state.remcom + game.state.nscrem) == 0)
 	    finish(FWON);    
 	if ((game.options & OPTION_PLAIN) == 0) {
 	    prout(_("Spock-  \"Captain, I believe the `Experimental Death Ray'"));
