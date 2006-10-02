@@ -12,9 +12,6 @@ maintainer-clean-local:
 	rm -f `find . -name *~`
 	rm -f src/include/config.h.in
 
-distclean-local:
-	rm -rf autom4te*.cache
-
 clean-local:
 	rm -rf autom4te*.cache
 
