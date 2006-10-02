@@ -365,7 +365,6 @@ WHITE = 16
 def tryexit(look, ienm, loccom, irun):
     # a bad guy attempts to bug out 
     iq = coord()
-
     iq.x = game.quadrant.x+(look.x+(QUADSIZE-1))/QUADSIZE - 1
     iq.y = game.quadrant.y+(look.y+(QUADSIZE-1))/QUADSIZE - 1
     if not VALID_QUADRANT(iq.x,iq.y) or \
@@ -387,12 +386,11 @@ def tryexit(look, ienm, loccom, irun):
 	if game.kpower[loccom] > 1000.0:
 	    return False
     # print escape message and move out of quadrant.
-    # We know this if either short or long range sensors are working
+    # we know this if either short or long range sensors are working
     if not damaged(DSRSENS) or not damaged(DLRSENS) or \
 	game.condition == docked:
-	crmena(True, ienm, sector, game.ks[loccom])
-	prout(_(" escapes to %s (and regains strength)."),
-	      cramlc(quadrant, iq))
+	crmena(True, ienm, "sector", game.ks[loccom])
+	prout(_(" escapes to Quadrant %s (and regains strength).") % q)
     # handle local matters related to escape 
     game.quad[game.ks[loccom].x][game.ks[loccom].y] = IHDOT
     game.ks[loccom] = game.ks[game.nenhere]
@@ -446,7 +444,7 @@ def tryexit(look, ienm, loccom, irun):
 # only commanders move. In Expert games, all enemy vessels move if there
 # is a commander present. In Emeritus games all enemy vessels move.
 # 
-# 3. If Enterprise is not docked, an agressive action is taken if enemy
+# 3. If Enterprise is not docked, an aggressive action is taken if enemy
 # forces are 1000 greater than Enterprise.
 # 
 # Agressive action on average cuts the distance between the ship and
@@ -473,11 +471,11 @@ def movebaddy(com, loccom, ienm):
 	nbaddys = game.comhere + game.ishere
 
     dist1 = game.kdist[loccom]
-    mdist = dist1 + 0.5; # Nearest integer distance 
+    mdist = int(dist1 + 0.5); # Nearest integer distance 
 
     # If SC, check with spy to see if should hi-tail it 
     if ienm==IHS and \
-	(game.kpower[loccom] <= 500.0 or (game.condition==docked and not damaged(DPHOTON))):
+	(game.kpower[loccom] <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
 	irun = True
 	motion = -QUADSIZE
     else:
@@ -498,7 +496,7 @@ def movebaddy(com, loccom, ienm):
 	    # phasers and photon tubes both out! 
 	    forces += 1000.0
 	motion = 0
-        if forces <= 1000.0 and game.condition != docked: # Typical situation 
+        if forces <= 1000.0 and game.condition != "docked": # Typical situation 
 	    motion = ((forces+200.0*Rand())/150.0) - 5.0
 	else:
             if forces > 1000.0: # Very strong -- move in for kill 
@@ -506,7 +504,7 @@ def movebaddy(com, loccom, ienm):
 	    if game.condition=="docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
 		motion -= game.skill*(2.0-square(Rand()))
 	if idebug:
-	    proutn("=== MOTION = %d, FORCES = %1.2f, ", motion, forces)
+	    proutn("=== MOTION = %d, FORCES = %1.2f, " % (motion, forces))
 	# don't move if no motion 
 	if motion==0:
 	    return
@@ -528,7 +526,7 @@ def movebaddy(com, loccom, ienm):
     if nsteps < 1:
 	nsteps = 1; # This shouldn't be necessary 
     if idebug:
-	proutn("NSTEPS = %d:", nsteps)
+	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
     mx = game.sector.x - com.x
     my = game.sector.y - com.y
@@ -550,7 +548,7 @@ def movebaddy(com, loccom, ienm):
     # main move loop 
     for ll in range(nsteps):
 	if idebug:
-	    proutn(" %d", ll+1)
+	    proutn(" %d" % (ll+1))
 	# Check if preferred position available 
 	look.x = next.x + mx
 	look.y = next.y + my
@@ -599,7 +597,7 @@ def movebaddy(com, loccom, ienm):
 	if success:
 	    next = look
 	    if idebug:
-		proutn(cramlc(neither, next))
+		proutn(`next`)
 	else:
 	    break; # done early 
 	
@@ -615,22 +613,19 @@ def movebaddy(com, loccom, ienm):
 	if not damaged(DSRSENS) or game.condition == docked:
 	    proutn("***")
 	    cramen(ienm)
-	    proutn(_(" from %s"), cramlc(2, com))
+	    proutn(_(" from Sector %s") % com)
 	    if game.kdist[loccom] < dist1:
 		proutn(_(" advances to "))
 	    else:
 		proutn(_(" retreats to "))
-	    prout(cramlc(sector, next))
+	    prout("Sector %s." % next)
 
 def moveklings():
     # Klingon tactical movement 
-    w = coord(); 
-
     if idebug:
 	prout("== MOVCOM")
-
     # Figure out which Klingon is the commander (or Supercommander)
-    #   and do move
+    # and do move
     if game.comhere:
 	for i in range(1, game.nenhere+1):
 	    w = game.ks[i]
@@ -643,7 +638,7 @@ def moveklings():
 	    if game.quad[w.x][w.y] == IHS:
 		movebaddy(w, i, IHS)
 		break
-    # if skill level is high, move other Klingons and Romulans too!
+    # If skill level is high, move other Klingons and Romulans too!
     # Move these last so they can base their actions on what the
     # commander(s) do.
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
@@ -655,7 +650,6 @@ def moveklings():
 
 def movescom(iq, avoid):
     # commander movement helper 
-
     if same(iq, game.quadrant) or not VALID_QUADRANT(iq.x, iq.y) or \
 	game.state.galaxy[iq.x][iq.y].supernova or \
 	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1:
@@ -701,32 +695,27 @@ def movescom(iq, avoid):
 	    if not damaged(DRADIO) or game.condition == docked:
 		pause_game(True)
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
-		proutn(_("   a planet in "))
-		proutn(cramlc(quadrant, game.state.kscmdr))
-		prout(_(" has been destroyed"))
+		proutn(_("   a planet in Quadrant %s has been destroyed") % game.state.kscmdr)
 		prout(_("   by the Super-commander.\""))
 	    break
     return False; # looks good! 
 			
 def supercommander():
     # move the Super Commander 
-    iq = coord(); sc = coord(); ibq = coord()
+    iq = coord(); sc = coord(); ibq = coord(); idelta = coord()
     basetbl = []
-
     if idebug:
 	prout("== SUPERCOMMANDER")
-
     # Decide on being active or passive 
     avoid = ((game.incom - game.state.remcom + game.inkling - game.state.remkl)/(game.state.date+0.01-game.indate) < 0.1*game.skill*(game.skill+1.0) or \
 	    (game.state.date-game.indate) < 3.0)
     if not game.iscate and avoid:
 	# compute move away from Enterprise 
-	ideltax = game.state.kscmdr.x-game.quadrant.x
-	ideltay = game.state.kscmdr.y-game.quadrant.y
-	if math.sqrt(ideltax*ideltax+ideltay*ideltay) > 2.0:
+	idelta = game.state.kscmdr-game.quadrant
+	if math.sqrt(idelta.x*idelta.x+idelta.y*idelta.y) > 2.0:
 	    # circulate in space 
-	    ideltax = game.state.kscmdr.y-game.quadrant.y
-	    ideltay = game.quadrant.x-game.state.kscmdr.x
+	    idelta.x = game.state.kscmdr.y-game.quadrant.y
+	    idelta.y = game.quadrant.x-game.state.kscmdr.x
     else:
 	# compute distances to starbases 
 	if game.state.rembase <= 0:
@@ -741,7 +730,6 @@ def supercommander():
 	# look for nearest base without a commander, no Enterprise, and
         # without too many Klingons, and not already under attack. 
 	ifindit = iwhichb = 0
-
 	for i2 in range(1, game.state.rembase+1):
 	    i = basetbl[i2][0];	# bug in original had it not finding nearest
 	    ibq = game.state.baseq[i]
@@ -764,26 +752,18 @@ def supercommander():
 	    return; # Nothing suitable -- wait until next time
 	ibq = game.state.baseq[iwhichb]
 	# decide how to move toward base 
-	ideltax = ibq.x - game.state.kscmdr.x
-	ideltay = ibq.y - game.state.kscmdr.y
-    # Maximum movement is 1 quadrant in either or both axis 
-    if ideltax > 1:
-	ideltax = 1
-    if ideltax < -1:
-	ideltax = -1
-    if ideltay > 1:
-	ideltay = 1
-    if ideltay < -1:
-	ideltay = -1
-
-    # try moving in both x and y directions 
-    iq.x = game.state.kscmdr.x + ideltax
-    iq.y = game.state.kscmdr.y + ideltax
+	idelta = ibq - game.state.kscmdr
+    # Maximum movement is 1 quadrant in either or both axes 
+    idelta = idelta.sgn()
+    # try moving in both x and y directions
+    # there was what looked like a bug in the Almy C code here,
+    # but it might be this translation is just wrong.
+    iq = game.state.kscmdr + idelta
     if movescom(iq, avoid):
 	# failed -- try some other maneuvers 
-	if ideltax==0 or ideltay==0:
+	if idelta.x==0 or idelta.y==0:
 	    # attempt angle move 
-	    if ideltax != 0:
+	    if idelta.x != 0:
 		iq.y = game.state.kscmdr.y + 1
 		if movescom(iq, avoid):
 		    iq.y = game.state.kscmdr.y - 1
@@ -797,7 +777,7 @@ def supercommander():
 	    # try moving just in x or y 
 	    iq.y = game.state.kscmdr.y
 	    if movescom(iq, avoid):
-		iq.y = game.state.kscmdr.y + ideltay
+		iq.y = game.state.kscmdr.y + idelta.y
 		iq.x = game.state.kscmdr.x
 		movescom(iq, avoid)
     # check for a base 
@@ -819,12 +799,11 @@ def supercommander():
 		    return; # no warning 
 		game.iseenit = True
 		pause_game(True)
-		proutn(_("Lt. Uhura-  \"Captain, the starbase in "))
-		proutn(cramlc(quadrant, game.state.kscmdr))
-		skip(1)
+		prout(_("Lt. Uhura-  \"Captain, the starbase in Quadrant %s") \
+                      % game.state.kscmdr)
 		prout(_("   reports that it is under attack from the Klingon Super-commander."))
-		proutn(_("   It can survive until stardate %d.\""),
-		       int(scheduled(FSCDBAS)))
+		proutn(_("   It can survive until stardate %d.\"") \
+                       % int(scheduled(FSCDBAS)))
 		if not game.resting:
 		    return
 		prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""))
@@ -841,9 +820,7 @@ def supercommander():
 	return
     pause_game(True)
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
-    proutn(_("   the Super-commander is in "))
-    proutn(cramlc(quadrant, game.state.kscmdr))
-    prout(".\"")
+    proutn(_("   the Super-commander is in Quadrant %s,") % game.state.kscmdr)
     return;
 
 def movetholian():
@@ -899,7 +876,7 @@ def movetholian():
     # All plugged up -- Tholian splits 
     game.quad[game.tholian.x][game.tholian.y]=IHWEB
     dropin(IHBLANK)
-    crmena(True, IHT, sector, game.tholian)
+    crmena(True, IHT, "sector", game.tholian)
     prout(_(" completes web."))
     game.ithere = False
     game.nenhere -= 1
