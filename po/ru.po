@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sst 2.0\n"
 "Report-Msgid-Bugs-To: stsp\n"
-"POT-Creation-Date: 2006-10-02 16:06+0400\n"
+"POT-Creation-Date: 2006-10-02 23:04+0400\n"
 "PO-Revision-Date: 2006-09-15 11:01+0400\n"
 "Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -162,7 +162,7 @@ msgid "Draining energy from shields.\""
 msgstr "Забираю энергию из защиты.\""
 
 #: src/battle.c:199 src/battle.c:999 src/events.c:875 src/moving.c:144
-#: src/moving.c:750 src/planets.c:491
+#: src/moving.c:750 src/planets.c:492
 msgid "***RED ALERT!  RED ALERT!"
 msgstr "***ТРЕВОГА!  ТРЕВОГА!"
 
@@ -762,11 +762,11 @@ msgstr "***Зарегистрирован взрыв сверхновой в %s"
 msgid "Emergency override attempts t"
 msgstr "Автопилот пытается в"
 
-#: src/events.c:948
+#: src/events.c:947
 msgid "Lucky you!"
 msgstr "Повезло!"
 
-#: src/events.c:949
+#: src/events.c:948
 #, c-format
 msgid "A supernova in %s has just destroyed the last Klingons."
 msgstr "Сверхновая в %s как раз уничтожила последних Клингонов."
@@ -2035,7 +2035,7 @@ msgid "  the planet, but there wouldn't be an energy for the trip back."
 msgstr "  планету, но на обратный путь энегии не останется."
 
 #: src/planets.c:158
-msgid "  However, the Galileo shuttle craft may still be on a surface."
+msgid "  Although the Galileo shuttle craft may still be on a surface."
 msgstr "  Хотя челнок Галилей может быть всё ещё на поверхности."
 
 #: src/planets.c:169
@@ -2162,11 +2162,11 @@ msgstr "Скотти-  \"Скрестите пальцы, Сэр!\""
 msgid "  \"Activating now! - - No good!  It's***"
 msgstr "  \"Уже запускаю! - - Плохо!  Он***"
 
-#: src/planets.c:289 src/planets.c:495
+#: src/planets.c:289 src/planets.c:496
 msgid "***RED ALERT!  RED A*L********************************"
 msgstr "***ТРЕВОГА! ТРЕ*ВО***********************************"
 
-#: src/planets.c:292 src/planets.c:498
+#: src/planets.c:292 src/planets.c:499
 msgid "******************   KA-BOOM!!!!   *******************"
 msgstr "******************   БА-БАХ!!!!    ********************"
 
@@ -2247,7 +2247,7 @@ msgstr "Спасательная команда"
 msgid " boards Galileo and swoops toward planet surface."
 msgstr " садится в Галилей и устремляется к поверхности планеты."
 
-#: src/planets.c:379 src/planets.c:401 src/planets.c:420
+#: src/planets.c:379 src/planets.c:402 src/planets.c:421
 msgid "Trip complete."
 msgstr "Полёт окончен."
 
@@ -2263,159 +2263,159 @@ msgstr "челнок чтобы лететь на Энтерпрайз."
 msgid "The short hop begins . . ."
 msgstr "Начался недолгий перелёт . . ."
 
-#: src/planets.c:408
+#: src/planets.c:409
 msgid "Mining party assembles in the hangar deck,"
 msgstr "Группа добытчиков собралась в ангаре,"
 
-#: src/planets.c:409
+#: src/planets.c:410
 msgid "ready to board the shuttle craft \"Galileo\"."
 msgstr "все готовы залезть в челнок \"Галилей\"."
 
-#: src/planets.c:411
+#: src/planets.c:412
 msgid "The hangar doors open; the trip begins."
 msgstr "Двери ангара открыты; полёт начался."
 
-#: src/planets.c:434
+#: src/planets.c:435
 msgid "Ye Faerie Queene has no death ray."
 msgstr "На Волшебной Королеве нет луча смерти."
 
-#: src/planets.c:438
+#: src/planets.c:439
 msgid "Sulu-  \"But Sir, there are no enemies in this quadrant.\""
 msgstr "Сулу- \"Но Сэр, в этом квадранте нет врагов.\""
 
-#: src/planets.c:442
+#: src/planets.c:443
 msgid "Death Ray is damaged."
 msgstr "Луч Смерти повреждён."
 
-#: src/planets.c:445
+#: src/planets.c:446
 msgid "Spock-  \"Captain, the 'Experimental Death Ray'"
 msgstr "Спок- \"Капитан, 'Экспериментальный Луч Смерти'"
 
-#: src/planets.c:446
+#: src/planets.c:447
 msgid "  is highly unpredictible.  Considering the alternatives,"
 msgstr "  довольно непредсказуем.  Обдумав все альтернативы,"
 
-#: src/planets.c:447
+#: src/planets.c:448
 msgid "  are you sure this is wise?\" "
 msgstr " вы уверены что это разумно?\" "
 
-#: src/planets.c:450
+#: src/planets.c:451
 msgid "Spock-  \"Acknowledged.\""
 msgstr "Спок- \"Вас понял.\""
 
-#: src/planets.c:453
+#: src/planets.c:454
 msgid "WHOOEE ... WHOOEE ... WHOOEE ... WHOOEE"
 msgstr ""
 
-#: src/planets.c:455
+#: src/planets.c:456
 msgid "Crew scrambles in emergency preparation."
 msgstr "Команда засуетилась, начались срочные приготовления."
 
-#: src/planets.c:456
+#: src/planets.c:457
 msgid "Spock and Scotty ready the death ray and"
 msgstr "Спок и Скотти наладили луч смерти и"
 
-#: src/planets.c:457
+#: src/planets.c:458
 msgid "prepare to channel all ship's power to the device."
 msgstr "готовы к подаче всей энергии корабля на установку."
 
-#: src/planets.c:459
+#: src/planets.c:460
 msgid "Spock-  \"Preparations complete, sir.\""
 msgstr "Спок- \"Преготовления окончены, сэр.\""
 
-#: src/planets.c:460
+#: src/planets.c:461
 msgid "Kirk-  \"Engage!\""
 msgstr "Кирк- \"Пли!\""
 
-#: src/planets.c:462
+#: src/planets.c:463
 msgid "WHIRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 msgstr ""
 
-#: src/planets.c:468 src/planets.c:489
+#: src/planets.c:469 src/planets.c:490
 msgid "Sulu- \"Captain!  It's working!\""
 msgstr "Сулу- \"Капитан!  Он работает!\""
 
-#: src/planets.c:472
+#: src/planets.c:473
 msgid "Ensign Chekov-  \"Congratulations, Captain!\""
 msgstr "Прапорщик Чехов- \"Поздравляю, Капитан.\""
 
-#: src/planets.c:476
+#: src/planets.c:477
 msgid "Spock-  \"Captain, I believe the `Experimental Death Ray'"
 msgstr "Спок- \"Капитан, я чувствую, что 'Эксперементальный Луч Смерти'"
 
-#: src/planets.c:478
+#: src/planets.c:479
 msgid "   is still operational.\""
 msgstr "   всё ещё исправен.\""
 
-#: src/planets.c:481
+#: src/planets.c:482
 msgid "   has been rendered nonfunctional.\""
 msgstr "   пришёл в негодность.\""
 
-#: src/planets.c:493
+#: src/planets.c:494
 msgid "***MATTER-ANTIMATTER IMPLOSION IMMINENT!"
 msgstr "***НАЧАЛОСЬ СЛИЯНИЕ МАТЕРИИ С АНТИМАТЕРИЕЙ!"
 
-#: src/planets.c:504
+#: src/planets.c:505
 msgid "Sulu- \"Captain!  Yagabandaghangrapl, brachriigringlanbla!\""
 msgstr "Сулу- \"Капитан!  Кабабонга, Абырвалг, Киргуду-Бамбарбия!\""
 
-#: src/planets.c:506
+#: src/planets.c:507
 msgid "Lt. Uhura-  \"Graaeek!  Graaeek!\""
 msgstr "Лт. Ухура- \"Горячё!  Горю!\""
 
-#: src/planets.c:508
+#: src/planets.c:509
 msgid "Spock-  \"Fascinating!  . . . All humans aboard"
 msgstr "Спок- \"Грандиозно!  . . . Все люди на борту"
 
-#: src/planets.c:509
+#: src/planets.c:510
 msgid "  have apparently been transformed into strange mutations."
 msgstr "  явно подверглись какой-то странной мутации."
 
-#: src/planets.c:510
+#: src/planets.c:511
 msgid "  Vulcans do not seem to be affected."
 msgstr "  Вулканиты, однако, похоже не пострадали."
 
-#: src/planets.c:512
+#: src/planets.c:513
 msgid "Kirk-  \"Raauch!  Raauch!\""
 msgstr "Кирк- \"Гав! Гав! Ррр-ав!"
 
-#: src/planets.c:518
+#: src/planets.c:519
 msgid "Sulu- \"Captain!  It's   --WHAT?!?!\""
 msgstr "Сулу- \"Капитан!  Он   --ЧТО???!\""
 
-#: src/planets.c:520
+#: src/planets.c:521
 msgid "Spock-  \"I believe the word is"
 msgstr "Спок- \"Похоже, слово"
 
-#: src/planets.c:521
+#: src/planets.c:522
 msgid " *ASTONISHING*"
 msgstr " *УДИВИТЕЛЬНО*"
 
-#: src/planets.c:522
+#: src/planets.c:523
 msgid " Mr. Sulu."
 msgstr " Мистер Сулу."
 
-#: src/planets.c:527
+#: src/planets.c:528
 msgid "  Captain, our quadrant is now infested with"
 msgstr "  Капитан, наш квадрант теперь весь набит"
 
-#: src/planets.c:528
+#: src/planets.c:529
 msgid " - - - - - -  *THINGS*."
 msgstr " - - - - - -  *ФИГНЁЙ*."
 
-#: src/planets.c:530
+#: src/planets.c:531
 msgid "  I have no logical explanation.\""
 msgstr "  У меня нет логичного объяснения.\""
 
-#: src/planets.c:533
+#: src/planets.c:534
 msgid "Sulu- \"Captain!  The Death Ray is creating tribbles!\""
 msgstr "Сулу- \"Капитан!   Луч Смерти зачем-то создаёт червяков!\""
 
-#: src/planets.c:535
+#: src/planets.c:536
 msgid "Scotty-  \"There are so many tribbles down here"
 msgstr "Скотти-  \"Тут столько этих червяков бегает"
 
-#: src/planets.c:536
+#: src/planets.c:537
 msgid "  in Engineering, we can't move for 'em, Captain.\""
 msgstr "  в техническом отсеке, что мы не можем к нему подобраться, Капитан.\""
 
@@ -2702,7 +2702,7 @@ msgstr "СЛОМАНО, осталось=%4.2f"
 msgid "ACTIVE"
 msgstr "РАБОТАЕТ"
 
-#: src/reports.c:319 src/setup.c:160
+#: src/reports.c:319 src/setup.c:159
 msgid "Life Support"
 msgstr "Жизнеобесп"
 
@@ -2739,7 +2739,7 @@ msgstr "СНЯТА,"
 msgid " %d%% %.1f units"
 msgstr " %d%% %.1f единиц"
 
-#: src/reports.c:345 src/setup.c:163
+#: src/reports.c:345 src/setup.c:162
 msgid "Shields"
 msgstr "Защита"
 
@@ -2887,348 +2887,348 @@ msgstr "Не могу найти файл "
 msgid "Game file format is bad, should begin with "
 msgstr "ФАйл с игрой испорчен, он должен был начинаться с "
 
-#: src/setup.c:109
+#: src/setup.c:108
 msgid "Andoria (Fesoan)"
 msgstr ""
 
-#: src/setup.c:110
+#: src/setup.c:109
 msgid "Tellar Prime (Miracht)"
 msgstr ""
 
-#: src/setup.c:111
+#: src/setup.c:110
 msgid "Vulcan (T'Khasi)"
 msgstr ""
 
-#: src/setup.c:112
+#: src/setup.c:111
 msgid "Medusa"
 msgstr "Медуза"
 
-#: src/setup.c:113
+#: src/setup.c:112
 msgid "Argelius II (Nelphia)"
 msgstr ""
 
-#: src/setup.c:114
+#: src/setup.c:113
 msgid "Ardana"
 msgstr "Ардана"
 
-#: src/setup.c:115
+#: src/setup.c:114
 msgid "Catulla (Cendo-Prae)"
 msgstr ""
 
-#: src/setup.c:116
+#: src/setup.c:115
 msgid "Gideon"
 msgstr "Гидеон"
 
-#: src/setup.c:117
+#: src/setup.c:116
 msgid "Aldebaran III"
 msgstr "Альдебаран 3"
 
-#: src/setup.c:118
+#: src/setup.c:117
 msgid "Alpha Majoris I"
 msgstr ""
 
-#: src/setup.c:119
+#: src/setup.c:118
 msgid "Altair IV"
 msgstr "Альтаир 4"
 
-#: src/setup.c:120
+#: src/setup.c:119
 msgid "Ariannus"
 msgstr ""
 
-#: src/setup.c:121
+#: src/setup.c:120
 msgid "Benecia"
 msgstr ""
 
-#: src/setup.c:122
+#: src/setup.c:121
 msgid "Beta Niobe I (Sarpeidon)"
 msgstr ""
 
-#: src/setup.c:123
+#: src/setup.c:122
 msgid "Alpha Carinae II"
 msgstr ""
 
-#: src/setup.c:124
+#: src/setup.c:123
 msgid "Capella IV (Kohath)"
 msgstr ""
 
-#: src/setup.c:125
+#: src/setup.c:124
 msgid "Daran V"
 msgstr ""
 
-#: src/setup.c:126
+#: src/setup.c:125
 msgid "Deneb II"
 msgstr ""
 
-#: src/setup.c:127
+#: src/setup.c:126
 msgid "Eminiar VII"
 msgstr ""
 
-#: src/setup.c:128
+#: src/setup.c:127
 msgid "Gamma Canaris IV"
 msgstr ""
 
-#: src/setup.c:129
+#: src/setup.c:128
 msgid "Gamma Tranguli VI (Vaalel)"
 msgstr ""
 
-#: src/setup.c:130
+#: src/setup.c:129
 msgid "Ingraham B"
 msgstr ""
 
-#: src/setup.c:131
+#: src/setup.c:130
 msgid "Janus IV"
 msgstr ""
 
-#: src/setup.c:132
+#: src/setup.c:131
 msgid "Makus III"
 msgstr ""
 
-#: src/setup.c:133
+#: src/setup.c:132
 msgid "Marcos XII"
 msgstr ""
 
-#: src/setup.c:134
+#: src/setup.c:133
 msgid "Omega IV"
 msgstr "Омега 4"
 
-#: src/setup.c:135
+#: src/setup.c:134
 msgid "Regulus V"
 msgstr ""
 
-#: src/setup.c:136
+#: src/setup.c:135
 msgid "Deneva"
 msgstr ""
 
-#: src/setup.c:138
+#: src/setup.c:137
 msgid "Rigel II"
 msgstr ""
 
-#: src/setup.c:139
+#: src/setup.c:138
 msgid "Beta III"
 msgstr "Бэта 3"
 
-#: src/setup.c:140
+#: src/setup.c:139
 msgid "Triacus"
 msgstr ""
 
-#: src/setup.c:141
+#: src/setup.c:140
 msgid "Exo III"
 msgstr ""
 
-#: src/setup.c:144
+#: src/setup.c:143
 msgid "Hansen's Planet"
 msgstr ""
 
-#: src/setup.c:145
+#: src/setup.c:144
 msgid "Taurus IV"
 msgstr ""
 
-#: src/setup.c:146
+#: src/setup.c:145
 msgid "Antos IV (Doraphane)"
 msgstr ""
 
-#: src/setup.c:147
+#: src/setup.c:146
 msgid "Izar"
 msgstr ""
 
-#: src/setup.c:148
+#: src/setup.c:147
 msgid "Tiburon"
 msgstr ""
 
-#: src/setup.c:149
+#: src/setup.c:148
 msgid "Merak II"
 msgstr ""
 
-#: src/setup.c:150
+#: src/setup.c:149
 msgid "Coridan (Desotriana)"
 msgstr ""
 
-#: src/setup.c:151
+#: src/setup.c:150
 msgid "Iotia"
 msgstr "Лоция"
 
-#: src/setup.c:156
+#: src/setup.c:155
 msgid "S. R. Sensors"
 msgstr "Сенсоры Б. О."
 
-#: src/setup.c:157
+#: src/setup.c:156
 msgid "L. R. Sensors"
 msgstr "Сенсоры Д. О."
 
-#: src/setup.c:158
+#: src/setup.c:157
 msgid "Phasers"
 msgstr "Фазеры"
 
-#: src/setup.c:159
+#: src/setup.c:158
 msgid "Photon Tubes"
 msgstr "Фотонные Трубы"
 
-#: src/setup.c:161
+#: src/setup.c:160
 msgid "Warp Engines"
 msgstr "Межпростр Двиг"
 
-#: src/setup.c:162
+#: src/setup.c:161
 msgid "Impulse Engines"
 msgstr "Импульсные Двиг"
 
-#: src/setup.c:164
+#: src/setup.c:163
 msgid "Subspace Radio"
 msgstr "Межпростр Рация"
 
-#: src/setup.c:165
+#: src/setup.c:164
 msgid "Shuttle Craft"
 msgstr "Челнок"
 
-#: src/setup.c:166
+#: src/setup.c:165
 msgid "Computer"
 msgstr "Компьютер"
 
-#: src/setup.c:167
+#: src/setup.c:166
 msgid "Navigation System"
 msgstr "Сист Навигации"
 
-#: src/setup.c:168
+#: src/setup.c:167
 msgid "Transporter"
 msgstr "Транспортёр"
 
-#: src/setup.c:169
+#: src/setup.c:168
 msgid "Shield Control"
 msgstr "Управл Защитой"
 
-#: src/setup.c:170
+#: src/setup.c:169
 msgid "Death Ray"
 msgstr "Луч Смерти"
 
-#: src/setup.c:171
+#: src/setup.c:170
 msgid "D. S. Probe"
 msgstr "Д. К. Ракета"
 
-#: src/setup.c:376
+#: src/setup.c:375
 #, c-format
 msgid "It is stardate %d. The Federation is being attacked by"
 msgstr "Сегодня %d число. Федерация атакована"
 
-#: src/setup.c:378
+#: src/setup.c:377
 msgid "a deadly Klingon invasion force. As captain of the United"
 msgstr "беспощадными захватчиками Клингонами. Как капитан"
 
-#: src/setup.c:379
+#: src/setup.c:378
 msgid "Starship U.S.S. Enterprise, it is your mission to seek out"
 msgstr "звездолёта Энтерпрайз, вы должны найти"
 
-#: src/setup.c:380
+#: src/setup.c:379
 #, c-format
 msgid "and destroy this invasion force of %d battle cruisers."
 msgstr "и уничтожить все вторгшиеся войска в составе %d боевых крейсеров."
 
-#: src/setup.c:382
+#: src/setup.c:381
 #, c-format
 msgid "You have an initial allotment of %d stardates to complete"
 msgstr "У вас есть %d дней чтобы завершить"
 
-#: src/setup.c:383
+#: src/setup.c:382
 msgid "your mission.  As you proceed you may be given more time."
 msgstr "эту миссию.  По ходу дела вам могут дать ещё времени."
 
-#: src/setup.c:385
+#: src/setup.c:384
 #, c-format
 msgid "You will have %d supporting starbases."
 msgstr "У вас будет %d баз."
 
-#: src/setup.c:386
+#: src/setup.c:385
 msgid "Starbase locations-  "
 msgstr "Координаты Баз-  "
 
-#: src/setup.c:389
+#: src/setup.c:388
 #, c-format
 msgid "Stardate %d."
 msgstr "Число %d."
 
-#: src/setup.c:391
+#: src/setup.c:390
 #, c-format
 msgid "%d Klingons."
 msgstr "%d Клингонов."
 
-#: src/setup.c:392
+#: src/setup.c:391
 msgid "An unknown number of Romulans."
 msgstr "Множество Ромулан."
 
-#: src/setup.c:394
+#: src/setup.c:393
 msgid "And one (GULP) Super-Commander."
 msgstr "И один (ик!) Глав-ком Клингонов."
 
-#: src/setup.c:395
+#: src/setup.c:394
 #, c-format
 msgid "%d stardates."
 msgstr "%d дней."
 
-#: src/setup.c:396
+#: src/setup.c:395
 #, c-format
 msgid "%d starbases in "
 msgstr "%d баз в "
 
-#: src/setup.c:403
+#: src/setup.c:402
 msgid "The Enterprise is currently in "
 msgstr "Энтерпрайз сейчас в "
 
-#: src/setup.c:408
+#: src/setup.c:407
 msgid "Good Luck!"
 msgstr "Удачи!"
 
-#: src/setup.c:410
+#: src/setup.c:409
 msgid "  YOU'LL NEED IT."
 msgstr "  ОНА ВАМ ПОНАДОБИТСЯ."
 
-#: src/setup.c:428
+#: src/setup.c:427
 msgid "Would you like a regular, tournament, or saved game? "
 msgstr "Хотите обычную (r), турнирную (t), или сохранённую (s) игру? "
 
-#: src/setup.c:434
+#: src/setup.c:433
 msgid "Type in tournament number-"
 msgstr "Введите номер турнира-"
 
-#: src/setup.c:459 src/setup.c:483 src/setup.c:515
+#: src/setup.c:458 src/setup.c:482 src/setup.c:514
 msgid "What is \""
 msgstr "Что за \""
 
-#: src/setup.c:491
+#: src/setup.c:490
 msgid "Would you like a Short, Medium, or Long game? "
 msgstr "Хотите короткую (s), среднюю (m), или длинную (l) игру? "
 
-#: src/setup.c:493
+#: src/setup.c:492
 msgid "Are you a Novice, Fair, Good, Expert, or Emeritus player? "
 msgstr ""
 "Вы новичёк (n), средний (f), умелый (g), специалист (e), или Отставной (em)? "
 
-#: src/setup.c:499
+#: src/setup.c:498
 msgid "Choose your game style (or just press enter): "
 msgstr "Выберите стить игры (или нажмите ввод): "
 
-#: src/setup.c:680
+#: src/setup.c:679
 msgid "LT. Uhura- \"Captain, an urgent message."
 msgstr "Лт. Ухура- \"Капитан, срочное сообщение."
 
-#: src/setup.c:681
+#: src/setup.c:680
 msgid "  I'll put it on audio.\"  CLICK"
 msgstr "  Я выведу его на громкоговоритель.\"  ЩЁЛК"
 
-#: src/setup.c:683
+#: src/setup.c:682
 msgid "INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."
 msgstr "ЧУЖАК! ТЫ ПЕРЕСЁК ГРАНИЦУ ТЕРРИТОРИИ РОМУЛАН."
 
-#: src/setup.c:684
+#: src/setup.c:683
 msgid "LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"
 msgstr "УЛЕТАЙ НЕМЕДЛЕННО, ИЛИ БУДЕШЬ УНИЧТОЖЕН!"
 
-#: src/setup.c:701
+#: src/setup.c:700
 msgid "Mr. Spock- \"Captain, this is most unusual."
 msgstr "Мистер Спок- \"Капитан, тут что-то очень необычное."
 
-#: src/setup.c:702
+#: src/setup.c:701
 msgid "    Please examine your short-range scan.\""
 msgstr "    Пожалуйста посмотрите результаты ближнего сканирования.\""
 
-#: src/setup.c:798
+#: src/setup.c:797
 msgid "Please type in a secret password- "
 msgstr "Пожалуйста наберите пароль- "
 

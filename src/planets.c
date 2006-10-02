@@ -155,7 +155,7 @@ void beam(void)
 	    prout(_("  Captain, we have enough energy only to transport you down to"));
 	    prout(_("  the planet, but there wouldn't be an energy for the trip back."));
 	    if (game.state.planets[game.iplnet].known == shuttle_down)
-		prout(_("  However, the Galileo shuttle craft may still be on a surface."));
+		prout(_("  Although the Galileo shuttle craft may still be on a surface."));
 	    proutn(_("  Are you sure this is wise?\" "));
 	    if (ja() == false) {
 		chew();
