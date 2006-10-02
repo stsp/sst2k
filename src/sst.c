@@ -189,7 +189,7 @@ int seed;		// the random-number seed
 bool idebug;		// debug mode
 FILE *logfp, *replayfp;
 
-char *systnames[NINHAB + 1];
+char *systnames[NINHAB];
 char *device[NDEVICES];
 
 static struct 
@@ -276,7 +276,7 @@ commands[] = {
 	{"HELP",	HELP,		0},
 #define SEED	37
 	{"SEED",	SEED,		0},
-#if BSD_BUG_FOR_BUG
+#ifdef BSD_BUG_FOR_BUG
 #define VISUAL	38
 	{"VISUAL",	VISUAL,		0},
 #endif
@@ -575,7 +575,7 @@ static void makemoves(void)
 	    if (key == IHREAL)
 		seed = (int)aaitem;
 	    break;
-#if BSD_BUG_FOR_BUG
+#ifdef BSD_BUG_FOR_BUG
 	case VISUAL:
 	    visual();			// perform visual scan
 	    break;
@@ -826,19 +826,12 @@ int scan(void)
 	chew();
 	return IHEOL;
     }
-    if (isdigit(*linep) || *linep=='+' || *linep=='-' || *linep=='.') {
-	// treat as a number
-	i = 0;
-	if (sscanf(linep, "%lf%n", &aaitem, &i) < 1) {
-	    linep = line; // Invalid numbers are ignored
-	    *linep = 0;
-	    return IHEOL;
-	}
-	else {
-	    // skip to end
-	    linep += i;
-	    return IHREAL;
-	}
+    i = 0;
+    // try a number
+    if (sscanf(linep, "%lf%n", &aaitem, &i) > 0) {
+	// skip to end
+	linep += i;
+	return IHREAL;
     }
     // Treat as alpha
     cp = citem;

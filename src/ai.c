@@ -363,7 +363,7 @@ static bool movescom(coord iq, bool avoid)
 	    game.state.planets[i].pclass = destroyed;
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET;
 	    if (!damaged(DRADIO) || game.condition == docked) {
-		pause_game(true);
+		announce();
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
 		proutn(_("   a planet in "));
 		proutn(cramlc(quadrant, game.state.kscmdr));
@@ -525,7 +525,7 @@ void supercommander(void)
 		if (damaged(DRADIO) && game.condition != docked)
 		    return; /* no warning */
 		game.iseenit = true;
-		pause_game(true);
+		announce();
 		proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 		proutn(cramlc(quadrant, game.state.kscmdr));
 		skip(1);
@@ -550,7 +550,7 @@ void supercommander(void)
 	 (damaged(DRADIO) && game.condition != docked) ||
 	 !game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted))
 	return;
-    pause_game(true);
+    announce();
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"));
     proutn(_("   the Super-commander is in "));
     proutn(cramlc(quadrant, game.state.kscmdr));

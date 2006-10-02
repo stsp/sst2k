@@ -1,5 +1,6 @@
-AM_CFLAGS = -Wall -Wimplicit -Wunused -Wmissing-prototypes \
-    -Wuninitialized -fno-inline -O1 -DDATA_DIR=\"$(pkgdatadir)\" \
+AM_CFLAGS = -Wall -Wimplicit -Wunused -Wmissing-prototypes -Wundef \
+    -Wuninitialized -Wdeclaration-after-statement \
+    -fno-inline -O1 -DDATA_DIR=\"$(pkgdatadir)\" \
     -DLOCALEDIR=\"$(datadir)/locale\" \
     @CFLAGS@
 

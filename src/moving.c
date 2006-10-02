@@ -1139,8 +1139,8 @@ void abandon(void)
 	    prout(_("Remainder of ship's complement beam down"));
 	    prout(_("to nearest habitable planet."));
 	} else if (q->planet != NOPLANET && !damaged(DTRANSP)) {
-	    prout(_("Remainder of ship's complement beam down"));
-	    prout(_("to %s."), systnames[q->planet]);
+	    prout(_("Remainder of ship's complement beam down to %s."),
+		    systnames[q->planet]);
 	} else {
 	    prout(_("Entire crew of %d left to die in outer space."),
 		    game.state.crew);

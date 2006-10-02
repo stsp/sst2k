@@ -104,7 +104,6 @@ bool thaw(void)
 	 * Some planets marked Class G and P here will be displayed as class M \
 	 * because of the way planets are generated. This is a known bug. \
 	 */ \
-	"ERROR", \
 	/* Federation Worlds */ \
 	_("Andoria (Fesoan)"),	/* several episodes */ \
 	_("Tellar Prime (Miracht)"),	/* TOS: "Journey to Babel" */ \
@@ -337,7 +336,7 @@ void setup(bool needprompt)
 	do w = randplace(GALSIZE); 
 	while (game.state.galaxy[w.x][w.y].planet != NOPLANET);
 	game.state.planets[i].w = w;
-	if (i < NINHAB) {
+	if ((game.options & OPTION_WORLDS) && i < NINHAB) {
 	    game.state.planets[i].pclass = M;	// All inhabited planets are class M
 	    game.state.planets[i].crystals = absent;
 	    game.state.planets[i].known = known;
@@ -348,8 +347,7 @@ void setup(bool needprompt)
 	    game.state.planets[i].known = unknown;
 	    game.state.planets[i].inhabited = UNINHABITED;
 	}
-	if ((game.options & OPTION_WORLDS) || i >= NINHAB)
-	    game.state.galaxy[w.x][w.y].planet = i;
+	game.state.galaxy[w.x][w.y].planet = i;
     }
     // Locate Romulans
     for (i = 1; i <= game.state.nromrem; i++) {
@@ -527,8 +525,11 @@ bool choose(bool needprompt)
     game.damfac = 0.5 * game.skill;
     game.state.rembase = 2.0 + Rand()*(BASEMAX-2.0);
     game.inbase = game.state.rembase;
+    game.inplan = 0;
     if (game.options & OPTION_PLANETS)
-	game.inplan = NINHAB + (MAXUNINHAB/2) + (MAXUNINHAB/2+1)*Rand();
+	game.inplan += (MAXUNINHAB/2) + (MAXUNINHAB/2+1)*Rand();
+    if (game.options & OPTION_WORLDS)
+	game.inplan += NINHAB;
     game.state.nromrem = game.inrom = (2.0+Rand())*game.skill;
     game.state.nscrem = game.inscom = (game.skill > SKILL_FAIR ? 1 : 0);
     game.state.remtime = 7.0 * game.length;
@@ -671,7 +672,7 @@ void newqad(bool shutup)
 	dropin(IHSTAR);
 
     // Check for RNZ
-    if (game.irhere > 0 && game.klhere == 0 && (q->planet == NOPLANET || game.state.planets[q->planet].inhabited == UNINHABITED)) {
+    if (game.irhere > 0 && game.klhere == 0) {
 	game.neutz = true;
 	if (!damaged(DRADIO)) {
 	    skip(1);

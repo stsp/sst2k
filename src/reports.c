@@ -576,7 +576,7 @@ void eta(void)
 			
 }
 
-#if BSD_BUG_FOR_BUG
+#ifdef BSD_BUG_FOR_BUG
 /*
  *	A visual scan is made in a particular direction of three sectors
  *	in the general direction specified.  This takes time, and

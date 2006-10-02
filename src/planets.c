@@ -78,17 +78,15 @@ void orbit(void)
 void sensor(void)
 /* examine planets in this quadrant */
 {
-    skip(1);
-    chew();
     if (damaged(DSRSENS)) {
 	prout(_("Short range sensors damaged."));
 	return;
     }
-    if (!game.plnet.x && (game.options & OPTION_TTY)) {
+    if (!is_valid(game.plnet) && (game.options & OPTION_TTY)) {
 	prout(_("Spock- \"No planet in this quadrant, Captain.\""));
 	return;
     }
-    if ((game.plnet.x != 0)&& (game.state.planets[game.iplnet].known == unknown)) {
+    if (is_valid(game.plnet) && (game.state.planets[game.iplnet].known == unknown)) {
 	prout(_("Spock-  \"Sensor scan for %s-"), cramlc(quadrant, game.quadrant));
 	skip(1);
 	prout(_("         Planet at %s is of class %s."),
@@ -108,6 +106,7 @@ void sensor(void)
 void beam(void) 
 /* use the transporter */
 {
+    double nrgneed = 0;
     chew();
     skip(1);
     if (damaged(DTRANSP)) {
@@ -135,6 +134,35 @@ void beam(void)
 	prout(_("  you may not go down.\""));
 	return;
     }
+    if (!game.landed && game.state.planets[game.iplnet].crystals==absent) {
+	prout(_("Spock-  \"Captain, I fail to see the logic in"));
+	prout(_("  exploring a planet with no dilithium crystals."));
+	proutn(_("  Are you sure this is wise?\" "));
+	if (ja() == false) {
+	    chew();
+	    return;
+	}
+    }
+    if (!(game.options & OPTION_PLAIN)) {
+	nrgneed = 50 * game.skill + game.height / 100.0;
+	if (nrgneed > game.energy) {
+    	    prout(_("Engineering to bridge--"));
+	    prout(_("  Captain, we don't have enough energy for transportation."));
+	    return;
+	}
+	if (!game.landed && nrgneed * 2 > game.energy) {
+    	    prout(_("Engineering to bridge--"));
+	    prout(_("  Captain, we have enough energy only to transport you down to"));
+	    prout(_("  the planet, but there wouldn't be an energy for the trip back."));
+	    if (game.state.planets[game.iplnet].known == shuttle_down)
+		prout(_("  However, the Galileo shuttle craft may still be on a surface."));
+	    proutn(_("  Are you sure this is wise?\" "));
+	    if (ja() == false) {
+		chew();
+		return;
+	    }
+	}
+    }
     if (game.landed) {
 	/* Coming from planet */
 	if (game.state.planets[game.iplnet].known==shuttle_down) {
@@ -154,15 +182,6 @@ void beam(void)
     }
     else {
 	/* Going to planet */
-	if (game.state.planets[game.iplnet].crystals==absent) {
-	    prout(_("Spock-  \"Captain, I fail to see the logic in"));
-	    prout(_("  exploring a planet with no dilithium crystals."));
-	    proutn(_("  Are you sure this is wise?\" "));
-	    if (ja() == false) {
-		chew();
-		return;
-	    }
-	}
 	prout(_("Scotty-  \"Transporter room ready, Sir.\""));
 	skip(1);
 	prout(_("Kirk and landing party prepare to beam down to planet surface."));
@@ -181,9 +200,10 @@ void beam(void)
 	return;
     }
     prouts(".    .   .  .  .  .  .E.E.EEEERRRRRIIIIIOOOHWW");
+    game.landed = !game.landed;
+    game.energy -= nrgneed;
     skip(2);
     prout(_("Transport complete."));
-    game.landed = !game.landed;
     if (game.landed && game.state.planets[game.iplnet].known==shuttle_down) {
 	prout(_("The shuttle craft Galileo is here!"));
     }
@@ -364,7 +384,8 @@ void shuttle(void)
 	    prout(_("You and your mining party board the"));
 	    prout(_("shuttle craft for the trip back to the Enterprise."));
 	    skip(1);
-	    prout(_("The short hop begins . . ."));
+	    prouts(_("The short hop begins . . ."));
+	    skip(1);
 	    game.state.planets[game.iplnet].known=known;
 	    game.icraft = true;
 	    skip(1);

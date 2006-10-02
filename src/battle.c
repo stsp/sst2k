@@ -240,7 +240,7 @@ void ram(bool ibumpd, feature ienm, coord w)
     game.shldup = false;
     prout(_("***Shields are down."));
     if (game.state.remkl + game.state.remcom + game.state.nscrem) {
-	pause_game(true);
+	announce();
 	damagereport();
     }
     else

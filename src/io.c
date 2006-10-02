@@ -7,7 +7,6 @@
 #include "sstlinux.h"
 
 static int rows, linecount;	/* for paging */
-static bool pause_latch;
 
 WINDOW *curwnd;
 WINDOW *fullscreen_window;
@@ -90,31 +89,25 @@ void waitfor(void)
 	getch();
 }
 
-void pause_reset(void)
+void announce(void)
 {
-    pause_latch = false;
+    skip(1);
+    if (game.skill > SKILL_FAIR)
+	prouts(_("[ANOUNCEMENT ARRIVING...]"));
+    else
+	prouts(_("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]"));
+    skip(1);
 }
 
-void pause_game(bool announcement) 
+static void pause_game(void)
 {
-    if (pause_latch)
-	return;
-    else {
 	char *prompt;
 	char buf[BUFSIZ];
-	if (announcement) {
-	    if (game.skill > SKILL_FAIR)
-		prompt = _("[ANOUNCEMENT ARRIVING...]");
-	    else
-		prompt = _("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]");
-	}
-	else {
-	    if (game.skill > SKILL_FAIR)
-		prompt = _("[CONTINUE?]");
-	    else
-		prompt = _("[PRESS ENTER TO CONTINUE]");
+        if (game.skill > SKILL_FAIR)
+	    prompt = _("[CONTINUE?]");
+	else
+	    prompt = _("[PRESS ENTER TO CONTINUE]");
 
-	}
 	if (game.options & OPTION_CURSES) {
 	    drawmaps(0);
 	    setwnd(prompt_window);
@@ -125,18 +118,14 @@ void pause_game(bool announcement)
 	    wrefresh(prompt_window);
 	    setwnd(message_window);
 	} else {
+	    int j;
 	    putchar('\n');
 	    proutn(prompt);
 	    fgets(buf, sizeof(buf), stdin);
-	    if (announcement) {
-		int j;
-		for (j = 0; j < rows; j++)
-		    putchar('\n');
-	    }
+	    for (j = 0; j < rows; j++)
+		putchar('\n');
 	    linecount = 0;
 	}
-	pause_latch = true;
-    }
 }
 
 
@@ -145,7 +134,7 @@ void skip(int i)
     while (i-- > 0) {
 	if (game.options & OPTION_CURSES) {
 	    if (curwnd == message_window && getcury(curwnd) >= getmaxy(curwnd) - 3) {
-		pause_game(false);
+		pause_game();
 		clrscr();
 	    } else {
 		proutn("\n");
@@ -153,7 +142,7 @@ void skip(int i)
 	} else {
 	    linecount++;
 	    if (linecount >= rows)
-		pause_game(false);
+		pause_game();
 	    else
 		putchar('\n');
 	}

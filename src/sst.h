@@ -302,7 +302,7 @@ extern struct game game;
 
 /* the following global state doesn't need to be saved */
 extern char *device[NDEVICES];
-extern char *systnames[NINHAB + 1];
+extern char *systnames[NINHAB];
 extern int iscore, iskill; // Common PLAQ
 extern double perdate;
 extern double aaitem;
@@ -390,8 +390,7 @@ extern void timwrp(void);
 extern void moveklings(void);
 extern void torpedo(double, double, coord, double *, int, int);
 extern void huh(void);
-extern void pause_reset(void);
-extern void pause_game(bool);
+extern void announce(void);
 extern void nova(coord);
 extern void supernova(bool, coord *);
 extern void supercommander(void);
@@ -421,7 +420,7 @@ extern void setpassword(void);
 extern void commandhook(char *, bool);
 extern void makechart(void);
 extern coord newkling(int);
-#if BSD_BUG_FOR_BUG
+#ifdef BSD_BUG_FOR_BUG
 extern void visual(void);
 #endif
 

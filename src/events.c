@@ -67,8 +67,6 @@ void events(void)
     coord w, hold;
     event *ev, *ev2;
 
-    pause_reset();
-
     if (idebug) {
 	prout("=== EVENTS from %.2f to %.2f:", game.state.date, fintim);
 	for (i = 1; i < NEVENTS; i++) {
@@ -158,7 +156,7 @@ void events(void)
 	game.optime -= xtime;
 	switch (evcode) {
 	case FSNOVA: /* Supernova */
-	    pause_game(true);
+	    announce();
 	    supernova(false, NULL);
 	    schedule(FSNOVA, expran(0.5*game.intime));
 	    if (game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova)
@@ -198,7 +196,7 @@ void events(void)
 	    }
 	    /* tractor beaming cases merge here */
 	    yank = sqrt(yank);
-	    pause_game(true);
+	    announce();
 	    game.optime = (10.0/(7.5*7.5))*yank; /* 7.5 is yank rate (warp 7.5) */
 	    ictbeam = true;
 	    skip(1);
@@ -297,7 +295,7 @@ void events(void)
 	    if (!damaged(DRADIO) && game.condition != docked) 
 		break; /* No warning :-( */
 	    game.iseenit = true;
-	    pause_game(true);
+	    announce();
 	    skip(1);
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in "));
 	    prout(cramlc(quadrant, game.battle));
@@ -344,7 +342,7 @@ void events(void)
 	    else if (game.state.rembase != 1 &&
 		     (!damaged(DRADIO) || game.condition == docked)) {
 		/* Get word via subspace radio */
-		pause_game(true);		    
+		announce();
 		skip(1);
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Command reports that"));
 		proutn(_("   the starbase in "));
@@ -389,7 +387,7 @@ void events(void)
 		    game.state.galaxy[game.probec.x][game.probec.y].supernova) {
 		    // Left galaxy or ran into supernova
 		    if (!damaged(DRADIO) || game.condition == docked) {
-			pause_game(true);
+			announce();
 			skip(1);
 			proutn(_("Lt. Uhura-  \"The deep space probe "));
 			if (!VALID_QUADRANT(j, i))
@@ -402,7 +400,7 @@ void events(void)
 		    break;
 		}
 		if (!damaged(DRADIO) || game.condition == docked) {
-		    pause_game(true);
+		    announce();
 		    skip(1);
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in "));
 		    proutn(cramlc(quadrant, game.probec));
@@ -442,6 +440,7 @@ void events(void)
 		q = &game.state.galaxy[w.x][w.y];
 	    } while (--i &&
 		     (same(game.quadrant, w) || q->planet == NOPLANET ||
+		      game.state.planets[q->planet].inhabited == UNINHABITED ||
 		      q->supernova || q->status!=secure || q->klingons<=0));
 	    if (i == 0) {
 		/* can't seem to find one; ignore this call */
@@ -458,9 +457,9 @@ void events(void)
 	    /* tell the captain about it if we can */
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {
-		prout("Uhura- Captain, %s in %s reports it is under attack",
+		prout(_("Uhura- Captain, %s in %s reports it is under attack"),
 		      systnames[q->planet], cramlc(quadrant, w));
-		prout("by a Klingon invasion fleet.");
+		prout(_("by a Klingon invasion fleet."));
 		if (cancelrest())
 		    return;
 	    }
@@ -482,9 +481,9 @@ void events(void)
 	    /* report the disaster if we can */
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {
-		prout("Uhura- We've lost contact with starsystem %s",
+		prout(_("Uhura- We've lost contact with starsystem %s"),
 		      systnames[q->planet]);
-		prout("in %s.\n", cramlc(quadrant, ev->quadrant));
+		prout(_("in %s.\n"), cramlc(quadrant, ev->quadrant));
 	    }
 	    break;
 	case FREPRO:		/* Klingon reproduces */
@@ -534,13 +533,13 @@ void events(void)
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {
 		if (same(game.quadrant, w)) {
-		    prout("Spock- sensors indicate the Klingons have");
-		    prout("launched a warship from %s.", systnames[q->planet]);
+		    prout(_("Spock- sensors indicate the Klingons have"));
+		    prout(_("launched a warship from %s."), systnames[q->planet]);
 		} else {
-		    prout("Uhura- Starfleet reports increased Klingon activity");
+		    prout(_("Uhura- Starfleet reports increased Klingon activity"));
 		    if (q->planet != NOPLANET)
-			proutn("near %s", systnames[q->planet]);
-		    prout("in %s.\n", cramlc(quadrant, w));
+			proutn(_("near %s"), systnames[q->planet]);
+		    prout(_("in %s.\n"), cramlc(quadrant, w));
 		}
 	    }
 	    break;
@@ -815,7 +814,7 @@ void nova(coord nov)
 void supernova(bool induced, coord *w) 
 /* star goes supernova */
 {
-    int num = 0, nrmdead, npdead, kldead;
+    int num = 0, nrmdead, npdead = 0, kldead, loop;
     coord nq;
 
     if (w != NULL) 
@@ -914,13 +913,12 @@ void supernova(bool induced, coord *w)
     nrmdead = game.state.galaxy[nq.x][nq.y].romulans;
     game.state.galaxy[nq.x][nq.y].romulans = 0;
     game.state.nromrem -= nrmdead;
-    npdead = num - nrmdead*10;
-    if (npdead) {
-	int loop;
-	for (loop = 0; loop < game.inplan; loop++)
-	    if (same(game.state.planets[loop].w, nq)) {
-		game.state.planets[loop].pclass = destroyed;
-	    }
+    /* Destroy planets */
+    for (loop = 0; loop < game.inplan; loop++) {
+	if (same(game.state.planets[loop].w, nq)) {
+	    game.state.planets[loop].pclass = destroyed;
+	    npdead++;
+	}
     }
     /* Destroy any base in supernovaed quadrant */
     if (game.state.rembase) {
