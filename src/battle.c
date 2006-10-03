@@ -792,7 +792,8 @@ void deadkl(coord w, feature type, coord mv)
     if ((game.state.remkl + game.state.remcom + game.state.nscrem)==0)
 	return;
 
-    game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom);
+    game.state.remtime = game.state.remkl + game.state.remcom > 0 ?
+	    game.state.remres/(game.state.remkl + 4*game.state.remcom) : 99;
 
     /* Remove enemy ship from arrays describing local conditions */
     if (is_scheduled(FCDBAS) && same(game.battle, game.quadrant) && type==IHC)

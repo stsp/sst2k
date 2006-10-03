@@ -2789,11 +2789,11 @@ msgstr "Отвечайте \"no\" если не знаете:"
 
 #: src/reports.c:482
 msgid "Time or arrival date? "
-msgstr "Время прибытия?"
+msgstr "Время прибытия? "
 
 #: src/reports.c:489
 msgid "We'll never make it, sir."
-msgstr "Ни как не получится, сэр."
+msgstr "Никак не получится, сэр."
 
 #: src/reports.c:498
 msgid "Warp factor? "

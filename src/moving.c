@@ -325,7 +325,7 @@ static void getcd(bool isprobe, int akey)
 		prout(_("(Manual navigation assumed.)"));
 	    else
 		prout(_("(Manual movement assumed.)"));
-	    navmode = automatic;
+	    navmode = manual;
 	    break;
 	}
     }

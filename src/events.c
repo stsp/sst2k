@@ -111,7 +111,8 @@ void events(void)
 	game.state.date = datemin;
 	/* Decrement Federation resources and recompute remaining time */
 	game.state.remres -= (game.state.remkl+4*game.state.remcom)*xtime;
-	game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
+	game.state.remtime = game.state.remkl + game.state.remcom > 0 ?
+		game.state.remres/(game.state.remkl + 4*game.state.remcom) : 99;
 	if (game.state.remtime <=0) {
 	    finish(FDEPLETE);
 	    return;
@@ -528,7 +529,8 @@ void events(void)
 		newkling(++game.klhere);
 
 	    /* recompute time left */
-	    game.state.remtime = game.state.remres/(game.state.remkl+4*game.state.remcom);
+	    game.state.remtime = game.state.remkl + game.state.remcom > 0 ?
+		    game.state.remres/(game.state.remkl + 4*game.state.remcom) : 99;
 	    /* report the disaster if we can */
 	    if (!damaged(DRADIO) || game.condition == docked)
 	    {

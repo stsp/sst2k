@@ -79,14 +79,16 @@ void sensor(void)
 /* examine planets in this quadrant */
 {
     if (damaged(DSRSENS)) {
-	prout(_("Short range sensors damaged."));
+	if (game.options & OPTION_TTY)
+	    prout(_("Short range sensors damaged."));
 	return;
     }
-    if (!is_valid(game.plnet) && (game.options & OPTION_TTY)) {
-	prout(_("Spock- \"No planet in this quadrant, Captain.\""));
+    if (!is_valid(game.plnet)) {
+	if (game.options & OPTION_TTY)
+	    prout(_("Spock- \"No planet in this quadrant, Captain.\""));
 	return;
     }
-    if (is_valid(game.plnet) && (game.state.planets[game.iplnet].known == unknown)) {
+    if (game.state.planets[game.iplnet].known == unknown) {
 	prout(_("Spock-  \"Sensor scan for %s-"), cramlc(quadrant, game.quadrant));
 	skip(1);
 	prout(_("         Planet at %s is of class %s."),
