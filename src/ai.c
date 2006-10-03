@@ -263,7 +263,7 @@ static void movebaddy(coord com, int loccom, feature ienm)
 	if (!damaged(DSRSENS) || game.condition == docked) {
 	    proutn("***");
 	    cramen(ienm);
-	    proutn(_(" from %s"), cramlc(2, com));
+	    proutn(_(" from %s"), cramlc(sector, com));
 	    if (game.kdist[loccom] < dist1)
 		proutn(_(" advances to "));
 	    else

@@ -155,8 +155,8 @@ typedef struct {
 #define FOREVER	1e30
 
 /* Define future events */
-#define FSPY	0	// Spy event happens always (no future[] entry)
-					// can cause SC to tractor beam Enterprise
+#define FSPY	0   // Spy event happens always (no future[] entry)
+		    // can cause SC to tractor beam Enterprise
 #define FSNOVA  1   // Supernova
 #define FTBEAM  2   // Commander tractor beams Enterprise
 #define FSNAP   3   // Snapshot for time warp

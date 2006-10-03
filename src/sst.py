@@ -693,7 +693,7 @@ def movescom(iq, avoid):
 	    game.state.planets[i].pclass = destroyed
 	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET
 	    if not damaged(DRADIO) or game.condition == docked:
-		pause_game(True)
+		announce()
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
 		proutn(_("   a planet in Quadrant %s has been destroyed") % game.state.kscmdr)
 		prout(_("   by the Super-commander.\""))
@@ -798,7 +798,7 @@ def supercommander():
 		if damaged(DRADIO) and game.condition != docked:
 		    return; # no warning 
 		game.iseenit = True
-		pause_game(True)
+		announce()
 		prout(_("Lt. Uhura-  \"Captain, the starbase in Quadrant %s") \
                       % game.state.kscmdr)
 		prout(_("   reports that it is under attack from the Klingon Super-commander."))
@@ -818,7 +818,7 @@ def supercommander():
 	 (damaged(DRADIO) and game.condition != docked) or \
 	 not game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted):
 	return
-    pause_game(True)
+    announce()
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
     proutn(_("   the Super-commander is in Quadrant %s,") % game.state.kscmdr)
     return;
@@ -1084,7 +1084,7 @@ def ram(ibumpd, ienm, w):
     game.shldup = False
     prout(_("***Shields are down."))
     if game.state.remkl + game.state.remcom + game.state.nscrem:
-	pause_game(True)
+	announce()
 	damagereport()
     else:
 	finish(FWON)

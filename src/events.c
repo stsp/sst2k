@@ -22,7 +22,7 @@ int is_scheduled(int evtype)
     return game.future[evtype].date != FOREVER;
 }
 
-extern double scheduled(int evtype)
+double scheduled(int evtype)
 /* when will this event happen? */
 {
     return game.future[evtype].date;
@@ -36,7 +36,7 @@ event *schedule(int evtype, double offset)
 }
 
 void postpone(int evtype, double offset)
-/* poistpone a scheduled event */
+/* postpone a scheduled event */
 {
     game.future[evtype].date += offset;
 }
@@ -80,7 +80,7 @@ void events(void)
 	    case FSCDBAS: proutn("=== SC Base Destroy "); break;
 	    case FDSPROB: proutn("=== Probe Move      "); break;
 	    case FDISTR:  proutn("=== Distress Call   "); break;
-	    case FENSLV:  proutn("=== Enlavement      "); break;
+	    case FENSLV:  proutn("=== Enslavement     "); break;
 	    case FREPRO:  proutn("=== Klingon Build   "); break;
 	    }
 	    if (is_scheduled(i))
@@ -166,7 +166,8 @@ void events(void)
 	case FSPY: /* Check with spy to see if S.C. should tractor beam */
 	    if (game.state.nscrem == 0 ||
 		ictbeam || istract ||
-		game.condition==docked || game.isatb==1 || game.iscate) return;
+		game.condition==docked || game.isatb==1 || game.iscate)
+		return;
 	    if (game.ientesc ||
 		(game.energy < 2000 && game.torps < 4 && game.shield < 1250) ||
 		(damaged(DPHASER) && (damaged(DPHOTON) || game.torps < 4)) ||
