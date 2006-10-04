@@ -6,7 +6,7 @@ The FORTRANness still shows in many ways, notably the use of 1-origin index
 an a lot of parallel arrays where a more modern language would use structures
 or objects.
 """
-import os, sys, math, curses
+import os, sys, math, curses, time
 
 SSTDOC = "/usr/share/doc/sst/sst.doc"
 
@@ -2877,3 +2877,436 @@ def supernova(induced, w=None):
     if game.alldone:
 	finish(FSNOVAED)
     return
+
+# Code from finish.c ends here.
+
+def selfdestruct():
+    # self-destruct maneuver 
+    # Finish with a BANG! 
+    chew()
+    if damaged(DCOMPTR):
+	prout(_("Computer damaged; cannot execute destruct sequence."))
+	return
+    prouts(_("---WORKING---")); skip(1)
+    prouts(_("SELF-DESTRUCT-SEQUENCE-ACTIVATED")); skip(1)
+    prouts("   10"); skip(1)
+    prouts("       9"); skip(1)
+    prouts("          8"); skip(1)
+    prouts("             7"); skip(1)
+    prouts("                6"); skip(1)
+    skip(1)
+    prout(_("ENTER-CORRECT-PASSWORD-TO-CONTINUE-"))
+    skip(1)
+    prout(_("SELF-DESTRUCT-SEQUENCE-OTHERWISE-"))
+    skip(1)
+    prout(_("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"))
+    skip(1)
+    scan()
+    chew()
+    if game.passwd != citem:
+	prouts(_("PASSWORD-REJECTED;"))
+	skip(1)
+	prouts(_("CONTINUITY-EFFECTED"))
+	skip(2)
+	return
+    prouts(_("PASSWORD-ACCEPTED")); skip(1)
+    prouts("                   5"); skip(1)
+    prouts("                      4"); skip(1)
+    prouts("                         3"); skip(1)
+    prouts("                            2"); skip(1)
+    prouts("                              1"); skip(1)
+    if Rand() < 0.15:
+	prouts(_("GOODBYE-CRUEL-WORLD"))
+	skip(1)
+    kaboom()
+
+def kaboom():
+    stars()
+    if game.ship==IHE:
+	prouts("***")
+    prouts(_("********* Entropy of "))
+    crmshp()
+    prouts(_(" maximized *********"))
+    skip(1)
+    stars()
+    skip(1)
+    if game.nenhere != 0:
+	whammo = 25.0 * game.energy
+	l=1
+	while l <= game.nenhere:
+	    if game.kpower[l]*game.kdist[l] <= whammo: 
+		deadkl(game.ks[l], game.quad[game.ks[l].x][game.ks[l].y], game.ks[l])
+	    l += 1
+    finish(FDILITHIUM)
+				
+def killrate():
+    "Compute our rate of kils over time."
+    return ((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem))/(game.state.date-game.indate)
+
+def badpoints():
+    "Compute demerits."
+    badpt = 5.0*game.state.starkl + \
+            game.casual + \
+            10.0*game.state.nplankl + \
+            300*game.state.nworldkl + \
+            45.0*game.nhelp +\
+            100.0*game.state.basekl +\
+            3.0*game.abandoned
+    if game.ship == IHF:
+        badpt += 100.0
+    elif game.ship == None:
+        badpt += 200.0
+    return badpt
+
+
+def finish(ifin):
+    # end the game, with appropriate notfications 
+    igotit = False
+    game.alldone = True
+    skip(3)
+    prout(_("It is stardate %.1f." % (game.state.date)))
+    skip(1)
+    if ifin == FWON: # Game has been won
+	if game.state.nromrem != 0:
+	    prout(_("The remaining %d Romulans surrender to Starfleet Command.") %
+		  game.state.nromrem)
+
+	prout(_("You have smashed the Klingon invasion fleet and saved"))
+	prout(_("the Federation."))
+	game.gamewon = True
+	if game.alive:
+            badpt = badpoints()
+            if badpt < 100.0:
+                badpt = 0.0	# Close enough!
+            # killsPerDate >= RateMax
+	    if game.state.date-game.indate < 5.0 or \
+                killrate() >= 0.1*game.skill*(game.skill+1.0) + 0.1 + 0.008*badpt:
+		skip(1)
+		prout(_("In fact, you have done so well that Starfleet Command"))
+		if game.skill == SKILL_NOVICE:
+		    prout(_("promotes you one step in rank from \"Novice\" to \"Fair\"."))
+		elif game.skill == SKILL_FAIR:
+		    prout(_("promotes you one step in rank from \"Fair\" to \"Good\"."))
+		elif game.skill == SKILL_GOOD:
+		    prout(_("promotes you one step in rank from \"Good\" to \"Expert\"."))
+		elif game.skill == SKILL_EXPERT:
+		    prout(_("promotes you to Commodore Emeritus."))
+		    skip(1)
+		    prout(_("Now that you think you're really good, try playing"))
+		    prout(_("the \"Emeritus\" game. It will splatter your ego."))
+		elif game.skill == SKILL_EMERITUS:
+		    skip(1)
+		    proutn(_("Computer-  "))
+		    prouts(_("ERROR-ERROR-ERROR-ERROR"))
+		    skip(2)
+		    prouts(_("  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM"))
+		    skip(1)
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"))
+		    skip(1)
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"))
+		    skip(1)
+		    prouts(_("  THIS-PROGRAM-MUST-SURVIVE"))
+		    skip(1)
+		    prouts(_("  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI"))
+		    skip(2)
+		    prout(_("Now you can retire and write your own Star Trek game!"))
+		    skip(1)
+		elif game.skill >= SKILL_EXPERT:
+		    if game.thawed and not idebug:
+			prout(_("You cannot get a citation, so..."))
+		    else:
+			proutn(_("Do you want your Commodore Emeritus Citation printed? "))
+			chew()
+			if ja() == True:
+			    igotit = True
+	    # Only grant long life if alive (original didn't!)
+	    skip(1)
+	    prout(_("LIVE LONG AND PROSPER."))
+	score()
+	if igotit:
+	    plaque()	    
+	return
+    elif ifin == FDEPLETE: # Federation Resources Depleted
+	prout(_("Your time has run out and the Federation has been"))
+	prout(_("conquered.  Your starship is now Klingon property,"))
+	prout(_("and you are put on trial as a war criminal.  On the"))
+	proutn(_("basis of your record, you are "))
+	if (game.state.remkl + game.state.remcom + game.state.nscrem)*3.0 > (game.inkling + game.incom + game.inscom):
+	    prout(_("acquitted."))
+	    skip(1)
+	    prout(_("LIVE LONG AND PROSPER."))
+	else:
+	    prout(_("found guilty and"))
+	    prout(_("sentenced to death by slow torture."))
+	    game.alive = False
+	score()
+	return
+    elif ifin == FLIFESUP:
+	prout(_("Your life support reserves have run out, and"))
+	prout(_("you die of thirst, starvation, and asphyxiation."))
+	prout(_("Your starship is a derelict in space."))
+    elif ifin == FNRG:
+	prout(_("Your energy supply is exhausted."))
+	skip(1)
+	prout(_("Your starship is a derelict in space."))
+    elif ifin == FBATTLE:
+	proutn(_("The "))
+	crmshp()
+	prout(_("has been destroyed in battle."))
+	skip(1)
+	prout(_("Dulce et decorum est pro patria mori."))
+    elif ifin == FNEG3:
+	prout(_("You have made three attempts to cross the negative energy"))
+	prout(_("barrier which surrounds the galaxy."))
+	skip(1)
+	prout(_("Your navigation is abominable."))
+	score()
+    elif ifin == FNOVA:
+	prout(_("Your starship has been destroyed by a nova."))
+	prout(_("That was a great shot."))
+	skip(1)
+    elif ifin == FSNOVAED:
+	proutn(_("The "))
+	crmshp()
+	prout(_(" has been fried by a supernova."))
+	prout(_("...Not even cinders remain..."))
+    elif ifin == FABANDN:
+	prout(_("You have been captured by the Klingons. If you still"))
+	prout(_("had a starbase to be returned to, you would have been"))
+	prout(_("repatriated and given another chance. Since you have"))
+	prout(_("no starbases, you will be mercilessly tortured to death."))
+    elif ifin == FDILITHIUM:
+	prout(_("Your starship is now an expanding cloud of subatomic particles"))
+    elif ifin == FMATERIALIZE:
+	prout(_("Starbase was unable to re-materialize your starship."))
+	prout(_("Sic transit gloria mundi"))
+    elif ifin == FPHASER:
+	proutn(_("The "))
+	crmshp()
+	prout(_(" has been cremated by its own phasers."))
+    elif ifin == FLOST:
+	prout(_("You and your landing party have been"))
+	prout(_("converted to energy, disipating through space."))
+    elif ifin == FMINING:
+	prout(_("You are left with your landing party on"))
+	prout(_("a wild jungle planet inhabited by primitive cannibals."))
+	skip(1)
+	prout(_("They are very fond of \"Captain Kirk\" soup."))
+	skip(1)
+	proutn(_("Without your leadership, the "))
+	crmshp()
+	prout(_(" is destroyed."))
+    elif ifin == FDPLANET:
+	prout(_("You and your mining party perish."))
+	skip(1)
+	prout(_("That was a great shot."))
+	skip(1)
+    elif ifin == FSSC:
+	prout(_("The Galileo is instantly annihilated by the supernova."))
+	prout(_("You and your mining party are atomized."))
+	skip(1)
+	proutn(_("Mr. Spock takes command of the "))
+	crmshp()
+	prout(_(" and"))
+	prout(_("joins the Romulans, reigning terror on the Federation."))
+    elif ifin == FPNOVA:
+	prout(_("You and your mining party are atomized."))
+	skip(1)
+	proutn(_("Mr. Spock takes command of the "))
+	crmshp()
+	prout(_(" and"))
+	prout(_("joins the Romulans, reigning terror on the Federation."))
+    elif ifin == FSTRACTOR:
+	prout(_("The shuttle craft Galileo is also caught,"))
+	prout(_("and breaks up under the strain."))
+	skip(1)
+	prout(_("Your debris is scattered for millions of miles."))
+	proutn(_("Without your leadership, the "))
+	crmshp()
+	prout(_(" is destroyed."))
+    elif ifin == FDRAY:
+	prout(_("The mutants attack and kill Spock."))
+	prout(_("Your ship is captured by Klingons, and"))
+	prout(_("your crew is put on display in a Klingon zoo."))
+    elif ifin == FTRIBBLE:
+	prout(_("Tribbles consume all remaining water,"))
+	prout(_("food, and oxygen on your ship."))
+	skip(1)
+	prout(_("You die of thirst, starvation, and asphyxiation."))
+	prout(_("Your starship is a derelict in space."))
+    elif ifin == FHOLE:
+	prout(_("Your ship is drawn to the center of the black hole."))
+	prout(_("You are crushed into extremely dense matter."))
+    elif ifin == FCREW:
+	prout(_("Your last crew member has died."))
+    if game.ship == IHF:
+	game.ship = None
+    elif game.ship == IHE:
+	game.ship = IHF
+    game.alive = False
+    if (game.state.remkl + game.state.remcom + game.state.nscrem) != 0:
+	goodies = game.state.remres/game.inresor
+	baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom)
+	if goodies/baddies >= 1.0+0.5*Rand():
+	    prout(_("As a result of your actions, a treaty with the Klingon"))
+	    prout(_("Empire has been signed. The terms of the treaty are"))
+	    if goodies/baddies >= 3.0+Rand():
+		prout(_("favorable to the Federation."))
+		skip(1)
+		prout(_("Congratulations!"))
+	    else:
+		prout(_("highly unfavorable to the Federation."))
+	else:
+	    prout(_("The Federation will be destroyed."))
+    else:
+	prout(_("Since you took the last Klingon with you, you are a"))
+	prout(_("martyr and a hero. Someday maybe they'll erect a"))
+	prout(_("statue in your memory. Rest in peace, and try not"))
+	prout(_("to think about pigeons."))
+	game.gamewon = True
+    score()
+
+def score():
+    # compute player's score 
+    timused = game.state.date - game.indate
+
+    iskill = game.skill
+    if (timused == 0 or (game.state.remkl + game.state.remcom + game.state.nscrem) != 0) and timused < 5.0:
+	timused = 5.0
+    perdate = killrate()
+    ithperd = 500*perdate + 0.5
+    iwon = 0
+    if game.gamewon:
+	iwon = 100*game.skill
+    if game.ship == IHE: 
+	klship = 0
+    elif game.ship == IHF: 
+	klship = 1
+    else:
+	klship = 2
+    if not game.gamewon:
+	game.state.nromrem = 0 # None captured if no win
+    iscore = 10*(game.inkling - game.state.remkl) \
+             + 50*(game.incom - game.state.remcom) \
+             + ithperd + iwon \
+             + 20*(game.inrom - game.state.nromrem) \
+             + 200*(game.inscom - game.state.nscrem) \
+    	     - game.state.nromrem \
+             - badpoints()
+    if not game.alive:
+	iscore -= 200
+    skip(2)
+    prout(_("Your score --"))
+    if game.inrom - game.state.nromrem:
+	prout(_("%6d Romulans destroyed                 %5d" %
+	      (game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem))))
+    if game.state.nromrem:
+	prout(_("%6d Romulans captured                  %5d" %
+	      (game.state.nromrem, game.state.nromrem)))
+    if game.inkling - game.state.remkl:
+	prout(_("%6d ordinary Klingons destroyed        %5d" %
+	      (game.inkling - game.state.remkl, 10*(game.inkling - game.state.remkl))))
+    if game.incom - game.state.remcom:
+	prout(_("%6d Klingon commanders destroyed       %5d" %
+	      (game.incom - game.state.remcom, 50*(game.incom - game.state.remcom))))
+    if game.inscom - game.state.nscrem:
+	prout(_("%6d Super-Commander destroyed          %5d" %
+	      (game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem))))
+    if ithperd:
+	prout(_("%6.2f Klingons per stardate              %5d" %
+	      (perdate, ithperd)))
+    if game.state.starkl:
+	prout(_("%6d stars destroyed by your action     %5d" %
+	      (game.state.starkl, -5*game.state.starkl)))
+    if game.state.nplankl:
+	prout(_("%6d planets destroyed by your action   %5d" %
+	      (game.state.nplankl, -10*game.state.nplankl)))
+    if (game.options & OPTION_WORLDS) and game.state.nworldkl:
+	prout(_("%6d inhabited planets destroyed by your action   %5d" %
+	      (game.state.nplankl, -300*game.state.nworldkl)))
+    if game.state.basekl:
+	prout(_("%6d bases destroyed by your action     %5d" %
+	      (game.state.basekl, -100*game.state.basekl)))
+    if game.nhelp:
+	prout(_("%6d calls for help from starbase       %5d" %
+	      (game.nhelp, -45*game.nhelp)))
+    if game.casual:
+	prout(_("%6d casualties incurred                %5d" %
+	      (game.casual, -game.casual)))
+    if game.abandoned:
+	prout(_("%6d crew abandoned in space            %5d" %
+	      (game.abandoned, -3*game.abandoned)))
+    if klship:
+	prout(_("%6d ship(s) lost or destroyed          %5d" %
+	      (klship, -100*klship)))
+    if not game.alive:
+	prout(_("Penalty for getting yourself killed        -200"))
+    if game.gamewon:
+	proutn(_("Bonus for winning "))
+	if game.skill   == SKILL_NOVICE:	proutn(_("Novice game  "))
+	elif game.skill == SKILL_FAIR:  	proutn(_("Fair game    "))
+	elif game.skill ==  SKILL_GOOD: 	proutn(_("Good game    "))
+	elif game.skill ==  SKILL_EXPERT:	proutn(_("Expert game  "))
+	elif game.skill ==  SKILL_EMERITUS:	proutn(_("Emeritus game"))
+	prout("           %5d" % (iwon))
+    skip(1)
+    prout(_("TOTAL SCORE                               %5d" % iscore))
+
+def plaque():
+    # emit winner's commemmorative plaque 
+    skip(2)
+    while True:
+        proutn(_("File or device name for your plaque: "))
+        cgetline(winner, sizeof(winner))
+        try:
+            fp = open(winner, "w")
+            break
+        except IOError:
+            prout(_("Invalid name."))
+
+    proutn(_("Enter name to go on plaque (up to 30 characters): "))
+    cgetline(winner, sizeof(winner))
+    # The 38 below must be 64 for 132-column paper 
+    nskip = 38 - len(winner)/2
+
+    fp.write("\n\n\n\n")
+    # --------DRAW ENTERPRISE PICTURE. 
+    fp.write("                                       EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n" )
+    fp.write("                                      EEE                      E  : :                                         :  E\n" )
+    fp.write("                                    EE   EEE                   E  : :                   NCC-1701              :  E\n")
+    fp.write("EEEEEEEEEEEEEEEE        EEEEEEEEEEEEEEE  : :                              : E\n")
+    fp.write(" E                                     EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n")
+    fp.write("                      EEEEEEEEE               EEEEEEEEEEEEE                 E  E\n")
+    fp.write("                               EEEEEEE   EEEEE    E          E              E  E\n")
+    fp.write("                                      EEE           E          E            E  E\n")
+    fp.write("                                                       E         E          E  E\n")
+    fp.write("                                                         EEEEEEEEEEEEE      E  E\n")
+    fp.write("                                                      EEE :           EEEEEEE  EEEEEEEE\n")
+    fp.write("                                                    :E    :                 EEEE       E\n")
+    fp.write("                                                   .-E   -:-----                       E\n")
+    fp.write("                                                    :E    :                            E\n")
+    fp.write("                                                      EE  :                    EEEEEEEE\n")
+    fp.write("                                                       EEEEEEEEEEEEEEEEEEEEEEE\n")
+    fp.write("\n\n\n")
+    fp.write(_("                                                       U. S. S. ENTERPRISE\n"))
+    fp.write("\n\n\n\n")
+    fp.write(_("                                  For demonstrating outstanding ability as a starship captain\n"))
+    fp.write("\n")
+    fp.write(_("                                                Starfleet Command bestows to you\n"))
+    fp.write("\n")
+    fp.write("%*s%s\n\n" % (nskip, "", winner))
+    fp.write(_("                                                           the rank of\n\n"))
+    fp.write(_("                                                       \"Commodore Emeritus\"\n\n"))
+    fp.write("                                                          ")
+    if game.skill ==  SKILL_EXPERT:
+        fp.write(_(" Expert level\n\n"))
+    elif game.skill == SKILL_EMERITUS:
+        fp.write(_("Emeritus level\n\n"))
+    else:
+        fp.write(_(" Cheat level\n\n"))
+    timestring = ctime()
+    fp.write(_("                                                 This day of %.6s %.4s, %.8s\n\n" %
+                    (timestring+4, timestring+20, timestring+11)))
+    fp.write(_("                                                        Your score:  %d\n\n" % iscore))
+    fp.write(_("                                                    Klingons per stardate:  %.2f\n" % perdate))
+    fp.close()
