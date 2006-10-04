@@ -1,6 +1,10 @@
 """
 sst.py =-- Super Star Trek in Python
 
+This code is a Python translation of a C translation of a FORTRAN original.
+The FORTRANness still shows in many ways, notably the use of 1-origin index
+an a lot of parallel arrays where a more modern language would use structures
+or objects.
 """
 import os, sys, math, curses
 
@@ -178,6 +182,13 @@ DDRAY	= 14
 DDSP	= 15
 NDEVICES= 16	# Number of devices
 
+SKILL_NONE	= 0
+SKILL_NOVICE	= 1
+SKILL_FAIR	= 2
+SKILL_GOOD	= 3
+SKILL_EXPERT	= 4
+SKILL_EMERITUS	= 5
+
 def damaged(dev):	return (game.damage[dev] != 0.0)
 
 # Define future events 
@@ -299,7 +310,9 @@ class gamestate:
         # Stas thinks this should be (C expression): 
         # game.state.remkl + game.state.remcom > 0 ?
 	#	game.state.remres/(game.state.remkl + 4*game.state.remcom) : 99
-        # He says the existing expression is prone to divide-by-zero errors.
+        # He says the existing expression is prone to divide-by-zero errors
+        # after killing the last klingon when score is shown -- perhaps also
+        # if the only remaining klingon is SCOM.
         game.state.remtime = game.state.remres/(game.state.remkl + 4*game.state.remcom)
 # From enumerated type 'feature'
 IHR = 'R'
