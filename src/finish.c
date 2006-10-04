@@ -90,8 +90,13 @@ void finish(FINTYPE ifin)
 	game.gamewon = true;
 	if (game.alive) {
 	    double badpt;
-	    badpt = 5.0*game.state.starkl + game.casual + 10.0*game.state.nplankl +
-		45.*game.nhelp+100.*game.state.basekl+3.*game.abandoned;
+	    badpt = 5.0*game.state.starkl \
+		+ game.casual \
+		+ 10.0*game.state.nplankl \
+		+ 300.0*game.state.nworldkl \
+		+ 45.0*game.nhelp \
+		+ 100.0*game.state.basekl \
+		+ 3.0*game.abandoned;
 	    if (game.ship == IHF)
 		badpt += 100.0;
 	    else if (game.ship == 0)
