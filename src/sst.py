@@ -1333,7 +1333,7 @@ def torpedo(course, r, incoming, i, n):
     if shoved:
 	game.quad[w.x][w.y]=IHDOT
 	game.quad[jw.x][jw.y]=iquad
-	prout(_(" displaced by blast to %s "), cramlc(sector, jw))
+	prout(_(" displaced by blast to Sector %s ") % jw)
 	for ll in range(1, game.nenhere+1):
 	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll])
 	sortklings()
@@ -1525,7 +1525,7 @@ def attack(torps_ok):
 	    proutn(_("down "))
 	else:
 	    proutn(_("damaged, "))
-    prout(_("%d%%,   torpedoes left %d"), percent, game.torps)
+    prout(_("%d%%,   torpedoes left %d") % (percent, game.torps))
     # Check if anyone was hurt 
     if hitmax >= 200 or hittot >= 500:
 	icas= hittot*Rand()*0.015
@@ -1645,7 +1645,7 @@ def photon():
 	    huh()
 	    return
 	elif key == IHEOL:
-	    prout(_("%d torpedoes left."), game.torps)
+	    prout(_("%d torpedoes left.") % game.torps)
 	    proutn(_("Number of torpedoes to fire- "))
 	    key = scan()
 	else: # key == IHREAL  {
@@ -1690,7 +1690,7 @@ def photon():
     if i == 1 and key == IHEOL:
 	# prompt for each one 
 	for i in range(1, n+1):
-	    proutn(_("Target sector for torpedo number %d- "), i)
+	    proutn(_("Target sector for torpedo number %d- ") % i)
 	    key = scan()
 	    if key != IHREAL:
 		huh()
@@ -1715,7 +1715,7 @@ def photon():
 	    # misfire! 
 	    r = (Rand()+1.2) * r
 	    if n>1:
-		prouts(_("***TORPEDO NUMBER %d MISFIRES"), i)
+		prouts(_("***TORPEDO NUMBER %d MISFIRES") % i)
 	    else:
 		prouts(_("***TORPEDO MISFIRES."))
 	    skip(1)
@@ -1769,7 +1769,7 @@ def checkshctrl(rpow):
     if icas:
 	skip(1)
 	prout(_("McCoy to bridge- \"Severe radiation burns, Jim."))
-	prout(_("  %d casualties so far.\""), icas)
+	prout(_("  %d casualties so far.\"") % icas)
 	game.casual += icas
 	game.state.crew -= icas
     skip(1)
@@ -1820,8 +1820,7 @@ def hittem(doublehits):
 	else: # decide whether or not to emasculate klingon 
 	    if kpow > 0 and Rand() >= 0.9 and \
 		kpow <= ((0.4 + 0.4*Rand())*kpini):
-		prout(_("***Mr. Spock-  \"Captain, the vessel at %s"),
-		      cramlc(sector, w))
+		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s"), w)
 		prout(_("   has just lost its firepower.\""))
 		game.kpower[kk] = -kpow
         kk += 1
@@ -1910,8 +1909,7 @@ def phasers():
 	    no = True
 	    key = scan()
 	if key != IHREAL and game.nenhere != 0:
-	    prout(_("Phasers locked on target. Energy available: %.2f"),
-		  avail)
+	    prout(_("Phasers locked on target. Energy available: %.2f")%avail)
 	irec=0
         while True:
 	    chew()
@@ -1919,7 +1917,7 @@ def phasers():
 		for i in range(1, game.nenhere+1):
 		    irec += math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))*(1.01+0.05*Rand()) + 1.0
 	    kz=1
-	    proutn(_("%d units required. "), irec)
+	    proutn(_("%d units required. ") % irec)
 	    chew()
 	    proutn(_("Units to fire= "))
 	    key = scan()
@@ -1973,7 +1971,7 @@ def phasers():
 		    proutn(_("excess "))
 		prout(_("phaser energy."))
 	    else:
-		prout(_("%d expended on empty space."), int(extra))
+		prout(_("%d expended on empty space.") % int(extra))
     elif automode == "FORCEMAN":
 	chew()
 	key = IHEOL
@@ -1993,7 +1991,7 @@ def phasers():
 	    aim = game.ks[k]
 	    ienm = game.quad[aim.x][aim.y]
 	    if msgflag:
-		proutn(_("Energy available= %.2f") % avail-0.006)
+		proutn(_("Energy available= %.2f") % (avail-0.006))
 		skip(1)
 		msgflag = False
 		rpow = 0.0
@@ -2013,7 +2011,7 @@ def phasers():
 		kz = k
 		proutn("(")
 		if not damaged(DCOMPTR):
-		    proutn("%d", irec)
+		    proutn("%d" % irec)
 		else:
 		    proutn("??")
 		proutn(")  ")
@@ -2249,7 +2247,7 @@ def events():
 	    if game.future[l].date < datemin:
 		evcode = l
 		if idebug:
-		    prout("== Event %d fires" % (evcode))
+		    prout("== Event %d fires" % evcode)
 		datemin = game.future[l].date
 	xtime = datemin-game.state.date
 	game.state.date = datemin
@@ -2370,7 +2368,7 @@ def events():
 	    skip(1)
 	    proutn(_("Lt. Uhura-  \"Captain, the starbase in Quadrant %s") % game.battle)
 	    prout(_("   reports that it is under attack and that it can"))
-	    proutn(_("   hold out only until stardate %d" % (int(scheduled(FCDBAS)))))
+	    proutn(_("   hold out only until stardate %d") % (int(scheduled(FCDBAS))))
             prout(".\"")
 	    if cancelrest():
                 return
@@ -2470,8 +2468,8 @@ def events():
 
 	    # tell the captain about it if we can 
 	    if not damaged(DRADIO) or game.condition == "docked":
-		prout(_("Uhura- Captain, %s in Quadrant %s reports it is under attack" \
-                        % (systnames[q.planet], `w`)))
+		prout(_("Uhura- Captain, %s in Quadrant %s reports it is under attack") \
+                        % (q.planet, `w`))
 		prout(_("by a Klingon invasion fleet."))
 		if cancelrest():
 		    return
@@ -2490,9 +2488,9 @@ def events():
 
 	    # report the disaster if we can 
 	    if not damaged(DRADIO) or game.condition == "docked":
-		prout(_("Uhura- We've lost contact with starsystem %s" % \
-                        systnames[q.planet]))
-		prout(_("in Quadrant %s.\n" % ev.quadrant))
+		prout(_("Uhura- We've lost contact with starsystem %s") % \
+                        q.planet)
+		prout(_("in Quadrant %s.\n") % ev.quadrant)
 	elif evcode == FREPRO:		# Klingon reproduces 
 	    # If we ever switch to a real event queue, we'll need to
 	    # explicitly retrieve and restore the x and y.
@@ -2535,13 +2533,12 @@ def events():
 	    if not damaged(DRADIO) or game.condition == "docked":
 		if same(game.quadrant, w):
 		    prout(_("Spock- sensors indicate the Klingons have"))
-		    prout(_("launched a warship from %s." \
-                            % systnames[q.planet]))
+		    prout(_("launched a warship from %s.") % q.planet)
 		else:
 		    prout(_("Uhura- Starfleet reports increased Klingon activity"))
 		    if q.planet != NOPLANET:
-			proutn(_("near %s" % systnames[q.planet]))
-		    prout(_("in %s.\n" % cramlc(quadrant, w)))
+			proutn(_("near %s") % q.planet)
+		    prout(_("in Quadrant %s.") % w)
 				
 def wait():
     # wait on events 
@@ -2570,7 +2567,7 @@ def wait():
 	if delay <= 0:
 	    game.resting = False
 	if not game.resting:
-	    prout(_("%d stardates left." % int(game.state.remtime)))
+	    prout(_("%d stardates left.") % int(game.state.remtime))
 	    return
 	temp = game.optime = delay
 	if game.nenhere:
@@ -2792,8 +2789,8 @@ def supernova(induced, w=None):
 	# it isn't here, or we just entered (treat as enroute) 
 	if not damaged(DRADIO) or game.condition == "docked":
 	    skip(1)
-	    prout(_("Message from Starfleet Command       Stardate %.2f" % game.state.date))
-	    prout(_("     Supernova in Quadrant %s; caution advised." % nq))
+	    prout(_("Message from Starfleet Command       Stardate %.2f") % game.state.date)
+	    prout(_("     Supernova in Quadrant %s; caution advised.") % nq)
     else:
 	ns = coord()
 	# we are in the quadrant! 
@@ -2810,7 +2807,7 @@ def supernova(induced, w=None):
 	skip(1)
 	prouts(_("***RED ALERT!  RED ALERT!"))
 	skip(1)
-	prout(_("***Incipient supernova detected at Sector %s" % ns))
+	prout(_("***Incipient supernova detected at Sector %s") % ns)
 	if square(ns.x-game.sector.x) + square(ns.y-game.sector.y) <= 2.1:
 	    proutn(_("Emergency override attempts t"))
 	    prouts("***************")
@@ -2870,7 +2867,7 @@ def supernova(induced, w=None):
 	skip(2)
 	if not induced:
 	    prout(_("Lucky you!"))
-	proutn(_("A supernova in %s has just destroyed the last Klingons." % nq))
+	proutn(_("A supernova in %s has just destroyed the last Klingons.") % nq)
 	finish(FWON)
 	return
     # if some Klingons remain, continue or die in supernova 
@@ -2964,7 +2961,7 @@ def finish(ifin):
     igotit = False
     game.alldone = True
     skip(3)
-    prout(_("It is stardate %.1f." % (game.state.date)))
+    prout(_("It is stardate %.1f.") % game.state.date)
     skip(1)
     if ifin == FWON: # Game has been won
 	if game.state.nromrem != 0:
@@ -3198,47 +3195,47 @@ def score():
     skip(2)
     prout(_("Your score --"))
     if game.inrom - game.state.nromrem:
-	prout(_("%6d Romulans destroyed                 %5d" %
-	      (game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem))))
+	prout(_("%6d Romulans destroyed                 %5d") %
+	      (game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem)))
     if game.state.nromrem:
-	prout(_("%6d Romulans captured                  %5d" %
-	      (game.state.nromrem, game.state.nromrem)))
+	prout(_("%6d Romulans captured                  %5d") %
+	      (game.state.nromrem, game.state.nromrem))
     if game.inkling - game.state.remkl:
-	prout(_("%6d ordinary Klingons destroyed        %5d" %
-	      (game.inkling - game.state.remkl, 10*(game.inkling - game.state.remkl))))
+	prout(_("%6d ordinary Klingons destroyed        %5d") %
+	      (game.inkling - game.state.remkl, 10*(game.inkling - game.state.remkl)))
     if game.incom - game.state.remcom:
-	prout(_("%6d Klingon commanders destroyed       %5d" %
-	      (game.incom - game.state.remcom, 50*(game.incom - game.state.remcom))))
+	prout(_("%6d Klingon commanders destroyed       %5d") %
+	      (game.incom - game.state.remcom, 50*(game.incom - game.state.remcom)))
     if game.inscom - game.state.nscrem:
-	prout(_("%6d Super-Commander destroyed          %5d" %
-	      (game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem))))
+	prout(_("%6d Super-Commander destroyed          %5d") %
+	      (game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem)))
     if ithperd:
-	prout(_("%6.2f Klingons per stardate              %5d" %
-	      (perdate, ithperd)))
+	prout(_("%6.2f Klingons per stardate              %5d") %
+	      (perdate, ithperd))
     if game.state.starkl:
-	prout(_("%6d stars destroyed by your action     %5d" %
-	      (game.state.starkl, -5*game.state.starkl)))
+	prout(_("%6d stars destroyed by your action     %5d") %
+	      (game.state.starkl, -5*game.state.starkl))
     if game.state.nplankl:
-	prout(_("%6d planets destroyed by your action   %5d" %
-	      (game.state.nplankl, -10*game.state.nplankl)))
+	prout(_("%6d planets destroyed by your action   %5d") %
+	      (game.state.nplankl, -10*game.state.nplankl))
     if (game.options & OPTION_WORLDS) and game.state.nworldkl:
-	prout(_("%6d inhabited planets destroyed by your action   %5d" %
-	      (game.state.nplankl, -300*game.state.nworldkl)))
+	prout(_("%6d inhabited planets destroyed by your action   %5d") %
+	      (game.state.nplankl, -300*game.state.nworldkl))
     if game.state.basekl:
-	prout(_("%6d bases destroyed by your action     %5d" %
-	      (game.state.basekl, -100*game.state.basekl)))
+	prout(_("%6d bases destroyed by your action     %5d") %
+	      (game.state.basekl, -100*game.state.basekl))
     if game.nhelp:
-	prout(_("%6d calls for help from starbase       %5d" %
-	      (game.nhelp, -45*game.nhelp)))
+	prout(_("%6d calls for help from starbase       %5d") %
+	      (game.nhelp, -45*game.nhelp))
     if game.casual:
-	prout(_("%6d casualties incurred                %5d" %
-	      (game.casual, -game.casual)))
+	prout(_("%6d casualties incurred                %5d") %
+	      (game.casual, -game.casual))
     if game.abandoned:
-	prout(_("%6d crew abandoned in space            %5d" %
-	      (game.abandoned, -3*game.abandoned)))
+	prout(_("%6d crew abandoned in space            %5d") %
+	      (game.abandoned, -3*game.abandoned))
     if klship:
-	prout(_("%6d ship(s) lost or destroyed          %5d" %
-	      (klship, -100*klship)))
+	prout(_("%6d ship(s) lost or destroyed          %5d") %
+	      (klship, -100*klship))
     if not game.alive:
 	prout(_("Penalty for getting yourself killed        -200"))
     if game.gamewon:
@@ -3248,9 +3245,9 @@ def score():
 	elif game.skill ==  SKILL_GOOD: 	proutn(_("Good game    "))
 	elif game.skill ==  SKILL_EXPERT:	proutn(_("Expert game  "))
 	elif game.skill ==  SKILL_EMERITUS:	proutn(_("Emeritus game"))
-	prout("           %5d" % (iwon))
+	prout("           %5d" % iwon)
     skip(1)
-    prout(_("TOTAL SCORE                               %5d" % iscore))
+    prout(_("TOTAL SCORE                               %5d") % iscore)
 
 def plaque():
     # emit winner's commemmorative plaque 
@@ -3305,10 +3302,10 @@ def plaque():
     else:
         fp.write(_(" Cheat level\n\n"))
     timestring = ctime()
-    fp.write(_("                                                 This day of %.6s %.4s, %.8s\n\n" %
-                    (timestring+4, timestring+20, timestring+11)))
-    fp.write(_("                                                        Your score:  %d\n\n" % iscore))
-    fp.write(_("                                                    Klingons per stardate:  %.2f\n" % perdate))
+    fp.write(_("                                                 This day of %.6s %.4s, %.8s\n\n") %
+                    (timestring+4, timestring+20, timestring+11))
+    fp.write(_("                                                        Your score:  %d\n\n") % iscore)
+    fp.write(_("                                                    Klingons per stardate:  %.2f\n") % perdate)
     fp.close()
 
 # Code from io.c begins here
@@ -3603,7 +3600,7 @@ def tracktorpedo(w, l, i, n, iquad):
 	if l == 1:
 	    if n != 1:
 		skip(1)
-		proutn(_("Track for torpedo number %d-  " % i))
+		proutn(_("Track for torpedo number %d-  ") % i)
 	    else:
 		skip(1)
 		proutn(_("Torpedo track- "))
@@ -3654,3 +3651,1002 @@ def prstat(txt, data):
     skip(1)
     if game.options & OPTION_CURSES:
 	setwnd(report_window)
+
+# Code from moving.c begins here
+
+def imove(novapush):
+    # movement execution for warp, impulse, supernova, and tractor-beam events 
+    w = coord(); final = coord()
+    trbeam = False
+
+    def no_quad_change():
+        # No quadrant change -- compute new avg enemy distances 
+        game.quad[game.sector.x][game.sector.y] = game.ship
+        if game.nenhere:
+            for m in range(1, game.nenhere+1):
+                finald = distance(w, game.ks[m])
+                game.kavgd[m] = 0.5 * (finald+game.kdist[m])
+                game.kdist[m] = finald
+            sortklings()
+            if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+                attack(False)
+            for m in range(1, game.nenhere+1):
+                game.kavgd[m] = game.kdist[m]
+        newcnd()
+        drawmaps(0)
+        setwnd(message_window)
+
+    w.x = w.y = 0
+    if game.inorbit:
+	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
+	game.inorbit = False
+
+    angle = ((15.0 - game.direc) * 0.5235988)
+    deltax = -math.sin(angle)
+    deltay = math.cos(angle)
+    if math.fabs(deltax) > math.fabs(deltay):
+	bigger = math.fabs(deltax)
+    else:
+	bigger = math.fabs(deltay)
+		
+    deltay /= bigger
+    deltax /= bigger
+
+    # If tractor beam is to occur, don't move full distance 
+    if game.state.date+game.optime >= scheduled(FTBEAM):
+	trbeam = True
+	game.condition = "red"
+	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
+	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
+    # Move within the quadrant 
+    game.quad[game.sector.x][game.sector.y] = IHDOT
+    x = game.sector.x
+    y = game.sector.y
+    n = 10.0*game.dist*bigger+0.5
+
+    if n > 0:
+	for m in range(1, n+1):
+            x += deltax
+            y += deltay
+	    w.x = x + 0.5
+	    w.y = y + 0.5
+	    if not VALID_SECTOR(w.x, w.y):
+		# Leaving quadrant -- allow final enemy attack 
+		# Don't do it if being pushed by Nova 
+		if game.nenhere != 0 and not novapush:
+		    newcnd()
+		    for m in range(1, game.nenhere+1):
+			finald = distance(w, game.ks[m])
+			game.kavgd[m] = 0.5 * (finald + game.kdist[m])
+		    #
+		    # Stas Sergeev added the condition
+		    # that attacks only happen if Klingons
+		    # are present and your skill is good.
+		    # 
+		    if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+			attack(False)
+		    if game.alldone:
+			return
+		# compute final position -- new quadrant and sector 
+		x = QUADSIZE*(game.quadrant.x-1)+game.sector.x
+		y = QUADSIZE*(game.quadrant.y-1)+game.sector.y
+		w.x = x+10.0*game.dist*bigger*deltax+0.5
+		w.y = y+10.0*game.dist*bigger*deltay+0.5
+		# check for edge of galaxy 
+		kinks = 0
+                while True:
+		    kink = 0
+		    if w.x <= 0:
+			w.x = -w.x + 1
+			kink = 1
+		    if w.y <= 0:
+			w.y = -w.y + 1
+			kink = 1
+		    if w.x > GALSIZE*QUADSIZE:
+			w.x = (GALSIZE*QUADSIZE*2)+1 - w.x
+			kink = 1
+		    if w.y > GALSIZE*QUADSIZE:
+			w.y = (GALSIZE*QUADSIZE*2)+1 - w.y
+			kink = 1
+		    if kink:
+			kinks = 1
+		if not kink:
+                    break
+
+		if kinks:
+		    game.nkinks += 1
+		    if game.nkinks == 3:
+			# Three strikes -- you're out! 
+			finish(FNEG3)
+			return
+		    skip(1)
+		    prout(_("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"))
+		    prout(_("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"))
+		    prout(_("YOU WILL BE DESTROYED."))
+		# Compute final position in new quadrant 
+		if trbeam: # Don't bother if we are to be beamed 
+		    return
+		game.quadrant.x = (w.x+(QUADSIZE-1))/QUADSIZE
+		game.quadrant.y = (w.y+(QUADSIZE-1))/QUADSIZE
+		game.sector.x = w.x - QUADSIZE*(game.quadrant.x-1)
+		game.sector.y = w.y - QUADSIZE*(game.quadrant.y-1)
+		skip(1)
+		prout(_("Entering Quadrant %s.") % game.quadrant)
+		game.quad[game.sector.x][game.sector.y] = game.ship
+		newqad(False)
+		if game.skill>SKILL_NOVICE:
+		    attack(False)  
+		return
+	    iquad = game.quad[w.x][w.y]
+	    if iquad != IHDOT:
+		# object encountered in flight path 
+		stopegy = 50.0*game.dist/game.optime
+		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
+                if iquad in (IHT. IHK, OHC, IHS, IHR, IHQUEST):
+		    game.sector = w
+		    ram(False, iquad, game.sector)
+		    final = game.sector
+		elif iquad == IHBLANK:
+		    skip(1)
+		    prouts(_("***RED ALERT!  RED ALERT!"))
+		    skip(1)
+		    proutn("***")
+		    crmshp()
+		    proutn(_(" pulled into black hole at Sector %s") % w)
+		    #
+		    # Getting pulled into a black hole was certain
+		    # death in Almy's original.  Stas Sergeev added a
+		    # possibility that you'll get timewarped instead.
+		    # 
+		    n=0
+		    for m in range(0, NDEVICES):
+			if game.damage[m]>0: 
+			    n += 1
+		    probf=math.pow(1.4,(game.energy+game.shield)/5000.0-1.0)*math.pow(1.3,1.0/(n+1)-1.0)
+		    if (game.options & OPTION_BLKHOLE) and Rand()>probf: 
+			timwrp()
+		    else: 
+			finish(FHOLE)
+		    return
+		else:
+		    # something else 
+		    skip(1)
+		    crmshp()
+		    if iquad == IHWEB:
+			proutn(_(" encounters Tholian web at %s;") % w)
+		    else:
+			proutn(_(" blocked by object at %s;") % w)
+		    proutn(_("Emergency stop required "))
+		    prout(_("%2d units of energy.") % int(stopegy))
+		    game.energy -= stopegy
+		    final.x = x-deltax+0.5
+		    final.y = y-deltay+0.5
+		    game.sector = final
+		    if game.energy <= 0:
+			finish(FNRG)
+			return
+                # We're here!
+		no_quad_change()
+                return
+	game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
+	game.sector = w
+    final = game.sector
+    no_quad_change()
+    return
+
+def dock(verbose):
+    # dock our ship at a starbase 
+    chew()
+    if game.condition == "docked" and verbose:
+	prout(_("Already docked."))
+	return
+    if game.inorbit:
+	prout(_("You must first leave standard orbit."))
+	return
+    if not is_valid(game.base) or abs(game.sector.x-game.base.x) > 1 or abs(game.sector.y-game.base.y) > 1:
+	crmshp()
+	prout(_(" not adjacent to base."))
+	return
+    game.condition = "docked"
+    if "verbose":
+	prout(_("Docked."))
+    game.ididit = True
+    if game.energy < game.inenrg:
+	game.energy = game.inenrg
+    game.shield = game.inshld
+    game.torps = game.intorps
+    game.lsupres = game.inlsr
+    game.state.crew = FULLCREW
+    if not damaged(DRADIO) and \
+	((is_scheduled(FCDBAS) or game.isatb == 1) and not game.iseenit):
+	# get attack report from base 
+	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""))
+	attackreport(False)
+	game.iseenit = True
+
+# 
+# This program originally required input in terms of a (clock)
+# direction and distance. Somewhere in history, it was changed to
+# cartesian coordinates. So we need to convert.  Probably
+# "manual" input should still be done this way -- it's a real
+# pain if the computer isn't working! Manual mode is still confusing
+# because it involves giving x and y motions, yet the coordinates
+# are always displayed y - x, where +y is downward!
+# 
+
+def getcd(isprobe, akey):
+    # get course and distance 
+    irowq=game.quadrant.x; icolq=game.quadrant.y; key=0
+    navmode = "unspecified"
+    itemp = "curt"
+    incr = coord()
+    iprompt = False
+
+    # Get course direction and distance. If user types bad values, return
+    # with DIREC = -1.0.
+    game.direc = -1.0
+	
+    if game.landed and not isprobe:
+	prout(_("Dummy! You can't leave standard orbit until you"))
+	proutn(_("are back aboard the ship."))
+	chew()
+	return
+    while navmode == "unspecified":
+	if damaged(DNAVSYS):
+	    if isprobe:
+		prout(_("Computer damaged; manual navigation only"))
+	    else:
+		prout(_("Computer damaged; manual movement only"))
+	    chew()
+	    navmode = "manual"
+	    key = IHEOL
+	    break
+	if isprobe and akey != -1:
+	    # For probe launch, use pre-scanned value first time 
+	    key = akey
+	    akey = -1
+	else: 
+	    key = scan()
+
+	if key == IHEOL:
+	    proutn(_("Manual or automatic- "))
+	    iprompt = True
+	    chew()
+	elif key == IHALPHA:
+            if isit("manual"):
+		navmode = "manual"
+		key = scan()
+		break
+            elif isit("automatic"):
+		navmode = "automatic"
+		key = scan()
+		break
+	    else:
+		huh()
+		chew()
+		return
+	else: # numeric 
+	    if isprobe:
+		prout(_("(Manual navigation assumed.)"))
+	    else:
+		prout(_("(Manual movement assumed.)"))
+	    navmode = "manual"
+	    break
+
+    if navmode == "automatic":
+	while key == IHEOL:
+	    if isprobe:
+		proutn(_("Target quadrant or quadrant&sector- "))
+	    else:
+		proutn(_("Destination sector or quadrant&sector- "))
+	    chew()
+	    iprompt = True
+	    key = scan()
+
+	if key != IHREAL:
+	    huh()
+	    return
+	xi = aaitem
+	key = scan()
+	if key != IHREAL:
+	    huh()
+	    return
+	xj = aaitem
+	key = scan()
+	if key == IHREAL:
+	    # both quadrant and sector specified 
+	    xk = aaitem
+	    key = scan()
+	    if key != IHREAL:
+		huh()
+		return
+	    xl = aaitem
+
+	    irowq = xi + 0.5
+	    icolq = xj + 0.5
+	    incr.y = xk + 0.5
+	    incr.x = xl + 0.5
+	else:
+	    if isprobe:
+		# only quadrant specified -- go to center of dest quad 
+		irowq = xi + 0.5
+		icolq = xj + 0.5
+		incr.y = incr.x = 5
+	    else:
+		incr.y = xi + 0.5
+		incr.x = xj + 0.5
+	    itemp = "normal"
+	if not VALID_QUADRANT(icolq,irowq) or not VALID_SECTOR(incr.x,incr.y):
+	    huh()
+	    return
+	skip(1)
+	if not isprobe:
+	    if itemp > "curt":
+		if iprompt:
+		    prout(_("Helmsman Sulu- \"Course locked in for Sector %s.\"") % incr)
+	    else:
+		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
+	deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y)
+	deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y)
+    else: # manual 
+	while key == IHEOL:
+	    proutn(_("X and Y displacements- "))
+	    chew()
+	    iprompt = True
+	    key = scan()
+	itemp = "verbose"
+	if key != IHREAL:
+	    huh()
+	    return
+	deltax = aaitem
+	key = scan()
+	if key != IHREAL:
+	    huh()
+	    return
+	deltay = aaitem
+    # Check for zero movement 
+    if deltax == 0 and deltay == 0:
+	chew()
+	return
+    if itemp == "verbose" and not isprobe:
+	skip(1)
+	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
+    game.dist = math.sqrt(deltax*deltax + deltay*deltay)
+    game.direc = math.atan2(deltax, deltay)*1.90985932
+    if game.direc < 0.0:
+	game.direc += 12.0
+    chew()
+    return
+
+def impulse():
+    # move under impulse power 
+    game.ididit = False
+    if damaged(DIMPULS):
+	chew()
+	skip(1)
+	prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
+	return
+    if game.energy > 30.0:
+	getcd(False, 0)
+	if game.direc == -1.0:
+	    return
+	power = 20.0 + 100.0*game.dist
+    else:
+	power = 30.0
+
+    if power >= game.energy:
+	# Insufficient power for trip 
+	skip(1)
+	prout(_("First Officer Spock- \"Captain, the impulse engines"))
+	prout(_("require 20.0 units to engage, plus 100.0 units per"))
+	if game.energy > 30:
+	    proutn(_("quadrant.  We can go, therefore, a maximum of %d") %
+                     int(0.01 * (game.energy-20.0)-0.05))
+	    prout(_(" quadrants.\""))
+	else:
+	    prout(_("quadrant.  They are, therefore, useless.\""))
+	chew()
+	return
+    # Make sure enough time is left for the trip 
+    game.optime = game.dist/0.095
+    if game.optime >= game.state.remtime:
+	prout(_("First Officer Spock- \"Captain, our speed under impulse"))
+	prout(_("power is only 0.95 sectors per stardate. Are you sure"))
+	proutn(_("we dare spend the time?\" "))
+	if ja() == False:
+	    return
+    # Activate impulse engines and pay the cost 
+    imove(False)
+    game.ididit = True
+    if game.alldone:
+	return
+    power = 20.0 + 100.0*game.dist
+    game.energy -= power
+    game.optime = game.dist/0.095
+    if game.energy <= 0:
+	finish(FNRG)
+    return
+
+def warp(timewarp):
+    # move under warp drive 
+    blooey = False; twarp = False
+    if not timewarp: # Not WARPX entry 
+	game.ididit = False
+	if game.damage[DWARPEN] > 10.0:
+	    chew()
+	    skip(1)
+	    prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
+	    return
+	if damaged(DWARPEN) and game.warpfac > 4.0:
+	    chew()
+	    skip(1)
+	    prout(_("Engineer Scott- \"Sorry, Captain. Until this damage"))
+	    prout(_("  is repaired, I can only give you warp 4.\""))
+	    return
+			
+	# Read in course and distance 
+	getcd(False, 0)
+	if game.direc == -1.0:
+	    return
+
+	# Make sure starship has enough energy for the trip 
+	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
+	if power >= game.energy:
+	    # Insufficient power for trip 
+	    game.ididit = False
+	    skip(1)
+	    prout(_("Engineering to bridge--"))
+	    if not game.shldup or 0.5*power > game.energy:
+		iwarp = math.pow((game.energy/(game.dist+0.05)), 0.333333333)
+		if iwarp <= 0:
+		    prout(_("We can't do it, Captain. We don't have enough energy."))
+		else:
+		    proutn(_("We don't have enough energy, but we could do it at warp %d") % iwarp)
+		    if game.shldup:
+			prout(",")
+			prout(_("if you'll lower the shields."))
+		    else:
+			prout(".")
+	    else:
+		prout(_("We haven't the energy to go that far with the shields up."))
+	    return
+						
+	# Make sure enough time is left for the trip 
+	game.optime = 10.0*game.dist/game.wfacsq
+	if game.optime >= 0.8*game.state.remtime:
+	    skip(1)
+	    prout(_("First Officer Spock- \"Captain, I compute that such"))
+	    proutn(_("  a trip would require approximately %2.0f") %
+		   (100.0*game.optime/game.state.remtime))
+	    prout(_(" percent of our"))
+	    proutn(_("  remaining time.  Are you sure this is wise?\" "))
+	    if ja() == False:
+		game.ididit = False
+		game.optime=0 
+		return
+    # Entry WARPX 
+    if game.warpfac > 6.0:
+	# Decide if engine damage will occur 
+	prob = game.dist*(6.0-game.warpfac)*(6.0-game.warpfac)/66.666666666
+	if prob > Rand():
+	    blooey = True
+	    game.dist = Rand()*game.dist
+	# Decide if time warp will occur 
+	if 0.5*game.dist*math.pow(7.0,game.warpfac-10.0) > Rand():
+	    twarp = True
+	if idebug and game.warpfac==10 and not twarp:
+	    blooey = False
+	    proutn("=== Force time warp? ")
+	    if ja() == True:
+		twarp = True
+	if blooey or twarp:
+	    # If time warp or engine damage, check path 
+	    # If it is obstructed, don't do warp or damage 
+	    angle = ((15.0-game.direc)*0.5235998)
+	    deltax = -math.sin(angle)
+	    deltay = math.cos(angle)
+	    if math.fabs(deltax) > math.fabs(deltay):
+		bigger = math.fabs(deltax)
+	    else:
+		bigger = math.fabs(deltay)
+			
+	    deltax /= bigger
+	    deltay /= bigger
+	    n = 10.0 * game.dist * bigger +0.5
+	    x = game.sector.x
+	    y = game.sector.y
+	    for l in range(1, n+1):
+		x += deltax
+		ix = x + 0.5
+		y += deltay
+		iy = y +0.5
+		if not VALID_SECTOR(ix, iy):
+		    break
+		if game.quad[ix][iy] != IHDOT:
+		    blooey = False
+		    twarp = False
+				
+
+    # Activate Warp Engines and pay the cost 
+    imove(False)
+    if game.alldone:
+	return
+    game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
+    if game.energy <= 0:
+	finish(FNRG)
+    game.optime = 10.0*game.dist/game.wfacsq
+    if twarp:
+	timwrp()
+    if blooey:
+	game.damage[DWARPEN] = game.damfac*(3.0*Rand()+1.0)
+	skip(1)
+	prout(_("Engineering to bridge--"))
+	prout(_("  Scott here.  The warp engines are damaged."))
+	prout(_("  We'll have to reduce speed to warp 4."))
+    game.ididit = True
+    return
+
+def setwarp():
+    # change the warp factor 	
+    while True:
+        key=scan()
+        if key != IHEOL:
+            break
+	chew()
+	proutn(_("Warp factor- "))
+    chew()
+    if key != IHREAL:
+	huh()
+	return
+    if game.damage[DWARPEN] > 10.0:
+	prout(_("Warp engines inoperative."))
+	return
+    if damaged(DWARPEN) and aaitem > 4.0:
+	prout(_("Engineer Scott- \"I'm doing my best, Captain,"))
+	prout(_("  but right now we can only go warp 4.\""))
+	return
+    if aaitem > 10.0:
+	prout(_("Helmsman Sulu- \"Our top speed is warp 10, Captain.\""))
+	return
+    if aaitem < 1.0:
+	prout(_("Helmsman Sulu- \"We can't go below warp 1, Captain.\""))
+	return
+    oldfac = game.warpfac
+    game.warpfac = aaitem
+    game.wfacsq=game.warpfac*game.warpfac
+    if game.warpfac <= oldfac or game.warpfac <= 6.0:
+	prout(_("Helmsman Sulu- \"Warp factor %d, Captain.\"") %
+	       int(game.warpfac))
+	return
+    if game.warpfac < 8.00:
+	prout(_("Engineer Scott- \"Aye, but our maximum safe speed is warp 6.\""))
+	return
+    if game.warpfac == 10.0:
+	prout(_("Engineer Scott- \"Aye, Captain, we'll try it.\""))
+	return
+    prout(_("Engineer Scott- \"Aye, Captain, but our engines may not take it.\""))
+    return
+
+def atover(igrab):
+    # cope with being tossed out of quadrant by supernova or yanked by beam 
+
+    chew()
+    # is captain on planet? 
+    if game.landed:
+	if damaged(DTRANSP):
+	    finish(FPNOVA)
+	    return
+	prout(_("Scotty rushes to the transporter controls."))
+	if game.shldup:
+	    prout(_("But with the shields up it's hopeless."))
+	    finish(FPNOVA)
+	prouts(_("His desperate attempt to rescue you . . ."))
+	if Rand() <= 0.5:
+	    prout(_("fails."))
+	    finish(FPNOVA)
+	    return
+	prout(_("SUCCEEDS!"))
+	if game.imine:
+	    game.imine = False
+	    proutn(_("The crystals mined were "))
+	    if Rand() <= 0.25:
+		prout(_("lost."))
+	    else:
+		prout(_("saved."))
+		game.icrystl = True
+    if igrab:
+	return
+
+    # Check to see if captain in shuttle craft 
+    if game.icraft:
+	finish(FSTRACTOR)
+    if game.alldone:
+	return
+
+    # Inform captain of attempt to reach safety 
+    skip(1)
+    while True:
+	if game.justin:
+	    prouts(_("***RED ALERT!  RED ALERT!"))
+	    skip(1)
+	    proutn(_("The "))
+	    crmshp()
+	    prout(_(" has stopped in a quadrant containing"))
+	    prouts(_("   a supernova."))
+	    skip(2)
+	proutn(_("***Emergency automatic override attempts to hurl "))
+	crmshp()
+	skip(1)
+	prout(_("safely out of quadrant."))
+	if not damaged(DRADIO):
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = True
+	# Try to use warp engines 
+	if damaged(DWARPEN):
+	    skip(1)
+	    prout(_("Warp engines damaged."))
+	    finish(FSNOVAED)
+	    return
+	game.warpfac = 6.0+2.0*Rand()
+	game.wfacsq = game.warpfac * game.warpfac
+	prout(_("Warp factor set to %d") % int(game.warpfac))
+	power = 0.75*game.energy
+	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
+	distreq = 1.4142+Rand()
+	if distreq < game.dist:
+	    game.dist = distreq
+	game.optime = 10.0*game.dist/game.wfacsq
+	game.direc = 12.0*Rand()	# How dumb! 
+	game.justin = False
+	game.inorbit = False
+	warp(True)
+	if not game.justin:
+	    # This is bad news, we didn't leave quadrant. 
+	    if game.alldone:
+		return
+	    skip(1)
+	    prout(_("Insufficient energy to leave quadrant."))
+	    finish(FSNOVAED)
+	    return
+	# Repeat if another snova
+        if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+            break
+    if (game.state.remkl + game.state.remcom + game.state.nscrem)==0: 
+	finish(FWON) # Snova killed remaining enemy. 
+
+def timwrp():
+    # let's do the time warp again 
+    prout(_("***TIME WARP ENTERED."))
+    if game.state.snap and Rand() < 0.5:
+	# Go back in time 
+	prout(_("You are traveling backwards in time %d stardates.") %
+	      int(game.state.date-game.snapsht.date))
+	game.state = game.snapsht
+	game.state.snap = False
+	if game.state.remcom:
+	    schedule(FTBEAM, expran(game.intime/game.state.remcom))
+	    schedule(FBATTAK, expran(0.3*game.intime))
+	schedule(FSNOVA, expran(0.5*game.intime))
+	# next snapshot will be sooner 
+	schedule(FSNAP, expran(0.25*game.state.remtime))
+				
+	if game.state.nscrem:
+	    schedule(FSCMOVE, 0.2777)	    
+	game.isatb = 0
+	unschedule(FCDBAS)
+	unschedule(FSCDBAS)
+	invalidate(game.battle)
+
+	# Make sure Galileo is consistant -- Snapshot may have been taken
+        # when on planet, which would give us two Galileos! 
+	gotit = False
+	for l in range(game.inplan):
+	    if game.state.planets[l].known == "shuttle_down":
+		gotit = True
+		if game.iscraft == "onship" and game.ship==IHE:
+		    prout(_("Chekov-  \"Security reports the Galileo has disappeared, Sir!"))
+		    game.iscraft = "offship"
+	# Likewise, if in the original time the Galileo was abandoned, but
+	# was on ship earlier, it would have vanished -- let's restore it.
+	if game.iscraft == "offship" and not gotit and game.damage[DSHUTTL] >= 0.0:
+	    prout(_("Checkov-  \"Security reports the Galileo has reappeared in the dock!\""))
+	    game.iscraft = "onship"
+	# 
+#	 * There used to be code to do the actual reconstrction here,
+#	 * but the starchart is now part of the snapshotted galaxy state.
+#	 
+	prout(_("Spock has reconstructed a correct star chart from memory"))
+    else:
+	# Go forward in time 
+	game.optime = -0.5*game.intime*math.log(Rand())
+	prout(_("You are traveling forward in time %d stardates.") % int(game.optime))
+	# cheat to make sure no tractor beams occur during time warp 
+	postpone(FTBEAM, game.optime)
+	game.damage[DRADIO] += game.optime
+    newqad(False)
+    events()	# Stas Sergeev added this -- do pending events 
+
+def probe():
+    # launch deep-space probe 
+    # New code to launch a deep space probe 
+    if game.nprobes == 0:
+	chew()
+	skip(1)
+	if game.ship == IHE: 
+	    prout(_("Engineer Scott- \"We have no more deep space probes, Sir.\""))
+	else:
+	    prout(_("Ye Faerie Queene has no deep space probes."))
+	return
+    if damaged(DDSP):
+	chew()
+	skip(1)
+	prout(_("Engineer Scott- \"The probe launcher is damaged, Sir.\""))
+	return
+    if is_scheduled(FDSPROB):
+	chew()
+	skip(1)
+	if damaged(DRADIO) and game.condition != "docked":
+	    prout(_("Spock-  \"Records show the previous probe has not yet"))
+	    prout(_("   reached its destination.\""))
+	else:
+	    prout(_("Uhura- \"The previous probe is still reporting data, Sir.\""))
+	return
+    key = scan()
+
+    if key == IHEOL:
+	# slow mode, so let Kirk know how many probes there are left
+        if game.nprobes == 1:
+            prout(_("1 probe left."))
+        else:
+            prout(_("%d probes left") % game.nprobes)
+	proutn(_("Are you sure you want to fire a probe? "))
+	if ja() == False:
+	    return
+
+    game.isarmed = False
+    if key == IHALPHA and citem == "armed":
+	game.isarmed = True
+	key = scan()
+    elif key == IHEOL:
+	proutn(_("Arm NOVAMAX warhead? "))
+	game.isarmed = ja()
+    getcd(True, key)
+    if game.direc == -1.0:
+	return
+    game.nprobes -= 1
+    angle = ((15.0 - game.direc) * 0.5235988)
+    game.probeinx = -math.sin(angle)
+    game.probeiny = math.cos(angle)
+    if math.fabs(game.probeinx) > math.fabs(game.probeiny):
+	bigger = math.fabs(game.probeinx)
+    else:
+	bigger = math.fabs(game.probeiny)
+		
+    game.probeiny /= bigger
+    game.probeinx /= bigger
+    game.proben = 10.0*game.dist*bigger +0.5
+    game.probex = game.quadrant.x*QUADSIZE + game.sector.x - 1	# We will use better packing than original
+    game.probey = game.quadrant.y*QUADSIZE + game.sector.y - 1
+    game.probec = game.quadrant
+    schedule(FDSPROB, 0.01) # Time to move one sector
+    prout(_("Ensign Chekov-  \"The deep space probe is launched, Captain.\""))
+    game.ididit = True
+    return
+
+# Here's how the mayday code works:
+# 
+# First, the closest starbase is selected.  If there is a a starbase
+# in your own quadrant, you are in good shape.  This distance takes
+# quadrant distances into account only.
+#
+# A magic number is computed based on the distance which acts as the
+# probability that you will be rematerialized.  You get three tries.
+#
+# When it is determined that you should be able to be rematerialized
+# (i.e., when the probability thing mentioned above comes up
+# positive), you are put into that quadrant (anywhere).  Then, we try
+# to see if there is a spot adjacent to the star- base.  If not, you
+# can't be rematerialized!!!  Otherwise, it drops you there.  It only
+# tries five times to find a spot to drop you.  After that, it's your
+# problem.
+
+def mayday():
+    # yell for help from nearest starbase 
+    # There's more than one way to move in this game! 
+    line = 0
+
+    chew()
+    # Test for conditions which prevent calling for help 
+    if game.condition == "docked":
+	prout(_("Lt. Uhura-  \"But Captain, we're already docked.\""))
+	return
+    if damaged(DRADIO):
+	prout(_("Subspace radio damaged."))
+	return
+    if game.state.rembase==0:
+	prout(_("Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\""))
+	return
+    if game.landed:
+	proutn(_("You must be aboard the "))
+	crmshp()
+	prout(".")
+	return
+    # OK -- call for help from nearest starbase 
+    game.nhelp += 1
+    if game.base.x!=0:
+	# There's one in this quadrant 
+	ddist = distance(game.base, game.sector)
+    else:
+	ddist = FOREVER
+	for m in range(1, game.state.rembase+1):
+	    xdist = QUADSIZE * distance(game.state.baseq[m], game.quadrant)
+	    if xdist < ddist:
+		ddist = xdist
+		line = m
+	# Since starbase not in quadrant, set up new quadrant 
+	game.quadrant = game.state.baseq[line]
+	newqad(True)
+    # dematerialize starship 
+    game.quad[game.sector.x][game.sector.y]=IHDOT
+    proutn(_("Starbase in Quadrant %s responds--") % game.quadrant)
+    crmshp()
+    prout(_(" dematerializes."))
+    game.sector.x=0
+    for m in range(1, 5+1):
+	ix = game.base.x+3.0*Rand()-1
+	iy = game.base.y+3.0*Rand()-1
+	if VALID_SECTOR(ix,iy) and game.quad[ix][iy]==IHDOT:
+	    # found one -- finish up 
+	    game.sector.x=ix
+	    game.sector.y=iy
+	    break
+    if not is_valid(game.sector):
+	prout(_("You have been lost in space..."))
+	finish(FMATERIALIZE)
+	return
+    # Give starbase three chances to rematerialize starship 
+    probf = math.pow((1.0 - math.pow(0.98,ddist)), 0.33333333)
+    for m in range(1, 3+1):
+	if m == 1: proutn(_("1st"))
+	elif m == 2: proutn(_("2nd"))
+	elif m == 3: proutn(_("3rd"))
+	proutn(_(" attempt to re-materialize "))
+	crmshp()
+	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
+	textcolor(RED)
+	warble()
+	if Rand() > probf:
+	    break
+	prout(_("fails."))
+	curses.delay_output(500)
+	textcolor(DEFAULT)
+    if m > 3:
+	game.quad[ix][iy]=IHQUEST
+	game.alive = False
+	drawmaps(1)
+	setwnd(message_window)
+	finish(FMATERIALIZE)
+	return
+    game.quad[ix][iy]=game.ship
+    textcolor(GREEN)
+    prout(_("succeeds."))
+    textcolor(DEFAULT)
+    dock(False)
+    skip(1)
+    prout(_("Lt. Uhura-  \"Captain, we made it!\""))
+
+# Abandon Ship (the BSD-Trek description)
+# 
+# The ship is abandoned.  If your current ship is the Faire
+# Queene, or if your shuttlecraft is dead, you're out of
+# luck.  You need the shuttlecraft in order for the captain
+# (that's you!!) to escape.
+# 
+# Your crew can beam to an inhabited starsystem in the
+# quadrant, if there is one and if the transporter is working.
+# If there is no inhabited starsystem, or if the transporter
+# is out, they are left to die in outer space.
+# 
+# If there are no starbases left, you are captured by the
+# Klingons, who torture you mercilessly.  However, if there
+# is at least one starbase, you are returned to the
+# Federation in a prisoner of war exchange.  Of course, this
+# can't happen unless you have taken some prisoners.
+
+def abandon():
+    # abandon ship 
+    chew()
+    if game.condition=="docked":
+	if game.ship!=IHE:
+	    prout(_("You cannot abandon Ye Faerie Queene."))
+	    return
+    else:
+	# Must take shuttle craft to exit 
+	if game.damage[DSHUTTL]==-1:
+	    prout(_("Ye Faerie Queene has no shuttle craft."))
+	    return
+	if game.damage[DSHUTTL]<0:
+	    prout(_("Shuttle craft now serving Big Macs."))
+	    return
+	if game.damage[DSHUTTL]>0:
+	    prout(_("Shuttle craft damaged."))
+	    return
+	if game.landed:
+	    prout(_("You must be aboard the ship."))
+	    return
+	if game.iscraft != "onship":
+	    prout(_("Shuttle craft not currently available."))
+	    return
+	# Print abandon ship messages 
+	skip(1)
+	prouts(_("***ABANDON SHIP!  ABANDON SHIP!"))
+	skip(1)
+	prouts(_("***ALL HANDS ABANDON SHIP!"))
+	skip(2)
+	prout(_("Captain and crew escape in shuttle craft."))
+	if game.state.rembase==0:
+	    # Oops! no place to go... 
+	    finish(FABANDN)
+	    return
+	q = game.state.galaxy[game.quadrant.x][game.quadrant.y]
+	# Dispose of crew 
+	if not (game.options & OPTION_WORLDS) and not damaged(DTRANSP):
+	    prout(_("Remainder of ship's complement beam down"))
+	    prout(_("to nearest habitable planet."))
+	elif q.planet != NOPLANET and not damaged(DTRANSP):
+	    prout(_("Remainder of ship's complement beam down to %s.") %
+		    q.planet)
+	else:
+	    prout(_("Entire crew of %d left to die in outer space.") %
+		    game.state.crew)
+	    game.casual += game.state.crew
+	    game.abandoned += game.state.crew
+
+	# If at least one base left, give 'em the Faerie Queene 
+	skip(1)
+	game.icrystl = False # crystals are lost 
+	game.nprobes = 0 # No probes 
+	prout(_("You are captured by Klingons and released to"))
+	prout(_("the Federation in a prisoner-of-war exchange."))
+	nb = Rand()*game.state.rembase+1
+	# Set up quadrant and position FQ adjacient to base 
+	if not same(game.quadrant, game.state.baseq[nb]):
+	    game.quadrant = game.state.baseq[nb]
+	    game.sector.x = game.sector.y = 5
+	    newqad(True)
+	while True:
+	    # position next to base by trial and error 
+	    game.quad[game.sector.x][game.sector.y] = IHDOT
+	    for l in range(1, QUADSIZE+1):
+		game.sector.x = 3.0*Rand() - 1.0 + game.base.x
+		game.sector.y = 3.0*Rand() - 1.0 + game.base.y
+		if VALID_SECTOR(game.sector.x, game.sector.y) and \
+                       game.quad[game.sector.x][game.sector.y] == IHDOT:
+                    break
+	    if l < QUADSIZE+1:
+		break # found a spot 
+	    game.sector.x=QUADSIZE/2
+	    game.sector.y=QUADSIZE/2
+	    newqad(True)
+    # Get new commission 
+    game.quad[game.sector.x][game.sector.y] = game.ship = IHF
+    game.state.crew = FULLCREW
+    prout(_("Starfleet puts you in command of another ship,"))
+    prout(_("the Faerie Queene, which is antiquated but,"))
+    prout(_("still useable."))
+    if game.icrystl:
+	prout(_("The dilithium crystals have been moved."))
+    game.imine = False
+    game.iscraft = "offship" # Galileo disappears 
+    # Resupply ship 
+    game.condition="docked"
+    for l in range(0, NDEVICES): 
+	game.damage[l] = 0.0
+    game.damage[DSHUTTL] = -1
+    game.energy = game.inenrg = 3000.0
+    game.shield = game.inshld = 1250.0
+    game.torps = game.intorps = 6
+    game.lsupres=game.inlsr=3.0
+    game.shldup=False
+    game.warpfac=5.0
+    game.wfacsq=25.0
+    return
