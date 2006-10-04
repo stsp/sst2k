@@ -6,7 +6,7 @@ The FORTRANness still shows in many ways, notably the use of 1-origin index
 an a lot of parallel arrays where a more modern language would use structures
 or objects.
 """
-import os, sys, math, curses, time
+import os, sys, math, curses, time, atexit, readline
 
 SSTDOC = "/usr/share/doc/sst/sst.doc"
 
@@ -3310,3 +3310,347 @@ def plaque():
     fp.write(_("                                                        Your score:  %d\n\n" % iscore))
     fp.write(_("                                                    Klingons per stardate:  %.2f\n" % perdate))
     fp.close()
+
+# Code from io.c begins here
+
+rows = linecount = 0	# for paging 
+stdscr = None
+fullscreen_window = None
+srscan_window     = None
+report_window     = None
+status_window     = None
+lrscan_window     = None
+message_window    = None
+prompt_window     = None
+
+def outro():
+    "wrap up, either normally or due to signal"
+    if game.options & OPTION_CURSES:
+	#clear()
+	#curs_set(1)
+	#refresh()
+	#resetterm()
+	#echo()
+	curses.endwin()
+	stdout.write('\n')
+    if logfp:
+	logfp.close()
+
+def iostart():
+    global stdscr
+    #setlocale(LC_ALL, "")
+    #bindtextdomain(PACKAGE, LOCALEDIR)
+    #textdomain(PACKAGE)
+    if atexit.register(outro):
+	sys.stderr.write("Unable to register outro(), exiting...\n")
+	os.exit(1)
+    if not (game.options & OPTION_CURSES):
+	ln_env = os.getenv("LINES")
+        if ln_env:
+            rows = ln_env
+        else:
+            rows = 25
+    else:
+	stdscr = curses.initscr()
+	stdscr.keypad(True)
+	#saveterm()
+	curses.nonl()
+	curses.cbreak()
+        curses.start_color()
+        curses.init_pair(curses.COLOR_BLACK, curses.COLOR_BLACK, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_GREEN, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_RED, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_CYAN, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_WHITE, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_MAGENTA, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_BLUE, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(curses.COLOR_YELLOW, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+	#noecho()
+        global fullscreen_window, srscan_window, report_window, status_window
+        global lrscan_window, message_window, prompt_window
+	fullscreen_window = stdscr
+	srscan_window     = curses.newwin(12, 25, 0,       0)
+	report_window     = curses.newwin(11, 0,  1,       25)
+	status_window     = curses.newwin(10, 0,  1,       39)
+	lrscan_window     = curses.newwin(5,  0,  0,       64) 
+	message_window    = curses.newwin(0,  0,  12,      0)
+	prompt_window     = curses.newwin(1,  0,  rows-2,  0) 
+	message_window.scrollok(True)
+	setwnd(fullscreen_window)
+	textcolor(DEFAULT)
+
+
+def waitfor():
+    "wait for user action -- OK to do nothing if on a TTY"
+    if game.options & OPTION_CURSES:
+	stsdcr.getch()
+
+def announce():
+    skip(1)
+    if game.skill > SKILL_FAIR:
+	prouts(_("[ANOUNCEMENT ARRIVING...]"))
+    else:
+	prouts(_("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]"))
+    skip(1)
+
+def pause_game():
+    if game.skill > SKILL_FAIR:
+        prompt = _("[CONTINUE?]")
+    else:
+        prompt = _("[PRESS ENTER TO CONTINUE]")
+
+    if game.options & OPTION_CURSES:
+        drawmaps(0)
+        setwnd(prompt_window)
+        prompt_window.wclear()
+        prompt_window.addstr(prompt)
+        prompt_window.getstr()
+        prompt_window.clear()
+        prompt_window.refresh()
+        setwnd(message_window)
+    else:
+        global linecount
+        stdout.write('\n')
+        proutn(prompt)
+        raw_input()
+        for j in range(0, rows):
+            stdout.write('\n')
+        linecount = 0
+
+def skip(i):
+    "Skip i lines.  Pause game if this would cause a scrolling event."
+    while dummy in range(i):
+	if game.options & OPTION_CURSES:
+            (y, x) = curwnd.getyx()
+            (my, mx) = curwnd.getmaxyx()
+	    if curwnd == message_window and y >= my - 3:
+		pause_game()
+		clrscr()
+	    else:
+		proutn("\n")
+	else:
+            global linecount
+	    linecount += 1
+	    if linecount >= rows:
+		pause_game()
+	    else:
+		stdout.write('\n')
+
+def proutn(line):
+    "Utter a line with no following line feed."
+    if game.options & OPTION_CURSES:
+	curwnd.addstr(line)
+	curwnd.refresh()
+    else:
+	stdout.write(line)
+
+def prout(line):
+    proutn(line)
+    skip(1)
+
+def prouts(line):
+    "print slowly!" 
+    for c in line:
+	curses.delay_output(30)
+	proutn(c)
+	if game.options & OPTION_CURSES:
+	    wrefresh(curwnd)
+	else:
+	    sys.stdout.flush()
+    curses.delay_output(300)
+
+def cgetline(line, max):
+    "Get a line of input."
+    if game.options & OPTION_CURSES:
+	line = curwnd.getstr() + "\n"
+	curwnd.refresh()
+    else:
+	if replayfp and not replayfp.closed:
+	    line = replayfp.readline()
+	else:
+	    sys.stdin.readline()
+    if logfp:
+	logfp.write(line)
+
+def setwnd(wnd):
+    "Change windows -- OK for this to be a no-op in tty mode." 
+    if game.options & OPTION_CURSES:
+        curwnd = wnd
+        curses.curs_set(wnd == fullscreen_window or wnd == message_window or wnd == prompt_window)
+
+def clreol():
+    "Clear to end of line -- can be a no-op in tty mode" 
+    if game.options & OPTION_CURSES:
+        wclrtoeol(curwnd)
+        wrefresh(curwnd)
+
+def clrscr():
+    "Clear screen -- can be a no-op in tty mode."
+    global linecount
+    if game.options & OPTION_CURSES:
+       curwnd.clear()
+       curwnd.move(0, 0)
+       curwnd.refresh()
+    linecount = 0
+
+def textcolor(color):
+    "Set the current text color"
+    if game.options & OPTION_CURSES:
+	if color == DEFAULT: 
+	    curwnd.attrset(0)
+	elif color == BLACK: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLACK))
+	elif color == BLUE: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLUE))
+	elif color == GREEN: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_GREEN))
+	elif color == CYAN: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_CYAN))
+	elif color == RED: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_RED))
+	elif color == MAGENTA: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_MAGENTA))
+	elif color == BROWN: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_YELLOW))
+	elif color == LIGHTGRAY: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_WHITE))
+	elif color == DARKGRAY: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLACK) | curses.A_BOLD)
+	elif color == LIGHTBLUE: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLUE) | curses.A_BOLD)
+	elif color == LIGHTGREEN: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_GREEN) | curses.A_BOLD)
+	elif color == LIGHTCYAN: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_CYAN) | curses.A_BOLD)
+	elif color == LIGHTRED: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_RED) | curses.A_BOLD)
+	elif color == LIGHTMAGENTA: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_MAGENTA) | curses.A_BOLD)
+	elif color == YELLOW: 
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_YELLOW) | curses.A_BOLD)
+	elif color == WHITE:
+	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_WHITE) | curses.A_BOLD)
+
+def highvideo():
+    "Set highlight video, if this is reasonable."
+    if game.options & OPTION_CURSES:
+	curwnd.attron(curses.A_REVERSE)
+ 
+def commandhook(cmd, before):
+    pass
+
+#
+# Things past this point have policy implications.
+# 
+
+def drawmaps(mode):
+    "Hook to be called after moving to redraw maps."
+    if game.options & OPTION_CURSES:
+	if mode == 1:
+	    sensor()
+        setwnd(srscan_window)
+        curwnd.move(0, 0)
+        srscan()
+	if mode != 2:
+	    setwnd(status_window)
+	    status_window.clear()
+	    status_window.move(0, 0)
+	    setwnd(report_window)
+	    report_window.clear()
+	    report_window.move(0, 0)
+	    status(0)
+	    setwnd(lrscan_window)
+	    lrscan_window.clear()
+	    lrscan_window.move(0, 0)
+	    lrscan()
+
+def put_srscan_sym(w, sym):
+    "Emit symbol for short-range scan."
+    srscan_window.move(w.x+1, w.y*2+2)
+    srscan_window.addch(sym)
+    srscan_window.refresh()
+
+def boom(w):
+    "Enemy fall down, go boom."  
+    if game.options & OPTION_CURSES:
+	drawmaps(2)
+	setwnd(srscan_window)
+	srscan_window.attron(curses.A_REVERSE)
+	put_srscan_sym(w, game.quad[w.x][w.y])
+	#sound(500)
+	#delay(1000)
+	#nosound()
+	srscan_window.attroff(curses.A_REVERSE)
+	put_srscan_sym(w, game.quad[w.x][w.y])
+	curses.delay_output(500)
+	setwnd(message_window) 
+
+def warble():
+    "Sound and visual effects for teleportation."
+    if game.options & OPTION_CURSES:
+	drawmaps(2)
+	setwnd(message_window)
+	#sound(50)
+    prouts("     . . . . .     ")
+    if game.options & OPTION_CURSES:
+	#curses.delay_output(1000)
+	#nosound()
+        pass
+
+def tracktorpedo(w, l, i, n, iquad):
+    "Torpedo-track animation." 
+    if not game.options & OPTION_CURSES:
+	if l == 1:
+	    if n != 1:
+		skip(1)
+		proutn(_("Track for torpedo number %d-  " % i))
+	    else:
+		skip(1)
+		proutn(_("Torpedo track- "))
+	elif l==4 or l==9: 
+	    skip(1)
+	proutn("%d - %d   " % (w.x, w.y))
+    else:
+	if not damaged(DSRSENS) or game.condition=="docked":
+	    if i != 1 and l == 1:
+		drawmaps(2)
+		curses.delay_output(400)
+	    if (iquad==IHDOT) or (iquad==IHBLANK):
+		put_srscan_sym(w, '+')
+		#sound(l*10)
+		#curses.delay_output(100)
+		#nosound()
+		put_srscan_sym(w, iquad)
+	    else:
+		curwnd.attron(curses.A_REVERSE)
+		put_srscan_sym(w, iquad)
+		#sound(500)
+		#curses.delay_output(1000)
+		#nosound()
+		curwnd.attroff(curses.A_REVERSE)
+		put_srscan_sym(w, iquad)
+	else:
+	    proutn("%d - %d   " % (w.x, w.y))
+
+def makechart():
+    "Display the current galaxy chart."
+    if game.options & OPTION_CURSES:
+	setwnd(message_window)
+	message_window.clear()
+    chart()
+    if game.options & OPTION_TTY:
+	skip(1)
+
+NSYM	= 14
+
+def prstat(txt, data):
+    proutn(txt)
+    if game.options & OPTION_CURSES:
+	skip(1)
+	setwnd(status_window)
+    else:
+        proutn(" " * NSYM - len(tx))
+    vproutn(data)
+    skip(1)
+    if game.options & OPTION_CURSES:
+	setwnd(report_window)
