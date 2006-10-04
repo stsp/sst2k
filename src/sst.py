@@ -6,7 +6,7 @@ The FORTRANness still shows in many ways, notably the use of 1-origin index
 an a lot of parallel arrays where a more modern language would use structures
 or objects.
 """
-import os, sys, math, curses, time, atexit, readline
+import os, sys, math, curses, time, atexit, readline, cPickle, random
 
 SSTDOC = "/usr/share/doc/sst/sst.doc"
 
@@ -84,6 +84,7 @@ class planet:
         self.pclass = None	# could be ""M", "N", "O", or "destroyed"
         self.crystals = None	# could be "mined", "present", "absent"
         self.known = None	# could be "unknown", "known", "shuttle_down"
+        self.inhabited		# is it inhabites?
     def __str__(self):
         return self.name
 
@@ -119,8 +120,6 @@ class snapshot:
 	self.nplankl = None	# destroyed uninhabited planets
 	self.nworldkl = None	# destroyed inhabited planets
         self.planets = []	# Planet information
-        for i in range(PLNETMAX):
-            self.planets.append(planet())
         self.date = None	# stardate
 	self.remres = None	# remaining resources
 	self.remtime = None	# remaining time
@@ -225,7 +224,7 @@ class gamestate:
         self.kpower = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy energy levels
         self.kdist = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy distances
         self.kavgd = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# average distances
-        self.damage = [0] * NDEVICES	# damage encountered
+        self.damage = [0.0] * NDEVICES	# damage encountered
         self.future = [0.0] * NEVENTS	# future events
         for i in range(NEVENTS):
             self.future.append(event())
@@ -2449,7 +2448,7 @@ def events():
 		w = randplace(GALSIZE)
 		q = game.state.galaxy[w.x][w.y]
                 if not (game.quadrant == w or q.planet == NOPLANET or \
-		      game.state.planets[q.planet].inhabited == UNINHABITED or \
+		      not game.state.planets[q.planet].inhabited or \
 		      q.supernova or q.status!=secure or q.klingons<=0):
                     break
             else:
@@ -4667,7 +4666,7 @@ def survey():
 	if game.state.planets[i].pclass == destroyed:
 	    continue
 	if (game.state.planets[i].known != "unknown" \
-            and game.state.planets[i].inhabited == UNINHABITED) \
+            and not game.state.planets[i].inhabited) \
             or idebug:
 	    iknow = True
 	    if idebug and game.state.planets[i].known=="unknown":
@@ -5353,7 +5352,7 @@ def status(req):
     elif not req or req == 10:
 	if game.options & OPTION_WORLDS:
 	    plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet
-	    if plnet != NOPLANET and game.state.planets[plnet].inhabited != UNINHABITED:
+	    if plnet != NOPLANET and game.state.planets[plnet].inhabited:
 		prstat(_("Major system"), plnet.name)
 	    else:
 		prout(_("Sector is uninhabited"))
@@ -5586,3 +5585,680 @@ def visual():
     game.optime = 0.5
     game.ididit = True
 #endif
+
+# Code from setup.c begins here
+
+def filelength(fd):
+    return os.fstat(fd).st_size
+
+def prelim():
+    # issue a historically correct banner 
+    skip(2)
+    prout(_("-SUPER- STAR TREK"))
+    skip(1)
+#ifdef __HISTORICAL__
+#    prout(_("Latest update-21 Sept 78"))
+#    skip(1)
+#endif __HISTORICAL__ 
+
+def freeze(boss):
+    # save game 
+    if boss:
+	citem = "emsave.trk"
+    else:
+        key = scan()
+	if key == IHEOL:
+	    proutn(_("File name: "))
+	    key = scan()
+	if key != IHALPHA:
+	    huh()
+	    return
+	chew()
+        if '.' not in citem:
+	    citem += ".trk"
+    try:
+        fp = open(citem, "wb")
+    except IOError:
+	prout(_("Can't freeze game as file %s") % citem)
+	return
+    cPickle.dump(game, fp)
+    fp.close()
+
+def thaw():
+    # retrieve saved game 
+    game.passwd[0] = '\0'
+    key = scan()
+    if key == IHEOL:
+	proutn(_("File name: "))
+	key = scan()
+    if key != IHALPHA:
+	huh()
+	return True
+    chew()
+    if '.' not in citem:
+        citem += ".trk"
+    try:
+        fp = open(citem, "rb")
+    except IOError:
+	prout(_("Can't thaw game in %s") % citem)
+	return
+    game = cPickle.load(fp)
+    fp.close()
+    return False
+
+# I used <http://www.memory-alpha.org> to find planets
+# with references in ST:TOS.  Eath and the Alpha Centauri
+# Colony have been omitted.
+# 
+# Some planets marked Class G and P here will be displayed as class M
+# because of the way planets are generated. This is a known bug.
+systnames = (
+    # Federation Worlds 
+    _("Andoria (Fesoan)"),	# several episodes 
+    _("Tellar Prime (Miracht)"),	# TOS: "Journey to Babel" 
+    _("Vulcan (T'Khasi)"),	# many episodes 
+    _("Medusa"),		# TOS: "Is There in Truth No Beauty?" 
+    _("Argelius II (Nelphia)"),# TOS: "Wolf in the Fold" ("IV" in BSD) 
+    _("Ardana"),		# TOS: "The Cloud Minders" 
+    _("Catulla (Cendo-Prae)"),	# TOS: "The Way to Eden" 
+    _("Gideon"),		# TOS: "The Mark of Gideon" 
+    _("Aldebaran III"),	# TOS: "The Deadly Years" 
+    _("Alpha Majoris I"),	# TOS: "Wolf in the Fold" 
+    _("Altair IV"),		# TOS: "Amok Time 
+    _("Ariannus"),		# TOS: "Let That Be Your Last Battlefield" 
+    _("Benecia"),		# TOS: "The Conscience of the King" 
+    _("Beta Niobe I (Sarpeidon)"),	# TOS: "All Our Yesterdays" 
+    _("Alpha Carinae II"),	# TOS: "The Ultimate Computer" 
+    _("Capella IV (Kohath)"),	# TOS: "Friday's Child" (Class G) 
+    _("Daran V"),		# TOS: "For the World is Hollow and I Have Touched the Sky" 
+    _("Deneb II"),		# TOS: "Wolf in the Fold" ("IV" in BSD) 
+    _("Eminiar VII"),		# TOS: "A Taste of Armageddon" 
+    _("Gamma Canaris IV"),	# TOS: "Metamorphosis" 
+    _("Gamma Tranguli VI (Vaalel)"),	# TOS: "The Apple" 
+    _("Ingraham B"),		# TOS: "Operation: Annihilate" 
+    _("Janus IV"),		# TOS: "The Devil in the Dark" 
+    _("Makus III"),		# TOS: "The Galileo Seven" 
+    _("Marcos XII"),		# TOS: "And the Children Shall Lead", 
+    _("Omega IV"),		# TOS: "The Omega Glory" 
+    _("Regulus V"),		# TOS: "Amok Time 
+    _("Deneva"),		# TOS: "Operation -- Annihilate!" 
+    # Worlds from BSD Trek 
+    _("Rigel II"),		# TOS: "Shore Leave" ("III" in BSD) 
+    _("Beta III"),		# TOS: "The Return of the Archons" 
+    _("Triacus"),		# TOS: "And the Children Shall Lead", 
+    _("Exo III"),		# TOS: "What Are Little Girls Made Of?" (Class P) 
+#	# Others 
+#    _("Hansen's Planet"),	# TOS: "The Galileo Seven" 
+#    _("Taurus IV"),		# TOS: "The Galileo Seven" (class G) 
+#    _("Antos IV (Doraphane)"),	# TOS: "Whom Gods Destroy", "Who Mourns for Adonais?" 
+#    _("Izar"),			# TOS: "Whom Gods Destroy" 
+#    _("Tiburon"),		# TOS: "The Way to Eden" 
+#    _("Merak II"),		# TOS: "The Cloud Minders" 
+#    _("Coridan (Desotriana)"),	# TOS: "Journey to Babel" 
+#    _("Iotia"),		# TOS: "A Piece of the Action" 
+)
+
+device = (
+	_("S. R. Sensors"), \
+	_("L. R. Sensors"), \
+	_("Phasers"), \
+	_("Photon Tubes"), \
+	_("Life Support"), \
+	_("Warp Engines"), \
+	_("Impulse Engines"), \
+	_("Shields"), \
+	_("Subspace Radio"), \
+	_("Shuttle Craft"), \
+	_("Computer"), \
+	_("Navigation System"), \
+	_("Transporter"), \
+	_("Shield Control"), \
+	_("Death Ray"), \
+	_("D. S. Probe"), \
+)
+
+def setup(needprompt):
+    # prepare to play, set up cosmos 
+    intj, krem, klumper
+    w = coord()
+
+    #  Decide how many of everything
+    if choose(needprompt):
+	return # frozen game
+    # Prepare the Enterprise
+    game.alldone = game.gamewon = False
+    game.ship = IHE
+    game.state.crew = FULLCREW
+    game.energy = game.inenrg = 5000.0
+    game.shield = game.inshld = 2500.0
+    game.shldchg = False
+    game.shldup = False
+    game.inlsr = 4.0
+    game.lsupres = 4.0
+    game.quadrant = randplace(GALSIZE)
+    game.sector = randplace(QUADSIZE)
+    game.torps = game.intorps = 10
+    game.nprobes = int(3.0*Rand() + 2.0)	# Give them 2-4 of these
+    game.warpfac = 5.0
+    game.wfacsq = game.warpfac * game.warpfac
+    for i in range(0, NDEVICES): 
+	game.damage[i] = 0.0
+    # Set up assorted game parameters
+    invalidate(game.battle)
+    game.state.date = game.indate = 100.0*int(31.0*Rand()+20.0)
+    game.nkinks = game.nhelp = game.casual = game.abandoned = 0
+    game.iscate = game.resting = game.imine = game.icrystl = game.icraft = False
+    game.isatb = game.state.nplankl = 0
+    game.state.starkl = game.state.basekl = 0
+    game.iscraft = "onship"
+    game.landed = False
+    game.alive = True
+    game.docfac = 0.25
+    for i in range(1, GALSIZE+1):
+	for j in range(1, GALSIZE+1):
+	    quad = game.state.galaxy[i][j]
+	    quad.charted = 0
+	    quad.planet = NOPLANET
+	    quad.romulans = 0
+	    quad.klingons = 0
+	    quad.starbase = False
+	    quad.supernova = False
+	    quad.status = "secure"
+    # Initialize times for extraneous events
+    schedule(FSNOVA, expran(0.5 * game.intime))
+    schedule(FTBEAM, expran(1.5 * (game.intime / game.state.remcom)))
+    schedule(FSNAP, 1.0 + Rand()) # Force an early snapshot
+    schedule(FBATTAK, expran(0.3*game.intime))
+    unschedule(FCDBAS)
+    if game.state.nscrem:
+	schedule(FSCMOVE, 0.2777)
+    else:
+	unschedule(FSCMOVE)
+    unschedule(FSCDBAS)
+    unschedule(FDSPROB)
+    if (game.options & OPTION_WORLDS) and game.skill >= SKILL_GOOD:
+	schedule(FDISTR, expran(1.0 + game.intime))
+    else:
+	unschedule(FDISTR)
+    unschedule(FENSLV)
+    unschedule(FREPRO)
+    # Starchart is functional but we've never seen it
+    game.lastchart = FOREVER
+    # Put stars in the galaxy
+    game.instar = 0
+    for i in range(1, GALSIZE+1):
+	for j in range(1, GALSIZE+1):
+	    k = Rand()*9.0 + 1.0
+	    game.instar += k
+	    game.state.galaxy[i][j].stars = k
+    # Locate star bases in galaxy
+    for i in range(1, game.inbase+1):
+        while True:
+            while True:
+                w = randplace(GALSIZE)
+                if not game.state.galaxy[w.x][w.y].starbase:
+                    break
+	    contflag = False
+            # C version: for (j = i-1; j > 0; j--)
+            # so it did them in the opposite order.
+            for j in range(i):
+		# Improved placement algorithm to spread out bases 
+		distq = w.distance(baseq[j])
+		if distq < 6.0*(BASEMAX+1-game.inbase) and Rand() < 0.75:
+		    contflag = True
+		    if idebug:
+			prout("=== Abandoning base #%d at %s" % (i, w))
+		    break
+		elif distq < 6.0 * (BASEMAX+1-game.inbase):
+		    if idebug:
+			prout("=== Saving base #%d, close to #%d" % (i, j))
+            if not contflag:
+                break
+	game.state.baseq[i] = w
+	game.state.galaxy[w.x][w.y].starbase = True
+	game.state.chart[w.x][w.y].starbase = True
+    # Position ordinary Klingon Battle Cruisers
+    krem = game.inkling
+    klumper = 0.25*game.skill*(9.0-game.length)+1.0
+    if klumper > MAXKLQUAD: 
+	klumper = MAXKLQUAD
+    while True:
+	r = Rand()
+	klump = (1.0 - r*r)*klumper
+	if klump > krem:
+	    klump = krem
+	krem -= klump
+        while True:
+            w = randplace(GALSIZE)
+            if not game.state.galaxy[w.x][w.y].supernova and \
+               game.state.galaxy[w.x][w.y].klingons + klump <= MAXKLQUAD:
+                break
+	game.state.galaxy[w.x][w.y].klingons += klump
+        if krem <= 0:
+            break
+    # Position Klingon Commander Ships
+    for i in range(1, game.incom+1):
+        while True:
+            w = randplace(GALSIZE)
+	    if (game.state.galaxy[w.x][w.y].klingons or Rand()>=0.75) and \
+		   not game.state.galaxy[w.x][w.y].supernova and \
+		   game.state.galaxy[w.x][w.y].klingons <= MAXKLQUAD-1 and \
+                   not w in game.state.kcmdr[:i]:
+                break
+	game.state.galaxy[w.x][w.y].klingons += 1
+	game.state.kcmdr[i] = w
+    # Locate planets in galaxy
+    for i in range(game.inplan):
+        while True:
+            w = randplace(GALSIZE) 
+            if game.state.galaxy[w.x][w.y].planet == NOPLANET:
+                break
+        new = planet()
+	new.w = w
+        new.crystals = "absent"
+	if (game.options & OPTION_WORLDS) and i < NINHAB:
+	    new.pclass = "M"	# All inhabited planets are class M
+	    new.crystals = "absent"
+	    new.known = "known"
+            new.name = systnames[i]
+	    new.inhabited = True
+	else:
+	    new.pclass = ("M", "N", "O")[Rand()*3.0]
+            if Rand()*1.5:		# 1 in 3 chance of crystals
+                new.crystals = "present"
+	    new.known = "unknown"
+	    new.inhabited = False
+	game.state.galaxy[w.x][w.y].planet = new
+        game.state.plnets.append(new)
+    # Locate Romulans
+    for i in range(1, game.state.nromrem+1):
+	w = randplace(GALSIZE)
+	game.state.galaxy[w.x][w.y].romulans += 1
+    # Locate the Super Commander
+    if game.state.nscrem > 0:
+        while True:
+            w = randplace(GALSIZE)
+            if not game.state.galaxy[w.x][w.y].supernova and game.state.galaxy[w.x][w.y].klingons <= MXKLQUAD:
+                break
+	game.state.kscmdr = w
+	game.state.galaxy[w.x][w.y].klingons += 1
+    # Place thing (in tournament game, thingx == -1, don't want one!)
+    if thing.x != -1:
+	thing = randplace(GALSIZE)
+    else:
+	invalidate(thing)
+    skip(2)
+    game.state.snap = False
+    if game.skill == SKILL_NOVICE:
+	prout(_("It is stardate %d. The Federation is being attacked by") % int(game.state.date))
+	prout(_("a deadly Klingon invasion force. As captain of the United"))
+	prout(_("Starship U.S.S. Enterprise, it is your mission to seek out"))
+	prout(_("and destroy this invasion force of %d battle cruisers.") % ((game.inkling + game.incom + game.inscom)))
+	prout(_("You have an initial allotment of %d stardates to complete") % int(game.intime))
+	prout(_("your mission.  As you proceed you may be given more time."))
+	skip(1)
+	prout(_("You will have %d supporting starbases.") % (game.inbase))
+	proutn(_("Starbase locations-  "))
+    else:
+	prout(_("Stardate %d.") % int(game.state.date))
+	skip(1)
+	prout(_("%d Klingons.") % (game.inkling + game.incom + game.inscom))
+	prout(_("An unknown number of Romulans."))
+	if game.state.nscrem:
+	    prout(_("And one (GULP) Super-Commander."))
+	prout(_("%d stardates.") % int(game.intime))
+	proutn(_("%d starbases in ") % game.inbase)
+    for i in range(1, game.inbase+1):
+	proutn(`game.state.baseq[i]`)
+	proutn("  ")
+    skip(2)
+    proutn(_("The Enterprise is currently in Quadrant %s") % game.quadrant)
+    proutn(_(" Sector %s") % game.sector)
+    skip(2)
+    prout(_("Good Luck!"))
+    if game.state.nscrem:
+	prout(_("  YOU'LL NEED IT."))
+    waitfor()
+    newqad(False)
+    if game.nenhere - iqhere-game.ithere:
+	game.shldup = True
+    if game.neutz:	# bad luck to start in a Romulan Neutral Zone
+	attack(False)
+
+def choose(needprompt):
+    # choose your game type 
+    while True:
+	game.tourn = 0
+	game.thawed = False
+	game.skill = SKILL_NONE
+	game.length = 0
+	if needprompt: # Can start with command line options 
+	    proutn(_("Would you like a regular, tournament, or saved game? "))
+	scan()
+	if len(citem)==0: # Try again
+	    continue
+        if isit("tournament"):
+	    while scan() == IHEOL:
+		proutn(_("Type in tournament number-"))
+	    if aaitem == 0:
+		chew()
+		continue # We don't want a blank entry
+	    game.tourn = int(aaitem)
+	    thing.x = -1
+	    random.seed(aaitem)
+	    break
+        if isit("saved") or isit("frozen"):
+	    if thaw():
+		continue
+	    chew()
+	    if game.passwd == None:
+		continue
+	    if not game.alldone:
+		game.thawed = True # No plaque if not finished
+	    report()
+	    waitfor()
+	    return True
+        if isit("regular"):
+	    break
+	proutn(_("What is \""))
+	proutn(citem)
+	prout("\"?")
+	chew()
+    while game.length==0 or game.skill==SKILL_NONE:
+	if scan() == IHALPHA:
+            if isit("short"):
+		game.length = 1
+	    elif isit("medium"):
+		game.length = 2
+	    elif isit("long"):
+		game.length = 4
+	    elif isit("novice"):
+		game.skill = SKILL_NOVICE
+	    elif isit("fair"):
+		game.skill = SKILL_FAIR
+	    elif isit("good"):
+		game.skill = SKILL_GOOD
+	    elif isit("expert"):
+		game.skill = SKILL_EXPERT
+	    elif isit("emeritus"):
+		game.skill = SKILL_EMERITUS
+	    else:
+		proutn(_("What is \""))
+		proutn(citem)
+		prout("\"?")
+	else:
+	    chew()
+	    if game.length==0:
+		proutn(_("Would you like a Short, Medium, or Long game? "))
+	    elif game.skill == SKILL_NONE:
+		proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "))
+    # Choose game options -- added by ESR for SST2K
+    if scan() != IHALPHA:
+	chew()
+	proutn(_("Choose your game style (or just press enter): "))
+	scan()
+    if isit("plain"):
+	# Approximates the UT FORTRAN version.
+	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS)
+	game.options |= OPTION_PLAIN
+    elif isit("almy"):
+	# Approximates Tom Almy's version.
+	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS)
+	game.options |= OPTION_ALMY
+    elif isit("fancy"):
+	pass
+    elif len(citem):
+        proutn(_("What is \"%s\"?") % citem)
+    setpassword()
+    if game.passwd == "debug":
+	idebug = True
+	fputs("=== Debug mode enabled\n", sys.stdout)
+
+    # Use parameters to generate initial values of things
+    game.damfac = 0.5 * game.skill
+    game.state.rembase = 2.0 + Rand()*(BASEMAX-2.0)
+    game.inbase = game.state.rembase
+    game.inplan = 0
+    if game.options & OPTION_PLANETS:
+	game.inplan += (MAXUNINHAB/2) + (MAXUNINHAB/2+1)*Rand()
+    if game.options & OPTION_WORLDS:
+	game.inplan += NINHAB
+    game.state.nromrem = game.inrom = (2.0+Rand())*game.skill
+    game.state.nscrem = game.inscom = (game.skill > SKILL_FAIR)
+    game.state.remtime = 7.0 * game.length
+    game.intime = game.state.remtime
+    game.state.remkl = game.inkling = 2.0*game.intime*((game.skill+1 - 2*Rand())*game.skill*0.1+.15)
+    game.incom = game.skill + 0.0625*game.inkling*Rand()
+    game.state.remcom = min(10, game.incom)
+    game.incom = game.state.remcom
+    game.state.remres = (game.inkling+4*game.incom)*game.intime
+    game.inresor = game.state.remres
+    if game.inkling > 50:
+        game.state.rembase += 1
+	game.inbase = game.state.rembase
+    return False
+
+def dropin(iquad):
+    # drop a feature on a random dot in the current quadrant 
+    w = coord()
+    while True:
+        w = randplace(QUADSIZE)
+        if game.quad[w.x][w.y] == IHDOT:
+            break
+    game.quad[w.x][w.y] = iquad
+    return w
+
+def newcnd():
+    # update our alert status 
+    game.condition = "green"
+    if game.energy < 1000.0:
+	game.condition = "yellow"
+    if game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons or game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans:
+	game.condition = "red"
+    if not game.alive:
+	game.condition="dead"
+
+def newkling(i):
+    # drop new Klingon into current quadrant 
+    pi = dropin(IHK)
+    game.ks[i] = pi
+    game.kdist[i] = game.kavgd[i] = distance(game.sector, pi)
+    game.kpower[i] = Rand()*150.0 +300.0 +25.0*game.skill
+    return pi
+
+def newqad(shutup):
+    # set up a new state of quadrant, for when we enter or re-enter it 
+    w = coord()
+    game.justin = True
+    invalidate(game.base)
+    game.klhere = 0
+    game.comhere = False
+    invalidate(game.plnet)
+    game.ishere = False
+    game.irhere = 0
+    game.iplnet = 0
+    game.nenhere = 0
+    game.neutz = False
+    game.inorbit = False
+    game.landed = False
+    game.ientesc = False
+    game.ithere = False
+    iqhere = False
+    iqengry = False
+    game.iseenit = False
+    if game.iscate:
+	# Attempt to escape Super-commander, so tbeam back!
+	game.iscate = False
+	game.ientesc = True
+    # Clear quadrant
+    for i in range(1, QUADSIZE+1):
+	for j in range(1, QUADSIZE+1):
+	    game.quad[i][j] = IHDOT
+    q = game.state.galaxy[game.quadrant.x][game.quadrant.y]
+    # cope with supernova
+    if q.supernova:
+	return
+    game.klhere = q.klingons
+    game.irhere = q.romulans
+    game.nenhere = game.klhere + game.irhere
+
+    # Position Starship
+    game.quad[game.sector.x][game.sector.y] = game.ship
+
+    if q.klingons:
+	w.x = w.y = 0	# quiet a gcc warning 
+	# Position ordinary Klingons
+	for i in range(1, game.klhere+1):
+	    w = newkling(i)
+	# If we need a commander, promote a Klingon
+	for i in range(1, game.state.remcom+1):
+	    if same(game.state.kcmdr[i], game.quadrant):
+		break
+			
+	if i <= game.state.remcom:
+	    game.quad[w.x][w.y] = IHC
+	    game.kpower[game.klhere] = 950.0+400.0*Rand()+50.0*game.skill
+	    game.comhere = True
+
+	# If we need a super-commander, promote a Klingon
+	if same(game.quadrant, game.state.kscmdr):
+	    game.quad[game.ks[1].x][game.ks[1].y] = IHS
+	    game.kpower[1] = 1175.0 + 400.0*Rand() + 125.0*game.skill
+	    game.iscate = (game.state.remkl > 1)
+	    game.ishere = True
+    # Put in Romulans if needed
+    for i in range(game.klhere+1, game.nenhere+1):
+	w = dropin(IHR)
+	game.ks[i] = w
+	game.kdist[i] = game.kavgd[i] = distance(game.sector, w)
+	game.kpower[i] = Rand()*400.0 + 450.0 + 50.0*game.skill
+    # If quadrant needs a starbase, put it in
+    if q.starbase:
+	game.base = dropin(IHB)
+	
+    # If quadrant needs a planet, put it in
+    if q.planet != NOPLANET:
+	game.iplnet = q.planet
+	if game.state.planets[q.planet].inhabited == UNINHABITED:
+	    game.plnet = dropin(IHP)
+	else:
+	    game.plnet = dropin(IHW)
+    # Check for condition
+    newcnd()
+    # And finally the stars
+    for i in range(1, q.stars+1): 
+	dropin(IHSTAR)
+
+    # Check for RNZ
+    if game.irhere > 0 and game.klhere == 0:
+	game.neutz = True
+	if not damaged(DRADIO):
+	    skip(1)
+	    prout(_("LT. Uhura- \"Captain, an urgent message."))
+	    prout(_("  I'll put it on audio.\"  CLICK"))
+	    skip(1)
+	    prout(_("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."))
+	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
+
+    if shutup==0:
+	# Put in THING if needed
+	if same(thing, game.quadrant):
+	    w = dropin(IHQUEST)
+	    thing = randplace(GALSIZE)
+	    game.nenhere += 1
+	    iqhere = True
+	    game.ks[game.nenhere] = w
+	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
+		distance(game.sector, w)
+	    game.kpower[game.nenhere] = Rand()*6000.0 +500.0 +250.0*game.skill
+	    if not damaged(DSRSENS):
+		skip(1)
+		prout(_("Mr. Spock- \"Captain, this is most unusual."))
+		prout(_("    Please examine your short-range scan.\""))
+
+    # Decide if quadrant needs a Tholian; lighten up if skill is low 
+    if game.options & OPTION_THOLIAN:
+	if (game.skill < SKILL_GOOD and Rand() <= 0.02) or \
+	    (game.skill == SKILL_GOOD and Rand() <= 0.05) or \
+            (game.skill > SKILL_GOOD and Rand() <= 0.08):
+            while True:
+		game.tholian.x = random.choice((1, QUADSIZE))
+		game.tholian.y = random.choice((1, QUADSIZE))
+                if game.quad[game.tholian.x][game.tholian.y] == IHDOT:
+                    break
+	    game.quad[game.tholian.x][game.tholian.y] = IHT
+	    game.ithere = True
+	    game.nenhere += 1
+	    game.ks[game.nenhere] = game.tholian
+	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
+		distance(game.sector, game.tholian)
+	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill
+	    # Reserve unoccupied corners 
+	    if game.quad[1][1]==IHDOT:
+		game.quad[1][1] = 'X'
+	    if game.quad[1][QUADSIZE]==IHDOT:
+		game.quad[1][QUADSIZE] = 'X'
+	    if game.quad[QUADSIZE][1]==IHDOT:
+		game.quad[QUADSIZE][1] = 'X'
+	    if game.quad[QUADSIZE][QUADSIZE]==IHDOT:
+		game.quad[QUADSIZE][QUADSIZE] = 'X'
+    sortklings()
+
+    # Put in a few black holes
+    for i in range(1, 3+1):
+	if Rand() > 0.5: 
+	    dropin(IHBLANK)
+
+    # Take out X's in corners if Tholian present
+    if game.ithere:
+	if game.quad[1][1]=='X':
+	    game.quad[1][1] = IHDOT
+	if game.quad[1][QUADSIZE]=='X':
+	    game.quad[1][QUADSIZE] = IHDOT
+	if game.quad[QUADSIZE][1]=='X':
+	    game.quad[QUADSIZE][1] = IHDOT
+	if game.quad[QUADSIZE][QUADSIZE]=='X':
+	    game.quad[QUADSIZE][QUADSIZE] = IHDOT
+
+def sortklings():
+    # sort Klingons by distance from us 
+    # The author liked bubble sort. So we will use it. :-(
+    if game.nenhere-iqhere-game.ithere < 2:
+	return
+    while True:
+	sw = False
+	for j in range(1, game.nenhere):
+	    if game.kdist[j] > game.kdist[j+1]:
+		sw = True
+		t = game.kdist[j]
+		game.kdist[j] = game.kdist[j+1]
+		game.kdist[j+1] = t
+		t = game.kavgd[j]
+		game.kavgd[j] = game.kavgd[j+1]
+		game.kavgd[j+1] = t
+		k = game.ks[j].x
+		game.ks[j].x = game.ks[j+1].x
+		game.ks[j+1].x = k
+		k = game.ks[j].y
+		game.ks[j].y = game.ks[j+1].y
+		game.ks[j+1].y = k
+		t = game.kpower[j]
+		game.kpower[j] = game.kpower[j+1]
+		game.kpower[j+1] = t
+        if not sw:
+            break
+
+def setpassword():
+    # set the self-destruct password 
+    if game.options & OPTION_PLAIN:
+	while True:
+	    chew()
+	    proutn(_("Please type in a secret password- "))
+	    scan()
+	    game.passwd = citem
+	    if game.passwd != None:
+		break
+    else:
+        game.passwd = ""
+        for i in range(3):
+	    game.passwd[i] += chr(97+int(Rand()*25))
