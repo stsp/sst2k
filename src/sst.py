@@ -1527,7 +1527,6 @@ def fry(hit):
     # a critical hit occured 
     if hit < (275.0-25.0*game.skill)*(1.0+0.5*random.random()):
 	return
-
     ncrit = 1.0 + hit/(500.0+100.0*random.random())
     proutn(_("***CRITICAL HIT--"))
     # Select devices and cause damage
@@ -1564,42 +1563,32 @@ def attack(torps_ok):
     hitmax=0.0; hittot=0.0; chgfac=1.0
     jay = coord()
     where = "neither"
-
     # game could be over at this point, check 
     if game.alldone:
 	return
-
     if idebug:
 	prout("=== ATTACK!")
-
-    # Tholian gewts to move before attacking 
+    # Tholian gets to move before attacking 
     if game.ithere:
 	movetholian()
-
     # if you have just entered the RNZ, you'll get a warning 
     if game.neutz: # The one chance not to be attacked 
 	game.neutz = False
 	return
-
     # commanders get a chance to tac-move towards you 
     if (((game.comhere or game.ishere) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
 	moveklings()
-
     # if no enemies remain after movement, we're done 
     if game.nenhere==0 or (game.nenhere==1 and thing == game.quadrant and not iqengry):
 	return
-
     # set up partial hits if attack happens during shield status change 
     pfac = 1.0/game.inshld
     if game.shldchg:
 	chgfac = 0.25+0.5*random.random()
-
     skip(1)
-
     # message verbosity control 
     if game.skill <= SKILL_FAIR:
 	where = "sector"
-
     for loop in range(game.nenhere):
 	if game.kpower[loop] < 0:
 	    continue;	# too weak to attack 
@@ -1723,7 +1712,6 @@ def attack(torps_ok):
 def deadkl(w, type, mv):
     # kill a Klingon, Tholian, Romulan, or Thingy 
     # Added mv to allow enemy to "move" before dying 
-
     crmena(True, type, sector, mv)
     # Decide what kind of enemy it is and update appropriately 
     if type == IHR:
@@ -1766,7 +1754,6 @@ def deadkl(w, type, mv):
 	    unschedule(FSCDBAS)
 	else:
 	    prout("*** Internal error, deadkl() called on %s\n" % type)
-
     # For each kind of enemy, finish message to player 
     prout(_(" destroyed."))
     game.quad[w.x][w.y] = IHDOT
@@ -1923,7 +1910,6 @@ def overheat(rpow):
 
 def checkshctrl(rpow):
     # check shield control 
-	
     skip(1)
     if random.random() < 0.998:
 	prout(_("Shields lowered."))
@@ -2014,7 +2000,6 @@ def phasers():
     ifast = False; no = False; itarg = True; msgflag = True
     automode = "NOTSET"
     key=0
-
     skip(1)
     # SR sensors and Computer are needed fopr automode 
     if damaged(DSRSENS) or damaged(DCOMPTR):
@@ -2038,8 +2023,8 @@ def phasers():
 	    return
 	prout(_("Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""))
 	ifast = True
-		
-    # Original code so convoluted, I re-did it all 
+    # Original code so convoluted, I re-did it all
+    # (That was Tom Almy talking about the C code, I think -- ESR)
     while automode=="NOTSET":
 	key=scan()
 	if key == IHALPHA:
@@ -2262,8 +2247,6 @@ def phasers():
 # only have one FDISTR/FENSLV/FREPRO sequence going at any given time
 # BSD Trek, from which we swiped the idea, can have up to 5.
 
-import math
-
 def unschedule(evtype):
     # remove an event from the schedule 
     game.future[evtype].date = FOREVER
@@ -2295,7 +2278,6 @@ def cancelrest():
 	    game.resting = False
 	    game.optime = 0.0
 	    return True
-
     return False
 
 def events():
@@ -2733,9 +2715,7 @@ def wait():
 	proutn(_("Are you sure? "))
 	if ja() == False:
 	    return
-
     # Alternate resting periods (events) with attacks 
-
     game.resting = True
     while True:
 	if delay <= 0:
@@ -2778,12 +2758,10 @@ def nova(nov):
     # star goes nova 
     course = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
     newc = coord(); scratch = coord()
-
     if random.random() < 0.05:
 	# Wow! We've supernova'ed 
 	supernova(False, nov)
 	return
-
     # handle initial nova 
     game.quad[nov.x][nov.y] = IHDOT
     crmena(False, IHSTAR, sector, nov)
@@ -2932,7 +2910,6 @@ def supernova(induced, w=None):
     # star goes supernova 
     num = 0; npdead = 0
     nq = coord()
-
     if w != None: 
 	nq = w
     else:
@@ -2957,7 +2934,6 @@ def supernova(induced, w=None):
 	    proutn("=== Super nova here?")
 	    if ja() == True:
 		nq = game.quadrant
-
     if not nq == game.quadrant or game.justin:
 	# it isn't here, or we just entered (treat as enroute) 
 	if communicating():
@@ -2976,7 +2952,6 @@ def supernova(induced, w=None):
 			break
 	    if num==0:
 		break
-
 	skip(1)
 	prouts(_("***RED ALERT!  RED ALERT!"))
 	skip(1)
@@ -3127,7 +3102,6 @@ def badpoints():
     elif game.ship == None:
         badpt += 200.0
     return badpt
-
 
 def finish(ifin):
     # end the game, with appropriate notfications 
@@ -3339,7 +3313,6 @@ def finish(ifin):
 def score():
     # compute player's score 
     timused = game.state.date - game.indate
-
     iskill = game.skill
     if (timused == 0 or (game.state.remkl + game.state.remcom + game.state.nscrem) != 0) and timused < 5.0:
 	timused = 5.0
@@ -3438,7 +3411,6 @@ def plaque():
     winner = cgetline()
     # The 38 below must be 64 for 132-column paper 
     nskip = 38 - len(winner)/2
-
     fp.write("\n\n\n\n")
     # --------DRAW ENTERPRISE PICTURE. 
     fp.write("                                       EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n" )
@@ -3550,7 +3522,6 @@ def iostart():
 	message_window.scrollok(True)
 	setwnd(fullscreen_window)
 	textcolor(DEFAULT)
-
 
 def waitfor():
     "wait for user action -- OK to do nothing if on a TTY"
@@ -4038,8 +4009,7 @@ def dock(verbose):
 	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""))
 	attackreport(False)
 	game.iseenit = True
-
-# 
+ 
 # This program originally required input in terms of a (clock)
 # direction and distance. Somewhere in history, it was changed to
 # cartesian coordinates. So we need to convert.  Probably
@@ -4047,7 +4017,6 @@ def dock(verbose):
 # pain if the computer isn't working! Manual mode is still confusing
 # because it involves giving x and y motions, yet the coordinates
 # are always displayed y - x, where +y is downward!
-# 
 
 def getcd(isprobe, akey):
     # get course and distance 
@@ -4208,7 +4177,6 @@ def impulse():
 	power = 20.0 + 100.0*game.dist
     else:
 	power = 30.0
-
     if power >= game.energy:
 	# Insufficient power for trip 
 	skip(1)
@@ -4258,12 +4226,10 @@ def warp(timewarp):
 	    prout(_("Engineer Scott- \"Sorry, Captain. Until this damage"))
 	    prout(_("  is repaired, I can only give you warp 4.\""))
 	    return
-			
-	# Read in course and distance 
+       	# Read in course and distance 
 	getcd(False, 0)
 	if game.direc == -1.0:
 	    return
-
 	# Make sure starship has enough energy for the trip 
 	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
 	if power >= game.energy:
@@ -4340,8 +4306,6 @@ def warp(timewarp):
 		if game.quad[ix][iy] != IHDOT:
 		    blooey = False
 		    twarp = False
-				
-
     # Activate Warp Engines and pay the cost 
     imove(False)
     if game.alldone:
@@ -4404,7 +4368,6 @@ def setwarp():
 
 def atover(igrab):
     # cope with being tossed out of quadrant by supernova or yanked by beam 
-
     chew()
     # is captain on planet? 
     if game.landed:
@@ -4431,13 +4394,11 @@ def atover(igrab):
 		game.icrystl = True
     if igrab:
 	return
-
     # Check to see if captain in shuttle craft 
     if game.icraft:
 	finish(FSTRACTOR)
     if game.alldone:
 	return
-
     # Inform captain of attempt to reach safety 
     skip(1)
     while True:
@@ -4566,7 +4527,6 @@ def probe():
 	    prout(_("Uhura- \"The previous probe is still reporting data, Sir.\""))
 	return
     key = scan()
-
     if key == IHEOL:
 	# slow mode, so let Kirk know how many probes there are left
         if game.nprobes == 1:
@@ -4576,7 +4536,6 @@ def probe():
 	proutn(_("Are you sure you want to fire a probe? "))
 	if ja() == False:
 	    return
-
     game.isarmed = False
     if key == IHALPHA and citem == "armed":
 	game.isarmed = True
@@ -4595,7 +4554,6 @@ def probe():
 	bigger = math.fabs(game.probeinx)
     else:
 	bigger = math.fabs(game.probeiny)
-		
     game.probeiny /= bigger
     game.probeinx /= bigger
     game.proben = 10.0*game.dist*bigger +0.5
@@ -4628,7 +4586,6 @@ def mayday():
     # yell for help from nearest starbase 
     # There's more than one way to move in this game! 
     line = 0
-
     chew()
     # Test for conditions which prevent calling for help 
     if game.condition == "docked":
@@ -5616,14 +5573,12 @@ def eta():
 	    w2.y = 0
 	else:
 	    w2.y=QUADSIZE-1
-
     if not VALID_QUADRANT(w1.x, w1.y) or not VALID_SECTOR(w2.x, w2.y):
 	huh()
 	return
     game.dist = math.sqrt(square(w1.y-game.quadrant.y+0.1*(w2.y-game.sector.y))+
 		square(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x)))
     wfl = False
-
     if prompt:
 	prout(_("Answer \"no\" if you don't know the value:"))
     while True:
@@ -5771,9 +5726,6 @@ def visual():
 
 # Code from setup.c begins here
 
-def filelength(fd):
-    return os.fstat(fd).st_size
-
 def prelim():
     # issue a historically correct banner 
     skip(2)
@@ -5903,7 +5855,6 @@ device = (
 def setup(needprompt):
     # prepare to play, set up cosmos 
     w = coord()
-
     #  Decide how many of everything
     if choose(needprompt):
 	return # frozen game
@@ -6274,10 +6225,8 @@ def newqad(shutup):
     game.klhere = q.klingons
     game.irhere = q.romulans
     game.nenhere = game.klhere + game.irhere
-
     # Position Starship
     game.quad[game.sector.x][game.sector.y] = game.ship
-
     if q.klingons:
 	w.x = w.y = 0	# quiet a gcc warning 
 	# Position ordinary Klingons
@@ -6292,7 +6241,6 @@ def newqad(shutup):
 	    game.quad[w.x][w.y] = IHC
 	    game.kpower[game.klhere] = 950.0+400.0*random.random()+50.0*game.skill
 	    game.comhere = True
-
 	# If we need a super-commander, promote a Klingon
 	if same(game.quadrant, game.state.kscmdr):
 	    game.quad[game.ks[0].x][game.ks[0].y] = IHS
@@ -6308,7 +6256,6 @@ def newqad(shutup):
     # If quadrant needs a starbase, put it in
     if q.starbase:
 	game.base = dropin(IHB)
-	
     # If quadrant needs a planet, put it in
     if q.planet:
 	game.iplnet = q.planet
@@ -6332,7 +6279,6 @@ def newqad(shutup):
 	    skip(1)
 	    prout(_("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."))
 	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
-
     if shutup==0:
 	# Put in THING if needed
         global thing
@@ -6348,7 +6294,6 @@ def newqad(shutup):
 		skip(1)
 		prout(_("Mr. Spock- \"Captain, this is most unusual."))
 		prout(_("    Please examine your short-range scan.\""))
-
     # Decide if quadrant needs a Tholian; lighten up if skill is low 
     if game.options & OPTION_THOLIAN:
 	if (game.skill < SKILL_GOOD and random.random() <= 0.02) or \
@@ -6376,12 +6321,10 @@ def newqad(shutup):
 	    if game.quad[QUADSIZE-1][QUADSIZE-1]==IHDOT:
 		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
     sortklings()
-
     # Put in a few black holes
     for i in range(1, 3+1):
 	if random.random() > 0.5: 
 	    dropin(IHBLANK)
-
     # Take out X's in corners if Tholian present
     if game.ithere:
 	if game.quad[0][0]=='X':
@@ -6735,22 +6678,17 @@ def cramen(cmd):
     else: s = "Unknown??"
     proutn(s)
 
-def cramlc(loctype, w):
-    # name a location 
-    if loctype == "quadrant":
-	buf = _("Quadrant ")
-    elif loctype == "sector":
-	buf = _("Sector ")
-    buf += ("%d - %d" % (w.x, w.y))
-    return buf
-
 def crmena(stars, enemy, loctype, w):
     # print an enemy and his location 
     if stars:
 	proutn("***")
     cramen(enemy)
     proutn(_(" at "))
-    proutn(cramlc(loctype, w))
+    if loctype == "quadrant":
+	buf = _("Quadrant ")
+    elif loctype == "sector":
+	buf = _("Sector ")
+    proutn(buf + `w`)
 
 def crmshp():
     # print our ship name 
@@ -6941,14 +6879,12 @@ if __name__ == '__main__':
     iqengry = False
     game = gamestate()
     idebug = 0
-
     game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME | OPTION_PLAIN | OPTION_ALMY)
     # Disable curses mode until the game logic is working.
     #    if os.getenv("TERM"):
     #	game.options |= OPTION_CURSES | OPTION_SHOWME
     #    else:
     game.options |= OPTION_TTY
-
     seed = time.time()
     (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
     for (switch, val) in options:
@@ -6984,13 +6920,11 @@ if __name__ == '__main__':
 	#setlinebuf(logfp)
 	logfp.write("seed %d\n" % (seed))
     random.seed(seed)
-
     iostart()
     if arguments:
         inqueue = arguments
     else:
         inqueue = None
-
     while True: # Play a game 
 	setwnd(fullscreen_window)
 	clrscr()
@@ -7004,7 +6938,6 @@ if __name__ == '__main__':
 	skip(1)
 	stars()
 	skip(1)
-
 	if game.tourn and game.alldone:
 	    proutn(_("Do you want your score recorded?"))
 	    if ja() == True:
@@ -7016,4 +6949,3 @@ if __name__ == '__main__':
     skip(1)
     prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
     raise SysExit, 0
-
