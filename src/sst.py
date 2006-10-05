@@ -1587,7 +1587,7 @@ def attack(torps_ok):
 	moveklings()
 
     # if no enemies remain after movement, we're done 
-    if game.nenhere==0 or (game.nenhere==1 and iqhere and not iqengry):
+    if game.nenhere==0 or (game.nenhere==1 and thing == game.quadrant and not iqengry):
 	return
 
     # set up partial hits if attack happens during shield status change 
@@ -1737,8 +1737,8 @@ def deadkl(w, type, mv):
 	game.ithere = False
     elif type == IHQUEST:
 	# Killed a Thingy
-        global iqhere, iqengry
-	iqhere = iqengry = False
+        global iqengry
+	iqengry = False
 	invalidate(thing)
     else:
 	# Some type of a Klingon 
@@ -6103,7 +6103,7 @@ def setup(needprompt):
 	prout(_("  YOU'LL NEED IT."))
     waitfor()
     newqad(False)
-    if game.nenhere - iqhere-game.ithere:
+    if game.nenhere - (thing == game.quadrant) - game.ithere:
 	game.shldup = True
     if game.neutz:	# bad luck to start in a Romulan Neutral Zone
 	attack(False)
@@ -6262,8 +6262,7 @@ def newqad(shutup):
     game.landed = False
     game.ientesc = False
     game.ithere = False
-    global iqhere, iqengry
-    iqhere = False
+    global iqengry
     iqengry = False
     game.iseenit = False
     if game.iscate:
@@ -6343,8 +6342,6 @@ def newqad(shutup):
 	    w = dropin(IHQUEST)
 	    thing = randplace(GALSIZE)
 	    game.nenhere += 1
-            global iqhere
-	    iqhere = True
 	    game.ks[game.nenhere] = w
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
 		distance(game.sector, w)
@@ -6401,7 +6398,7 @@ def newqad(shutup):
 def sortklings():
     # sort Klingons by distance from us 
     # The author liked bubble sort. So we will use it. :-(
-    if game.nenhere-iqhere-game.ithere < 2:
+    if game.nenhere-(thing==game.quadrant)-game.ithere < 2:
 	return
     while True:
 	sw = False
@@ -6936,11 +6933,11 @@ def debugme():
 	atover(True)
 
 if __name__ == '__main__':
-    global line, thing, game, idebug, iqhere, iqengry
+    global line, thing, game, idebug, iqengry
     game = citem = aaitem = inqueue = None
     line = ''
     thing = coord()
-    iqhere = iqengry = False
+    iqengry = False
     game = gamestate()
     idebug = 0
 
