@@ -1,4 +1,5 @@
-'''
+#!/usr/bin/env python
+"""
 sst.py =-- Super Star Trek in Python
 
 This code is a Python translation of a C translation of a FORTRAN original.
@@ -171,7 +172,7 @@ your score.  Docking at a starbase replenishes your crew.
 Also, the nav subsystem (enabling automatic course
 setting) can be damaged separately from the main computer (which
 handles weapons targeting, ETA calculation, and self-destruct).
-'''
+"""
 import os, sys, math, curses, time, atexit, readline, cPickle, random, getopt
 
 SSTDOC  	= "/usr/share/doc/sst/sst.doc"
@@ -3477,6 +3478,7 @@ def plaque():
 
 rows = linecount = 0	# for paging 
 stdscr = None
+replayfp = None
 fullscreen_window = None
 srscan_window     = None
 report_window     = None
@@ -3484,6 +3486,7 @@ status_window     = None
 lrscan_window     = None
 message_window    = None
 prompt_window     = None
+curwnd = None
 
 def outro():
     "wrap up, either normally or due to signal"
@@ -3494,12 +3497,12 @@ def outro():
 	#resetterm()
 	#echo()
 	curses.endwin()
-	stdout.write('\n')
+	sys.stdout.write('\n')
     if logfp:
 	logfp.close()
 
 def iostart():
-    global stdscr
+    global stdscr, rows
     #setlocale(LC_ALL, "")
     #bindtextdomain(PACKAGE, LOCALEDIR)
     #textdomain(PACKAGE)
@@ -3572,16 +3575,16 @@ def pause_game():
         setwnd(message_window)
     else:
         global linecount
-        stdout.write('\n')
+        sys.stdout.write('\n')
         proutn(prompt)
         raw_input()
         for j in range(0, rows):
-            stdout.write('\n')
+            sys.stdout.write('\n')
         linecount = 0
 
 def skip(i):
     "Skip i lines.  Pause game if this would cause a scrolling event."
-    while dummy in range(i):
+    for dummy in range(i):
 	if game.options & OPTION_CURSES:
             (y, x) = curwnd.getyx()
             (my, mx) = curwnd.getmaxyx()
@@ -3593,10 +3596,10 @@ def skip(i):
 	else:
             global linecount
 	    linecount += 1
-	    if linecount >= rows:
+	    if rows and linecount >= rows:
 		pause_game()
 	    else:
-		stdout.write('\n')
+		sys.stdout.write('\n')
 
 def proutn(line):
     "Utter a line with no following line feed."
@@ -3604,7 +3607,8 @@ def proutn(line):
 	curwnd.addstr(line)
 	curwnd.refresh()
     else:
-	stdout.write(line)
+	sys.stdout.write(line)
+        sys.stdout.flush()
 
 def prout(line):
     proutn(line)
@@ -3630,12 +3634,14 @@ def cgetline():
 	if replayfp and not replayfp.closed:
 	    line = replayfp.readline()
 	else:
-	    sys.stdin.readline()
+	    line = raw_input()
     if logfp:
 	logfp.write(line)
+    return line
 
 def setwnd(wnd):
-    "Change windows -- OK for this to be a no-op in tty mode." 
+    "Change windows -- OK for this to be a no-op in tty mode."
+    global curwnd
     if game.options & OPTION_CURSES:
         curwnd = wnd
         curses.curs_set(wnd == fullscreen_window or wnd == message_window or wnd == prompt_window)
@@ -5890,7 +5896,6 @@ device = (
 
 def setup(needprompt):
     # prepare to play, set up cosmos 
-    intj, krem, klumper
     w = coord()
 
     #  Decide how many of everything
@@ -6131,9 +6136,7 @@ def choose(needprompt):
 	    return True
         if isit("regular"):
 	    break
-	proutn(_("What is \""))
-	proutn(citem)
-	prout("\"?")
+	proutn(_("What is \"%s\"?"), citem)
 	chew()
     while game.length==0 or game.skill==SKILL_NONE:
 	if scan() == IHALPHA:
@@ -6773,37 +6776,34 @@ def randplace(size):
     return w
 
 def chew():
+    # Demand input for next scan
     global inqueue
-    inqueue = []
+    inqueue = None
 
 def chew2():
     # return IHEOL next time 
     global inqueue
-    inqueue = ["\n"]
+    inqueue = []
 
 def scan():
     # Get a token from the user
-    global inqueue
+    global inqueue, line, citem
     aaitem = 0.0
     citem = ''
 
     # Read a line if nothing here
-    if line == '\n':
-        line = ''
-        return IHEOL
-    elif line == '':
+    if inqueue == None:
 	line = cgetline()
 	if curwnd==prompt_window:
 	    clrscr()
 	    setwnd(message_window)
 	    clrscr()
-    # Skip leading white space
-    line = line.lstrip()
-    # Nothing left
-    if not line:
-	return IHEOL
-    else:
-        inqueue += line.split()
+        # Skip leading white space
+        line = line.lstrip()
+        if line:
+            inqueue = line.split()
+    elif not inqueue:
+        return IHEOL
     # From here on in it's all looking at the queue
     citem = inqueue.pop(0)
     if citem == IHEOL:
@@ -6811,7 +6811,7 @@ def scan():
     try:
         aaitem = float(citem)
         return IHREAL
-    except ValuError:
+    except ValueError:
         pass
     # Treat as alpha
     citem = citem.lower()
@@ -6836,8 +6836,8 @@ def huh():
     prout(_("Beg your pardon, Captain?"))
 
 def isit(s):
-    # compares s to citem and returns true if it matches to the length of s 
-    return citem.startswith(s)
+    # compares s to citem and returns true if it matches to the length of s
+    return s.startswith(citem)
 
 def debugme():
     # access to the internals for debugging 
@@ -6929,15 +6929,18 @@ def debugme():
 	atover(True)
 
 if __name__ == '__main__':
-    line = ""
+    global line, thing, game
+    game = citem = aaitem = inqueue = None
+    line = ''
     thing = coord()
     game = gamestate()
 
     game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME | OPTION_PLAIN | OPTION_ALMY)
-    if os.getenv("TERM"):
-	game.options |= OPTION_CURSES | OPTION_SHOWME
-    else:
-	game.options |= OPTION_TTY
+    # Disable curses mode until the game logic is working.
+    #    if os.getenv("TERM"):
+    #	game.options |= OPTION_CURSES | OPTION_SHOWME
+    #    else:
+    game.options |= OPTION_TTY
 
     seed = time.time()
     (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
@@ -6977,15 +6980,15 @@ if __name__ == '__main__':
 
     iostart()
 
-    for i in range(optind, argc):
-	line += sys.argv[i]
+    for tok in arguments:
+	line += tok
 	line += " "
 
     while True: # Play a game 
 	setwnd(fullscreen_window)
 	clrscr()
 	prelim()
-	setup(line[0] == '\0')
+	setup(needprompt=not line)
 	if game.alldone:
 	    score()
 	    game.alldone = False
