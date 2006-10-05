@@ -3731,7 +3731,7 @@ def drawmaps(mode):
 	    setwnd(report_window)
 	    report_window.clear()
 	    report_window.move(0, 0)
-	    status(0)
+	    status()
 	    setwnd(lrscan_window)
 	    lrscan_window.clear()
 	    lrscan_window.move(0, 0)
@@ -3822,8 +3822,8 @@ def prstat(txt, data):
 	skip(1)
 	setwnd(status_window)
     else:
-        proutn(" " * NSYM - len(tx))
-    vproutn(data)
+        proutn(" " * (NSYM - len(txt)))
+    proutn(data)
     skip(1)
     if game.options & OPTION_CURSES:
 	setwnd(report_window)
@@ -5484,13 +5484,13 @@ def sectscan(goodScan, i, j):
     else:
 	proutn("- ")
 
-def status(req):
+def status(req=0):
     # print status report lines 
 
     if not req or req == 1:
 	prstat(_("Stardate"), _("%.1f, Time Left %.2f") \
                % (game.state.date, game.state.remtime))
-    elif not req or req == 2:
+    if not req or req == 2:
 	if game.condition != "docked":
 	    newcnd()
         dam = 0
@@ -5498,40 +5498,40 @@ def status(req):
 	    if game.damage[t]>0: 
 		dam += 1
 	prstat(_("Condition"), _("%s, %i DAMAGES") % (game.condition.upper(), dam))
-    elif not req or req == 3:
+    if not req or req == 3:
 	prstat(_("Position"), "%s , %s" % (game.quadrant, game.sector))
-    elif not req or req == 4:
+    if not req or req == 4:
 	if damaged(DLIFSUP):
 	    if game.condition == "docked":
-		sprintf(s, _("DAMAGED, Base provides"))
+		s = _("DAMAGED, Base provides")
 	    else:
-		sprintf(s, _("DAMAGED, reserves=%4.2f") % game.lsupres)
+		s = _("DAMAGED, reserves=%4.2f") % game.lsupres
 	else:
-	    sprintf(s, _("ACTIVE"))
+	    s = _("ACTIVE")
 	prstat(_("Life Support"), s)
-    elif not req or req == 5:
-	prstat(_("Warp Factor"), "%.1f" % (game.warpfac))
-    elif not req or req == 6:
+    if not req or req == 5:
+	prstat(_("Warp Factor"), "%.1f" % game.warpfac)
+    if not req or req == 6:
         extra = ""
         if game.icrystl and (game.options & OPTION_SHOWME):
             extra = _(" (have crystals)")
-	prstat(_("Energy"), "%.2f%s" % game.energy, extra)
-    elif not req or req == 7:
+	prstat(_("Energy"), "%.2f%s" % (game.energy, extra))
+    if not req or req == 7:
 	prstat(_("Torpedoes"), "%d" % (game.torps))
-    elif not req or req == 8:
+    if not req or req == 8:
 	if damaged(DSHIELD):
-	    strcpy(s, _("DAMAGED,"))
+	    s = _("DAMAGED,")
 	elif game.shldup:
-	    strcpy(s, _("UP,"))
+	    s = _("UP,")
 	else:
-	    strcpy(s, _("DOWN,"))
+	    s = _("DOWN,")
 	data = _(" %d%% %.1f units") \
                % (int((100.0*game.shield)/game.inshld + 0.5), game.shield)
-	prstat(_("Shields"), s)
-    elif not req or req == 9:
+	prstat(_("Shields"), s+data)
+    if not req or req == 9:
         prstat(_("Klingons Left"), "%d" \
                % (game.state.remkl + game.state.remcom + game.state.nscrem))
-    elif not req or req == 10:
+    if not req or req == 10:
 	if game.options & OPTION_WORLDS:
 	    plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet
 	    if plnet != NOPLANET and game.state.planets[plnet].inhabited:
@@ -6576,8 +6576,10 @@ def makemoves():
 	    clrscr()
 	    setwnd(message_window)
 	    clrscr()
-            cmd = citem.upper()
-            if cmd in commands:
+            candidates = filter(lambda x: x.startswith(citem.upper()),
+                                commands)
+            if len(candidates) == 1:
+                cmd = candidates[0]
                 break
             else:
                 listCommands()
@@ -6585,7 +6587,7 @@ def makemoves():
 	if cmd == "SRSCAN":		# srscan
 	    srscan()
 	elif cmd == "STATUS":		# status
-	    status(0)
+	    status()
 	elif cmd == "REQUEST":		# status request 
 	    request()
 	elif cmd == "LRSCAN":		# long range scan
