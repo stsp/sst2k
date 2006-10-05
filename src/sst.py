@@ -1260,7 +1260,7 @@ def ram(ibumpd, ienm, w):
     proutn("***")
     crmshp()
     prout(_(" heavily damaged."))
-    icas = 10.0+20.0*random.random()
+    icas = 10 + random.randrange(20)
     prout(_("***Sickbay reports %d casualties"), icas)
     game.casual += icas
     game.state.crew -= icas
@@ -2479,7 +2479,7 @@ def events():
             if game.state.remcom == 0:
                 unschedule(FTBEAM)
                 continue
-            i = random.random()*game.state.remcom+1.0
+            i = random.randrange(game.state.remcom)
             yank = square(game.state.kcmdr[i].x-game.quadrant.x) + square(game.state.kcmdr[i].y-game.quadrant.y)
             if istract or game.condition == "docked" or yank == 0:
                 # Drats! Have to reschedule 
@@ -2922,7 +2922,7 @@ def supernova(induced, w=None):
 		stars += game.state.galaxy[nq.x][nq.y].stars
 	if stars == 0:
 	    return # nothing to supernova exists 
-	num = random.random()*stars + 1
+	num = random.randrange(stars) + 1
 	for nq.x in range(GALSIZE):
 	    for nq.y in range(GALSIZE):
 		num -= game.state.galaxy[nq.x][nq.y].stars
@@ -2943,7 +2943,7 @@ def supernova(induced, w=None):
     else:
 	ns = coord()
 	# we are in the quadrant! 
-	num = random.random()* game.state.galaxy[nq.x][nq.y].stars + 1
+	num = random.randrange(game.state.galaxy[nq.x][nq.y].stars) + 1
 	for ns.x in range(QUADSIZE):
 	    for ns.y in range(QUADSIZE):
 		if game.quad[ns.x][ns.y]==IHSTAR:
@@ -3821,12 +3821,10 @@ def imove(novapush):
         newcnd()
         drawmaps(0)
         setwnd(message_window)
-
     w.x = w.y = 0
     if game.inorbit:
 	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
 	game.inorbit = False
-
     angle = ((15.0 - game.direc) * 0.5235988)
     deltax = -math.sin(angle)
     deltay = math.cos(angle)
@@ -3834,10 +3832,8 @@ def imove(novapush):
 	bigger = math.fabs(deltax)
     else:
 	bigger = math.fabs(deltay)
-		
     deltay /= bigger
     deltax /= bigger
-
     # If tractor beam is to occur, don't move full distance 
     if game.state.date+game.optime >= scheduled(FTBEAM):
 	trbeam = True
@@ -3849,13 +3845,12 @@ def imove(novapush):
     x = game.sector.x
     y = game.sector.y
     n = int(10.0*game.dist*bigger+0.5)
-
     if n > 0:
 	for m in range(1, n+1):
             x += deltax
             y += deltay
-	    w.x = int(x + 0.5)
-	    w.y = int(y + 0.5)
+	    w.x = int(round(x))
+	    w.y = int(round(y))
 	    if not VALID_SECTOR(w.x, w.y):
 		# Leaving quadrant -- allow final enemy attack 
 		# Don't do it if being pushed by Nova 
@@ -3874,31 +3869,30 @@ def imove(novapush):
 		    if game.alldone:
 			return
 		# compute final position -- new quadrant and sector 
-		x = QUADSIZE*(game.quadrant.x-1)+game.sector.x
-		y = QUADSIZE*(game.quadrant.y-1)+game.sector.y
-		w.x = int(x+10.0*game.dist*bigger*deltax+0.5)
-		w.y = int(y+10.0*game.dist*bigger*deltay+0.5)
+		x = (QUADSIZE*game.quadrant.x)+game.sector.x
+		y = (QUADSIZE*game.quadrant.y)+game.sector.y
+		w.x = int(round(x+10.0*game.dist*bigger*deltax))
+		w.y = int(round(y+10.0*game.dist*bigger*deltay))
 		# check for edge of galaxy 
 		kinks = 0
                 while True:
-		    kink = 0
-		    if w.x <= 0:
-			w.x = -w.x + 1
-			kink = 1
-		    if w.y <= 0:
-			w.y = -w.y + 1
-			kink = 1
-		    if w.x > GALSIZE*QUADSIZE:
-			w.x = (GALSIZE*QUADSIZE*2)+1 - w.x
-			kink = 1
-		    if w.y > GALSIZE*QUADSIZE:
-			w.y = (GALSIZE*QUADSIZE*2)+1 - w.y
-			kink = 1
+		    kink = False
+		    if w.x < 0:
+			w.x = -w.x
+			kink = True
+		    if w.y < 0:
+			w.y = -w.y
+			kink = True
+		    if w.x >= GALSIZE*QUADSIZE:
+			w.x = (GALSIZE*QUADSIZE*2) - w.x
+			kink = True
+		    if w.y >= GALSIZE*QUADSIZE:
+			w.y = (GALSIZE*QUADSIZE*2) - w.y
+			kink = True
 		    if kink:
-			kinks = 1
-		if not kink:
-                    break
-
+			kinks += 1
+                    else:
+                        break
 		if kinks:
 		    game.nkinks += 1
 		    if game.nkinks == 3:
@@ -3928,7 +3922,7 @@ def imove(novapush):
 		# object encountered in flight path 
 		stopegy = 50.0*game.dist/game.optime
 		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
-                if iquad in (IHT. IHK, OHC, IHS, IHR, IHQUEST):
+                if iquad in (IHT, IHK, OHC, IHS, IHR, IHQUEST):
 		    game.sector = w
 		    ram(False, iquad, game.sector)
 		    final = game.sector
@@ -5138,7 +5132,6 @@ def shuttle():
 def deathray():
     # use the big zapper 
     r = random.random()
-	
     game.ididit = False
     skip(1)
     chew()
