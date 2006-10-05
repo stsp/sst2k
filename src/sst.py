@@ -173,7 +173,7 @@ Also, the nav subsystem (enabling automatic course
 setting) can be damaged separately from the main computer (which
 handles weapons targeting, ETA calculation, and self-destruct).
 """
-import os, sys, math, curses, time, atexit, readline, cPickle, random, getopt
+import os,sys,math,curses,time,atexit,readline,cPickle,random,getopt,copy
 
 SSTDOC  	= "/usr/share/doc/sst/sst.doc"
 DOC_NAME	= "sst.doc"
@@ -2902,7 +2902,7 @@ def nova(nov):
     game.optime = 10.0*game.dist/16.0
     skip(1)
     prout(_("Force of nova displaces starship."))
-    imove(True)
+    imove(novapush=True)
     game.optime = 10.0*game.dist/16.0
     return
 	
@@ -3595,13 +3595,13 @@ def prout(line):
 def prouts(line):
     "print slowly!" 
     for c in line:
-	curses.delay_output(30)
+	time.sleep(0.03)
 	proutn(c)
 	if game.options & OPTION_CURSES:
 	    wrefresh(curwnd)
 	else:
 	    sys.stdout.flush()
-    curses.delay_output(300)
+    time.sleep(0.03)
 
 def cgetline():
     "Get a line of input."
@@ -3721,7 +3721,7 @@ def boom(w):
 	srscan_window.attron(curses.A_REVERSE)
 	put_srscan_sym(w, game.quad[w.x][w.y])
 	#sound(500)
-	#delay(1000)
+	#time.sleep(1.0)
 	#nosound()
 	srscan_window.attroff(curses.A_REVERSE)
 	put_srscan_sym(w, game.quad[w.x][w.y])
@@ -3757,18 +3757,18 @@ def tracktorpedo(w, l, i, n, iquad):
 	if not damaged(DSRSENS) or game.condition=="docked":
 	    if i != 1 and l == 1:
 		drawmaps(2)
-		curses.delay_output(400)
+		time.sleep(0.4)
 	    if (iquad==IHDOT) or (iquad==IHBLANK):
 		put_srscan_sym(w, '+')
 		#sound(l*10)
-		#curses.delay_output(100)
+		#time.sleep(0.1)
 		#nosound()
 		put_srscan_sym(w, iquad)
 	    else:
 		curwnd.attron(curses.A_REVERSE)
 		put_srscan_sym(w, iquad)
 		#sound(500)
-		#curses.delay_output(1000)
+		#time.sleep(1.0)
 		#nosound()
 		curwnd.attroff(curses.A_REVERSE)
 		put_srscan_sym(w, iquad)
@@ -3806,7 +3806,7 @@ def imove(novapush):
     trbeam = False
 
     def no_quad_change():
-        # No quadrant change -- compute new avg enemy distances 
+        # No quadrant change -- compute new average enemy distances 
         game.quad[game.sector.x][game.sector.y] = game.ship
         if game.nenhere:
             for m in range(game.nenhere):
@@ -3848,14 +3848,14 @@ def imove(novapush):
     game.quad[game.sector.x][game.sector.y] = IHDOT
     x = game.sector.x
     y = game.sector.y
-    n = 10.0*game.dist*bigger+0.5
+    n = int(10.0*game.dist*bigger+0.5)
 
     if n > 0:
 	for m in range(1, n+1):
             x += deltax
             y += deltay
-	    w.x = x + 0.5
-	    w.y = y + 0.5
+	    w.x = int(x + 0.5)
+	    w.y = int(y + 0.5)
 	    if not VALID_SECTOR(w.x, w.y):
 		# Leaving quadrant -- allow final enemy attack 
 		# Don't do it if being pushed by Nova 
@@ -3876,8 +3876,8 @@ def imove(novapush):
 		# compute final position -- new quadrant and sector 
 		x = QUADSIZE*(game.quadrant.x-1)+game.sector.x
 		y = QUADSIZE*(game.quadrant.y-1)+game.sector.y
-		w.x = x+10.0*game.dist*bigger*deltax+0.5
-		w.y = y+10.0*game.dist*bigger*deltay+0.5
+		w.x = int(x+10.0*game.dist*bigger*deltax+0.5)
+		w.y = int(y+10.0*game.dist*bigger*deltay+0.5)
 		# check for edge of galaxy 
 		kinks = 0
                 while True:
@@ -4018,23 +4018,19 @@ def dock(verbose):
 # because it involves giving x and y motions, yet the coordinates
 # are always displayed y - x, where +y is downward!
 
-def getcd(isprobe, akey):
-    # get course and distance 
-    irowq=game.quadrant.x; icolq=game.quadrant.y; key=0
+def getcourse(isprobe, akey):
+    # get course and distance
+    key = 0
+    dquad = copy.copy(game.quadrant)
     navmode = "unspecified"
     itemp = "curt"
-    incr = coord()
+    dsect = coord()
     iprompt = False
-
-    # Get course direction and distance. If user types bad values, return
-    # with DIREC = -1.0.
-    game.direc = -1.0
-	
     if game.landed and not isprobe:
 	prout(_("Dummy! You can't leave standard orbit until you"))
 	proutn(_("are back aboard the ship."))
 	chew()
-	return
+	return False
     while navmode == "unspecified":
 	if damaged(DNAVSYS):
 	    if isprobe:
@@ -4051,7 +4047,6 @@ def getcd(isprobe, akey):
 	    akey = -1
 	else: 
 	    key = scan()
-
 	if key == IHEOL:
 	    proutn(_("Manual or automatic- "))
 	    iprompt = True
@@ -4068,7 +4063,7 @@ def getcd(isprobe, akey):
 	    else:
 		huh()
 		chew()
-		return
+		return False
 	else: # numeric 
 	    if isprobe:
 		prout(_("(Manual navigation assumed.)"))
@@ -4076,7 +4071,6 @@ def getcd(isprobe, akey):
 		prout(_("(Manual movement assumed.)"))
 	    navmode = "manual"
 	    break
-
     if navmode == "automatic":
 	while key == IHEOL:
 	    if isprobe:
@@ -4086,52 +4080,53 @@ def getcd(isprobe, akey):
 	    chew()
 	    iprompt = True
 	    key = scan()
-
 	if key != IHREAL:
 	    huh()
-	    return
-	xi = int(aaitem-0.05)
+	    return False
+	xi = int(round(aaitem))-1
 	key = scan()
 	if key != IHREAL:
 	    huh()
-	    return
-	xj = int(aaitem-0.5)
+	    return False
+	xj = int(round(aaitem))-1
 	key = scan()
 	if key == IHREAL:
 	    # both quadrant and sector specified 
-	    xk = aaitem
+	    xk = int(round(aaitem))-1
 	    key = scan()
 	    if key != IHREAL:
 		huh()
-		return
-	    xl = aaitem
-
-	    irowq = xi + 0.5
-	    icolq = xj + 0.5
-	    incr.y = xk + 0.5
-	    incr.x = xl + 0.5
+		return False
+	    xl = int(round(aaitem))-1
+	    dquad.x = xi
+	    dquad.y = xj
+	    dsect.y = xk
+	    dsect.x = xl
 	else:
+            # only one pair of numbers was specified
 	    if isprobe:
 		# only quadrant specified -- go to center of dest quad 
-		irowq = xi + 0.5
-		icolq = xj + 0.5
-		incr.y = incr.x = 5
+		dquad.x = xi
+		dquad.y = xj
+		dsect.y = dsect.x = 4	# preserves 1-origin behavior
 	    else:
-		incr.y = xi + 0.5
-		incr.x = xj + 0.5
+                # only sector specified
+		dsect.y = xi
+		dsect.x = xj
 	    itemp = "normal"
-	if not VALID_QUADRANT(icolq,irowq) or not VALID_SECTOR(incr.x,incr.y):
+	if not VALID_QUADRANT(dquad.y,dquad.x) or not VALID_SECTOR(dsect.x,dsect.y):
 	    huh()
-	    return
+	    return False
 	skip(1)
 	if not isprobe:
 	    if itemp > "curt":
 		if iprompt:
-		    prout(_("Helmsman Sulu- \"Course locked in for Sector %s.\"") % incr)
+		    prout(_("Helmsman Sulu- \"Course locked in for Sector %s.\"") % dsect)
 	    else:
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
-	deltax = icolq - game.quadrant.y + 0.1*(incr.x-game.sector.y)
-	deltay = game.quadrant.x - irowq + 0.1*(game.sector.x-incr.y)
+        # the actual deltas get computed here
+	deltax = dquad.y-game.quadrant.y + 0.1*(dsect.x-game.sector.y)
+	deltay = game.quadrant.x-dquad.x + 0.1*(game.sector.x-dsect.y)
     else: # manual 
 	while key == IHEOL:
 	    proutn(_("X and Y displacements- "))
@@ -4141,26 +4136,27 @@ def getcd(isprobe, akey):
 	itemp = "verbose"
 	if key != IHREAL:
 	    huh()
-	    return
+	    return False
 	deltax = aaitem
 	key = scan()
 	if key != IHREAL:
 	    huh()
-	    return
+	    return False
 	deltay = aaitem
     # Check for zero movement 
     if deltax == 0 and deltay == 0:
 	chew()
-	return
+	return False
     if itemp == "verbose" and not isprobe:
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
+    # Course actually laid in.
     game.dist = math.sqrt(deltax*deltax + deltay*deltay)
     game.direc = math.atan2(deltax, deltay)*1.90985932
     if game.direc < 0.0:
 	game.direc += 12.0
     chew()
-    return
+    return True
 
 def impulse():
     # move under impulse power 
@@ -4171,8 +4167,7 @@ def impulse():
 	prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
 	return
     if game.energy > 30.0:
-	getcd(False, 0)
-	if game.direc == -1.0:
+        if not getcourse(isprobe=False, akey=0):
 	    return
 	power = 20.0 + 100.0*game.dist
     else:
@@ -4199,7 +4194,7 @@ def impulse():
 	if ja() == False:
 	    return
     # Activate impulse engines and pay the cost 
-    imove(False)
+    imove(novapush=False)
     game.ididit = True
     if game.alldone:
 	return
@@ -4227,8 +4222,7 @@ def warp(timewarp):
 	    prout(_("  is repaired, I can only give you warp 4.\""))
 	    return
        	# Read in course and distance 
-	getcd(False, 0)
-	if game.direc == -1.0:
+        if not getcourse(isprobe=False, akey=0):
 	    return
 	# Make sure starship has enough energy for the trip 
 	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
@@ -4307,7 +4301,7 @@ def warp(timewarp):
 		    blooey = False
 		    twarp = False
     # Activate Warp Engines and pay the cost 
-    imove(False)
+    imove(novapush=False)
     if game.alldone:
 	return
     game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
@@ -4543,8 +4537,7 @@ def probe():
     elif key == IHEOL:
 	proutn(_("Arm NOVAMAX warhead? "))
 	game.isarmed = ja()
-    getcd(True, key)
-    if game.direc == -1.0:
+    if not getcourse(isprobe=True, akey=key):
 	return
     game.nprobes -= 1
     angle = ((15.0 - game.direc) * 0.5235988)
@@ -4864,13 +4857,14 @@ def sensor():
 	if game.iplnet.known=="shuttle_down": 
 	    prout(_("         Sensors show Galileo still on surface."))
 	proutn(_("         Readings indicate"))
-	if game.iplnet.crystals != present:
+	if game.iplnet.crystals != "present":
 	    proutn(_(" no"))
 	prout(_(" dilithium crystals present.\""))
 	if game.iplnet.known == "unknown":
 	    game.iplnet.known = "known"
     elif game.iplnet.inhabited:
-        prout(_("Spock-  \"The inhabited planet %s is located at Sector %s, Captain.\"") % (game.iplnet.name, game.plnet))
+        prout(_("Spock-  \"The inhabited planet %s ") % game.iplnet.name)
+        prout(_("        is located at Sector %s, Captain.\"") % game.plnet)
 
 def beam():
     # use the transporter 
@@ -5403,7 +5397,7 @@ def chart():
 	prout(_("(Last surveillance update %d stardates ago).") % ((int)(game.state.date-game.lastchart)))
     prout("      1    2    3    4    5    6    7    8")
     for i in range(GALSIZE):
-	proutn("%d |" % (i))
+	proutn("%d |" % (i+1))
 	for j in range(GALSIZE):
 	    if (game.options & OPTION_SHOWME) and i == game.quadrant.x and j == game.quadrant.y:
 		proutn("<")
@@ -5532,7 +5526,7 @@ def srscan():
     if game.condition != "docked":
 	newcnd()
     for i in range(QUADSIZE):
-	proutn("%2d  " % (i))
+	proutn("%2d  " % (i+1))
 	for j in range(QUADSIZE):
 	    sectscan(goodScan, i, j)
 	skip(1)
@@ -6076,7 +6070,7 @@ def choose(needprompt):
 	    if aaitem == 0:
 		chew()
 		continue # We don't want a blank entry
-	    game.tourn = int(aaitem)
+	    game.tourn = int(round(aaitem))
 	    random.seed(aaitem)
 	    break
         if isit("saved") or isit("frozen"):
@@ -6632,7 +6626,7 @@ def makemoves():
 	elif cmd == "SEED":		# set random-number seed
 	    key = scan()
 	    if key == IHREAL:
-		seed = int(aaitem)
+		seed = int(round(aaitem))
 #ifdef BSD_BUG_FOR_BUG
 #	elif cmd == "VISUAL":
 #	    visual()			# perform visual scan
@@ -6727,7 +6721,7 @@ def chew2():
 
 def scan():
     # Get a token from the user
-    global inqueue, line, citem
+    global inqueue, line, citem, aaitem
     aaitem = 0.0
     citem = ''
 
@@ -6857,13 +6851,13 @@ def debugme():
 			    prout("Event %d canceled, no x coordinate." % (i))
 			    unschedule(i)
 			    continue
-			w.x = int(aaitem)
+			w.x = int(round(aaitem))
 			key = scan()
 			if key != IHREAL:
 			    prout("Event %d canceled, no y coordinate." % (i))
 			    unschedule(i)
 			    continue
-			w.y = int(aaitem)
+			w.y = int(round(aaitem))
 			ev.quadrant = w
 	chew()
     proutn("Induce supernova here? ")
