@@ -3906,10 +3906,10 @@ def imove(novapush):
 		# Compute final position in new quadrant 
 		if trbeam: # Don't bother if we are to be beamed 
 		    return
-		game.quadrant.x = (w.x+(QUADSIZE-1))/QUADSIZE
-		game.quadrant.y = (w.y+(QUADSIZE-1))/QUADSIZE
-		game.sector.x = w.x - QUADSIZE*(game.quadrant.x-1)
-		game.sector.y = w.y - QUADSIZE*(game.quadrant.y-1)
+		game.quadrant.x = w.x/QUADSIZE
+		game.quadrant.y = w.y/QUADSIZE
+		game.sector.x = w.x - (QUADSIZE*game.quadrant.x)
+		game.sector.y = w.y - (QUADSIZE*game.quadrant.y)
 		skip(1)
 		prout(_("Entering Quadrant %s.") % game.quadrant)
 		game.quad[game.sector.x][game.sector.y] = game.ship
