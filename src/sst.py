@@ -236,7 +236,7 @@ class coord:
     def is_valid(self):
         return self.x != None and self.y != None
     def __eq__(self, other):
-        return self.x == other.y and self.x == other.y
+        return other != None and self.x == other.y and self.x == other.y
     def __add__(self, other):
         return coord(self.x+self.x, self.y+self.y)
     def __sub__(self, other):
@@ -279,6 +279,15 @@ class page:
 	self.starbase = None
 	self.klingons = None
 
+def fill2d(size, fillfun):
+    "Fill an empty list in 2D."
+    lst = []
+    for i in range(size+1):
+        lst.append([]) 
+        for j in range(size+1):
+            lst[i][j] = fillfun(i, j)
+    return lst
+
 class snapshot:
     def __init__(self):
         self.snap = False	# snapshot taken
@@ -303,16 +312,10 @@ class snapshot:
         for i in range(QUADSIZE+1):
             self.kcmdr.append(coord())
 	self.kscmdr = coord()	# Supercommander quadrant coordinates
-        self.galaxy = [] 	# The Galaxy (subscript 0 not used)
-        for i in range(GALSIZE+1):
-            self.galaxy.append([])
-            for j in range(GALSIZE+1):
-                self.galaxy[i].append(quadrant())
-    	self.chart = [] 	# the starchart (subscript 0 not used)
-        for i in range(GALSIZE+1):
-            self.chart.append([])
-            for j in range(GALSIZE+1):
-                self.chart[i].append(page())
+        # the galaxy (subscript 0 not used)
+        self.galaxy = fill2d(GALSIZE, lambda i, j: quadrant())
+        # the starchart (subscript 0 not used)
+    	self.chart = fill2d(GALSIZE, lambda i, j: page())
 
 class event:
     def __init__(self):
@@ -393,10 +396,10 @@ class gamestate:
         self.options = None	# Game options
         self.state = snapshot()	# A snapshot structure
         self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
-        self.quad = [[IHDOT * (QUADSIZE+1)] * (QUADSIZE+1)]	# contents of our quadrant
-        self.kpower = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy energy levels
-        self.kdist = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy distances
-        self.kavgd = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# average distances
+        self.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)	# contents of our quadrant
+        self.kpower = fill2d(QUADSIZE, lambda i, j: 0.0)	# enemy energy levels
+        self.kdist = fill2d(QUADSIZE, lambda i, j: 0.0)		# enemy distances
+        self.kavgd = fill2d(QUADSIZE, lambda i, j: 0.0) 	# average distances
         self.damage = [0.0] * NDEVICES	# damage encountered
         self.future = []		# future events
         for i in range(NEVENTS):
@@ -6244,10 +6247,8 @@ def newqad(shutup):
     # set up a new state of quadrant, for when we enter or re-enter it 
     w = coord()
     game.justin = True
-    invalidate(game.base)
     game.klhere = 0
     game.comhere = False
-    invalidate(game.plnet)
     game.ishere = False
     game.irhere = 0
     game.iplnet = 0
@@ -6264,10 +6265,6 @@ def newqad(shutup):
 	# Attempt to escape Super-commander, so tbeam back!
 	game.iscate = False
 	game.ientesc = True
-    # Clear quadrant
-    for i in range(1, QUADSIZE+1):
-	for j in range(1, QUADSIZE+1):
-	    game.quad[i][j] = IHDOT
     q = game.state.galaxy[game.quadrant.x][game.quadrant.y]
     # cope with supernova
     if q.supernova:
@@ -6286,7 +6283,7 @@ def newqad(shutup):
 	    w = newkling(i)
 	# If we need a commander, promote a Klingon
 	for i in range(1, game.state.remcom+1):
-	    if same(game.state.kcmdr[i], game.quadrant):
+	    if game.state.kcmdr[i] == game.quadrant:
 		break
 			
 	if i <= game.state.remcom:
