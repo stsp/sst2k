@@ -244,7 +244,16 @@ class coord:
     def distance(self, other):
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
     def sgn(self):
-        return coord(self.x / abs(x), self.y / abs(y));
+        s = coord()
+        if self.x == 0:
+            s.x = 0
+        else:
+            s.x = self.x / abs(self.x)
+        if self.y == 0:
+            s.y = 0
+        else:
+            s.y = self.y / abs(self.y)
+        return s
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
@@ -423,7 +432,6 @@ class gamestate:
         self.ishere = False	# super-commander in quadrant
         self.iscate = False	# super commander is here
         self.ientesc = False	# attempted escape from supercommander
-        self.ithere = False	# Tholian is here 
         self.resting = False	# rest time
         self.icraft = False	# Kirk in Galileo
         self.landed = False	# party on planet (true), on ship (false)
@@ -1021,9 +1029,8 @@ def supercommander():
 
 def movetholian():
     # move the Tholian 
-    if not game.ithere or game.justin:
+    if not game.tholian or game.justin:
 	return
-
     if game.tholian.x == 0 and game.tholian.y == 0:
 	idx = 0; idy = QUADSIZE-1
     elif game.tholian.x == 0 and game.tholian.y == QUADSIZE-1:
@@ -1036,12 +1043,10 @@ def movetholian():
 	# something is wrong! 
 	game.ithere = False
 	return
-
     # do nothing if we are blocked 
     if game.quad[idx][idy]!= IHDOT and game.quad[idx][idy]!= IHWEB:
 	return
     game.quad[game.tholian.x][game.tholian.y] = IHWEB
-
     if game.tholian.x != idx:
 	# move in x axis 
 	im = math.fabs(idx - game.tholian.x)*1.0/(idx - game.tholian.x)
@@ -1074,7 +1079,7 @@ def movetholian():
     dropin(IHBLANK)
     crmena(True, IHT, "sector", game.tholian)
     prout(_(" completes web."))
-    game.ithere = False
+    game.tholian = None
     game.nenhere -= 1
     return
 
@@ -1486,7 +1491,7 @@ def torpedo(course, r, incoming, i, n):
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
 		game.quad[w.x][w.y] = IHDOT
-		game.ithere = False
+		game.tholian = None
 		deadkl(w, iquad, w)
 		return None
 	    skip(1)
@@ -1496,7 +1501,7 @@ def torpedo(course, r, incoming, i, n):
 		return None
 	    prout(_(" disappears."))
 	    game.quad[w.x][w.y] = IHWEB
-	    game.ithere = False
+	    game.tholian = None
 	    game.nenhere -= 1
 	    dropin(IHBLANK)
 	    return None
@@ -1569,7 +1574,7 @@ def attack(torps_ok):
     if idebug:
 	prout("=== ATTACK!")
     # Tholian gets to move before attacking 
-    if game.ithere:
+    if game.tholian:
 	movetholian()
     # if you have just entered the RNZ, you'll get a warning 
     if game.neutz: # The one chance not to be attacked 
@@ -1721,7 +1726,7 @@ def deadkl(w, type, mv):
 	game.state.nromrem -= 1
     elif type == IHT:
 	# Killed a Tholian 
-	game.ithere = False
+	game.tholian = None
     elif type == IHQUEST:
 	# Killed a Thingy
         global iqengry
@@ -1946,7 +1951,7 @@ def checkshctrl(rpow):
 
 def hittem(hits):
     # register a phaser hit on Klingons and Romulans 
-    nenhr2=game.nenhere; kk=1
+    nenhr2 = game.nenhere; kk=1
     w = coord()
     skip(1)
     for k in range(nenhr2):
@@ -1995,9 +2000,9 @@ def hittem(hits):
 
 def phasers():
     # fire phasers 
-    hits = []; rpow=0
+    hits = []
     kz = 0; k = 1; irec=0 # Cheating inhibitor 
-    ifast = False; no = False; itarg = True; msgflag = True
+    ifast = False; no = False; itarg = True; msgflag = True; rpow=0
     automode = "NOTSET"
     key=0
     skip(1)
@@ -2066,7 +2071,8 @@ def phasers():
 	    elif not itarg:
 		automode = "FORCEMAN"
 	    else: 
-		proutn(_("Manual or automatic? "))			
+		proutn(_("Manual or automatic? "))
+                chew()
     avail = game.energy
     if ifast:
         avail -= 200.0
@@ -2114,7 +2120,7 @@ def phasers():
 	    extra = 0.0
 	    powrem = rpow
 	    for i in range(game.nenhere):
-		hits[i] = 0.0
+		hits.append(0.0)
 		if powrem <= 0:
 		    continue
 		hits[i] = math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))
@@ -2131,7 +2137,7 @@ def phasers():
 	    hittem(hits)
 	    game.ididit = True
 	if extra > 0 and not game.alldone:
-	    if game.ithere:
+	    if game.tholian:
 		proutn(_("*** Tholian web absorbs "))
 		if game.nenhere>0:
 		    proutn(_("excess "))
@@ -2288,9 +2294,8 @@ def events():
     w = coord(); hold = coord()
     ev = event(); ev2 = event()
 
-    def tractorbeam():
+    def tractorbeam(yank):
         # tractor beaming cases merge here 
-        yank = math.sqrt(yank)
         announce()
         game.optime = (10.0/(7.5*7.5))*yank # 7.5 is yank rate (warp 7.5) 
         skip(1)
@@ -2314,7 +2319,7 @@ def events():
                 game.iscraft = "removed"
             else:
                 prout(_("Galileo, left on the planet surface, is well hidden."))
-        if evcode==0:
+        if evcode == FSPY:
             game.quadrant = game.state.kscmdr
         else:
             game.quadrant = game.state.kcmdr[i]
@@ -2327,8 +2332,8 @@ def events():
             game.resting = False
         if not game.shldup:
             if not damaged(DSHIELD) and game.shield > 0:
-                doshield(True) # raise shields 
-                game.shldchg=False
+                doshield(shraise=True) # raise shields 
+                game.shldchg = False
             else:
                 prout(_("(Shields not currently useable.)"))
         newqad(False)
@@ -2469,10 +2474,8 @@ def events():
 		 (game.energy < 2500 or damaged(DPHASER)) and \
                  (game.torps < 5 or damaged(DPHOTON))):
 		# Tractor-beam her! 
-		istract = True
-		yank = distance(game.state.kscmdr, game.quadrant)
-                ictbeam = True
-                tractorbeam()
+		istract = ictbeam = True
+                tractorbeam(distance(game.state.kscmdr, game.quadrant))
 	    else:
 		return
 	elif evcode == FTBEAM: # Tractor beam 
@@ -2480,16 +2483,16 @@ def events():
                 unschedule(FTBEAM)
                 continue
             i = random.randrange(game.state.remcom)
-            yank = square(game.state.kcmdr[i].x-game.quadrant.x) + square(game.state.kcmdr[i].y-game.quadrant.y)
+            yank = distance(game.state.kcmdr[i], game.quadrant)
             if istract or game.condition == "docked" or yank == 0:
                 # Drats! Have to reschedule 
                 schedule(FTBEAM, 
                          game.optime + expran(1.5*game.intime/game.state.remcom))
                 continue
             ictbeam = True
-            tractorbeam()
+            tractorbeam(yank)
 	elif evcode == FSNAP: # Snapshot of the universe (for time warp) 
-	    game.snapsht = game.state
+	    game.snapsht = copy.deepcopy(game.state)
 	    game.state.snap = True
 	    schedule(FSNAP, expran(0.5 * game.intime))
 	elif evcode == FBATTAK: # Commander attacks starbase 
@@ -2610,7 +2613,7 @@ def events():
 		q = game.state.galaxy[w.x][w.y]
                 if not (game.quadrant == w or q.planet == None or \
 		      not q.planet.inhabited or \
-		      q.supernova or q.status!=secure or q.klingons<=0):
+		      q.supernova or q.status!="secure" or q.klingons<=0):
                     break
             else:
 		# can't seem to find one; ignore this call 
@@ -3614,7 +3617,7 @@ def cgetline():
 	else:
 	    line = raw_input()
     if logfp:
-	logfp.write(line)
+	logfp.write(line + "\n")
     return line
 
 def setwnd(wnd):
@@ -4974,7 +4977,7 @@ def mine():
 	skip(1)
 	prout(_("there's no reason to mine more at this time."))
 	return
-    game.optime = (0.1+0.2*random.random())*game.iplnet.pclass
+    game.optime = (0.1+0.2*random.random())*(ord(game.iplnet.pclass)-ord("M"))
     if consumeTime():
 	return
     prout(_("Mining operation complete."))
@@ -6039,7 +6042,7 @@ def setup(needprompt):
 	prout(_("  YOU'LL NEED IT."))
     waitfor()
     newqad(False)
-    if game.nenhere - (thing == game.quadrant) - game.ithere:
+    if game.nenhere - (thing == game.quadrant) - (game.tholian != None):
 	game.shldup = True
     if game.neutz:	# bad luck to start in a Romulan Neutral Zone
 	attack(False)
@@ -6197,7 +6200,6 @@ def newqad(shutup):
     game.inorbit = False
     game.landed = False
     game.ientesc = False
-    game.ithere = False
     global iqengry
     iqengry = False
     game.iseenit = False
@@ -6229,7 +6231,7 @@ def newqad(shutup):
 	    game.kpower[game.klhere] = 950.0+400.0*random.random()+50.0*game.skill
 	    game.comhere = True
 	# If we need a super-commander, promote a Klingon
-	if same(game.quadrant, game.state.kscmdr):
+	if game.quadrant == game.state.kscmdr:
 	    game.quad[game.ks[0].x][game.ks[0].y] = IHS
 	    game.kpower[1] = 1175.0 + 400.0*random.random() + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
@@ -6286,13 +6288,13 @@ def newqad(shutup):
 	if (game.skill < SKILL_GOOD and random.random() <= 0.02) or \
 	    (game.skill == SKILL_GOOD and random.random() <= 0.05) or \
             (game.skill > SKILL_GOOD and random.random() <= 0.08):
+            game.tholian = coord()
             while True:
 		game.tholian.x = random.choice((0, QUADSIZE-1))
 		game.tholian.y = random.choice((0, QUADSIZE-1))
                 if game.quad[game.tholian.x][game.tholian.y] == IHDOT:
                     break
 	    game.quad[game.tholian.x][game.tholian.y] = IHT
-	    game.ithere = True
 	    game.nenhere += 1
 	    game.ks[game.nenhere] = game.tholian
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
@@ -6313,7 +6315,7 @@ def newqad(shutup):
 	if random.random() > 0.5: 
 	    dropin(IHBLANK)
     # Take out X's in corners if Tholian present
-    if game.ithere:
+    if game.tholian:
 	if game.quad[0][0]=='X':
 	    game.quad[0][0] = IHDOT
 	if game.quad[0][QUADSIZE-1]=='X':
@@ -6326,7 +6328,7 @@ def newqad(shutup):
 def sortklings():
     # sort Klingons by distance from us 
     # The author liked bubble sort. So we will use it. :-(
-    if game.nenhere-(thing==game.quadrant)-game.ithere < 2:
+    if game.nenhere-(thing==game.quadrant)-(game.tholian!=None) < 2:
 	return
     while True:
 	sw = False
@@ -6535,7 +6537,7 @@ def makemoves():
 	elif cmd == "MOVE":		# move under warp
 	    warp(False)
 	elif cmd == "SHIELDS":		# shields
-	    doshield(False)
+	    doshield(shraise=False)
 	    if game.ididit:
 		hitme = True
 		game.shldchg = False
@@ -6671,6 +6673,7 @@ def crmena(stars, enemy, loctype, w):
 	proutn("***")
     cramen(enemy)
     proutn(_(" at "))
+    buf = ""
     if loctype == "quadrant":
 	buf = _("Quadrant ")
     elif loctype == "sector":
