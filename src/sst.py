@@ -262,7 +262,6 @@ class planet:
     def __str__(self):
         return self.name
 
-NOPLANET = None
 class quadrant:
     def __init__(self):
         self.stars = None
@@ -454,7 +453,7 @@ class gamestate:
         self.casual = 0		# causalties
         self.nhelp = 0		# calls for help
         self.nkinks = 0		# count of energy-barrier crossings
-        self.iplnet = 0		# planet # in quadrant
+        self.iplnet = None	# planet # in quadrant
         self.inplan = 0		# initial planets
         self.nenhere = 0	# number of enemies in quadrant
         self.irhere = 0		# Romulans in quadrant
@@ -888,7 +887,7 @@ def movescom(iq, avoid):
 	    game.state.planets[i].crystals == "present":
 	    # destroy the planet 
 	    game.state.planets[i].pclass = "destroyed"
-	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = NOPLANET
+	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = None
 	    if communicating():
 		announce()
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
@@ -1420,9 +1419,9 @@ def torpedo(course, r, incoming, i, n):
 	    crmena(True, iquad, sector, w)
 	    prout(_(" destroyed."))
 	    game.state.nplankl += 1
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET
-	    game.state.planets[game.iplnet].pclass = destroyed
-	    game.iplnet = 0
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
+	    game.iplnet.pclass = "destroyed"
+	    game.iplnet = None
 	    invalidate(game.plnet)
 	    game.quad[w.x][w.y] = IHDOT
 	    if game.landed:
@@ -1433,9 +1432,9 @@ def torpedo(course, r, incoming, i, n):
 	    crmena(True, iquad, sector, w)
 	    prout(_(" destroyed."))
 	    game.state.nworldkl += 1
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET
-	    game.state.planets[game.iplnet].pclass = destroyed
-	    game.iplnet = 0
+	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
+	    game.iplnet.pclass = "destroyed"
+	    game.iplnet = None
 	    invalidate(game.plnet)
 	    game.quad[w.x][w.y] = IHDOT
 	    if game.landed:
@@ -2627,8 +2626,8 @@ def events():
 		# supernova'ed, and which has some Klingons in it
 		w = randplace(GALSIZE)
 		q = game.state.galaxy[w.x][w.y]
-                if not (game.quadrant == w or q.planet == NOPLANET or \
-		      not game.state.planets[q.planet].inhabited or \
+                if not (game.quadrant == w or q.planet == None or \
+		      not q.planet.inhabited or \
 		      q.supernova or q.status!=secure or q.klingons<=0):
                     break
             else:
@@ -2711,7 +2710,7 @@ def events():
 		    prout(_("launched a warship from %s.") % q.planet)
 		else:
 		    prout(_("Uhura- Starfleet reports increased Klingon activity"))
-		    if q.planet != NOPLANET:
+		    if q.planet != None:
 			proutn(_("near %s") % q.planet)
 		    prout(_("in Quadrant %s.") % w)
 				
@@ -2826,12 +2825,12 @@ def nova(nov):
 			prout(_(" novas."))
 			game.quad[scratch.x][scratch.y] = IHDOT
 		    elif iquad == IHP: # Destroy planet 
-			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = NOPLANET
+			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 			game.state.nplankl += 1
 			crmena(True, IHP, sector, scratch)
 			prout(_(" destroyed."))
-			game.state.planets[game.iplnet].pclass = destroyed
-			game.iplnet = 0
+			game.iplnet.pclass = "destroyed"
+			game.iplnet = None
 			invalidate(game.plnet)
 			if game.landed:
 			    finish(FPNOVA)
@@ -3017,7 +3016,7 @@ def supernova(induced, w=None):
     # Destroy planets 
     for loop in range(game.inplan):
 	if game.state.planets[loop].w == nq:
-	    game.state.planets[loop].pclass = destroyed
+	    game.state.planets[loop].pclass = "destroyed"
 	    npdead += 1
     # Destroy any base in supernovaed quadrant 
     if game.state.rembase:
@@ -4768,7 +4767,7 @@ def abandon():
 	if not (game.options & OPTION_WORLDS) and not damaged(DTRANSP):
 	    prout(_("Remainder of ship's complement beam down"))
 	    prout(_("to nearest habitable planet."))
-	elif q.planet != NOPLANET and not damaged(DTRANSP):
+	elif q.planet != None and not damaged(DTRANSP):
 	    prout(_("Remainder of ship's complement beam down to %s.") %
 		    q.planet)
 	else:
@@ -4845,7 +4844,7 @@ def survey():
     prout(_("Spock-  \"Planet report follows, Captain.\""))
     skip(1)
     for i in range(game.inplan):
-	if game.state.planets[i].pclass == destroyed:
+	if game.state.planets[i].pclass == "destroyed":
 	    continue
 	if (game.state.planets[i].known != "unknown" \
             and not game.state.planets[i].inhabited) \
@@ -4896,23 +4895,25 @@ def sensor():
 	if game.options & OPTION_TTY:
 	    prout(_("Short range sensors damaged."))
 	return
-    if not is_valid(game.plnet):
+    if game.iplnet == None:
 	if game.options & OPTION_TTY:
 	    prout(_("Spock- \"No planet in this quadrant, Captain.\""))
 	return
-    if game.state.planets[game.iplnet].known == "unknown":
+    if game.iplnet.known == "unknown":
 	prout(_("Spock-  \"Sensor scan for Quadrant %s-") % game.quadrant)
 	skip(1)
 	prout(_("         Planet at Sector %s is of class %s.") %
-	      (sector,game.plnet, game.state.planets[game.iplnet]))
-	if game.state.planets[game.iplnet].known=="shuttle_down": 
+	      (game.plnet, game.iplnet.pclass))
+	if game.iplnet.known=="shuttle_down": 
 	    prout(_("         Sensors show Galileo still on surface."))
 	proutn(_("         Readings indicate"))
-	if game.state.planets[game.iplnet].crystals != present:
+	if game.iplnet.crystals != present:
 	    proutn(_(" no"))
 	prout(_(" dilithium crystals present.\""))
-	if game.state.planets[game.iplnet].known == "unknown":
-	    game.state.planets[game.iplnet].known = "known"
+	if game.iplnet.known == "unknown":
+	    game.iplnet.known = "known"
+    elif game.iplnet.inhabited:
+        prout(_("Spock-  \"The inhabited planet %s is located at Sector %s, Captain.\"") % (game.iplnet.name, game.plnet))
 
 def beam():
     # use the transporter 
@@ -4921,7 +4922,7 @@ def beam():
     skip(1)
     if damaged(DTRANSP):
 	prout(_("Transporter damaged."))
-	if not damaged(DSHUTTL) and (game.state.planets[game.iplnet].known=="shuttle_down" or game.iscraft == "onship"):
+	if not damaged(DSHUTTL) and (game.iplnet.known=="shuttle_down" or game.iscraft == "onship"):
 	    skip(1)
 	    proutn(_("Spock-  \"May I suggest the shuttle craft, Sir?\" "))
 	    if ja() == True:
@@ -4934,12 +4935,12 @@ def beam():
     if game.shldup:
 	prout(_("Impossible to transport through shields."))
 	return
-    if game.state.planets[game.iplnet].known=="unknown":
+    if game.iplnet.known=="unknown":
 	prout(_("Spock-  \"Captain, we have no information on this planet"))
 	prout(_("  and Starfleet Regulations clearly state that in this situation"))
 	prout(_("  you may not go down.\""))
 	return
-    if not game.landed and game.state.planets[game.iplnet].crystals==absent:
+    if not game.landed and game.iplnet.crystals=="absent":
 	prout(_("Spock-  \"Captain, I fail to see the logic in"))
 	prout(_("  exploring a planet with no dilithium crystals."))
 	proutn(_("  Are you sure this is wise?\" "))
@@ -4956,7 +4957,7 @@ def beam():
     	    prout(_("Engineering to bridge--"))
 	    prout(_("  Captain, we have enough energy only to transport you down to"))
 	    prout(_("  the planet, but there wouldn't be an energy for the trip back."))
-	    if game.state.planets[game.iplnet].known == "shuttle_down":
+	    if game.iplnet.known == "shuttle_down":
 		prout(_("  Although the Galileo shuttle craft may still be on a surface."))
 	    proutn(_("  Are you sure this is wise?\" "))
 	    if ja() == False:
@@ -4964,7 +4965,7 @@ def beam():
 		return
     if game.landed:
 	# Coming from planet 
-	if game.state.planets[game.iplnet].known=="shuttle_down":
+	if game.iplnet.known=="shuttle_down":
 	    proutn(_("Spock-  \"Wouldn't you rather take the Galileo?\" "))
 	    if ja() == True:
 		chew()
@@ -4998,7 +4999,7 @@ def beam():
     game.energy -= nrgneed
     skip(2)
     prout(_("Transport complete."))
-    if game.landed and game.state.planets[game.iplnet].known=="shuttle_down":
+    if game.landed and game.iplnet.known=="shuttle_down":
 	prout(_("The shuttle craft Galileo is here!"))
     if not game.landed and game.imine:
 	game.icrystl = True
@@ -5013,10 +5014,10 @@ def mine():
     if not game.landed:
 	prout(_("Mining party not on planet."))
 	return
-    if game.state.planets[game.iplnet].crystals == mined:
+    if game.iplnet.crystals == "mined":
 	prout(_("This planet has already been strip-mined for dilithium."))
 	return
-    elif game.state.planets[game.iplnet].crystals == absent:
+    elif game.iplnet.crystals == "absent":
 	prout(_("No dilithium crystals on this planet."))
 	return
     if game.imine:
@@ -5028,11 +5029,11 @@ def mine():
 	skip(1)
 	prout(_("there's no reason to mine more at this time."))
 	return
-    game.optime = (0.1+0.2*random.random())*game.state.planets[game.iplnet].pclass
+    game.optime = (0.1+0.2*random.random())*game.iplnet.pclass
     if consumeTime():
 	return
     prout(_("Mining operation complete."))
-    game.state.planets[game.iplnet].crystals = mined
+    game.iplnet.crystals = "mined"
     game.imine = game.ididit = True
 
 def usecrystals():
@@ -5087,7 +5088,7 @@ def shuttle():
     skip(1)
     if damaged(DSHUTTL):
 	if game.damage[DSHUTTL] == -1.0:
-	    if game.inorbit and game.state.planets[game.iplnet].known == "shuttle_down":
+	    if game.inorbit and game.iplnet.known == "shuttle_down":
 		prout(_("Ye Faerie Queene has no shuttle craft bay to dock it at."))
 	    else:
 		prout(_("Ye Faerie Queene had no shuttle craft."))
@@ -5100,16 +5101,16 @@ def shuttle():
 	crmshp()
 	prout(_(" not in standard orbit."))
 	return
-    if (game.state.planets[game.iplnet].known != "shuttle_down") and game.iscraft != "onship":
+    if (game.iplnet.known != "shuttle_down") and game.iscraft != "onship":
 	prout(_("Shuttle craft not currently available."))
 	return
-    if not game.landed and game.state.planets[game.iplnet].known=="shuttle_down":
+    if not game.landed and game.iplnet.known=="shuttle_down":
 	prout(_("You will have to beam down to retrieve the shuttle craft."))
 	return
     if game.shldup or game.condition == "docked":
 	prout(_("Shuttle craft cannot pass through shields."))
 	return
-    if game.state.planets[game.iplnet].known=="unknown":
+    if game.iplnet.known=="unknown":
 	prout(_("Spock-  \"Captain, we have no information on this planet"))
 	prout(_("  and Starfleet Regulations clearly state that in this situation"))
 	prout(_("  you may not fly down.\""))
@@ -5141,7 +5142,7 @@ def shuttle():
 	    skip(1)
 	    if consumeTime():
 		return
-	    game.state.planets[game.iplnet].known="shuttle_down"
+	    game.iplnet.known="shuttle_down"
 	    prout(_("Trip complete."))
 	    return
 	else:
@@ -5151,7 +5152,7 @@ def shuttle():
 	    skip(1)
 	    prouts(_("The short hop begins . . ."))
 	    skip(1)
-	    game.state.planets[game.iplnet].known="known"
+	    game.iplnet.known="known"
 	    game.icraft = True
 	    skip(1)
 	    game.landed = False
@@ -5177,7 +5178,7 @@ def shuttle():
 	game.iscraft = "offship"
 	if consumeTime():
 	    return
-	game.state.planets[game.iplnet].known = "shuttle_down"
+	game.iplnet.known = "shuttle_down"
 	game.landed = True
 	game.icraft = False
 	prout(_("Trip complete."))
@@ -5534,7 +5535,7 @@ def status(req=0):
     if not req or req == 10:
 	if game.options & OPTION_WORLDS:
 	    plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet
-	    if plnet != NOPLANET and game.state.planets[plnet].inhabited:
+	    if plnet and plnet.inhabited:
 		prstat(_("Major system"), plnet.name)
 	    else:
 		prout(_("Sector is uninhabited"))
@@ -5939,7 +5940,7 @@ def setup(needprompt):
 	for j in range(GALSIZE):
 	    quad = game.state.galaxy[i][j]
 	    quad.charted = 0
-	    quad.planet = NOPLANET
+	    quad.planet = None
 	    quad.romulans = 0
 	    quad.klingons = 0
 	    quad.starbase = False
@@ -6032,7 +6033,7 @@ def setup(needprompt):
     for i in range(game.inplan):
         while True:
             w = randplace(GALSIZE) 
-            if game.state.galaxy[w.x][w.y].planet == NOPLANET:
+            if game.state.galaxy[w.x][w.y].planet == None:
                 break
         new = planet()
 	new.w = w
@@ -6309,7 +6310,7 @@ def newqad(shutup):
 	game.base = dropin(IHB)
 	
     # If quadrant needs a planet, put it in
-    if q.planet != NOPLANET:
+    if q.planet:
 	game.iplnet = q.planet
 	if not q.planet.inhabited:
 	    game.plnet = dropin(IHP)
@@ -6563,7 +6564,6 @@ def makemoves():
 	    hitme = False
 	    game.justin = False
 	    game.optime = 0.0
-	    i = -1
 	    chew()
 	    setwnd(prompt_window)
 	    clrscr()
@@ -6581,6 +6581,8 @@ def makemoves():
             if len(candidates) == 1:
                 cmd = candidates[0]
                 break
+            elif candidates and not (game.options & OPTION_PLAIN):
+                prout("Commands with that prefix: " + " ".join(candidates))
             else:
                 listCommands()
                 continue
