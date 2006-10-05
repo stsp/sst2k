@@ -3712,9 +3712,6 @@ def highvideo():
     if game.options & OPTION_CURSES:
 	curwnd.attron(curses.A_REVERSE)
  
-def commandhook(cmd, before):
-    pass
-
 #
 # Things past this point have policy implications.
 # 
@@ -5455,14 +5452,14 @@ def chart():
 	    else:
 		proutn(" ")
 	    if game.state.galaxy[i][j].supernova:
-		strcpy(buf, "***")
+		show = "***"
 	    elif not game.state.galaxy[i][j].charted and game.state.galaxy[i][j].starbase:
-		strcpy(buf, ".1.")
+		show = ".1."
 	    elif game.state.galaxy[i][j].charted:
-		sprintf(buf, "%3d" % (game.state.chart[i][j].klingons*100 + game.state.chart[i][j].starbase * 10 + game.state.chart[i][j].stars))
+		show = "%3d" % (game.state.chart[i][j].klingons*100 + game.state.chart[i][j].starbase * 10 + game.state.chart[i][j].stars)
 	    else:
-		strcpy(buf, "...")
-	    proutn(buf)
+		show = "..."
+	    proutn(show)
 	    if (game.options & OPTION_SHOWME) and i == game.quadrant.x and j == game.quadrant.y:
 		proutn(">")
 	    else:
@@ -6017,7 +6014,7 @@ def setup(needprompt):
             if not game.state.galaxy[w.x][w.y].supernova and \
                game.state.galaxy[w.x][w.y].klingons + klump <= MAXKLQUAD:
                 break
-	game.state.galaxy[w.x][w.y].klingons += klump
+	game.state.galaxy[w.x][w.y].klingons += int(klump)
         if krem <= 0:
             break
     # Position Klingon Commander Ships
@@ -6491,7 +6488,7 @@ def listCommands():
     k = 0
     proutn(_("LEGAL COMMANDS ARE:"))
     for key in commands:
-	if ACCEPT(cmd):
+	if ACCEPT(key):
             if k % 5 == 0:
                 skip(1)
             proutn("%-12s " % key) 
@@ -6580,10 +6577,11 @@ def makemoves():
 	    setwnd(message_window)
 	    clrscr()
             cmd = citem.upper()
-            if cmd not in commands:
+            if cmd in commands:
+                break
+            else:
                 listCommands()
                 continue
-	commandhook(commands[i].name, True)
 	if cmd == "SRSCAN":		# srscan
 	    srscan()
 	elif cmd == "STATUS":		# status
@@ -6692,7 +6690,6 @@ def makemoves():
 #	elif cmd == "VISUAL":
 #	    visual()			# perform visual scan
 #endif
-	commandhook(commands[i].name, False)
 	while True:
 	    if game.alldone:
 		break		# Game has ended
@@ -6994,7 +6991,7 @@ if __name__ == '__main__':
 	setwnd(fullscreen_window)
 	clrscr()
 	prelim()
-	setup(needprompt=not line)
+	setup(needprompt=not inqueue)
 	if game.alldone:
 	    score()
 	    game.alldone = False
