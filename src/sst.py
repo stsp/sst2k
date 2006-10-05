@@ -187,6 +187,7 @@ NINHAB  	= (GALSIZE * GALSIZE / 2)
 MAXUNINHAB	= 10
 PLNETMAX	= (NINHAB + MAXUNINHAB)
 QUADSIZE	= 10
+BASEMIN		= 2
 BASEMAX 	= (GALSIZE * GALSIZE / 12)
 MAXKLGAME	= 127
 MAXKLQUAD	= 9
@@ -227,7 +228,7 @@ IHREAL = 0.0
 IHALPHA = " "
 
 class coord:
-    def __init(self, x=None, y=None):
+    def __init__(self, x=None, y=None):
         self.x = x
         self.y = y
     def invalidate(self):
@@ -247,22 +248,22 @@ class coord:
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
-        return "%d - %d" % (self.x, self.y)
+        return "%s - %s" % (self.x, self.y)
 
 class planet:
-    def __init(self):
+    def __init__(self):
         self.name = None	# string-valued if inhabited
         self.w = coord()	# quadrant located
         self.pclass = None	# could be ""M", "N", "O", or "destroyed"
-        self.crystals = None	# could be "mined", "present", "absent"
-        self.known = None	# could be "unknown", "known", "shuttle_down"
-        self.inhabited		# is it inhabites?
+        self.crystals = "absent"# could be "mined", "present", "absent"
+        self.known = "unknown"	# could be "unknown", "known", "shuttle_down"
+        self.inhabited = False	# is it inhabites?
     def __str__(self):
         return self.name
 
 NOPLANET = None
 class quadrant:
-    def __init(self):
+    def __init__(self):
         self.stars = None
         self.planet = None
 	self.starbase = None
@@ -273,28 +274,28 @@ class quadrant:
         self.status = None	# Could be "secure", "distressed", "enslaved"
 
 class page:
-    def __init(self):
+    def __init__(self):
 	self.stars = None
 	self.starbase = None
 	self.klingons = None
 
 class snapshot:
-    def __init(self):
+    def __init__(self):
         self.snap = False	# snapshot taken
-        self.crew = None	# crew complement
-	self.remkl = None	# remaining klingons
-	self.remcom = None	# remaining commanders
-	self.nscrem = None	# remaining super commanders
-	self.rembase = None	# remaining bases
-	self.starkl = None	# destroyed stars
-	self.basekl = None	# destroyed bases
-	self.nromrem = None	# Romulans remaining
-	self.nplankl = None	# destroyed uninhabited planets
-	self.nworldkl = None	# destroyed inhabited planets
+        self.crew = 0   	# crew complement
+	self.remkl = 0  	# remaining klingons
+	self.remcom = 0  	# remaining commanders
+	self.nscrem = 0		# remaining super commanders
+	self.rembase = 0	# remaining bases
+	self.starkl = 0 	# destroyed stars
+	self.basekl = 0 	# destroyed bases
+	self.nromrem = 0	# Romulans remaining
+	self.nplankl = 0	# destroyed uninhabited planets
+	self.nworldkl = 0	# destroyed inhabited planets
         self.planets = []	# Planet information
-        self.date = None	# stardate
-	self.remres = None	# remaining resources
-	self.remtime = None	# remaining time
+        self.date = 0.0   	# stardate
+	self.remres = 0 	# remaining resources
+	self.remtime = 0	# remaining time
         self.baseq = [] 	# Base quadrant coordinates
         for i in range(BASEMAX+1):
             self.baseq.append(coord())
@@ -304,7 +305,7 @@ class snapshot:
 	self.kscmdr = coord()	# Supercommander quadrant coordinates
         self.galaxy = [] 	# The Galaxy (subscript 0 not used)
         for i in range(GALSIZE+1):
-            self.chart.append([])
+            self.galaxy.append([])
             for j in range(GALSIZE+1):
                 self.galaxy[i].append(quadrant())
     	self.chart = [] 	# the starchart (subscript 0 not used)
@@ -390,14 +391,14 @@ def findevent(evtype):	return game.future[evtype]
 class gamestate:
     def __init__(self):
         self.options = None	# Game options
-        self.state = None	# A snapshot structure
-        self.snapsht = None	# Last snapshot taken for time-travel purposes
+        self.state = snapshot()	# A snapshot structure
+        self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
         self.quad = [[IHDOT * (QUADSIZE+1)] * (QUADSIZE+1)]	# contents of our quadrant
         self.kpower = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy energy levels
         self.kdist = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy distances
         self.kavgd = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# average distances
         self.damage = [0.0] * NDEVICES	# damage encountered
-        self.future = [0.0] * NEVENTS	# future events
+        self.future = []		# future events
         for i in range(NEVENTS):
             self.future.append(event())
         self.passwd  = None;		# Self Destruct password
@@ -2271,7 +2272,7 @@ def scheduled(evtype):
     return game.future[evtype].date
 
 def schedule(evtype, offset):
-    # schedule an event of specified type 
+    # schedule an event of specified type
     game.future[evtype].date = game.state.date + offset
     return game.future[evtype]
 
@@ -5920,7 +5921,7 @@ def setup(needprompt):
     for i in range(0, NDEVICES): 
 	game.damage[i] = 0.0
     # Set up assorted game parameters
-    invalidate(game.battle)
+    game.battle = coord()
     game.state.date = game.indate = 100.0*int(31.0*random.random()+20.0)
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0
     game.iscate = game.resting = game.imine = game.icrystl = game.icraft = False
@@ -5977,9 +5978,9 @@ def setup(needprompt):
 	    contflag = False
             # C version: for (j = i-1; j > 0; j--)
             # so it did them in the opposite order.
-            for j in range(i):
-		# Improved placement algorithm to spread out bases 
-		distq = w.distance(baseq[j])
+            for j in range(1, i):
+		# Improved placement algorithm to spread out bases
+		distq = w.distance(game.state.baseq[j])
 		if distq < 6.0*(BASEMAX+1-game.inbase) and random.random() < 0.75:
 		    contflag = True
 		    if idebug:
@@ -6039,13 +6040,13 @@ def setup(needprompt):
             new.name = systnames[i]
 	    new.inhabited = True
 	else:
-	    new.pclass = ("M", "N", "O")[random.random()*3.0]
+	    new.pclass = ("M", "N", "O")[random.randint(0, 2)]
             if random.random()*1.5:		# 1 in 3 chance of crystals
                 new.crystals = "present"
 	    new.known = "unknown"
 	    new.inhabited = False
 	game.state.galaxy[w.x][w.y].planet = new
-        game.state.plnets.append(new)
+        game.state.planets.append(new)
     # Locate Romulans
     for i in range(1, game.state.nromrem+1):
 	w = randplace(GALSIZE)
@@ -6054,15 +6055,14 @@ def setup(needprompt):
     if game.state.nscrem > 0:
         while True:
             w = randplace(GALSIZE)
-            if not game.state.galaxy[w.x][w.y].supernova and game.state.galaxy[w.x][w.y].klingons <= MXKLQUAD:
+            if not game.state.galaxy[w.x][w.y].supernova and game.state.galaxy[w.x][w.y].klingons <= MAXKLQUAD:
                 break
 	game.state.kscmdr = w
 	game.state.galaxy[w.x][w.y].klingons += 1
     # Place thing (in tournament game, thingx == -1, don't want one!)
-    if thing.x != -1:
+    global thing
+    if thing == None:
 	thing = randplace(GALSIZE)
-    else:
-	invalidate(thing)
     skip(2)
     game.state.snap = False
     if game.skill == SKILL_NOVICE:
@@ -6102,7 +6102,8 @@ def setup(needprompt):
 	attack(False)
 
 def choose(needprompt):
-    # choose your game type 
+    # choose your game type
+    global thing
     while True:
 	game.tourn = 0
 	game.thawed = False
@@ -6120,7 +6121,6 @@ def choose(needprompt):
 		chew()
 		continue # We don't want a blank entry
 	    game.tourn = int(aaitem)
-	    thing.x = -1
 	    random.seed(aaitem)
 	    break
         if isit("saved") or isit("frozen"):
@@ -6190,7 +6190,7 @@ def choose(needprompt):
 
     # Use parameters to generate initial values of things
     game.damfac = 0.5 * game.skill
-    game.state.rembase = 2.0 + random.random()*(BASEMAX-2.0)
+    game.state.rembase = random.randint(BASEMIN, BASEMAX)
     game.inbase = game.state.rembase
     game.inplan = 0
     if game.options & OPTION_PLANETS:
@@ -6435,7 +6435,7 @@ def setpassword():
     else:
         game.passwd = ""
         for i in range(3):
-	    game.passwd[i] += chr(97+int(random.random()*25))
+	    game.passwd += chr(97+int(random.random()*25))
 
 # Code from sst.c begins here
 
@@ -6802,6 +6802,9 @@ def scan():
         line = line.lstrip()
         if line:
             inqueue = line.split()
+        else:
+            inqueue = []
+            return IHEOL
     elif not inqueue:
         return IHEOL
     # From here on in it's all looking at the queue
@@ -6934,6 +6937,7 @@ if __name__ == '__main__':
     line = ''
     thing = coord()
     game = gamestate()
+    idebug = 0
 
     game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME | OPTION_PLAIN | OPTION_ALMY)
     # Disable curses mode until the game logic is working.
@@ -6945,7 +6949,7 @@ if __name__ == '__main__':
     seed = time.time()
     (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
     for (switch, val) in options:
-        if switch == 'r':
+        if switch == '-r':
             try:
                 replayfp = open(optarg, "r")
             except IOError:
@@ -6960,10 +6964,10 @@ if __name__ == '__main__':
 		os.exit(1)
 	    game.options |= OPTION_TTY
 	    game.options &=~ OPTION_CURSES
-	elif switch == 't':
+	elif switch == '-t':
 	    game.options |= OPTION_TTY
 	    game.options &=~ OPTION_CURSES
-	elif switch == 'x':
+	elif switch == '-x':
 	    idebug = True
 	else:
 	    sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
@@ -6979,10 +6983,10 @@ if __name__ == '__main__':
     random.seed(seed)
 
     iostart()
-
-    for tok in arguments:
-	line += tok
-	line += " "
+    if arguments:
+        inqueue = arguments
+    else:
+        inqueue = None
 
     while True: # Play a game 
 	setwnd(fullscreen_window)
