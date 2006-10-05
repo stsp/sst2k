@@ -3,9 +3,9 @@
 sst.py =-- Super Star Trek in Python
 
 This code is a Python translation of a C translation of a FORTRAN original.
-The FORTRANness still shows in many ways, notably the use of 1-origin index
-an a lot of parallel arrays where a more modern language would use structures
-or objects.
+The FORTRANness still shows in many ways, notably the use of a lot of
+parallel arrays where a more modern language would use structures
+or objects.  (However, 1-origin array indexing was fixed.)
 
 Dave Matuszek says:
 
@@ -195,8 +195,8 @@ FULLCREW	= 428	# BSD Trek was 387, that's wrong
 FOREVER 	= 1e30
 
 # These functions hide the difference between 0-origin and 1-origin addressing.
-def VALID_QUADRANT(x, y):	return ((x)>=1 and (x)<=GALSIZE and (y)>=1 and (y)<=GALSIZE)
-def VALID_SECTOR(x, y):	return ((x)>=1 and (x)<=QUADSIZE and (y)>=1 and (y)<=QUADSIZE)
+def VALID_QUADRANT(x, y):	return ((x)>=0 and (x)<GALSIZE and (y)>=0 and (y)<GALSIZE)
+def VALID_SECTOR(x, y):	return ((x)>=0 and (x)<QUADSIZE and (y)>=0 and (y)<QUADSIZE)
 
 def square(i):		return ((i)*(i))
 def distance(c1, c2):	return math.sqrt(square(c1.x - c2.x) + square(c1.y - c2.y))
@@ -248,7 +248,8 @@ class coord:
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
-        return "%s - %s" % (self.x, self.y)
+        return "%s - %s" % (self.x+1, self.y+1)
+    __repr__ = __str__
 
 class planet:
     def __init__(self):
@@ -282,10 +283,10 @@ class page:
 def fill2d(size, fillfun):
     "Fill an empty list in 2D."
     lst = []
-    for i in range(size+1):
+    for i in range(size):
         lst.append([]) 
-        for j in range(size+1):
-            lst[i][j] = fillfun(i, j)
+        for j in range(size):
+            lst[i].append(fillfun(i, j))
     return lst
 
 class snapshot:
@@ -306,10 +307,10 @@ class snapshot:
 	self.remres = 0 	# remaining resources
 	self.remtime = 0	# remaining time
         self.baseq = [] 	# Base quadrant coordinates
-        for i in range(BASEMAX+1):
+        for i in range(BASEMAX):
             self.baseq.append(coord())
         self.kcmdr = [] 	# Commander quadrant coordinates
-        for i in range(QUADSIZE+1):
+        for i in range(QUADSIZE):
             self.kcmdr.append(coord())
 	self.kscmdr = coord()	# Supercommander quadrant coordinates
         # the galaxy (subscript 0 not used)
@@ -405,7 +406,7 @@ class gamestate:
         for i in range(NEVENTS):
             self.future.append(event())
         self.passwd  = None;		# Self Destruct password
-        self.ks = [[0 * (QUADSIZE+1)] * (QUADSIZE+1)]	# enemy sector locations
+        self.ks = fill2d(QUADSIZE, lambda i, j: coord())	# enemy sector locations
         self.quadrant = None	# where we are in the large
         self.sector = None	# where we are in the small
         self.tholian = None	# coordinates of Tholian
@@ -572,7 +573,7 @@ def tryexit(look, ienm, loccom, irun):
     if not irun:
 	# avoid intruding on another commander's territory 
 	if ienm == IHC:
-	    for n in range(1, game.state.remcom+1):
+	    for n in range(game.state.remcom):
 		if game.state.kcmdr[n] == iq:
 		    return False
 	    # refuse to leave if currently attacking starbase 
@@ -609,7 +610,7 @@ def tryexit(look, ienm, loccom, irun):
 	unschedule(FSCDBAS)
 	game.state.kscmdr=iq
     else:
-	for n in range(1, game.state.remcom+1):
+	for n in range(game.state.remcom):
 	    if game.state.kcmdr[n] == game.quadrant:
 		game.state.kcmdr[n]=iq
 		break
@@ -760,14 +761,14 @@ def movebaddy(com, loccom, ienm):
 	attempts = 0; # Settle mysterious hang problem 
 	while attempts < 20 and not success:
             attempts += 1
-	    if look.x < 1 or look.x > QUADSIZE:
+	    if look.x < 0 or look.x >= QUADSIZE:
 		if motion < 0 and tryexit(look, ienm, loccom, irun):
 		    return
 		if krawlx == mx or my == 0:
 		    break
 		look.x = next.x + krawlx
 		krawlx = -krawlx
-	    elif look.y < 1 or look.y > QUADSIZE:
+	    elif look.y < 0 or look.y >= QUADSIZE:
 		if motion < 0 and tryexit(look, ienm, loccom, irun):
 		    return
 		if krawly == my or mx == 0:
@@ -823,13 +824,13 @@ def moveklings():
     # Figure out which Klingon is the commander (or Supercommander)
     # and do move
     if game.comhere:
-	for i in range(1, game.nenhere+1):
+	for i in range(game.nenhere):
 	    w = game.ks[i]
 	    if game.quad[w.x][w.y] == IHC:
 		movebaddy(w, i, IHC)
 		break
     if game.ishere:
-	for i in range(1, game.nenhere+1):
+	for i in range(game.nenhere):
 	    w = game.ks[i]
 	    if game.quad[w.x][w.y] == IHS:
 		movebaddy(w, i, IHS)
@@ -838,7 +839,7 @@ def moveklings():
     # Move these last so they can base their actions on what the
     # commander(s) do.
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
-	for i in range(1, game.nenhere+1):
+	for i in range(game.nenhere):
 	    w = game.ks[i]
 	    if game.quad[w.x][w.y] == IHK or game.quad[w.x][w.y] == IHR:
 		movebaddy(w, i, game.quad[w.x][w.y])
@@ -852,7 +853,7 @@ def movescom(iq, avoid):
 	return 1
     if avoid:
 	# Avoid quadrants with bases if we want to avoid Enterprise 
-	for i in range(1, game.state.rembase+1):
+	for i in range(game.state.rembase):
 	    if game.state.baseq[i] == iq:
 		return True
     if game.justin and not game.iscate:
@@ -868,7 +869,7 @@ def movescom(iq, avoid):
 	game.ishere = False
 	game.ientesc = False
 	unschedule(FSCDBAS)
-	for i in range(1, game.nenhere+1):
+	for i in range(game.nenhere):
 	    if game.quad[game.ks[i].x][game.ks[i].y] == IHS:
 		break
 	game.quad[game.ks[i].x][game.ks[i].y] = IHDOT
@@ -919,14 +920,14 @@ def supercommander():
 	    unschedule(FSCMOVE)
 	    return
 	sc = game.state.kscmdr
-	for i in range(1, game.state.rembase+1):
+	for i in range(game.state.rembase):
 	    basetbl.append((i, distance(game.state.baseq[i], sc)))
 	if game.state.rembase > 1:
             basetbl.sort(lambda x, y: cmp(x[1]. y[1]))
 	# look for nearest base without a commander, no Enterprise, and
         # without too many Klingons, and not already under attack. 
 	ifindit = iwhichb = 0
-	for i2 in range(1, game.state.rembase+1):
+	for i2 in range(game.state.rembase):
 	    i = basetbl[i2][0];	# bug in original had it not finding nearest
 	    ibq = game.state.baseq[i]
 	    if ibq == game.quadrant or ibq == game.battle or \
@@ -935,7 +936,7 @@ def supercommander():
 		continue
 	    # if there is a commander, and no other base is appropriate,
 	    #   we will take the one with the commander
-	    for j in range(1, game.state.remcom+1):
+	    for j in range(game.state.remcom):
 		if ibq == game.state.kcmdr[j] and ifindit!= 2:
 		    ifindit = 2
 		    iwhichb = i
@@ -980,7 +981,7 @@ def supercommander():
     if game.state.rembase == 0:
 	unschedule(FSCMOVE)
     else:
-	for i in range(1, game.state.rembase+1):
+	for i in range(game.state.rembase):
 	    ibq = game.state.baseq[i]
 	    if ibq == game.state.kscmdr and game.state.kscmdr == game.battle:
 		# attack the base 
@@ -1024,14 +1025,14 @@ def movetholian():
     if not game.ithere or game.justin:
 	return
 
-    if game.tholian.x == 1 and game.tholian.y == 1:
-	idx = 1; idy = QUADSIZE
-    elif game.tholian.x == 1 and game.tholian.y == QUADSIZE:
-	idx = QUADSIZE; idy = QUADSIZE
-    elif game.tholian.x == QUADSIZE and game.tholian.y == QUADSIZE:
-	idx = QUADSIZE; idy = 1
-    elif game.tholian.x == QUADSIZE and game.tholian.y == 1:
-	idx = 1; idy = 1
+    if game.tholian.x == 0 and game.tholian.y == 0:
+	idx = 0; idy = QUADSIZE-1
+    elif game.tholian.x == 0 and game.tholian.y == QUADSIZE-1:
+	idx = QUADSIZE-1; idy = QUADSIZE-1
+    elif game.tholian.x == QUADSIZE-1 and game.tholian.y == QUADSIZE-1:
+	idx = QUADSIZE-1; idy = 0
+    elif game.tholian.x == QUADSIZE-1 and game.tholian.y == 0:
+	idx = 0; idy = 0
     else:
 	# something is wrong! 
 	game.ithere = False
@@ -1060,12 +1061,12 @@ def movetholian():
     game.ks[game.nenhere] = game.tholian
 
     # check to see if all holes plugged 
-    for i in range(1, QUADSIZE+1):
-	if game.quad[1][i]!=IHWEB and game.quad[1][i]!=IHT:
+    for i in range(QUADSIZE):
+	if game.quad[0][i]!=IHWEB and game.quad[0][i]!=IHT:
 	    return
 	if game.quad[QUADSIZE][i]!=IHWEB and game.quad[QUADSIZE][i]!=IHT:
 	    return
-	if game.quad[i][1]!=IHWEB and game.quad[i][1]!=IHT:
+	if game.quad[i][0]!=IHWEB and game.quad[i][0]!=IHT:
 	    return
 	if game.quad[i][QUADSIZE]!=IHWEB and game.quad[i][QUADSIZE]!=IHT:
 	    return
@@ -1359,7 +1360,7 @@ def torpedo(course, r, incoming, i, n):
 		return None
 	elif iquad in (IHR, IHK): # Hit a regular enemy 
 	    # find the enemy 
-	    for ll in range(1, game.nenhere+1):
+	    for ll in range(game.nenhere):
 		if w == game.ks[ll]:
 		    break
 	    kp = math.fabs(game.kpower[ll])
@@ -1403,7 +1404,7 @@ def torpedo(course, r, incoming, i, n):
 	elif iquad == IHB: # Hit a base 
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
-	    for ll in range(1, game.state.rembase+1):
+	    for ll in range(game.state.rembase):
 		if game.state.baseq[ll] == game.quadrant:
 		    game.state.baseq[ll]=game.state.baseq[game.state.rembase]
 		    break
@@ -1466,7 +1467,8 @@ def torpedo(course, r, incoming, i, n):
 		# Stas Sergeev added the possibility that
 		# you can shove the Thingy and piss it off.
 		# It then becomes an enemy and may fire at you.
-		# 
+		#
+                global iqengry
 		iqengry = True
 		shoved = True
 	    return None
@@ -1512,7 +1514,7 @@ def torpedo(course, r, incoming, i, n):
 	game.quad[w.x][w.y]=IHDOT
 	game.quad[jw.x][jw.y]=iquad
 	prout(_(" displaced by blast to Sector %s ") % jw)
-	for ll in range(1, game.nenhere+1):
+	for ll in range(game.nenhere):
 	    game.kdist[ll] = game.kavgd[ll] = distance(game.sector,game.ks[ll])
 	sortklings()
 	return None
@@ -1599,7 +1601,7 @@ def attack(torps_ok):
     if game.skill <= SKILL_FAIR:
 	where = "sector"
 
-    for loop in range(1, game.nenhere+1):
+    for loop in range(game.nenhere):
 	if game.kpower[loop] < 0:
 	    continue;	# too weak to attack 
 	# compute hit strength and diminish shield power 
@@ -1714,7 +1716,7 @@ def attack(torps_ok):
 	    game.casual += icas
 	    game.state.crew -= icas
     # After attack, reset average distance to enemies 
-    for loop in range(1, game.nenhere+1):
+    for loop in range(game.nenhere):
 	game.kavgd[loop] = game.kdist[loop]
     sortklings()
     return;
@@ -1734,7 +1736,8 @@ def deadkl(w, type, mv):
 	# Killed a Tholian 
 	game.ithere = False
     elif type == IHQUEST:
-	# Killed a Thingy 
+	# Killed a Thingy
+        global iqhere, iqengry
 	iqhere = iqengry = False
 	invalidate(thing)
     else:
@@ -1743,7 +1746,7 @@ def deadkl(w, type, mv):
 	game.klhere -= 1
 	if type == IHC:
 	    game.comhere = False
-	    for i in range(1, game.state.remcom+1):
+	    for i in range(game.state.remcom):
 		if game.state.kcmdr[i] == game.quadrant:
 		    break
 	    game.state.kcmdr[i] = game.state.kcmdr[game.state.remcom]
@@ -1774,20 +1777,20 @@ def deadkl(w, type, mv):
     # Remove enemy ship from arrays describing local conditions 
     if is_scheduled(FCDBAS) and game.battle == game.quadrant and type==IHC:
 	unschedule(FCDBAS)
-    for i in range(1, game.nenhere+1):
+    for i in range(game.nenhere):
 	if game.ks[i] == w:
+            for j in range(i, game.nenhere):
+                game.ks[j] = game.ks[j+1]
+                game.kpower[j] = game.kpower[j+1]
+                game.kavgd[j] = game.kdist[j] = game.kdist[j+1]
+            game.ks[game.nenhere].x = 0
+            game.ks[game.nenhere].y = 0
+            game.kdist[game.nenhere] = 0
+            game.kavgd[game.nenhere] = 0
+            game.kpower[game.nenhere] = 0
+            game.nenhere -= 1
 	    break
-    game.nenhere -= 1
-    if i <= game.nenhere:
-        for j in range(i, game.nenhere+1):
-	    game.ks[j] = game.ks[j+1]
-	    game.kpower[j] = game.kpower[j+1]
-	    game.kavgd[j] = game.kdist[j] = game.kdist[j+1]
-    game.ks[game.nenhere+1].x = 0
-    game.ks[game.nenhere+1].x = 0
-    game.kdist[game.nenhere+1] = 0
-    game.kavgd[game.nenhere+1] = 0
-    game.kpower[game.nenhere+1] = 0
+        break
     return;
 
 def targetcheck(x, y):
@@ -1873,12 +1876,12 @@ def photon():
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i][1] = aaitem
+	    targ[i][1] = int(aaitem-0.5)
 	    key = scan()
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i][2] = aaitem
+	    targ[i][2] = int(aaitem-0.5)
 	    chew()
             course[i] = targetcheck(targ[i][1], targ[i][2])
             if course[i] == None:
@@ -1956,12 +1959,12 @@ def checkshctrl(rpow):
     overheat(rpow)
     return True;
 
-def hittem(doublehits):
+def hittem(hits):
     # register a phaser hit on Klingons and Romulans 
     nenhr2=game.nenhere; kk=1
     w = coord()
     skip(1)
-    for k in range(1, nenhr2+1):
+    for k in range(nenhr2):
         wham = hits[k]
 	if wham==0:
 	    continue
@@ -1985,6 +1988,7 @@ def hittem(doublehits):
 	    proutn(_("Very small hit on "))
 	ienm = game.quad[w.x][w.y]
 	if ienm==IHQUEST:
+            global iqengry
 	    iqengry = True
 	crmena(False, ienm, "sector", w)
 	skip(1)
@@ -2092,7 +2096,7 @@ def phasers():
         while True:
 	    chew()
 	    if not kz:
-		for i in range(1, game.nenhere+1):
+		for i in range(game.nenhere):
 		    irec += math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))*(1.01+0.05*random.random()) + 1.0
 	    kz=1
 	    proutn(_("%d units required. ") % irec)
@@ -2125,7 +2129,7 @@ def phasers():
 	if game.nenhere:
 	    extra = 0.0
 	    powrem = rpow
-	    for i in range(1, game.nenhere+1):
+	    for i in range(game.nenhere):
 		hits[i] = 0.0
 		if powrem <= 0:
 		    continue
@@ -2165,7 +2169,7 @@ def phasers():
 	    skip(1)
     elif automode == "MANUAL":
 	rpow = 0.0
-        for k in range(1, game.nenhere+1):
+        for k in range(game.nenhere):
 	    aim = game.ks[k]
 	    ienm = game.quad[aim.x][aim.y]
 	    if msgflag:
@@ -2447,7 +2451,7 @@ def events():
 	if game.condition == "docked":
 	    repair /= game.docfac
 	# Don't fix Deathray here 
-	for l in range(0, NDEVICES):
+	for l in range(NDEVICES):
 	    if game.damage[l] > 0.0 and l != DDRAY:
                 if game.damage[l]-repair > 0.0:
                     game.damage[l] -= repair
@@ -2514,8 +2518,8 @@ def events():
 		unschedule(FCDBAS)
                 continue
 	    i = 0
-	    for j in range(1, game.state.rembase+1):
-		for k in range(1, game.state.remcom+1):
+	    for j in range(game.state.rembase):
+		for k in range(game.state.remcom):
 		    if game.state.baseq[j] == game.state.kcmdr[k] and \
 			not game.state.baseq[j] == game.quadrant and \
                         not game.state.baseq[j] == game.state.kscmdr:
@@ -2557,7 +2561,7 @@ def events():
 	    if evcode==FCDBAS:
 		unschedule(FCDBAS)
 		# find the lucky pair 
-		for i in range(1, game.state.remcom+1):
+		for i in range(game.state.remcom):
 		    if game.state.kcmdr[i] == game.battle: 
 			break
 		if i > game.state.remcom or game.state.rembase == 0 or \
@@ -2835,7 +2839,7 @@ def nova(nov):
 			game.quad[scratch.x][scratch.y] = IHDOT
 		    elif iquad == IHB: # Destroy base 
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase = False
-			for i in range(1, game.state.rembase+1):
+			for i in range(game.state.rembase):
 			    if game.state.baseq[i] == game.quadrant: 
 				break
 			game.state.baseq[i] = game.state.baseq[game.state.rembase]
@@ -2870,7 +2874,7 @@ def nova(nov):
 		    elif iquad == IHK: # kill klingon 
 			deadkl(scratch,iquad, scratch)
                     elif iquad in (IHC,IHS,IHR): # Damage/destroy big enemies 
-			for ll in range(1, game.nenhere+1):
+			for ll in range(game.nenhere):
 			    if game.ks[ll] == scratch:
 				break
 			game.kpower[ll] -= 800.0 # If firepower is lost, die 
@@ -2937,14 +2941,14 @@ def supernova(induced, w=None):
 	# Scheduled supernova -- select star 
 	# logic changed here so that we won't favor quadrants in top
         # left of universe 
-	for nq.x in range(1, GALSIZE+1):
-	    for nq.y in range(1, GALSIZE+1):
+	for nq.x in range(GALSIZE):
+	    for nq.y in range(GALSIZE):
 		stars += game.state.galaxy[nq.x][nq.y].stars
 	if stars == 0:
 	    return # nothing to supernova exists 
 	num = random.random()*stars + 1
-	for nq.x in range(1, GALSIZE+1):
-	    for nq.y in range(1, GALSIZE+1):
+	for nq.x in range(GALSIZE):
+	    for nq.y in range(GALSIZE):
 		num -= game.state.galaxy[nq.x][nq.y].stars
 		if num <= 0:
 		    break
@@ -2965,8 +2969,8 @@ def supernova(induced, w=None):
 	ns = coord()
 	# we are in the quadrant! 
 	num = random.random()* game.state.galaxy[nq.x][nq.y].stars + 1
-	for ns.x in range(1, QUADSIZE+1):
-	    for ns.y in range(1, QUADSIZE+1):
+	for ns.x in range(QUADSIZE):
+	    for ns.y in range(QUADSIZE):
 		if game.quad[ns.x][ns.y]==IHSTAR:
 		    num -= 1
 		    if num==0:
@@ -2996,7 +3000,7 @@ def supernova(induced, w=None):
 	unschedule(FSCDBAS)
     if game.state.remcom:
 	maxloop = game.state.remcom
-	for l in range(1, maxloop+1):
+	for l in range(maxloop):
 	    if game.state.kcmdr[l] == nq:
 		game.state.kcmdr[l] = game.state.kcmdr[game.state.remcom]
 		invalidate(game.state.kcmdr[game.state.remcom])
@@ -3018,7 +3022,7 @@ def supernova(induced, w=None):
     # Destroy any base in supernovaed quadrant 
     if game.state.rembase:
 	maxloop = game.state.rembase
-	for loop in range(1, maxloop+1):
+	for loop in range(maxloop):
 	    if game.state.baseq[loop] == nq:
 		game.state.baseq[loop] = game.state.baseq[game.state.rembase]
 		invalidate(game.state.baseq[game.state.rembase])
@@ -3582,7 +3586,7 @@ def pause_game():
         sys.stdout.write('\n')
         proutn(prompt)
         raw_input()
-        for j in range(0, rows):
+        for j in range(rows):
             sys.stdout.write('\n')
         linecount = 0
 
@@ -3838,14 +3842,14 @@ def imove(novapush):
         # No quadrant change -- compute new avg enemy distances 
         game.quad[game.sector.x][game.sector.y] = game.ship
         if game.nenhere:
-            for m in range(1, game.nenhere+1):
+            for m in range(game.nenhere):
                 finald = distance(w, game.ks[m])
                 game.kavgd[m] = 0.5 * (finald+game.kdist[m])
                 game.kdist[m] = finald
             sortklings()
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
                 attack(False)
-            for m in range(1, game.nenhere+1):
+            for m in range(game.nenhere):
                 game.kavgd[m] = game.kdist[m]
         newcnd()
         drawmaps(0)
@@ -3890,7 +3894,7 @@ def imove(novapush):
 		# Don't do it if being pushed by Nova 
 		if game.nenhere != 0 and not novapush:
 		    newcnd()
-		    for m in range(1, game.nenhere+1):
+		    for m in range(game.nenhere):
 			finald = distance(w, game.ks[m])
 			game.kavgd[m] = 0.5 * (finald + game.kdist[m])
 		    #
@@ -3974,7 +3978,7 @@ def imove(novapush):
 		    # possibility that you'll get timewarped instead.
 		    # 
 		    n=0
-		    for m in range(0, NDEVICES):
+		    for m in range(NDEVICES):
 			if game.damage[m]>0: 
 			    n += 1
 		    probf=math.pow(1.4,(game.energy+game.shield)/5000.0-1.0)*math.pow(1.3,1.0/(n+1)-1.0)
@@ -4121,12 +4125,12 @@ def getcd(isprobe, akey):
 	if key != IHREAL:
 	    huh()
 	    return
-	xi = aaitem
+	xi = int(aaitem-0.05)
 	key = scan()
 	if key != IHREAL:
 	    huh()
 	    return
-	xj = aaitem
+	xj = int(aaitem-0.5)
 	key = scan()
 	if key == IHREAL:
 	    # both quadrant and sector specified 
@@ -4652,7 +4656,7 @@ def mayday():
 	ddist = distance(game.base, game.sector)
     else:
 	ddist = FOREVER
-	for m in range(1, game.state.rembase+1):
+	for m in range(game.state.rembase):
 	    xdist = QUADSIZE * distance(game.state.baseq[m], game.quadrant)
 	    if xdist < ddist:
 		ddist = xdist
@@ -4791,7 +4795,7 @@ def abandon():
 	while True:
 	    # position next to base by trial and error 
 	    game.quad[game.sector.x][game.sector.y] = IHDOT
-	    for l in range(1, QUADSIZE+1):
+	    for l in range(QUADSIZE):
 		game.sector.x = 3.0*random.random() - 1.0 + game.base.x
 		game.sector.y = 3.0*random.random() - 1.0 + game.base.y
 		if VALID_SECTOR(game.sector.x, game.sector.y) and \
@@ -4814,7 +4818,7 @@ def abandon():
     game.iscraft = "offship" # Galileo disappears 
     # Resupply ship 
     game.condition="docked"
-    for l in range(0, NDEVICES): 
+    for l in range(NDEVICES): 
 	game.damage[l] = 0.0
     game.damage[DSHUTTL] = -1
     game.energy = game.inenrg = 3000.0
@@ -5270,8 +5274,8 @@ def deathray():
 	proutn(_("Spock-  \"I believe the word is"))
 	prouts(_(" *ASTONISHING*"))
 	prout(_(" Mr. Sulu."))
-	for i in range(1, QUADSIZE+1):
-	    for j in range(1, QUADSIZE+1):
+	for i in range(QUADSIZE):
+	    for j in range(QUADSIZE):
 		if game.quad[i][j] == IHDOT:
 		    game.quad[i][j] = IHQUEST
 	prout(_("  Captain, our quadrant is now infested with"))
@@ -5423,8 +5427,8 @@ def damagereport():
 def rechart():
     # update the chart in the Enterprise's computer from galaxy data 
     game.lastchart = game.state.date
-    for i in range(1, GALSIZE+1):
-	for j in range(1, GALSIZE+1):
+    for i in range(GALSIZE):
+	for j in range(GALSIZE):
 	    if game.state.galaxy[i][j].charted:
 		game.state.chart[i][j].klingons = game.state.galaxy[i][j].klingons
 		game.state.chart[i][j].starbase = game.state.galaxy[i][j].starbase
@@ -5443,9 +5447,9 @@ def chart():
     if game.state.date > game.lastchart:
 	prout(_("(Last surveillance update %d stardates ago).") % ((int)(game.state.date-game.lastchart)))
     prout("      1    2    3    4    5    6    7    8")
-    for i in range(1, GALSIZE+1):
+    for i in range(GALSIZE):
 	proutn("%d |" % (i))
-	for j in range(1, GALSIZE+1):
+	for j in range(GALSIZE):
 	    if (game.options & OPTION_SHOWME) and i == game.quadrant.x and j == game.quadrant.y:
 		proutn("<")
 	    else:
@@ -5493,7 +5497,7 @@ def status(req):
 	if game.condition != "docked":
 	    newcnd()
         dam = 0
-	for t in range(0, NDEVICES):
+	for t in range(NDEVICES):
 	    if game.damage[t]>0: 
 		dam += 1
 	prstat(_("Condition"), _("%s, %i DAMAGES") % (game.condition.upper(), dam))
@@ -5572,9 +5576,9 @@ def srscan():
     prout("    1 2 3 4 5 6 7 8 9 10")
     if game.condition != "docked":
 	newcnd()
-    for i in range(1, QUADSIZE+1):
+    for i in range(QUADSIZE):
 	proutn("%2d  " % (i))
-	for j in range(1, QUADSIZE+1):
+	for j in range(QUADSIZE):
 	    sectscan(goodScan, i, j)
 	skip(1)
 			
@@ -5594,26 +5598,26 @@ def eta():
 	if scan()!=IHREAL:
 	    huh()
 	    return
-    w1.y = aaitem +0.5
+    w1.y = int(aaitem-0.5)
     if scan() != IHREAL:
 	huh()
 	return
-    w1.x = aaitem + 0.5
+    w1.x = int(aaitem-0.5)
     if scan() == IHREAL:
-	w2.y = aaitem + 0.5
+	w2.y = int(aaitem-0.5)
 	if scan() != IHREAL:
 	    huh()
 	    return
-	w2.x = aaitem + 0.5
+	w2.x = int(aaitem-0.5)
     else:
 	if game.quadrant.y>w1.x:
-	    w2.x = 1
+	    w2.x = 0
 	else:
-	    w2.x=QUADSIZE
+	    w2.x=QUADSIZE-1
 	if game.quadrant.x>w1.y:
-	    w2.y = 1
+	    w2.y = 0
 	else:
-	    w2.y=QUADSIZE
+	    w2.y=QUADSIZE-1
 
     if not VALID_QUADRANT(w1.x, w1.y) or not VALID_SECTOR(w2.x, w2.y):
 	huh()
@@ -5746,7 +5750,7 @@ def visual():
 	co = '?'
     else:
 	co = game.quad[ix][iy]
-    printf("%d,%d %c " % (ix, iy, co))
+    printf("%d,%d %c " % (ix+1, iy+1, co))
     v += 1
     ix = game.sector.x + v.x
     iy = game.sector.y + v.y
@@ -5762,7 +5766,7 @@ def visual():
 	co = '?'
     else:
 	co = game.quad[ix][iy]
-    prout("%c %d,%d\n" % (co, ix, iy))
+    prout("%c %d,%d\n" % (co, ix+1, iy+1))
     game.optime = 0.5
     game.ididit = True
 #endif
@@ -5921,7 +5925,7 @@ def setup(needprompt):
     game.nprobes = int(3.0*random.random() + 2.0)	# Give them 2-4 of these
     game.warpfac = 5.0
     game.wfacsq = game.warpfac * game.warpfac
-    for i in range(0, NDEVICES): 
+    for i in range(NDEVICES): 
 	game.damage[i] = 0.0
     # Set up assorted game parameters
     game.battle = coord()
@@ -5934,8 +5938,8 @@ def setup(needprompt):
     game.landed = False
     game.alive = True
     game.docfac = 0.25
-    for i in range(1, GALSIZE+1):
-	for j in range(1, GALSIZE+1):
+    for i in range(GALSIZE):
+	for j in range(GALSIZE):
 	    quad = game.state.galaxy[i][j]
 	    quad.charted = 0
 	    quad.planet = NOPLANET
@@ -5966,13 +5970,13 @@ def setup(needprompt):
     game.lastchart = FOREVER
     # Put stars in the galaxy
     game.instar = 0
-    for i in range(1, GALSIZE+1):
-	for j in range(1, GALSIZE+1):
-	    k = random.random()*9.0 + 1.0
+    for i in range(GALSIZE):
+	for j in range(GALSIZE):
+	    k = int(random.random()*9.0 + 1.0)
 	    game.instar += k
 	    game.state.galaxy[i][j].stars = k
     # Locate star bases in galaxy
-    for i in range(1, game.inbase+1):
+    for i in range(game.inbase):
         while True:
             while True:
                 w = randplace(GALSIZE)
@@ -6051,7 +6055,7 @@ def setup(needprompt):
 	game.state.galaxy[w.x][w.y].planet = new
         game.state.planets.append(new)
     # Locate Romulans
-    for i in range(1, game.state.nromrem+1):
+    for i in range(game.state.nromrem):
 	w = randplace(GALSIZE)
 	game.state.galaxy[w.x][w.y].romulans += 1
     # Locate the Super Commander
@@ -6087,7 +6091,7 @@ def setup(needprompt):
 	    prout(_("And one (GULP) Super-Commander."))
 	prout(_("%d stardates.") % int(game.intime))
 	proutn(_("%d starbases in ") % game.inbase)
-    for i in range(1, game.inbase+1):
+    for i in range(game.inbase):
 	proutn(`game.state.baseq[i]`)
 	proutn("  ")
     skip(2)
@@ -6197,15 +6201,15 @@ def choose(needprompt):
     game.inbase = game.state.rembase
     game.inplan = 0
     if game.options & OPTION_PLANETS:
-	game.inplan += (MAXUNINHAB/2) + (MAXUNINHAB/2+1)*random.random()
+	game.inplan += int((MAXUNINHAB/2) + (MAXUNINHAB/2+1)*random.random())
     if game.options & OPTION_WORLDS:
-	game.inplan += NINHAB
-    game.state.nromrem = game.inrom = (2.0+random.random())*game.skill
+	game.inplan += int(NINHAB)
+    game.state.nromrem = game.inrom = int((2.0+random.random())*game.skill)
     game.state.nscrem = game.inscom = (game.skill > SKILL_FAIR)
     game.state.remtime = 7.0 * game.length
     game.intime = game.state.remtime
     game.state.remkl = game.inkling = 2.0*game.intime*((game.skill+1 - 2*random.random())*game.skill*0.1+.15)
-    game.incom = game.skill + 0.0625*game.inkling*random.random()
+    game.incom = int(game.skill + 0.0625*game.inkling*random.random())
     game.state.remcom = min(10, game.incom)
     game.incom = game.state.remcom
     game.state.remres = (game.inkling+4*game.incom)*game.intime
@@ -6258,6 +6262,7 @@ def newqad(shutup):
     game.landed = False
     game.ientesc = False
     game.ithere = False
+    global iqhere, iqengry
     iqhere = False
     iqengry = False
     game.iseenit = False
@@ -6279,10 +6284,10 @@ def newqad(shutup):
     if q.klingons:
 	w.x = w.y = 0	# quiet a gcc warning 
 	# Position ordinary Klingons
-	for i in range(1, game.klhere+1):
+	for i in range(game.klhere):
 	    w = newkling(i)
 	# If we need a commander, promote a Klingon
-	for i in range(1, game.state.remcom+1):
+	for i in range(game.state.remcom):
 	    if game.state.kcmdr[i] == game.quadrant:
 		break
 			
@@ -6293,12 +6298,12 @@ def newqad(shutup):
 
 	# If we need a super-commander, promote a Klingon
 	if same(game.quadrant, game.state.kscmdr):
-	    game.quad[game.ks[1].x][game.ks[1].y] = IHS
+	    game.quad[game.ks[0].x][game.ks[0].y] = IHS
 	    game.kpower[1] = 1175.0 + 400.0*random.random() + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
 	    game.ishere = True
     # Put in Romulans if needed
-    for i in range(game.klhere+1, game.nenhere+1):
+    for i in range(game.klhere, game.nenhere):
 	w = dropin(IHR)
 	game.ks[i] = w
 	game.kdist[i] = game.kavgd[i] = distance(game.sector, w)
@@ -6310,14 +6315,14 @@ def newqad(shutup):
     # If quadrant needs a planet, put it in
     if q.planet != NOPLANET:
 	game.iplnet = q.planet
-	if game.state.planets[q.planet].inhabited == UNINHABITED:
+	if not q.planet.inhabited:
 	    game.plnet = dropin(IHP)
 	else:
 	    game.plnet = dropin(IHW)
     # Check for condition
     newcnd()
     # And finally the stars
-    for i in range(1, q.stars+1): 
+    for i in range(q.stars): 
 	dropin(IHSTAR)
 
     # Check for RNZ
@@ -6333,10 +6338,12 @@ def newqad(shutup):
 
     if shutup==0:
 	# Put in THING if needed
-	if same(thing, game.quadrant):
+        global thing
+	if thing == game.quadrant:
 	    w = dropin(IHQUEST)
 	    thing = randplace(GALSIZE)
 	    game.nenhere += 1
+            global iqhere
 	    iqhere = True
 	    game.ks[game.nenhere] = w
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
@@ -6353,8 +6360,8 @@ def newqad(shutup):
 	    (game.skill == SKILL_GOOD and random.random() <= 0.05) or \
             (game.skill > SKILL_GOOD and random.random() <= 0.08):
             while True:
-		game.tholian.x = random.choice((1, QUADSIZE))
-		game.tholian.y = random.choice((1, QUADSIZE))
+		game.tholian.x = random.choice((0, QUADSIZE-1))
+		game.tholian.y = random.choice((0, QUADSIZE-1))
                 if game.quad[game.tholian.x][game.tholian.y] == IHDOT:
                     break
 	    game.quad[game.tholian.x][game.tholian.y] = IHT
@@ -6365,14 +6372,14 @@ def newqad(shutup):
 		distance(game.sector, game.tholian)
 	    game.kpower[game.nenhere] = random.random()*400.0 +100.0 +25.0*game.skill
 	    # Reserve unoccupied corners 
-	    if game.quad[1][1]==IHDOT:
-		game.quad[1][1] = 'X'
-	    if game.quad[1][QUADSIZE]==IHDOT:
-		game.quad[1][QUADSIZE] = 'X'
-	    if game.quad[QUADSIZE][1]==IHDOT:
-		game.quad[QUADSIZE][1] = 'X'
-	    if game.quad[QUADSIZE][QUADSIZE]==IHDOT:
-		game.quad[QUADSIZE][QUADSIZE] = 'X'
+	    if game.quad[0][0]==IHDOT:
+		game.quad[0][0] = 'X'
+	    if game.quad[0][QUADSIZE-1]==IHDOT:
+		game.quad[0][QUADSIZE-1] = 'X'
+	    if game.quad[QUADSIZE-1][0]==IHDOT:
+		game.quad[QUADSIZE-1][0] = 'X'
+	    if game.quad[QUADSIZE-1][QUADSIZE-1]==IHDOT:
+		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
     sortklings()
 
     # Put in a few black holes
@@ -6382,14 +6389,14 @@ def newqad(shutup):
 
     # Take out X's in corners if Tholian present
     if game.ithere:
-	if game.quad[1][1]=='X':
-	    game.quad[1][1] = IHDOT
-	if game.quad[1][QUADSIZE]=='X':
-	    game.quad[1][QUADSIZE] = IHDOT
-	if game.quad[QUADSIZE][1]=='X':
-	    game.quad[QUADSIZE][1] = IHDOT
-	if game.quad[QUADSIZE][QUADSIZE]=='X':
-	    game.quad[QUADSIZE][QUADSIZE] = IHDOT
+	if game.quad[0][0]=='X':
+	    game.quad[0][0] = IHDOT
+	if game.quad[0][QUADSIZE-1]=='X':
+	    game.quad[0][QUADSIZE-1] = IHDOT
+	if game.quad[QUADSIZE-1][0]=='X':
+	    game.quad[QUADSIZE-1][0] = IHDOT
+	if game.quad[QUADSIZE-1][QUADSIZE-1]=='X':
+	    game.quad[QUADSIZE-1][QUADSIZE-1] = IHDOT
 
 def sortklings():
     # sort Klingons by distance from us 
@@ -6398,7 +6405,7 @@ def sortklings():
 	return
     while True:
 	sw = False
-	for j in range(1, game.nenhere):
+	for j in range(game.nenhere):
 	    if game.kdist[j] > game.kdist[j+1]:
 		sw = True
 		t = game.kdist[j]
@@ -6575,7 +6582,7 @@ def makemoves():
 	    clrscr()
 	    setwnd(message_window)
 	    clrscr()
-            cmd = citem.upoper
+            cmd = citem.upper()
             if cmd not in commands:
                 listCommands()
                 continue
@@ -6768,8 +6775,8 @@ def expran(avrage):
 def randplace(size):
     # choose a random location  
     w = coord()
-    w.x = random.randint(1, size) 
-    w.y = random.randint(1, size)
+    w.x = random.randint(0, size-1) 
+    w.y = random.randint(0, size-1)
     return w
 
 def chew():
@@ -6850,7 +6857,7 @@ def debugme():
 	game.lsupres = game.inlsr
     proutn("Reset damage? ")
     if ja() == True:
-	for i in range(0, NDEVICES): 
+	for i in range(NDEVICES): 
 	    if game.damage[i] > 0.0: 
 		game.damage[i] = 0.0
     proutn("Toggle debug flag? ")
@@ -6929,10 +6936,11 @@ def debugme():
 	atover(True)
 
 if __name__ == '__main__':
-    global line, thing, game
+    global line, thing, game, idebug, iqhere, iqengry
     game = citem = aaitem = inqueue = None
     line = ''
     thing = coord()
+    iqhere = iqengry = False
     game = gamestate()
     idebug = 0
 
