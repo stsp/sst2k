@@ -254,6 +254,11 @@ class coord:
         else:
             s.y = self.y / abs(self.y)
         return s
+    def scatter(self):
+        s = coord()
+        s.x = self.x + randrange(-1, 2)
+        s.y = self.y + randrange(-1, 2)
+        return s
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
@@ -564,6 +569,29 @@ LIGHTMAGENTA = 14
 YELLOW = 15
 WHITE = 16
 
+# Log the results of pulling random numbers so we can check determinism.
+
+import traceback
+
+def withprob(p):
+    v = random.random()
+    logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[1][1:]))
+    return v < p
+
+def randrange(*args):
+    v = random.randrange(*args)
+    logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[1][1:]))
+    return v
+
+def randreal(*args):
+    v = random.random()
+    if len(args) == 1:
+        v *= args[0] 		# returns from [0, a1)
+    elif len(args) == 2:
+        v = args[0] + v*args[1]	# returns from [a1, a2)
+    logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[1][1:]))
+    return v
+
 # Code from ai.c begins here
 
 def tryexit(look, ienm, loccom, irun):
@@ -701,12 +729,12 @@ def movebaddy(com, loccom, ienm):
 	    forces += 1000.0
 	motion = 0
         if forces <= 1000.0 and game.condition != "docked": # Typical situation 
-	    motion = ((forces+200.0*random.random())/150.0) - 5.0
+	    motion = ((forces + randreal(200))/150.0) - 5.0
 	else:
             if forces > 1000.0: # Very strong -- move in for kill 
-		motion = (1.0-square(random.random()))*dist1 + 1.0
+		motion = (1.0-square(randreal()))*dist1 + 1.0
 	    if game.condition=="docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
-		motion -= game.skill*(2.0-square(random.random()))
+		motion -= game.skill*(2.0-square(randreal()))
 	if idebug:
 	    proutn("=== MOTION = %d, FORCES = %1.2f, " % (motion, forces))
 	# don't move if no motion 
@@ -996,7 +1024,7 @@ def supercommander():
 		    return; # no, don't attack base! 
 		game.iseenit = False
 		game.isatb = 1
-		schedule(FSCDBAS, 1.0 +2.0*random.random())
+		schedule(FSCDBAS, randreal(1.0, 3.0))
 		if is_scheduled(FCDBAS):
 		    postpone(FSCDBAS, scheduled(FCDBAS)-game.state.date)
 		if not communicating():
@@ -1018,7 +1046,7 @@ def supercommander():
 		return
     # Check for intelligence report 
     if not idebug and \
-	(random.random() > 0.2 or \
+	(withprob(0.8) or \
 	 (not communicating()) or \
 	 not game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted):
 	return
@@ -1208,7 +1236,7 @@ def randdevice():
     # 
     # This is one place where OPTION_PLAIN does not restore the
     # original behavior, which was equiprobable damage across
-    # all devices.  If we wanted that, we'd return NDEVICES*random.random()
+    # all devices.  If we wanted that, we'd return randrange(NDEVICES)
     # and have done with it.  Also, in the original game, DNAVYS
     # and DCOMPTR were the same device. 
     # 
@@ -1236,7 +1264,7 @@ def randdevice():
 	10,	# DDRAY: death ray			 1.0% 
 	30,	# DDSP: deep-space probes		 3.0% 
     )
-    idx = random.random() * 1000.0	# weights must sum to 1000 
+    idx = randrange(1000)	# weights must sum to 1000 
     sum = 0
     for (i, w) in enumerate(weights):
 	sum += w
@@ -1265,7 +1293,7 @@ def ram(ibumpd, ienm, w):
     proutn("***")
     crmshp()
     prout(_(" heavily damaged."))
-    icas = 10 + random.randrange(20)
+    icas = randrange(10, 30)
     prout(_("***Sickbay reports %d casualties"), icas)
     game.casual += icas
     game.state.crew -= icas
@@ -1274,12 +1302,12 @@ def ram(ibumpd, ienm, w):
     # which was silly.  Instead, pick up to half the devices at
     # random according to our weighting table,
     # 
-    ncrits = random.randrange(NDEVICES/2)
+    ncrits = randrange(NDEVICES/2)
     for m in range(ncrits):
 	dev = randdevice()
 	if game.damage[dev] < 0:
 	    continue
-	extradm = (10.0*hardness*random.random()+1.0)*game.damfac
+	extradm = (10.0*hardness*randreal()+1.0)*game.damfac
 	# Damage for at least time of travel! 
 	game.damage[dev] += game.optime + extradm
     game.shldup = False
@@ -1331,13 +1359,13 @@ def torpedo(course, r, incoming, i, n):
 	    proutn(_("Torpedo hits "))
 	    crmshp()
 	    prout(".")
-	    hit = 700.0 + 100.0*random.random() - \
+	    hit = 700.0 + randreal(100) - \
 		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
 	    newcnd(); # we're blown out of dock 
 	    # We may be displaced. 
 	    if game.landed or game.condition=="docked":
 		return hit # Cheat if on a planet 
-	    ang = angle + 2.5*(random.random()-0.5)
+	    ang = angle + 2.5*(randreal()-0.5)
 	    temp = math.fabs(math.sin(ang))
 	    if math.fabs(math.cos(ang)) > temp:
 		temp = math.fabs(math.cos(ang))
@@ -1357,7 +1385,7 @@ def torpedo(course, r, incoming, i, n):
 	    crmshp()
 	    shoved = True
 	elif iquad in (IHC, IHS): # Hit a commander 
-	    if random.random() <= 0.05:
+	    if withprob(0.05):
 		crmena(True, iquad, sector, w)
 		prout(_(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
@@ -1368,7 +1396,7 @@ def torpedo(course, r, incoming, i, n):
 		if w == game.ks[ll]:
 		    break
 	    kp = math.fabs(game.kpower[ll])
-	    h1 = 700.0 + 100.0*random.random() - \
+	    h1 = 700.0 + randrange(100) - \
 		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if kp < h1:
@@ -1382,7 +1410,7 @@ def torpedo(course, r, incoming, i, n):
 		return None
 	    crmena(True, iquad, "sector", w)
 	    # If enemy damaged but not destroyed, try to displace 
-	    ang = angle + 2.5*(random.random()-0.5)
+	    ang = angle + 2.5*(randreal()-0.5)
 	    temp = math.fabs(math.sin(ang))
 	    if math.fabs(math.cos(ang)) > temp:
 		temp = math.fabs(math.cos(ang))
@@ -1449,14 +1477,14 @@ def torpedo(course, r, incoming, i, n):
 	    prout(_("Celebratory rallies are being held on the Klingon homeworld."))
 	    return None
 	elif iquad == IHSTAR: # Hit a star 
-	    if random.random() > 0.10:
+	    if withprob(0.9):
 		nova(w)
-		return None
-	    crmena(True, IHSTAR, sector, w)
-	    prout(_(" unaffected by photon blast."))
+            else:
+                crmena(True, IHSTAR, sector, w)
+                prout(_(" unaffected by photon blast."))
 	    return None
 	elif iquad == IHQUEST: # Hit a thingy 
-	    if not (game.options & OPTION_THINGY) or random.random()>0.7:
+	    if not (game.options & OPTION_THINGY) or withprob(0.3):
 		skip(1)
 		prouts(_("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!"))
 		skip(1)
@@ -1486,7 +1514,7 @@ def torpedo(course, r, incoming, i, n):
 	    prout(_("***Torpedo absorbed by Tholian web."))
 	    return None
 	elif iquad == IHT:  # Hit a Tholian 
-	    h1 = 700.0 + 100.0*random.random() - \
+	    h1 = 700.0 + randrange(100) - \
 		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
@@ -1496,7 +1524,7 @@ def torpedo(course, r, incoming, i, n):
 		return None
 	    skip(1)
 	    crmena(True, IHT, sector, w)
-	    if random.random() > 0.05:
+	    if withprob(0.05):
 		prout(_(" survives photon blast."))
 		return None
 	    prout(_(" disappears."))
@@ -1530,9 +1558,9 @@ def fry(hit):
     # critical-hit resolution 
     ktr=1
     # a critical hit occured 
-    if hit < (275.0-25.0*game.skill)*(1.0+0.5*random.random()):
+    if hit < (275.0-25.0*game.skill)*randreal(1.0, 1.5):
 	return
-    ncrit = 1.0 + hit/(500.0+100.0*random.random())
+    ncrit = int(1.0 + hit/(500.0+randreal(100)))
     proutn(_("***CRITICAL HIT--"))
     # Select devices and cause damage
     cdam = []
@@ -1543,7 +1571,7 @@ def fry(hit):
             if not (game.damage[j]<0.0 or (j==DSHUTTL and game.iscraft != "onship")):
                 break
 	cdam.append(j)
-	extradm = (hit*game.damfac)/(ncrit*(75.0+25.0*random.random()))
+	extradm = (hit*game.damfac)/(ncrit*randreal(75, 100))
 	game.damage[j] += extradm
 	if loop1 > 0:
             for loop2 in range(loop1):
@@ -1589,7 +1617,7 @@ def attack(torps_ok):
     # set up partial hits if attack happens during shield status change 
     pfac = 1.0/game.inshld
     if game.shldchg:
-	chgfac = 0.25+0.5*random.random()
+	chgfac = 0.25 + randreal(0.5)
     skip(1)
     # message verbosity control 
     if game.skill <= SKILL_FAIR:
@@ -1598,7 +1626,7 @@ def attack(torps_ok):
 	if game.kpower[loop] < 0:
 	    continue;	# too weak to attack 
 	# compute hit strength and diminish shield power 
-	r = random.random()
+	r = randreal()
 	# Increase chance of photon torpedos if docked or enemy energy low 
 	if game.condition == "docked":
 	    r *= 0.25
@@ -1619,7 +1647,7 @@ def attack(torps_ok):
 	    if game.condition == "docked":
 		continue; # Don't waste the effort! 
 	    attempt = True; # Attempt to attack 
-	    dustfac = 0.8+0.05*random.random()
+	    dustfac = 0.8 + randreal(0.5)
 	    hit = game.kpower[loop]*math.pow(dustfac,game.kavgd[loop])
 	    game.kpower[loop] *= 0.75
 	else: # Enemy uses photon torpedo 
@@ -1631,7 +1659,7 @@ def attack(torps_ok):
 		crmena(False, iquad, where, jay)
 	    attempt = True
 	    prout("  ")
-	    r = (random.random()+random.random())*0.5 -0.5
+	    r = (randreal()+randreal())*0.5 - 0.5
 	    r += 0.002*game.kpower[loop]*r
 	    hit = torpedo(course, r, jay, 1, 1)
 	    if (game.state.remkl + game.state.remcom + game.state.nscrem)==0:
@@ -1701,7 +1729,7 @@ def attack(torps_ok):
     prout(_("%d%%,   torpedoes left %d") % (percent, game.torps))
     # Check if anyone was hurt 
     if hitmax >= 200 or hittot >= 500:
-	icas= hittot*random.random()*0.015
+	icas = randrange(hittot * 0.015)
 	if icas >= 2:
 	    skip(1)
 	    prout(_("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties") % icas)
@@ -1879,23 +1907,23 @@ def photon():
                 return
     game.ididit = True
     # Loop for moving <n> torpedoes 
-    for i in range(1, n+1):
+    for i in range(n):
 	if game.condition != "docked":
 	    game.torps -= 1
-	r = (random.random()+random.random())*0.5 -0.5
+	r = (randreal()+randreal())*0.5 -0.5
 	if math.fabs(r) >= 0.47:
 	    # misfire! 
-	    r = (random.random()+1.2) * r
-	    if n>1:
-		prouts(_("***TORPEDO NUMBER %d MISFIRES") % i)
+	    r *= randreal(1.2, 2.2)
+	    if n > 0:
+		prouts(_("***TORPEDO NUMBER %d MISFIRES") % (i+1))
 	    else:
 		prouts(_("***TORPEDO MISFIRES."))
 	    skip(1)
 	    if i < n:
 		prout(_("  Remainder of burst aborted."))
-	    if random.random() <= 0.2:
+	    if withprob(0.2):
 		prout(_("***Photon tubes damaged by misfire."))
-		game.damage[DPHOTON] = game.damfac*(1.0+2.0*random.random())
+		game.damage[DPHOTON] = game.damfac * randreal(1.0, 3.0)
 	    break
 	if game.shldup or game.condition == "docked":
 	    r *= 1.0 + 0.0001*game.shield
@@ -1908,15 +1936,15 @@ def photon():
 def overheat(rpow):
     # check for phasers overheating 
     if rpow > 1500:
-	chekbrn = (rpow-1500.)*0.00038
-	if random.random() <= chekbrn:
+        checkburn = (rpow-1500.0)*0.00038
+        if withprob(checkburn):
 	    prout(_("Weapons officer Sulu-  \"Phasers overheated, sir.\""))
-	    game.damage[DPHASER] = game.damfac*(1.0 + random.random()) * (1.0+chekbrn)
+	    game.damage[DPHASER] = game.damfac* randreal(1.0, 2.0) * (1.0+checkburn)
 
 def checkshctrl(rpow):
     # check shield control 
     skip(1)
-    if random.random() < 0.998:
+    if withprob(0.998):
 	prout(_("Shields lowered."))
 	return False
     # Something bad has happened 
@@ -1934,7 +1962,7 @@ def checkshctrl(rpow):
     prouts(_("Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""))
     skip(2)
     prout(_("Lt. Uhura-  \"Sir, all decks reporting damage.\""))
-    icas = hit*random.random()*0.012
+    icas = randrange(hit*0.012)
     skip(1)
     fry(0.8*hit)
     if icas:
@@ -1958,7 +1986,7 @@ def hittem(hits):
         wham = hits[k]
 	if wham==0:
 	    continue
-	dustfac = 0.9 + 0.01*random.random()
+	dustfac = randreal(0.9, 1.0)
 	hit = wham*math.pow(dustfac,game.kdist[kk])
 	kpini = game.kpower[kk]
 	kp = math.fabs(kpini)
@@ -1990,9 +2018,8 @@ def hittem(hits):
 		return
 	    kk -= 1; # don't do the increment 
 	else: # decide whether or not to emasculate klingon 
-	    if kpow > 0 and random.random() >= 0.9 and \
-		kpow <= ((0.4 + 0.4*random.random())*kpini):
-		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s") % w)
+	    if kpow>0 and withprob(0.9) and kpow <= randreal(0.4, 0.8)*kpini:
+		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s")%w)
 		prout(_("   has just lost its firepower.\""))
 		game.kpower[kk] = -kpow
         kk += 1
@@ -2087,7 +2114,7 @@ def phasers():
 	    chew()
 	    if not kz:
 		for i in range(game.nenhere):
-		    irec += math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))*(1.01+0.05*random.random()) + 1.0
+		    irec += math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))*randreal(1.01, 1.06) + 1.0
 	    kz=1
 	    proutn(_("%d units required. ") % irec)
 	    chew()
@@ -2124,7 +2151,7 @@ def phasers():
 		if powrem <= 0:
 		    continue
 		hits[i] = math.fabs(game.kpower[i])/(PHASEFAC*math.pow(0.90,game.kdist[i]))
-		over = (0.01 + 0.05*random.random())*hits[i]
+		over = randreal(1.01, 1.06) * hits[i]
 		temp = powrem
 		powrem -= hits[i] + over
 		if powrem <= 0 and temp < hits[i]:
@@ -2179,7 +2206,7 @@ def phasers():
 	    if key == IHEOL:
 		chew()
 		if itarg and k > kz:
-		    irec=(abs(game.kpower[k])/(PHASEFAC*math.pow(0.9,game.kdist[k]))) *	(1.01+0.05*random.random()) + 1.0
+		    irec=(abs(game.kpower[k])/(PHASEFAC*math.pow(0.9,game.kdist[k]))) *	randreal(1.01, 1.06) + 1.0
 		kz = k
 		proutn("(")
 		if not damaged(DCOMPTR):
@@ -2235,7 +2262,7 @@ def phasers():
     if ifast:
 	skip(1)
 	if no == 0:
-	    if random.random() >= 0.99:
+	    if withprob(0.99):
 		prout(_("Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."))
 		prouts(_("         CLICK   CLICK   POP  . . ."))
 		prout(_(" No response, sir!"))
@@ -2312,7 +2339,7 @@ def events():
         # Check to see if shuttle is aboard 
         if game.iscraft == "offship":
             skip(1)
-            if random.random() > 0.5:
+            if withprob(0.5):
                 prout(_("Galileo, left on the planet surface, is captured"))
                 prout(_("by aliens and made into a flying McDonald's."))
                 game.damage[DSHUTTL] = -10
@@ -2482,7 +2509,7 @@ def events():
             if game.state.remcom == 0:
                 unschedule(FTBEAM)
                 continue
-            i = random.randrange(game.state.remcom)
+            i = randrange(game.state.remcom)
             yank = distance(game.state.kcmdr[i], game.quadrant)
             if istract or game.condition == "docked" or yank == 0:
                 # Drats! Have to reschedule 
@@ -2517,7 +2544,7 @@ def events():
 		continue
 	    # commander + starbase combination found -- launch attack 
 	    game.battle = game.state.baseq[j]
-	    schedule(FCDBAS, 1.0+3.0*random.random())
+	    schedule(FCDBAS, randreal(1.0, 4.0))
 	    if game.isatb: # extra time if SC already attacking 
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date)
 	    game.future[FBATTAK].date = game.future[FCDBAS].date + expran(0.3*game.intime)
@@ -2728,7 +2755,7 @@ def wait():
 	    return
 	temp = game.optime = delay
 	if game.nenhere:
-	    rtime = 1.0 + random.random()
+	    rtime = randreal(1.0, 2.0)
 	    if rtime < temp:
 		temp = rtime
 	    game.optime = temp
@@ -2761,7 +2788,7 @@ def nova(nov):
     # star goes nova 
     course = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
     newc = coord(); scratch = coord()
-    if random.random() < 0.05:
+    if withprob(0.05):
 	# Wow! We've supernova'ed 
 	supernova(False, nov)
 	return
@@ -2793,7 +2820,7 @@ def nova(nov):
                     if iquad in (IHDOT, IHQUEST, IHBLANK, IHT, IHWEB):
 			break
 		    elif iquad == IHSTAR: # Affect another star 
-			if random.random() < 0.05:
+			if wthprob(0.05):
 			    # This star supernovas 
 			    scratch = supernova(False)
 			    return
@@ -2841,7 +2868,7 @@ def nova(nov):
 				game.shield = 0.0
 				game.shldup = False
 				prout(_("***Shields knocked out."))
-				game.damage[DSHIELD] += 0.005*game.damfac*random.random()*diff
+				game.damage[DSHIELD] += 0.005*game.damfac*randreal()*diff
 			else:
 			    game.energy -= 2000.0
 			if game.energy <= 0:
@@ -2925,7 +2952,7 @@ def supernova(induced, w=None):
 		stars += game.state.galaxy[nq.x][nq.y].stars
 	if stars == 0:
 	    return # nothing to supernova exists 
-	num = random.randrange(stars) + 1
+	num = randrange(stars) + 1
 	for nq.x in range(GALSIZE):
 	    for nq.y in range(GALSIZE):
 		num -= game.state.galaxy[nq.x][nq.y].stars
@@ -2946,7 +2973,7 @@ def supernova(induced, w=None):
     else:
 	ns = coord()
 	# we are in the quadrant! 
-	num = random.randrange(game.state.galaxy[nq.x][nq.y].stars) + 1
+	num = randrange(game.state.galaxy[nq.x][nq.y].stars) + 1
 	for ns.x in range(QUADSIZE):
 	    for ns.y in range(QUADSIZE):
 		if game.quad[ns.x][ns.y]==IHSTAR:
@@ -3063,7 +3090,7 @@ def selfdestruct():
     prouts("                         3"); skip(1)
     prouts("                            2"); skip(1)
     prouts("                              1"); skip(1)
-    if random.random() < 0.15:
+    if withprob(0.15):
 	prouts(_("GOODBYE-CRUEL-WORLD"))
 	skip(1)
     kaboom()
@@ -3300,10 +3327,10 @@ def finish(ifin):
     if (game.state.remkl + game.state.remcom + game.state.nscrem) != 0:
 	goodies = game.state.remres/game.inresor
 	baddies = (game.state.remkl + 2.0*game.state.remcom)/(game.inkling+2.0*game.incom)
-	if goodies/baddies >= 1.0+0.5*random.random():
+	if goodies/baddies >= randreal(1.0, 1.5):
 	    prout(_("As a result of your actions, a treaty with the Klingon"))
 	    prout(_("Empire has been signed. The terms of the treaty are"))
-	    if goodies/baddies >= 3.0+random.random():
+	    if goodies/baddies >= randreal(3.0):
 		prout(_("favorable to the Federation."))
 		skip(1)
 		prout(_("Congratulations!"))
@@ -3619,10 +3646,14 @@ def cgetline():
 	curwnd.refresh()
     else:
 	if replayfp and not replayfp.closed:
-	    line = replayfp.readline()
-            if line == '':
-                prout("*** Replay finished")
-                replayfp.close()
+            while True:
+                line = replayfp.readline()
+                if line == '':
+                    prout("*** Replay finished")
+                    replayfp.close()
+                    break
+                elif line[0] != "#":
+                    break
 	else:
 	    line = raw_input("COMMAND> ")
     if logfp:
@@ -3955,7 +3986,7 @@ def imove(novapush):
 			if game.damage[m]>0: 
 			    n += 1
 		    probf=math.pow(1.4,(game.energy+game.shield)/5000.0-1.0)*math.pow(1.3,1.0/(n+1)-1.0)
-		    if (game.options & OPTION_BLKHOLE) and random.random()>probf: 
+		    if (game.options & OPTION_BLKHOLE) and withprob(1-probf): 
 			timwrp()
 		    else: 
 			finish(FHOLE)
@@ -4267,13 +4298,14 @@ def warp(timewarp):
 		return
     # Entry WARPX 
     if game.warpfac > 6.0:
-	# Decide if engine damage will occur 
-	prob = game.dist*(6.0-game.warpfac)*(6.0-game.warpfac)/66.666666666
-	if prob > random.random():
+	# Decide if engine damage will occur
+        # ESR: Seems wrong. Probability of damage goes *down* with distance? 
+	prob = game.dist*square(6.0-game.warpfac)/66.666666666
+	if prob > randreal():
 	    blooey = True
-	    game.dist = random.random()*game.dist
+	    game.dist = randreal(game.dist)
 	# Decide if time warp will occur 
-	if 0.5*game.dist*math.pow(7.0,game.warpfac-10.0) > random.random():
+	if 0.5*game.dist*math.pow(7.0,game.warpfac-10.0) > randreal():
 	    twarp = True
 	if idebug and game.warpfac==10 and not twarp:
 	    blooey = False
@@ -4317,7 +4349,7 @@ def warp(timewarp):
     if twarp:
 	timwrp()
     if blooey:
-	game.damage[DWARPEN] = game.damfac*(3.0*random.random()+1.0)
+	game.damage[DWARPEN] = game.damfac * randreal(1.0, 4.0)
 	skip(1)
 	prout(_("Engineering to bridge--"))
 	prout(_("  Scott here.  The warp engines are damaged."))
@@ -4379,7 +4411,7 @@ def atover(igrab):
 	    prout(_("But with the shields up it's hopeless."))
 	    finish(FPNOVA)
 	prouts(_("His desperate attempt to rescue you . . ."))
-	if random.random() <= 0.5:
+	if withprob(0.5):
 	    prout(_("fails."))
 	    finish(FPNOVA)
 	    return
@@ -4387,7 +4419,7 @@ def atover(igrab):
 	if game.imine:
 	    game.imine = False
 	    proutn(_("The crystals mined were "))
-	    if random.random() <= 0.25:
+	    if withprob(0.25):
 		prout(_("lost."))
 	    else:
 		prout(_("saved."))
@@ -4422,16 +4454,16 @@ def atover(igrab):
 	    prout(_("Warp engines damaged."))
 	    finish(FSNOVAED)
 	    return
-	game.warpfac = 6.0+2.0*random.random()
+	game.warpfac = randreal(6.0, 8.0)
 	game.wfacsq = game.warpfac * game.warpfac
 	prout(_("Warp factor set to %d") % int(game.warpfac))
 	power = 0.75*game.energy
 	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
-	distreq = 1.4142+random.random()
+	distreq = randreal(math.sqrt(2))
 	if distreq < game.dist:
 	    game.dist = distreq
 	game.optime = 10.0*game.dist/game.wfacsq
-	game.direc = 12.0*random.random()	# How dumb! 
+	game.direc = randreal(12)	# How dumb! 
 	game.justin = False
 	game.inorbit = False
 	warp(True)
@@ -4452,7 +4484,7 @@ def atover(igrab):
 def timwrp():
     # let's do the time warp again 
     prout(_("***TIME WARP ENTERED."))
-    if game.state.snap and random.random() < 0.5:
+    if game.state.snap and withprob(0.5):
 	# Go back in time 
 	prout(_("You are traveling backwards in time %d stardates.") %
 	      int(game.state.date-game.snapsht.date))
@@ -4493,7 +4525,7 @@ def timwrp():
 	prout(_("Spock has reconstructed a correct star chart from memory"))
     else:
 	# Go forward in time 
-	game.optime = -0.5*game.intime*math.log(random.random())
+	game.optime = -0.5*game.intime*math.log(randreal())
 	prout(_("You are traveling forward in time %d stardates.") % int(game.optime))
 	# cheat to make sure no tractor beams occur during time warp 
 	postpone(FTBEAM, game.optime)
@@ -4623,12 +4655,10 @@ def mayday():
     prout(_(" dematerializes."))
     game.sector.x=0
     for m in range(1, 5+1):
-	ix = game.base.x+3.0*random.random()-1
-	iy = game.base.y+3.0*random.random()-1
+        w = game.base.scatter() 
 	if VALID_SECTOR(ix,iy) and game.quad[ix][iy]==IHDOT:
 	    # found one -- finish up 
-	    game.sector.x=ix
-	    game.sector.y=iy
+            game.sector = w
 	    break
     if not is_valid(game.sector):
 	prout(_("You have been lost in space..."))
@@ -4645,7 +4675,7 @@ def mayday():
 	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
 	textcolor(RED)
 	warble()
-	if random.random() > probf:
+	if randreal() > probf:
 	    break
 	prout(_("fails."))
 	curses.delay_output(500)
@@ -4738,7 +4768,7 @@ def abandon():
 	game.nprobes = 0 # No probes 
 	prout(_("You are captured by Klingons and released to"))
 	prout(_("the Federation in a prisoner-of-war exchange."))
-	nb = random.random()*game.state.rembase+1
+	nb = randrange(game.state.rembase)
 	# Set up quadrant and position FQ adjacient to base 
 	if not game.quadrant == game.state.baseq[nb]:
 	    game.quadrant = game.state.baseq[nb]
@@ -4748,8 +4778,7 @@ def abandon():
 	    # position next to base by trial and error 
 	    game.quad[game.sector.x][game.sector.y] = IHDOT
 	    for l in range(QUADSIZE):
-		game.sector.x = 3.0*random.random() - 1.0 + game.base.x
-		game.sector.y = 3.0*random.random() - 1.0 + game.base.y
+		game.sector = game.base.scatter()
 		if VALID_SECTOR(game.sector.x, game.sector.y) and \
                        game.quad[game.sector.x][game.sector.y] == IHDOT:
                     break
@@ -4835,12 +4864,12 @@ def orbit():
 	prout(_(" not adjacent to planet."))
 	skip(1)
 	return
-    game.optime = 0.02+0.03*random.random()
+    game.optime = randreal(0.02, 0.05)
     prout(_("Helmsman Sulu-  \"Entering standard orbit, Sir.\""))
     newcnd()
     if consumeTime():
 	return
-    game.height = (1400.0+7200.0*random.random())
+    game.height = randreal(1400, 8600)
     prout(_("Sulu-  \"Entered orbit at altitude %.2f kilometers.\"") % game.height)
     game.inorbit = True
     game.ididit = True
@@ -4945,7 +4974,7 @@ def beam():
     skip(1)
     prouts("WWHOOOIIIIIRRRRREEEE.E.E.  .  .  .  .   .    .")
     skip(2)
-    if random.random() > 0.98:
+    if withprob(0.98):
 	prouts("BOOOIIIOOOIIOOOOIIIOIING . . .")
 	skip(2)
 	prout(_("Scotty-  \"Oh my God!  I've lost them.\""))
@@ -4986,7 +5015,7 @@ def mine():
 	skip(1)
 	prout(_("there's no reason to mine more at this time."))
 	return
-    game.optime = (0.1+0.2*random.random())*(ord(game.iplnet.pclass)-ord("M"))
+    game.optime = randreal(0.1, 0.3)*(ord(game.iplnet.pclass)-ord("L"))
     if consumeTime():
 	return
     prout(_("Mining operation complete."))
@@ -5021,7 +5050,7 @@ def usecrystals():
     skip(1)
     prouts(_("Scotty-  \"Keep your fingers crossed, Sir!\""))
     skip(1)
-    if random.random() <= game.cryprob:
+    if with(game.cryprob):
 	prouts(_("  \"Activating now! - - No good!  It's***"))
 	skip(2)
 	prouts(_("***RED ALERT!  RED A*L********************************"))
@@ -5031,7 +5060,7 @@ def usecrystals():
 	skip(1)
 	kaboom()
 	return
-    game.energy += 5000.0*(1.0 + 0.9*random.random())
+    game.energy += randreal(5000.0, 5500.0)
     prouts(_("  \"Activating now! - - "))
     prout(_("The instruments"))
     prout(_("   are going crazy, but I think it's"))
@@ -5143,7 +5172,6 @@ def shuttle():
 
 def deathray():
     # use the big zapper 
-    r = random.random()
     game.ididit = False
     skip(1)
     chew()
@@ -5175,9 +5203,10 @@ def deathray():
     skip(1)
     prouts(_("WHIRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"))
     skip(1)
-    dprob = .30
+    dprob = 0.30
     if game.options & OPTION_PLAIN:
-	dprob = .5
+	dprob = 0.5
+    r = randreal()
     if r > dprob:
 	prouts(_("Sulu- \"Captain!  It's working!\""))
 	skip(2)
@@ -5188,14 +5217,14 @@ def deathray():
 	    finish(FWON)    
 	if (game.options & OPTION_PLAIN) == 0:
 	    prout(_("Spock-  \"Captain, I believe the `Experimental Death Ray'"))
-	    if random.random() <= 0.05:
+	    if withprob(0.05):
 		prout(_("   is still operational.\""))
 	    else:
 		prout(_("   has been rendered nonfunctional.\""))
 		game.damage[DDRAY] = 39.95
 	return
-    r = random.random()	# Pick failure method 
-    if r <= .30:
+    r = randreal()	# Pick failure method 
+    if r <= 0.30:
 	prouts(_("Sulu- \"Captain!  It's working!\""))
 	skip(1)
 	prouts(_("***RED ALERT!  RED ALERT!"))
@@ -5209,7 +5238,7 @@ def deathray():
 	skip(1)
 	kaboom()
 	return
-    if r <= .55:
+    if r <= 0.55:
 	prouts(_("Sulu- \"Captain!  Yagabandaghangrapl, brachriigringlanbla!\""))
 	skip(1)
 	prout(_("Lt. Uhura-  \"Graaeek!  Graaeek!\""))
@@ -5806,14 +5835,14 @@ def setup(needprompt):
     game.quadrant = randplace(GALSIZE)
     game.sector = randplace(QUADSIZE)
     game.torps = game.intorps = 10
-    game.nprobes = int(3.0*random.random() + 2.0)	# Give them 2-4 of these
+    game.nprobes = randrange(2, 5)
     game.warpfac = 5.0
     game.wfacsq = game.warpfac * game.warpfac
     for i in range(NDEVICES): 
 	game.damage[i] = 0.0
     # Set up assorted game parameters
     game.battle = coord()
-    game.state.date = game.indate = 100.0*int(31.0*random.random()+20.0)
+    game.state.date = game.indate = 100.0 * randreal(20, 51)
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0
     game.iscate = game.resting = game.imine = game.icrystl = game.icraft = False
     game.isatb = game.state.nplankl = 0
@@ -5835,7 +5864,7 @@ def setup(needprompt):
     # Initialize times for extraneous events
     schedule(FSNOVA, expran(0.5 * game.intime))
     schedule(FTBEAM, expran(1.5 * (game.intime / game.state.remcom)))
-    schedule(FSNAP, 1.0 + random.random()) # Force an early snapshot
+    schedule(FSNAP, randreal(1.0, 2.0)) # Force an early snapshot
     schedule(FBATTAK, expran(0.3*game.intime))
     unschedule(FCDBAS)
     if game.state.nscrem:
@@ -5856,7 +5885,7 @@ def setup(needprompt):
     game.instar = 0
     for i in range(GALSIZE):
 	for j in range(GALSIZE):
-	    k = int(random.random()*9.0 + 1.0)
+	    k = randrange(1, QUADSIZE**2/10+1)
 	    game.instar += k
 	    game.state.galaxy[i][j].stars = k
     # Locate star bases in galaxy
@@ -5872,7 +5901,7 @@ def setup(needprompt):
             for j in range(1, i):
 		# Improved placement algorithm to spread out bases
 		distq = w.distance(game.state.baseq[j])
-		if distq < 6.0*(BASEMAX+1-game.inbase) and random.random() < 0.75:
+		if distq < 6.0*(BASEMAX+1-game.inbase) and withprob(0.75):
 		    contflag = True
 		    if idebug:
 			prout("=== Abandoning base #%d at %s" % (i, w))
@@ -5891,7 +5920,7 @@ def setup(needprompt):
     if klumper > MAXKLQUAD: 
 	klumper = MAXKLQUAD
     while True:
-	r = random.random()
+	r = randreal()
 	klump = (1.0 - r*r)*klumper
 	if klump > krem:
 	    klump = krem
@@ -5908,7 +5937,7 @@ def setup(needprompt):
     for i in range(1, game.incom+1):
         while True:
             w = randplace(GALSIZE)
-	    if (game.state.galaxy[w.x][w.y].klingons or random.random()>=0.75) and \
+	    if (game.state.galaxy[w.x][w.y].klingons or withprob(0.25)) and \
 		   not game.state.galaxy[w.x][w.y].supernova and \
 		   game.state.galaxy[w.x][w.y].klingons <= MAXKLQUAD-1 and \
                    not w in game.state.kcmdr[:i]:
@@ -5931,8 +5960,8 @@ def setup(needprompt):
             new.name = systnames[i]
 	    new.inhabited = True
 	else:
-	    new.pclass = ("M", "N", "O")[random.randint(0, 2)]
-            if random.random()*1.5:		# 1 in 3 chance of crystals
+	    new.pclass = ("M", "N", "O")[randrange(0, 3)]
+            if withprob(0.33):
                 new.crystals = "present"
 	    new.known = "unknown"
 	    new.inhabited = False
@@ -6013,6 +6042,8 @@ def choose(needprompt):
 		continue # We don't want a blank entry
 	    game.tourn = int(round(aaitem))
 	    random.seed(aaitem)
+            if logfp:
+                logfp.write("# random.seed(%d)\n" % aaitem)
 	    break
         if isit("saved") or isit("frozen"):
 	    if thaw():
@@ -6081,19 +6112,19 @@ def choose(needprompt):
 
     # Use parameters to generate initial values of things
     game.damfac = 0.5 * game.skill
-    game.state.rembase = random.randint(BASEMIN, BASEMAX)
+    game.state.rembase = randrange(BASEMIN, BASEMAX+1)
     game.inbase = game.state.rembase
     game.inplan = 0
     if game.options & OPTION_PLANETS:
-	game.inplan += int((MAXUNINHAB/2) + (MAXUNINHAB/2+1)*random.random())
+	game.inplan += randrange(MAXUNINHAB/2, MAXUNINHAB+1)
     if game.options & OPTION_WORLDS:
 	game.inplan += int(NINHAB)
-    game.state.nromrem = game.inrom = int((2.0+random.random())*game.skill)
+    game.state.nromrem = game.inrom = randrange(2 *game.skill)
     game.state.nscrem = game.inscom = (game.skill > SKILL_FAIR)
     game.state.remtime = 7.0 * game.length
     game.intime = game.state.remtime
-    game.state.remkl = game.inkling = 2.0*game.intime*((game.skill+1 - 2*random.random())*game.skill*0.1+.15)
-    game.incom = int(game.skill + 0.0625*game.inkling*random.random())
+    game.state.remkl = game.inkling = 2.0*game.intime*((game.skill+1 - 2*randreal())*game.skill*0.1+.15)
+    game.incom = int(game.skill + 0.0625*game.inkling*randreal())
     game.state.remcom = min(10, game.incom)
     game.incom = game.state.remcom
     game.state.remres = (game.inkling+4*game.incom)*game.intime
@@ -6128,7 +6159,7 @@ def newkling(i):
     pi = dropin(IHK)
     game.ks[i] = pi
     game.kdist[i] = game.kavgd[i] = distance(game.sector, pi)
-    game.kpower[i] = random.random()*150.0 +300.0 +25.0*game.skill
+    game.kpower[i] = randreal(300, 450) + 25.0*game.skill
     return pi
 
 def newqad(shutup):
@@ -6173,12 +6204,12 @@ def newqad(shutup):
 			
 	if i <= game.state.remcom:
 	    game.quad[w.x][w.y] = IHC
-	    game.kpower[game.klhere] = 950.0+400.0*random.random()+50.0*game.skill
+	    game.kpower[game.klhere] = randreal(950, 1350) + 50.0*game.skill
 	    game.comhere = True
 	# If we need a super-commander, promote a Klingon
 	if game.quadrant == game.state.kscmdr:
 	    game.quad[game.ks[0].x][game.ks[0].y] = IHS
-	    game.kpower[1] = 1175.0 + 400.0*random.random() + 125.0*game.skill
+	    game.kpower[0] = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
 	    game.ishere = True
     # Put in Romulans if needed
@@ -6186,7 +6217,7 @@ def newqad(shutup):
 	w = dropin(IHR)
 	game.ks[i] = w
 	game.kdist[i] = game.kavgd[i] = distance(game.sector, w)
-	game.kpower[i] = random.random()*400.0 + 450.0 + 50.0*game.skill
+	game.kpower[i] = randreal(400.0, 850.0) + 50.0*game.skill
     # If quadrant needs a starbase, put it in
     if q.starbase:
 	game.base = dropin(IHB)
@@ -6223,20 +6254,20 @@ def newqad(shutup):
 	    game.ks[game.nenhere] = w
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
 		distance(game.sector, w)
-	    game.kpower[game.nenhere] = random.random()*6000.0 +500.0 +250.0*game.skill
+	    game.kpower[game.nenhere] = randreal(6000,6500.0)+250.0*game.skill
 	    if not damaged(DSRSENS):
 		skip(1)
 		prout(_("Mr. Spock- \"Captain, this is most unusual."))
 		prout(_("    Please examine your short-range scan.\""))
     # Decide if quadrant needs a Tholian; lighten up if skill is low 
     if game.options & OPTION_THOLIAN:
-	if (game.skill < SKILL_GOOD and random.random() <= 0.02) or \
-	    (game.skill == SKILL_GOOD and random.random() <= 0.05) or \
-            (game.skill > SKILL_GOOD and random.random() <= 0.08):
+	if (game.skill < SKILL_GOOD and withprob(0.02)) or \
+	    (game.skill == SKILL_GOOD and withprob(0.05)) or \
+            (game.skill > SKILL_GOOD and withprob(0.08)):
             game.tholian = coord()
             while True:
-		game.tholian.x = random.choice((0, QUADSIZE-1))
-		game.tholian.y = random.choice((0, QUADSIZE-1))
+		game.tholian.x = withprob(0.5) * QUADSIZE
+		game.tholian.y = withprob(0.5) * QUADSIZE
                 if game.quad[game.tholian.x][game.tholian.y] == IHDOT:
                     break
 	    game.quad[game.tholian.x][game.tholian.y] = IHT
@@ -6244,7 +6275,7 @@ def newqad(shutup):
 	    game.ks[game.nenhere] = game.tholian
 	    game.kdist[game.nenhere] = game.kavgd[game.nenhere] = \
 		distance(game.sector, game.tholian)
-	    game.kpower[game.nenhere] = random.random()*400.0 +100.0 +25.0*game.skill
+	    game.kpower[game.nenhere] = randrange(100, 500) + 25.0*game.skill
 	    # Reserve unoccupied corners 
 	    if game.quad[0][0]==IHDOT:
 		game.quad[0][0] = 'X'
@@ -6257,7 +6288,7 @@ def newqad(shutup):
     sortklings()
     # Put in a few black holes
     for i in range(1, 3+1):
-	if random.random() > 0.5: 
+	if withprob(0.5): 
 	    dropin(IHBLANK)
     # Take out X's in corners if Tholian present
     if game.tholian:
@@ -6311,7 +6342,7 @@ def setpassword():
     else:
         game.passwd = ""
         for i in range(3):
-	    game.passwd += chr(97+int(random.random()*25))
+	    game.passwd += chr(ord('a')+randrange(26))
 
 # Code from sst.c begins here
 
@@ -6632,13 +6663,13 @@ def stars():
     skip(1)
 
 def expran(avrage):
-    return -avrage*math.log(1e-7 + random.random())
+    return -avrage*math.log(1e-7 + randreal())
 
 def randplace(size):
     # choose a random location  
     w = coord()
-    w.x = random.randint(0, size-1) 
-    w.y = random.randint(0, size-1)
+    w.x = randrange(size) 
+    w.y = randrange(size)
     return w
 
 def chew():
@@ -6822,7 +6853,7 @@ if __name__ == '__main__':
 		raise SysExit, 1
             line = replayfp.readline().strip()
             try:
-                (key, seed) = line.split()
+                (leader, key, seed) = line.split()
                 seed = int(seed)
                 sys.stderr.write("sst2k: seed set to %d\n" % seed)
             except ValueError:
@@ -6845,7 +6876,7 @@ if __name__ == '__main__':
         sys.stderr.write("sst: warning, can't open logfile\n")
     if logfp:
 	#setlinebuf(logfp)
-	logfp.write("seed %d\n" % (seed))
+	logfp.write("# seed %d\n" % (seed))
     random.seed(seed)
     iostart()
     if arguments:
