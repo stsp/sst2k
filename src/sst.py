@@ -5660,69 +5660,6 @@ def eta():
 	    return
 			
 
-#ifdef BSD_BUG_FOR_BUG
-# A visual scan is made in a particular direction of three sectors
-# in the general direction specified.  This takes time, and
-# Klingons can attack you, so it should be done only when sensors
-# are out.  Code swiped from BSD-Trek.  Not presently used, as we
-# automatically display all adjacent sectors on the short-range
-# scan even when short-range sensors are out.
-
-# This struct[] has the delta x, delta y for particular directions
-
-visdelta = (
-    (-1,-1),
-    (-1, 0),
-    (-1, 1),
-    (0,	 1),
-    (1,	 1),
-    (1,	 0),
-    (1,	-1),
-    (0,	-1),
-    (-1,-1),
-    (-1, 0),
-    (-1, 1),
-)
-
-def visual():
-    v = coord()
-    if scan() != IHREAL:
-	chew()
-	proutn(_("Direction? "))
-	if scan()!=IHREAL:
-	    huh()
-	    return
-    if aaitem < 0.0 or aaitem > 360.0:
-	return
-    co = (aaitem + 22) / 45
-    v = visdelta[co]
-    ix = game.sector.x + v.x
-    iy = game.sector.y + v.y
-    if ix < 0 or ix >= QUADSIZE or iy < 0 or iy >= QUADSIZE:
-	co = '?'
-    else:
-	co = game.quad[ix][iy]
-    printf("%d,%d %c " % (ix+1, iy+1, co))
-    v += 1
-    ix = game.sector.x + v.x
-    iy = game.sector.y + v.y
-    if ix < 0 or ix >= QUADSIZE or iy < 0 or iy >= QUADSIZE:
-	co = '?'
-    else:
-	co = game.quad[ix][iy]
-    printf("%c " % (co))
-    v += 1
-    ix = game.sector.x + v.x
-    iy = game.sector.y + v.y
-    if ix < 0 or ix >= QUADSIZE or iy < 0 or iy >= QUADSIZE:
-	co = '?'
-    else:
-	co = game.quad[ix][iy]
-    prout("%c %d,%d\n" % (co, ix+1, iy+1))
-    game.optime = 0.5
-    game.ididit = True
-#endif
-
 # Code from setup.c begins here
 
 def prelim():
@@ -5730,10 +5667,9 @@ def prelim():
     skip(2)
     prout(_("-SUPER- STAR TREK"))
     skip(1)
-#ifdef __HISTORICAL__
+# From the FORTRAN original
 #    prout(_("Latest update-21 Sept 78"))
 #    skip(1)
-#endif __HISTORICAL__ 
 
 def freeze(boss):
     # save game 
@@ -6626,10 +6562,6 @@ def makemoves():
 	    game.alldone = True		# quit the game
 	elif cmd == "HELP":
 	    helpme()			# get help
-#ifdef BSD_BUG_FOR_BUG
-#	elif cmd == "VISUAL":
-#	    visual()			# perform visual scan
-#endif
 	while True:
 	    if game.alldone:
 		break		# Game has ended
