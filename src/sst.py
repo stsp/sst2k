@@ -1992,7 +1992,7 @@ def hittem(hits):
 	else: # decide whether or not to emasculate klingon 
 	    if kpow > 0 and random.random() >= 0.9 and \
 		kpow <= ((0.4 + 0.4*random.random())*kpini):
-		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s"), w)
+		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s") % w)
 		prout(_("   has just lost its firepower.\""))
 		game.kpower[kk] = -kpow
         kk += 1
@@ -3089,7 +3089,13 @@ def kaboom():
 				
 def killrate():
     "Compute our rate of kils over time."
-    return ((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem))/(game.state.date-game.indate)
+    elapsed = game.state.date - game.indate
+    if elapsed == 0:	# Avoid divide-by-zero error if calculated on turn 0
+        return 0
+    else:
+        starting = (game.inkling + game.incom + game.inscom)
+        remaining = (game.state.remkl + game.state.remcom + game.state.nscrem)
+        return (starting - remaining)/elapsed
 
 def badpoints():
     "Compute demerits."
@@ -3490,7 +3496,7 @@ def iostart():
     #textdomain(PACKAGE)
     if atexit.register(outro):
 	sys.stderr.write("Unable to register outro(), exiting...\n")
-	os.exit(1)
+	raise SysExit,1
     if not (game.options & OPTION_CURSES):
 	ln_env = os.getenv("LINES")
         if ln_env:
@@ -3925,7 +3931,7 @@ def imove(novapush):
 		# object encountered in flight path 
 		stopegy = 50.0*game.dist/game.optime
 		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
-                if iquad in (IHT, IHK, OHC, IHS, IHR, IHQUEST):
+                if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
 		    game.sector = w
 		    ram(False, iquad, game.sector)
 		    final = game.sector
@@ -6590,7 +6596,7 @@ def makemoves():
 	elif cmd == "EMEXIT":		# Emergency exit
 	    clrscr()			# Hide screen
 	    freeze(True)		# forced save
-	    os.exit(1)			# And quick exit
+	    raise SysExit,1			# And quick exit
 	elif cmd == "PROBE":
 	    probe()			# Launch probe
 	    if game.ididit:
@@ -6880,16 +6886,17 @@ if __name__ == '__main__':
     for (switch, val) in options:
         if switch == '-r':
             try:
-                replayfp = open(optarg, "r")
+                replayfp = open(val, "r")
             except IOError:
-		sys.stderr.write("sst: can't open replay file %s\n" % optarg)
-		os.exit(1)
+		sys.stderr.write("sst: can't open replay file %s\n" % val)
+		raise SysExit, 1
             line = replayfp.readline().strip()
             try:
                 (key, seed) = line.split()
                 seed = int(seed)
+                sys.stderr.write("sst2k: seed set to %d\n" % seed)
             except ValueError:
-		sys.stderr.write("sst: replay file %s is ill-formed\n"%optarg)
+		sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
 		os.exit(1)
 	    game.options |= OPTION_TTY
 	    game.options &=~ OPTION_CURSES
@@ -6933,6 +6940,7 @@ if __name__ == '__main__':
 	    if ja() == True:
 		chew2()
 		freeze(False)
+        chew()
 	proutn(_("Do you want to play again? "))
 	if not ja():
 	    break
