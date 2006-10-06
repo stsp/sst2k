@@ -424,6 +424,7 @@ class enemy:
         self.kpower = power	# enemy energy level
         game.enemies.append(self)
     def move(self, loc):
+        motion = (loc != self.kloc)
         if self.kloc.x is not None and self.kloc.y is not None:
             game.quad[self.kloc.x][self.kloc.y] = IHDOT
         if loc:
@@ -434,6 +435,7 @@ class enemy:
             self.kloc = coord()	# enemy sector location
             self.kdist = self.kavgd = None
             game.enemies.remove(self)
+        return motion
     def __repr__(self):
         return "<%s=%f>" % (self.kloc, self.kpower)	# For debugging
 
@@ -781,35 +783,33 @@ def movebaddy(enemy):
     if idebug:
 	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
-    mx = game.sector.x - enemy.kloc.x
-    my = game.sector.y - enemy.kloc.y
-    if 2.0 * abs(mx) < abs(my):
-	mx = 0
-    if 2.0 * abs(my) < abs(game.sector.x-enemy.kloc.x):
-	my = 0
-    if mx != 0:
-        if mx*motion < 0:
-            mx = -1
+    m = game.sector - enemy.kloc
+    if 2.0 * abs(m.x) < abs(m.y):
+	m.x = 0
+    if 2.0 * abs(m.y) < abs(game.sector.x-enemy.kloc.x):
+	m.y = 0
+    if m.x != 0:
+        if m.x*motion < 0:
+            m.x = -1
         else:
-            mx = 1
-    if my != 0:
-        if my*motion < 0:
-            my = -1
+            m.x = 1
+    if m.y != 0:
+        if m.y*motion < 0:
+            m.y = -1
         else:
-            my = 1
+            m.y = 1
     next = enemy.kloc
     # main move loop 
     for ll in range(nsteps):
 	if idebug:
 	    proutn(" %d" % (ll+1))
 	# Check if preferred position available 
-	look.x = next.x + mx
-	look.y = next.y + my
-        if mx < 0:
+	look = next + m
+        if m.x < 0:
             krawlx = 1
         else:
             krawlx = -1
-        if my < 0:
+        if m.y < 0:
             krawly = 1
         else:
             krawly = -1
@@ -820,14 +820,14 @@ def movebaddy(enemy):
 	    if look.x < 0 or look.x >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawlx == mx or my == 0:
+		if krawlx == m.x or m.y == 0:
 		    break
 		look.x = next.x + krawlx
 		krawlx = -krawlx
 	    elif look.y < 0 or look.y >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawly == my or mx == 0:
+		if krawly == m.y or m.x == 0:
 		    break
 		look.y = next.y + krawly
 		krawly = -krawly
@@ -837,10 +837,10 @@ def movebaddy(enemy):
 		    (enemy.type == IHC or enemy.type == IHS):
 		    collision(rammed=True, enemy=enemy)
 		    return
-		if krawlx != mx and my != 0:
+		if krawlx != m.x and m.y != 0:
 		    look.x = next.x + krawlx
 		    krawlx = -krawlx
-		elif krawly != my and mx != 0:
+		elif krawly != m.y and m.x != 0:
 		    look.y = next.y + krawly
 		    krawly = -krawly
 		else:
@@ -855,13 +855,7 @@ def movebaddy(enemy):
 	    break; # done early 
     if idebug:
 	skip(1)
-    # Put commander in place within same quadrant 
-    game.quad[enemy.kloc.x][enemy.kloc.y] = IHDOT
-    game.quad[next.x][next.y] = enemy.type
-    if next != enemy.kloc:
-	# it moved 
-	enemy.kloc = next
-	enemy.kdist = enemy.kavgd = distance(game.sector, next)
+    if enemy.move(next):
 	if not damaged(DSRSENS) or game.condition == "docked":
 	    proutn("***")
 	    cramen(enemy.type)
