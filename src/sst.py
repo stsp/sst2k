@@ -1285,7 +1285,7 @@ def ram(ibumpd, ienm, w):
         proutn(_(" rammed by "))
     else:
         proutn(_(" rams "))
-    crmena(False, ienm, sector, w)
+    crmena(False, ienm, "sector", w)
     if ibumpd:
 	proutn(_(" (original position)"))
     skip(1)
@@ -1386,7 +1386,7 @@ def torpedo(course, r, incoming, i, n):
 	    shoved = True
 	elif iquad in (IHC, IHS): # Hit a commander 
 	    if withprob(0.05):
-		crmena(True, iquad, sector, w)
+		crmena(True, iquad, "sector", w)
 		prout(_(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
 		return None
@@ -1449,7 +1449,7 @@ def torpedo(course, r, incoming, i, n):
 	    newcnd()
 	    return None
 	elif iquad == IHP: # Hit a planet 
-	    crmena(True, iquad, sector, w)
+	    crmena(True, iquad, "sector", w)
 	    prout(_(" destroyed."))
 	    game.state.nplankl += 1
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
@@ -1462,7 +1462,7 @@ def torpedo(course, r, incoming, i, n):
 		finish(FDPLANET)
 	    return None
 	elif iquad == IHW: # Hit an inhabited world -- very bad! 
-	    crmena(True, iquad, sector, w)
+	    crmena(True, iquad, "sector", w)
 	    prout(_(" destroyed."))
 	    game.state.nworldkl += 1
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
@@ -1480,7 +1480,7 @@ def torpedo(course, r, incoming, i, n):
 	    if withprob(0.9):
 		nova(w)
             else:
-                crmena(True, IHSTAR, sector, w)
+                crmena(True, IHSTAR, "sector", w)
                 prout(_(" unaffected by photon blast."))
 	    return None
 	elif iquad == IHQUEST: # Hit a thingy 
@@ -1506,7 +1506,7 @@ def torpedo(course, r, incoming, i, n):
 	    return None
 	elif iquad == IHBLANK: # Black hole 
 	    skip(1)
-	    crmena(True, IHBLANK, sector, w)
+	    crmena(True, IHBLANK, "sector", w)
 	    prout(_(" swallows torpedo."))
 	    return None
 	elif iquad == IHWEB: # hit the web 
@@ -1523,7 +1523,7 @@ def torpedo(course, r, incoming, i, n):
 		deadkl(w, iquad, w)
 		return None
 	    skip(1)
-	    crmena(True, IHT, sector, w)
+	    crmena(True, IHT, "sector", w)
 	    if withprob(0.05):
 		prout(_(" survives photon blast."))
 		return None
@@ -1536,7 +1536,7 @@ def torpedo(course, r, incoming, i, n):
         else: # Problem!
 	    skip(1)
 	    proutn("Don't know how to handle torpedo collision with ")
-	    crmena(True, iquad, sector, w)
+	    crmena(True, iquad, "sector", w)
 	    skip(1)
 	    return None
 	break
@@ -1745,7 +1745,7 @@ def attack(torps_ok):
 def deadkl(w, type, mv):
     # kill a Klingon, Tholian, Romulan, or Thingy 
     # Added mv to allow enemy to "move" before dying 
-    crmena(True, type, sector, mv)
+    crmena(True, type, "sector", mv)
     # Decide what kind of enemy it is and update appropriately 
     if type == IHR:
 	# chalk up a Romulan 
@@ -2215,7 +2215,7 @@ def phasers():
 		    proutn("??")
 		proutn(")  ")
 		proutn(_("units to fire at "))
-		crmena(False, ienm, sector, aim)
+		crmena(False, ienm, "sector", aim)
 		proutn("-  ")
 		key = scan()
 	    if key == IHALPHA and isit("no"):
@@ -2794,7 +2794,7 @@ def nova(nov):
 	return
     # handle initial nova 
     game.quad[nov.x][nov.y] = IHDOT
-    crmena(False, IHSTAR, sector, nov)
+    crmena(False, IHSTAR, "sector", nov)
     prout(_(" novas."))
     game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
     game.state.starkl += 1
@@ -2829,13 +2829,13 @@ def nova(nov):
 			hits[top2][2]=scratch.y
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
 			game.state.starkl += 1
-			crmena(True, IHSTAR, sector, scratch)
+			crmena(True, IHSTAR, "sector", scratch)
 			prout(_(" novas."))
 			game.quad[scratch.x][scratch.y] = IHDOT
 		    elif iquad == IHP: # Destroy planet 
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 			game.state.nplankl += 1
-			crmena(True, IHP, sector, scratch)
+			crmena(True, IHP, "sector", scratch)
 			prout(_(" destroyed."))
 			game.iplnet.pclass = "destroyed"
 			game.iplnet = None
@@ -2854,7 +2854,7 @@ def nova(nov):
 			invalidate(game.base)
 			game.state.basekl += 1
 			newcnd()
-			crmena(True, IHB, sector, scratch)
+			crmena(True, IHB, "sector", scratch)
 			prout(_(" destroyed."))
 			game.quad[scratch.x][scratch.y] = IHDOT
 		    elif iquad in (IHE, IHF): # Buffet ship 
@@ -2890,7 +2890,7 @@ def nova(nov):
 			    break
 			newc.x = scratch.x + scratch.x - hits[mm][1]
 			newc.y = scratch.y + scratch.y - hits[mm][2]
-			crmena(True, iquad, sector, scratch)
+			crmena(True, iquad, "sector", scratch)
 			proutn(_(" damaged"))
 			if not VALID_SECTOR(newc.x, newc.y):
 			    # can't leave quadrant 
@@ -2899,7 +2899,7 @@ def nova(nov):
 			iquad1 = game.quad[newc.x][newc.y]
 			if iquad1 == IHBLANK:
 			    proutn(_(", blasted into "))
-			    crmena(False, IHBLANK, sector, newc)
+			    crmena(False, IHBLANK, "sector", newc)
 			    skip(1)
 			    deadkl(scratch, iquad, newc)
 			    break
@@ -3655,7 +3655,7 @@ def cgetline():
                 elif line[0] != "#":
                     break
 	else:
-	    line = raw_input("COMMAND> ")
+	    line = raw_input()
     if logfp:
 	logfp.write(line + "\n")
     return line
@@ -6475,6 +6475,7 @@ def makemoves():
 	    chew()
 	    setwnd(prompt_window)
 	    clrscr()
+	    proutn("COMMAND> ")
 	    if scan() == IHEOL:
 		if game.options & OPTION_CURSES:
 		    makechart()
