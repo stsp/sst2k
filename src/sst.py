@@ -622,7 +622,7 @@ def randreal(*args):
 
 # Code from ai.c begins here
 
-def tryexit(look, ienm, loccom, irun):
+def tryexit(enemy, look, irun):
     # a bad guy attempts to bug out 
     iq = coord()
     iq.x = game.quadrant.x+(look.x+(QUADSIZE-1))/QUADSIZE - 1
@@ -631,11 +631,11 @@ def tryexit(look, ienm, loccom, irun):
 	game.state.galaxy[iq.x][iq.y].supernova or \
 	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1:
 	return False; # no can do -- neg energy, supernovae, or >MAXKLQUAD-1 Klingons 
-    if ienm == IHR:
+    if enemy.type == IHR:
 	return False; # Romulans cannot escape! 
     if not irun:
 	# avoid intruding on another commander's territory 
-	if ienm == IHC:
+	if enemy.type == IHC:
 	    for n in range(game.state.remcom):
 		if game.state.kcmdr[n] == iq:
 		    return False
@@ -643,23 +643,23 @@ def tryexit(look, ienm, loccom, irun):
 	    if game.battle == game.quadrant:
 		return False
 	# don't leave if over 1000 units of energy 
-	if game.enemies[loccom].kpower > 1000.0:
+	if enemy.kpower > 1000.0:
 	    return False
     # print escape message and move out of quadrant.
     # we know this if either short or long range sensors are working
     if not damaged(DSRSENS) or not damaged(DLRSENS) or \
-	game.condition == docked:
-	crmena(True, ienm, "sector", game.enemies[loccom].kloc)
+	game.condition == "docked":
+	crmena(True, enemy.type, "sector", enemy.kloc)
 	prout(_(" escapes to Quadrant %s (and regains strength).") % q)
     # handle local matters related to escape
-    game.enemies[loccom].move(None)
+    enemy.move(None)
     game.klhere -= 1
-    if game.condition != docked:
+    if game.condition != "docked":
 	newcnd()
     # Handle global matters related to escape 
     game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons -= 1
     game.state.galaxy[iq.x][iq.y].klingons += 1
-    if ienm==IHS:
+    if enemy.type==IHS:
 	game.ishere = False
 	game.iscate = False
 	game.ientesc = False
@@ -715,7 +715,7 @@ def tryexit(look, ienm, loccom, irun):
 # 5.  Motion is limited to skill level, except for SC hi-tailing it out.
 # 
 
-def movebaddy(com, loccom, ienm):
+def movebaddy(enemy):
     # tactical movement for the bad guys 
     next = coord(); look = coord()
     irun = False
@@ -724,17 +724,16 @@ def movebaddy(com, loccom, ienm):
 	nbaddys = ((game.comhere*2 + game.ishere*2+game.klhere*1.23+game.irhere*1.5)/2.0)
     else:
 	nbaddys = game.comhere + game.ishere
-
-    dist1 = game.enemies[loccom].kdist
+    dist1 = enemy.kdist
     mdist = int(dist1 + 0.5); # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
-    if ienm==IHS and \
-	(game.enemies[loccom].kpower <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
+    if enemy.type==IHS and \
+	(enemy.kpower <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
 	irun = True
 	motion = -QUADSIZE
     else:
 	# decide whether to advance, retreat, or hold position 
-	forces = game.enemies[loccom].kpower+100.0*len(game.enemies)+400*(nbaddys-1)
+	forces = enemy.kpower+100.0*len(game.enemies)+400*(nbaddys-1)
 	if not game.shldup:
 	    forces += 1000; # Good for enemy if shield is down! 
 	if not damaged(DPHASER) or not damaged(DPHOTON):
@@ -782,11 +781,11 @@ def movebaddy(com, loccom, ienm):
     if idebug:
 	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
-    mx = game.sector.x - com.x
-    my = game.sector.y - com.y
+    mx = game.sector.x - enemy.kloc.x
+    my = game.sector.y - enemy.kloc.y
     if 2.0 * abs(mx) < abs(my):
 	mx = 0
-    if 2.0 * abs(my) < abs(game.sector.x-com.x):
+    if 2.0 * abs(my) < abs(game.sector.x-enemy.kloc.x):
 	my = 0
     if mx != 0:
         if mx*motion < 0:
@@ -798,7 +797,7 @@ def movebaddy(com, loccom, ienm):
             my = -1
         else:
             my = 1
-    next = com
+    next = enemy.kloc
     # main move loop 
     for ll in range(nsteps):
 	if idebug:
@@ -819,24 +818,24 @@ def movebaddy(com, loccom, ienm):
 	while attempts < 20 and not success:
             attempts += 1
 	    if look.x < 0 or look.x >= QUADSIZE:
-		if motion < 0 and tryexit(look, ienm, loccom, irun):
+		if motion < 0 and tryexit(enemy, look, irun):
 		    return
 		if krawlx == mx or my == 0:
 		    break
 		look.x = next.x + krawlx
 		krawlx = -krawlx
 	    elif look.y < 0 or look.y >= QUADSIZE:
-		if motion < 0 and tryexit(look, ienm, loccom, irun):
+		if motion < 0 and tryexit(enemy, look, irun):
 		    return
 		if krawly == my or mx == 0:
 		    break
 		look.y = next.y + krawly
 		krawly = -krawly
 	    elif (game.options & OPTION_RAMMING) and game.quad[look.x][look.y] != IHDOT:
-		# See if we should ram ship 
+		# See if enemy should ram ship 
 		if game.quad[look.x][look.y] == game.ship and \
-		    (ienm == IHC or ienm == IHS):
-		    ram(True, ienm, com)
+		    (enemy.type == IHC or enemy.type == IHS):
+		    collision(rammed=True, enemy=enemy)
 		    return
 		if krawlx != mx and my != 0:
 		    look.x = next.x + krawlx
@@ -854,21 +853,20 @@ def movebaddy(com, loccom, ienm):
 		proutn(`next`)
 	else:
 	    break; # done early 
-	
     if idebug:
 	skip(1)
     # Put commander in place within same quadrant 
-    game.quad[com.x][com.y] = IHDOT
-    game.quad[next.x][next.y] = ienm
-    if next != com:
+    game.quad[enemy.kloc.x][enemy.kloc.y] = IHDOT
+    game.quad[next.x][next.y] = enemy.type
+    if next != enemy.kloc:
 	# it moved 
-	game.enemies[loccom].kloc = next
-	game.enemies[loccom].kdist = game.enemies[loccom].kavgd = distance(game.sector, next)
-	if not damaged(DSRSENS) or game.condition == docked:
+	enemy.kloc = next
+	enemy.kdist = enemy.kavgd = distance(game.sector, next)
+	if not damaged(DSRSENS) or game.condition == "docked":
 	    proutn("***")
-	    cramen(ienm)
-	    proutn(_(" from Sector %s") % com)
-	    if game.enemies[loccom].kdist < dist1:
+	    cramen(enemy.type)
+	    proutn(_(" from Sector %s") % enemy.kloc)
+	    if enemy.kdist < dist1:
 		proutn(_(" advances to "))
 	    else:
 		proutn(_(" retreats to "))
@@ -881,22 +879,21 @@ def moveklings():
     # Figure out which Klingon is the commander (or Supercommander)
     # and do move
     if game.comhere:
-        for (i, e) in enumerate(game.enemies):
-	    if game.quad[e.kloc.x][e.kloc.y] == IHC:
-		movebaddy(e.kloc, i, IHC)
-		break
+        for enemy in game.enemies:
+	    if enemy.type == IHC:
+		movebaddy(enemy)
     if game.ishere:
-        for (i, e) in enumerate(game.enemies):
-	    if game.quad[e.kloc.x][e.kloc.y] == IHS:
-		movebaddy(e.kloc, i, IHS)
+        for enemy in game.enemies:
+	    if enemy.type == IHS:
+		movebaddy(enemy)
 		break
     # If skill level is high, move other Klingons and Romulans too!
     # Move these last so they can base their actions on what the
     # commander(s) do.
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
-        for (i, e) in enumerate(game.enemies):
-            if game.quad[e.kloc.x][e.kloc.y] in (IHK, IHR):
-		movebaddy(e.kloc, i, game.quad[e.kloc.x][e.kloc.y])
+        for enemy in game.enemies:
+            if enemy.type in (IHK, IHR):
+		movebaddy(enemy)
     game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 
 def movescom(iq, avoid):
@@ -923,12 +920,12 @@ def movescom(iq, avoid):
 	game.ishere = False
 	game.ientesc = False
 	unschedule(FSCDBAS)
-	for e in game.enemies:
-	    if game.quad[e.kloc.x][e.kloc.y] == IHS:
+	for enemy in game.enemies:
+	    if enemy.type == IHS:
 		break
-	game.enemies[i].move(None)
+	enemy.move(None)
 	game.klhere -= 1
-	if game.condition!=docked:
+	if game.condition != "docked":
 	    newcnd()
         game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     # check for a helpful planet 
@@ -1284,24 +1281,24 @@ def randdevice():
 	    return i
     return None;	# we should never get here
 
-def ram(ibumpd, ienm, w):
-    # make our ship ram something 
+def collision(rammed, enemy):
+    # collision handling
     prouts(_("***RED ALERT!  RED ALERT!"))
     skip(1)
     prout(_("***COLLISION IMMINENT."))
     skip(2)
     proutn("***")
     crmshp()
-    hardness = {IHR:1.5, IHC:2.0, IHS:2.5, IHT:0.5, IHQUEST:4.0}.get(ienm, 1.0)
-    if ibumpd:
+    hardness = {IHR:1.5, IHC:2.0, IHS:2.5, IHT:0.5, IHQUEST:4.0}.get(enemy.type, 1.0)
+    if rammed:
         proutn(_(" rammed by "))
     else:
         proutn(_(" rams "))
-    crmena(False, ienm, "sector", w)
-    if ibumpd:
+    crmena(False, enemy.type, "sector", enemy.kloc)
+    if rammed:
 	proutn(_(" (original position)"))
     skip(1)
-    deadkl(w, ienm, game.sector)
+    deadkl(enemy.kloc, enemy.type, game.sector)
     proutn("***")
     crmshp()
     prout(_(" heavily damaged."))
@@ -3627,9 +3624,9 @@ def cgetline():
                 elif line[0] != "#":
                     break
 	else:
-	    line = raw_input()
+	    line = raw_input() + "\n"
     if logfp:
-	logfp.write("$" + line + "\n")
+	logfp.write(line)
     return line
 
 def setwnd(wnd):
@@ -3939,7 +3936,10 @@ def imove(novapush):
 		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
                 if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
 		    game.sector = w
-		    ram(False, iquad, game.sector)
+                    for enemy in game.enemies:
+                        if enemy.kloc == game.sector:
+                            break
+		    collision(rammed=False, enemy=enemy)
 		    final = game.sector
 		elif iquad == IHBLANK:
 		    skip(1)
