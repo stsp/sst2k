@@ -575,12 +575,12 @@ import traceback
 
 def withprob(p):
     v = random.random()
-    logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[-2][1:]))
+    #logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[-2][1:]))
     return v < p
 
 def randrange(*args):
     v = random.randrange(*args)
-    logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
+    #logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
     return v
 
 def randreal(*args):
@@ -589,7 +589,7 @@ def randreal(*args):
         v *= args[0] 		# returns from [0, a1)
     elif len(args) == 2:
         v = args[0] + v*args[1]	# returns from [a1, a2)
-    logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
+    #logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
     return v
 
 # Code from ai.c begins here
@@ -6842,7 +6842,7 @@ if __name__ == '__main__':
     #	game.options |= OPTION_CURSES | OPTION_SHOWME
     #    else:
     game.options |= OPTION_TTY
-    seed = time.time()
+    seed = int(time.time())
     (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
     for (switch, val) in options:
         if switch == '-r':
