@@ -575,12 +575,12 @@ import traceback
 
 def withprob(p):
     v = random.random()
-    logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[1][1:]))
+    logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[-2][1:]))
     return v < p
 
 def randrange(*args):
     v = random.randrange(*args)
-    logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[1][1:]))
+    logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
     return v
 
 def randreal(*args):
@@ -589,7 +589,7 @@ def randreal(*args):
         v *= args[0] 		# returns from [0, a1)
     elif len(args) == 2:
         v = args[0] + v*args[1]	# returns from [a1, a2)
-    logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[1][1:]))
+    logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
     return v
 
 # Code from ai.c begins here
@@ -6266,8 +6266,8 @@ def newqad(shutup):
             (game.skill > SKILL_GOOD and withprob(0.08)):
             game.tholian = coord()
             while True:
-		game.tholian.x = withprob(0.5) * QUADSIZE
-		game.tholian.y = withprob(0.5) * QUADSIZE
+		game.tholian.x = withprob(0.5) * (QUADSIZE-1)
+		game.tholian.y = withprob(0.5) * (QUADSIZE-1)
                 if game.quad[game.tholian.x][game.tholian.y] == IHDOT:
                     break
 	    game.quad[game.tholian.x][game.tholian.y] = IHT
@@ -6850,12 +6850,12 @@ if __name__ == '__main__':
                 replayfp = open(val, "r")
             except IOError:
 		sys.stderr.write("sst: can't open replay file %s\n" % val)
-		raise SysExit, 1
+		raise SystemExit, 1
             line = replayfp.readline().strip()
             try:
                 (leader, key, seed) = line.split()
-                seed = int(seed)
-                sys.stderr.write("sst2k: seed set to %d\n" % seed)
+                seed = eval(seed)
+                sys.stderr.write("sst2k: seed set to %s\n" % seed)
             except ValueError:
 		sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
 		os.exit(1)
@@ -6875,8 +6875,7 @@ if __name__ == '__main__':
     except IOError:
         sys.stderr.write("sst: warning, can't open logfile\n")
     if logfp:
-	#setlinebuf(logfp)
-	logfp.write("# seed %d\n" % (seed))
+	logfp.write("# seed %s\n" % seed)
     random.seed(seed)
     iostart()
     if arguments:
@@ -6907,4 +6906,4 @@ if __name__ == '__main__':
 	    break
     skip(1)
     prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
-    raise SysExit, 0
+    raise SystemExit, 0
