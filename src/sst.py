@@ -6851,11 +6851,13 @@ if __name__ == '__main__':
             except IOError:
 		sys.stderr.write("sst: can't open replay file %s\n" % val)
 		raise SystemExit, 1
-            line = replayfp.readline().strip()
             try:
+                line = replayfp.readline().strip()
                 (leader, key, seed) = line.split()
                 seed = eval(seed)
                 sys.stderr.write("sst2k: seed set to %s\n" % seed)
+                line = replayfp.readline().strip()
+                arguments += line.split()[2:]
             except ValueError:
 		sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
 		os.exit(1)
@@ -6876,6 +6878,7 @@ if __name__ == '__main__':
         sys.stderr.write("sst: warning, can't open logfile\n")
     if logfp:
 	logfp.write("# seed %s\n" % seed)
+	logfp.write("# options %s\n" % " ".join(arguments))
     random.seed(seed)
     iostart()
     if arguments:
