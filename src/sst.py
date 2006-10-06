@@ -200,6 +200,7 @@ MAXKLGAME	= 127
 MAXKLQUAD	= 9
 FULLCREW	= 428	# BSD Trek was 387, that's wrong 
 FOREVER 	= 1e30
+MAXBURST	= 3
 
 # These functions hide the difference between 0-origin and 1-origin addressing.
 def VALID_QUADRANT(x, y):	return ((x)>=0 and (x)<GALSIZE and (y)>=0 and (y)<GALSIZE)
@@ -1322,16 +1323,16 @@ def collision(rammed, enemy):
 	finish(FWON)
     return
 
-def torpedo(course, r, incoming, i, n):
+def torpedo(course, dispersion, origin, number, nburst):
     # let a photon torpedo fly 
     iquad = 0
     shoved = False
-    ac = course + 0.25*r
+    ac = course + 0.25*dispersion
     angle = (15.0-ac)*0.5235988
     bullseye = (15.0 - course)*0.5235988
     deltax = -math.sin(angle);
     deltay = math.cos(angle);
-    x = incoming.x; y = incoming.y
+    x = origin.x; y = origin.y
     w = coord(); jw = coord()
     w.x = w.y = jw.x = jw.y = 0
     bigger = max(math.fabs(deltax), math.fabs(deltay))
@@ -1342,7 +1343,7 @@ def torpedo(course, r, incoming, i, n):
     else: 
 	setwnd(message_window)
     # Loop to move a single torpedo 
-    for l in range(1, 15+1):
+    for step in range(1, 15+1):
 	x += deltax
 	w.x = int(x + 0.5)
 	y += deltay
@@ -1350,7 +1351,7 @@ def torpedo(course, r, incoming, i, n):
 	if not VALID_SECTOR(w.x, w.y):
 	    break
 	iquad=game.quad[w.x][w.y]
-	tracktorpedo(w, l, i, n, iquad)
+	tracktorpedo(w, step, number, nburst, iquad)
 	if iquad==IHDOT:
 	    continue
 	# hit something 
@@ -1363,7 +1364,7 @@ def torpedo(course, r, incoming, i, n):
 	    crmshp()
 	    prout(".")
 	    hit = 700.0 + randreal(100) - \
-		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
 	    newcnd(); # we're blown out of dock 
 	    # We may be displaced. 
 	    if game.landed or game.condition=="docked":
@@ -1400,7 +1401,7 @@ def torpedo(course, r, incoming, i, n):
 		    break
 	    kp = math.fabs(e.kpower)
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if kp < h1:
 		h1 = kp
@@ -1419,8 +1420,8 @@ def torpedo(course, r, incoming, i, n):
 		temp = math.fabs(math.cos(ang))
 	    xx = -math.sin(ang)/temp
 	    yy = math.cos(ang)/temp
-	    jw.x=w.x+xx+0.5
-	    jw.y=w.y+yy+0.5
+	    jw.x = int(w.x+xx+0.5)
+	    jw.y = int(w.y+yy+0.5)
 	    if not VALID_SECTOR(jw.x, jw.y):
 		prout(_(" damaged but not destroyed."))
 		return
@@ -1517,7 +1518,7 @@ def torpedo(course, r, incoming, i, n):
 	    return None
 	elif iquad == IHT:  # Hit a Tholian 
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * distance(w, incoming) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
 		game.quad[w.x][w.y] = IHDOT
@@ -1652,9 +1653,9 @@ def attack(torps_ok):
 		crmena(False, enemy.type, where, enemy.kloc)
 	    attempt = True
 	    prout("  ")
-	    r = (randreal()+randreal())*0.5 - 0.5
-	    r += 0.002*enemy.kpower*r
-	    hit = torpedo(course, r, enemy.kloc, 1, 1)
+	    dispersion = (randreal()+randreal())*0.5 - 0.5
+	    dispersion += 0.002*enemy.kpower*dispersion
+	    hit = torpedo(course, dispersion, origin=enemy.kloc, number=1, nburst=1)
 	    if (game.state.remkl + game.state.remcom + game.state.nscrem)==0:
 		finish(FWON); # Klingons did themselves in! 
 	    if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova or game.alldone:
@@ -1789,13 +1790,13 @@ def deadkl(w, type, mv):
 	    break
     return
 
-def targetcheck(x, y):
+def targetcheck(w):
     # Return None if target is invalid 
-    if not VALID_SECTOR(x, y):
+    if not VALID_SECTOR(w.x, w.y):
 	huh()
 	return None
-    deltx = 0.1*(y - game.sector.y)
-    delty = 0.1*(x - game.sector.x)
+    deltx = 0.1*(w.y - game.sector.y)
+    delty = 0.1*(w.x - game.sector.x)
     if deltx==0 and delty== 0:
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
@@ -1830,56 +1831,58 @@ def photon():
 	    if n <= 0: # abort command 
 		chew()
 		return
-	    if n > 3:
+	    if n > MAXBURST:
 		chew()
-		prout(_("Maximum of 3 torpedoes per burst."))
+		prout(_("Maximum of %d torpedoes per burst.") % MAXBURST)
 		key = IHEOL
 		return
 	    if n <= game.torps:
 		break
 	    chew()
 	    key = IHEOL
-    for i in range(1, n+1):
+    targ = []
+    for i in range(MAXBURST):
+        targ.append(coord())
+    for i in range(n):
 	key = scan()
-	if i==1 and key == IHEOL:
+	if i==0 and key == IHEOL:
 	    break;	# we will try prompting 
-	if i==2 and key == IHEOL:
+	if i==1 and key == IHEOL:
 	    # direct all torpedoes at one target 
 	    while i <= n:
-		targ[i][1] = targ[1][1]
-		targ[i][2] = targ[1][2]
-		course[i] = course[1]
+		targ[i] = targ[0]
+		course[i] = course[0]
 		i += 1
 	    break
 	if key != IHREAL:
 	    huh()
 	    return
-	targ[i][1] = aaitem
+	targ[i].x = aaitem
 	key = scan()
 	if key != IHREAL:
 	    huh()
 	    return
-	targ[i][2] = aaitem
-	course[i] = targetcheck(targ[i][1], targ[i][2])
+	targ[i].y = aaitem
+	course[i] = targetcheck(targ[i])
         if course[i] == None:
 	    return
     chew()
     if i == 1 and key == IHEOL:
 	# prompt for each one 
-	for i in range(1, n+1):
-	    proutn(_("Target sector for torpedo number %d- ") % i)
+	for i in range(n):
+	    proutn(_("Target sector for torpedo number %d- ") % (i+1))
 	    key = scan()
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i][1] = int(aaitem-0.5)
+	    targ[i].x = int(aaitem-0.5)
 	    key = scan()
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i][2] = int(aaitem-0.5)
+	    targ[i].y = int(aaitem-0.5)
 	    chew()
-            course[i] = targetcheck(targ[i][1], targ[i][2])
+            course[i] = targetcheck(targ[i])
             if course[i] == None:
                 return
     game.ididit = True
@@ -1887,10 +1890,10 @@ def photon():
     for i in range(n):
 	if game.condition != "docked":
 	    game.torps -= 1
-	r = (randreal()+randreal())*0.5 -0.5
-	if math.fabs(r) >= 0.47:
+	dispersion = (randreal()+randreal())*0.5 -0.5
+	if math.fabs(dispersion) >= 0.47:
 	    # misfire! 
-	    r *= randreal(1.2, 2.2)
+	    dispersion *= randreal(1.2, 2.2)
 	    if n > 0:
 		prouts(_("***TORPEDO NUMBER %d MISFIRES") % (i+1))
 	    else:
@@ -1903,8 +1906,8 @@ def photon():
 		game.damage[DPHOTON] = game.damfac * randreal(1.0, 3.0)
 	    break
 	if game.shldup or game.condition == "docked":
-	    r *= 1.0 + 0.0001*game.shield
-	torpedo(course[i], r, game.sector, i, n)
+	    dispersion *= 1.0 + 0.0001*game.shield
+	torpedo(course[i], dispersion, origin=game.sector, number=i, nburst=n)
 	if game.alldone or game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
 	    return
     if (game.state.remkl + game.state.remcom + game.state.nscrem)==0:
@@ -2342,7 +2345,7 @@ def events():
         newqad(False)
         # Adjust finish time to time of tractor beaming 
         fintim = game.state.date+game.optime
-        attack(False)
+        attack(torps_ok=False)
         if game.state.remcom <= 0:
             unschedule(FTBEAM)
         else: 
@@ -2735,7 +2738,7 @@ def wait():
 		temp = rtime
 	    game.optime = temp
 	if game.optime < delay:
-	    attack(False)
+	    attack(torps_ok=False)
 	if game.alldone:
 	    return
 	events()
@@ -3746,27 +3749,27 @@ def warble():
 	#nosound()
         pass
 
-def tracktorpedo(w, l, i, n, iquad):
+def tracktorpedo(w, step, i, n, iquad):
     "Torpedo-track animation." 
     if not game.options & OPTION_CURSES:
-	if l == 1:
+	if step == 1:
 	    if n != 1:
 		skip(1)
 		proutn(_("Track for torpedo number %d-  ") % i)
 	    else:
 		skip(1)
 		proutn(_("Torpedo track- "))
-	elif l==4 or l==9: 
+	elif step==4 or step==9: 
 	    skip(1)
-	proutn("%d - %d   " % (w.x, w.y))
+	proutn("%s   " % w)
     else:
 	if not damaged(DSRSENS) or game.condition=="docked":
-	    if i != 1 and l == 1:
+	    if i != 0 and step == 1:
 		drawmaps(2)
 		time.sleep(0.4)
 	    if (iquad==IHDOT) or (iquad==IHBLANK):
 		put_srscan_sym(w, '+')
-		#sound(l*10)
+		#sound(step*10)
 		#time.sleep(0.1)
 		#nosound()
 		put_srscan_sym(w, iquad)
@@ -3779,7 +3782,7 @@ def tracktorpedo(w, l, i, n, iquad):
 		curwnd.attroff(curses.A_REVERSE)
 		put_srscan_sym(w, iquad)
 	else:
-	    proutn("%d - %d   " % (w.x, w.y))
+	    proutn("%s   " % w)
 
 def makechart():
     "Display the current galaxy chart."
@@ -3821,7 +3824,7 @@ def imove(novapush):
                 game.enemies[m].kdist = finald
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
-                attack(False)
+                attack(torps_ok=False)
             for m in range(game.nenhere):
                 game.enemies[m].kavgd = game.enemies[m].kdist
         newcnd()
@@ -3871,7 +3874,7 @@ def imove(novapush):
 		    # are present and your skill is good.
 		    # 
 		    if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
-			attack(False)
+			attack(torps_ok=False)
 		    if game.alldone:
 			return
 		# compute final position -- new quadrant and sector 
@@ -3921,7 +3924,7 @@ def imove(novapush):
 		game.quad[game.sector.x][game.sector.y] = game.ship
 		newqad(False)
 		if game.skill>SKILL_NOVICE:
-		    attack(False)  
+		    attack(torps_ok=False)  
 		return
 	    iquad = game.quad[w.x][w.y]
 	    if iquad != IHDOT:
@@ -5991,7 +5994,7 @@ def setup(needprompt):
     if game.nenhere - (thing == game.quadrant) - (game.tholian != None):
 	game.shldup = True
     if game.neutz:	# bad luck to start in a Romulan Neutral Zone
-	attack(False)
+	attack(torps_ok=False)
 
 def choose(needprompt):
     # choose your game type
@@ -6445,7 +6448,7 @@ def makemoves():
 	elif cmd == "DOCK":		# dock at starbase
 	    dock(True)
 	    if game.ididit:
-		attack(False)		
+		attack(torps_ok=False)		
 	elif cmd == "DAMAGES":		# damage reports
 	    damagereport()
 	elif cmd == "CHART":		# chart
@@ -6530,7 +6533,7 @@ def makemoves():
 		atover(False)
 		continue
 	    if hitme and not game.justin:
-		attack(True)
+		attack(torps_ok=True)
 		if game.alldone:
 		    break
 		if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
