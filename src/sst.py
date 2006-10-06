@@ -177,7 +177,7 @@ After these features were added, I translated this into Python and added
 more:
 
 9. A long-range scan is done silently whenever you call CHART; thus
-the LRSCAN command is no longer needed.  (Controlled by OPTION_PLAIN
+the LRSCAN command is no longer needed.  (Controlled by OPTION_AUTOSCAN
 and turned off if game type is "plain" or "almy".)
 """
 import os,sys,math,curses,time,atexit,readline,cPickle,random,getopt,copy
@@ -269,6 +269,8 @@ class coord:
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
+        if self.x == None or self.y == None:
+            return "Nowhere"
         return "%s - %s" % (self.x+1, self.y+1)
     __repr__ = __str__
 
@@ -349,15 +351,16 @@ OPTION_TTY	= 0x00000001	# old interface
 OPTION_CURSES	= 0x00000002	# new interface 
 OPTION_IOMODES	= 0x00000003	# cover both interfaces 
 OPTION_PLANETS	= 0x00000004	# planets and mining 
-OPTION_THOLIAN	= 0x00000008	# Tholians and their webs 
-OPTION_THINGY	= 0x00000010	# Space Thingy can shoot back 
-OPTION_PROBE	= 0x00000020	# deep-space probes 
+OPTION_THOLIAN	= 0x00000008	# Tholians and their webs (UT 1979 version)
+OPTION_THINGY	= 0x00000010	# Space Thingy can shoot back (Stas, 2005)
+OPTION_PROBE	= 0x00000020	# deep-space probes (DECUS version, 1980)
 OPTION_SHOWME	= 0x00000040	# bracket Enterprise in chart 
-OPTION_RAMMING	= 0x00000080	# enemies may ram Enterprise 
-OPTION_MVBADDY	= 0x00000100	# more enemies can move 
-OPTION_BLKHOLE	= 0x00000200	# black hole may timewarp you 
-OPTION_BASE	= 0x00000400	# bases have good shields 
-OPTION_WORLDS	= 0x00000800	# logic for inhabited worlds 
+OPTION_RAMMING	= 0x00000080	# enemies may ram Enterprise (Almy)
+OPTION_MVBADDY	= 0x00000100	# more enemies can move (Almy)
+OPTION_BLKHOLE	= 0x00000200	# black hole may timewarp you (Stas, 2005) 
+OPTION_BASE	= 0x00000400	# bases have good shields (Stas, 2005)
+OPTION_WORLDS	= 0x00000800	# logic for inhabited worlds (ESR, 2006)
+OPTION_AUTOSCAN	= 0x00001000	# automatic LRSCAN before CHART (ESR, 2006)
 OPTION_PLAIN	= 0x01000000	# user chose plain game 
 OPTION_ALMY	= 0x02000000	# user chose Almy variant 
 
@@ -418,15 +421,17 @@ class gamestate:
         self.state = snapshot()	# A snapshot structure
         self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
         self.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)	# contents of our quadrant
-        self.kpower = fill2d(QUADSIZE, lambda i, j: 0.0)	# enemy energy levels
-        self.kdist = fill2d(QUADSIZE, lambda i, j: 0.0)		# enemy distances
-        self.kavgd = fill2d(QUADSIZE, lambda i, j: 0.0) 	# average distances
+        self.kpower = [0.0]*(QUADSIZE**2)	# enemy energy levels
+        self.kdist =  [0.0]*(QUADSIZE**2)	# enemy distances
+        self.kavgd =  [0.0]*(QUADSIZE**2) 	# average distances
         self.damage = [0.0] * NDEVICES	# damage encountered
         self.future = []		# future events
         for i in range(NEVENTS):
             self.future.append(event())
         self.passwd  = None;		# Self Destruct password
-        self.ks = fill2d(QUADSIZE, lambda i, j: coord())	# enemy sector locations
+        self.ks = []	# enemy sector locations
+        for i in range(QUADSIZE**2):
+            self.ks.append(coord())
         self.quadrant = None	# where we are in the large
         self.sector = None	# where we are in the small
         self.tholian = None	# coordinates of Tholian
@@ -1986,15 +1991,16 @@ def checkshctrl(rpow):
 
 def hittem(hits):
     # register a phaser hit on Klingons and Romulans 
-    nenhr2 = game.nenhere; kk=1
+    nenhr2 = game.nenhere; kk=0
     w = coord()
     skip(1)
-    for k in range(nenhr2):
-        wham = hits[k]
+    for (k, wham) in enumerate(hits):
 	if wham==0:
 	    continue
 	dustfac = randreal(0.9, 1.0)
+        print type(wham), type(dustfac), type(game.kdist[kk]), "Foo!", game.kdist
 	hit = wham*math.pow(dustfac,game.kdist[kk])
+        print "Got here"
 	kpini = game.kpower[kk]
 	kp = math.fabs(kpini)
 	if PHASEFAC*hit < kp:
@@ -2023,14 +2029,15 @@ def hittem(hits):
 		finish(FWON);		
 	    if game.alldone:
 		return
-	    kk -= 1; # don't do the increment 
+	    kk -= 1	# don't do the increment
+            continue
 	else: # decide whether or not to emasculate klingon 
 	    if kpow>0 and withprob(0.9) and kpow <= randreal(0.4, 0.8)*kpini:
 		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s")%w)
 		prout(_("   has just lost its firepower.\""))
 		game.kpower[kk] = -kpow
         kk += 1
-    return;
+    return
 
 def phasers():
     # fire phasers 
@@ -3638,13 +3645,15 @@ def prout(line):
 def prouts(line):
     "print slowly!" 
     for c in line:
-	time.sleep(0.03)
+        if not replayfp or replayfp.closed:	# Don't slow down replays
+            time.sleep(0.03)
 	proutn(c)
 	if game.options & OPTION_CURSES:
 	    wrefresh(curwnd)
 	else:
 	    sys.stdout.flush()
-    time.sleep(0.03)
+    if not replayfp or replayfp.closed:
+        time.sleep(0.03)
 
 def cgetline():
     "Get a line of input."
@@ -3655,6 +3664,7 @@ def cgetline():
 	if replayfp and not replayfp.closed:
             while True:
                 line = replayfp.readline()
+                proutn(line)
                 if line == '':
                     prout("*** Replay finished")
                     replayfp.close()
@@ -5431,7 +5441,7 @@ def rechart():
 def chart():
     # display the star chart  
     chew()
-    if not (game.options & (OPTION_PLAIN | OPTION_ALMY)):
+    if (game.options & OPTION_AUTOSCAN):
         lrscan(silent=True)
     if not damaged(DRADIO):
 	rechart()
@@ -6206,22 +6216,19 @@ def newqad(shutup):
     # Position Starship
     game.quad[game.sector.x][game.sector.y] = game.ship
     if q.klingons:
-	w.x = w.y = 0	# quiet a gcc warning 
 	# Position ordinary Klingons
 	for i in range(game.klhere):
 	    w = newkling(i)
 	# If we need a commander, promote a Klingon
 	for i in range(game.state.remcom):
 	    if game.state.kcmdr[i] == game.quadrant:
-		break
-			
-	if i <= game.state.remcom:
-	    game.quad[w.x][w.y] = IHC
-	    game.kpower[game.klhere] = randreal(950, 1350) + 50.0*game.skill
-	    game.comhere = True
+                game.quad[game.ks[i].x][game.ks[i].y] = IHC
+                game.kpower[game.klhere] = randreal(950,1350) + 50.0*game.skill
+                game.comhere = True
+		break	
 	# If we need a super-commander, promote a Klingon
 	if game.quadrant == game.state.kscmdr:
-	    game.quad[game.ks[0].x][game.ks[0].y] = IHS
+	    game.quad[w.x][w.y] = IHS
 	    game.kpower[0] = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
 	    game.ishere = True
@@ -6244,9 +6251,8 @@ def newqad(shutup):
     # Check for condition
     newcnd()
     # And finally the stars
-    for i in range(q.stars): 
+    for i in range(q.stars):
 	dropin(IHSTAR)
-
     # Check for RNZ
     if game.irhere > 0 and game.klhere == 0:
 	game.neutz = True
@@ -6321,7 +6327,7 @@ def sortklings():
 	return
     while True:
 	sw = False
-	for j in range(game.nenhere):
+	for j in range(game.nenhere-1):
 	    if game.kdist[j] > game.kdist[j+1]:
 		sw = True
 		t = game.kdist[j]
@@ -6875,7 +6881,7 @@ if __name__ == '__main__':
                     arguments += line.split()[2:]
                 except ValueError:
                     sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
-                    os.exit(1)
+                    raise SystemExit(1)
                 game.options |= OPTION_TTY
                 game.options &=~ OPTION_CURSES
             elif switch == '-t':
@@ -6885,7 +6891,7 @@ if __name__ == '__main__':
                 idebug = True
             else:
                 sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
-                os.exit(0)
+                raise SystemExit, 1
         # where to save the input in case of bugs
         try:
             logfp = open("/usr/tmp/sst-input.log", "w")
