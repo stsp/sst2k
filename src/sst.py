@@ -3620,8 +3620,11 @@ def cgetline():
     else:
 	if replayfp and not replayfp.closed:
 	    line = replayfp.readline()
+            if line == '':
+                prout("*** Replay finished")
+                replayfp.close()
 	else:
-	    line = raw_input()
+	    line = raw_input("COMMAND> ")
     if logfp:
 	logfp.write(line + "\n")
     return line
@@ -6505,7 +6508,6 @@ def makemoves():
 	    chew()
 	    setwnd(prompt_window)
 	    clrscr()
-	    proutn("COMMAND> ")
 	    if scan() == IHEOL:
 		if game.options & OPTION_CURSES:
 		    makechart()
@@ -6624,10 +6626,6 @@ def makemoves():
 	    game.alldone = True		# quit the game
 	elif cmd == "HELP":
 	    helpme()			# get help
-	elif cmd == "SEED":		# set random-number seed
-	    key = scan()
-	    if key == IHREAL:
-		seed = int(round(aaitem))
 #ifdef BSD_BUG_FOR_BUG
 #	elif cmd == "VISUAL":
 #	    visual()			# perform visual scan
