@@ -172,6 +172,13 @@ your score.  Docking at a starbase replenishes your crew.
 Also, the nav subsystem (enabling automatic course
 setting) can be damaged separately from the main computer (which
 handles weapons targeting, ETA calculation, and self-destruct).
+
+After these features were added, I translated this into Python and added
+more:
+
+9. A long-range scan is done silently whenever you call CHART; thus
+the LRSCAN command is no longer needed.  (Controlled by OPTION_PLAIN
+and turned off if game type is "plain" or "almy".)
 """
 import os,sys,math,curses,time,atexit,readline,cPickle,random,getopt,copy
 
@@ -748,9 +755,9 @@ def movebaddy(com, loccom, ienm):
                 motion = game.skill
     # calculate preferred number of steps 
     if motion < 0:
-        msteps = -motion
+        nsteps = -motion
     else:
-        msteps = motion
+        nsteps = motion
     if motion > 0 and nsteps > mdist:
 	nsteps = mdist; # don't overshoot 
     if nsteps > QUADSIZE:
@@ -3748,7 +3755,7 @@ def drawmaps(mode):
 	    setwnd(lrscan_window)
 	    lrscan_window.clear()
 	    lrscan_window.move(0, 0)
-	    lrscan()
+	    lrscan(silent=False)
 
 def put_srscan_sym(w, sym):
     "Emit symbol for short-range scan."
@@ -5363,30 +5370,34 @@ def report():
                   (i, (_("s"), "")[i==1]))
     skip(1)
 	
-def lrscan():
+def lrscan(silent):
     # long-range sensor scan 
     if damaged(DLRSENS):
 	# Now allow base's sensors if docked 
 	if game.condition != "docked":
-	    prout(_("LONG-RANGE SENSORS DAMAGED."))
+            if not silent:
+                prout(_("LONG-RANGE SENSORS DAMAGED."))
 	    return
-	prout(_("Starbase's long-range scan"))
-    else:
+        if not silent:
+            prout(_("Starbase's long-range scan"))
+    elif not silent:
 	prout(_("Long-range scan"))
     for x in range(game.quadrant.x-1, game.quadrant.x+2):
-        proutn(" ")
+        if not silent:
+            proutn(" ")
         for y in range(game.quadrant.y-1, game.quadrant.y+2):
 	    if not VALID_QUADRANT(x, y):
-		proutn("  -1")
+                if not silent:
+                    proutn("  -1")
 	    else:
 		if not damaged(DRADIO):
 		    game.state.galaxy[x][y].charted = True
 		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons
 		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase
 		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars
-		if game.state.galaxy[x][y].supernova: 
+		if not silent and game.state.galaxy[x][y].supernova: 
 		    proutn(" ***")
-		else:
+		elif not silent:
 		    proutn(" %3d" % (game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars))
 	prout(" ")
 
@@ -5420,6 +5431,8 @@ def rechart():
 def chart():
     # display the star chart  
     chew()
+    if not (game.options & (OPTION_PLAIN | OPTION_ALMY)):
+        lrscan(silent=True)
     if not damaged(DRADIO):
 	rechart()
     if game.lastchart < game.state.date and game.condition == "docked":
@@ -6501,7 +6514,7 @@ def makemoves():
 	elif cmd == "REQUEST":		# status request 
 	    request()
 	elif cmd == "LRSCAN":		# long range scan
-	    lrscan()
+	    lrscan(silent=False)
 	elif cmd == "PHASERS":		# phasers
 	    phasers()
 	    if game.ididit:
@@ -6830,84 +6843,89 @@ def debugme():
 	atover(True)
 
 if __name__ == '__main__':
-    global line, thing, game, idebug, iqengry
-    game = citem = aaitem = inqueue = None
-    line = ''
-    thing = coord()
-    iqengry = False
-    game = gamestate()
-    idebug = 0
-    game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_SHOWME | OPTION_PLAIN | OPTION_ALMY)
-    # Disable curses mode until the game logic is working.
-    #    if os.getenv("TERM"):
-    #	game.options |= OPTION_CURSES | OPTION_SHOWME
-    #    else:
-    game.options |= OPTION_TTY
-    seed = int(time.time())
-    (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
-    for (switch, val) in options:
-        if switch == '-r':
-            try:
-                replayfp = open(val, "r")
-            except IOError:
-		sys.stderr.write("sst: can't open replay file %s\n" % val)
-		raise SystemExit, 1
-            try:
-                line = replayfp.readline().strip()
-                (leader, key, seed) = line.split()
-                seed = eval(seed)
-                sys.stderr.write("sst2k: seed set to %s\n" % seed)
-                line = replayfp.readline().strip()
-                arguments += line.split()[2:]
-            except ValueError:
-		sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
-		os.exit(1)
-	    game.options |= OPTION_TTY
-	    game.options &=~ OPTION_CURSES
-	elif switch == '-t':
-	    game.options |= OPTION_TTY
-	    game.options &=~ OPTION_CURSES
-	elif switch == '-x':
-	    idebug = True
-	else:
-	    sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
-	    os.exit(0)
-    # where to save the input in case of bugs
     try:
-        logfp = open("/usr/tmp/sst-input.log", "w")
-    except IOError:
-        sys.stderr.write("sst: warning, can't open logfile\n")
-    if logfp:
-	logfp.write("# seed %s\n" % seed)
-	logfp.write("# options %s\n" % " ".join(arguments))
-    random.seed(seed)
-    iostart()
-    if arguments:
-        inqueue = arguments
-    else:
-        inqueue = None
-    while True: # Play a game 
-	setwnd(fullscreen_window)
-	clrscr()
-	prelim()
-	setup(needprompt=not inqueue)
-	if game.alldone:
-	    score()
-	    game.alldone = False
-	else:
-	    makemoves()
-	skip(1)
-	stars()
-	skip(1)
-	if game.tourn and game.alldone:
-	    proutn(_("Do you want your score recorded?"))
-	    if ja() == True:
-		chew2()
-		freeze(False)
-        chew()
-	proutn(_("Do you want to play again? "))
-	if not ja():
-	    break
-    skip(1)
-    prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
-    raise SystemExit, 0
+        global line, thing, game, idebug, iqengry
+        game = citem = aaitem = inqueue = None
+        line = ''
+        thing = coord()
+        iqengry = False
+        game = gamestate()
+        idebug = 0
+        game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_PLAIN | OPTION_ALMY)
+        # Disable curses mode until the game logic is working.
+        #    if os.getenv("TERM"):
+        #	game.options |= OPTION_CURSES | OPTION_SHOWME
+        #    else:
+        game.options |= OPTION_TTY
+        seed = int(time.time())
+        (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
+        for (switch, val) in options:
+            if switch == '-r':
+                try:
+                    replayfp = open(val, "r")
+                except IOError:
+                    sys.stderr.write("sst: can't open replay file %s\n" % val)
+                    raise SystemExit, 1
+                try:
+                    line = replayfp.readline().strip()
+                    (leader, key, seed) = line.split()
+                    seed = eval(seed)
+                    sys.stderr.write("sst2k: seed set to %s\n" % seed)
+                    line = replayfp.readline().strip()
+                    arguments += line.split()[2:]
+                except ValueError:
+                    sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
+                    os.exit(1)
+                game.options |= OPTION_TTY
+                game.options &=~ OPTION_CURSES
+            elif switch == '-t':
+                game.options |= OPTION_TTY
+                game.options &=~ OPTION_CURSES
+            elif switch == '-x':
+                idebug = True
+            else:
+                sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
+                os.exit(0)
+        # where to save the input in case of bugs
+        try:
+            logfp = open("/usr/tmp/sst-input.log", "w")
+        except IOError:
+            sys.stderr.write("sst: warning, can't open logfile\n")
+        if logfp:
+            logfp.write("# seed %s\n" % seed)
+            logfp.write("# options %s\n" % " ".join(arguments))
+        random.seed(seed)
+        iostart()
+        if arguments:
+            inqueue = arguments
+        else:
+            inqueue = None
+        while True: # Play a game 
+            setwnd(fullscreen_window)
+            clrscr()
+            prelim()
+            setup(needprompt=not inqueue)
+            if game.alldone:
+                score()
+                game.alldone = False
+            else:
+                makemoves()
+            skip(1)
+            stars()
+            skip(1)
+            if game.tourn and game.alldone:
+                proutn(_("Do you want your score recorded?"))
+                if ja() == True:
+                    chew2()
+                    freeze(False)
+            chew()
+            proutn(_("Do you want to play again? "))
+            if not ja():
+                break
+        skip(1)
+        prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
+        raise SystemExit, 0
+    except KeyboardInterrupt:
+        print""
+        pass
+
