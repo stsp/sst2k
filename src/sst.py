@@ -419,10 +419,11 @@ class enemy:
     def __init__(self, loc=None, power=None):
         if loc:
             self.kloc = loc
+            self.kdist = self.kavgd = distance(game.sector, loc)
         else:
             self.kloc = coord()	# enemy sector location
+            self.kdist = self.kavgd = None
         self.kpower = power	# enemy energy levels
-        self.kdist = self.kavgd = distance(game.sector, e.kloc)
     def __repr__(self):
         return "<%s=%f>" % (self.kloc, self.kpower)	# For debugging
 
@@ -896,7 +897,7 @@ def moveklings():
 	    w = game.enemies[i].kloc
 	    if game.quad[w.x][w.y] == IHK or game.quad[w.x][w.y] == IHR:
 		movebaddy(w, i, game.quad[w.x][w.y])
-    sortklings();
+    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 
 def movescom(iq, avoid):
     # commander movement helper 
@@ -934,7 +935,7 @@ def movescom(iq, avoid):
 	game.nenhere -= 1
 	if game.condition!=docked:
 	    newcnd()
-	sortklings()
+        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     # check for a helpful planet 
     for i in range(game.inplan):
 	if game.state.planets[i].w == game.state.kscmdr and \
@@ -1566,7 +1567,7 @@ def torpedo(course, r, incoming, i, n):
 	prout(_(" displaced by blast to Sector %s ") % jw)
 	for ll in range(game.nenhere):
 	    game.enemies[ll].kdist = game.enemies[ll].kavgd = distance(game.sector,game.enemies[ll].kloc)
-	sortklings()
+        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 	return None
     skip(1)
     prout(_("Torpedo missed."))
@@ -1752,7 +1753,7 @@ def attack(torps_ok):
     # After attack, reset average distance to enemies 
     for loop in range(game.nenhere):
 	game.enemies[loop].kavgd = game.enemies[loop].kdist
-    sortklings()
+    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     return;
 		
 def deadkl(w, type, mv):
@@ -3871,7 +3872,7 @@ def imove(novapush):
                 finald = distance(w, game.enemies[m].kloc)
                 game.enemies[m].kavgd = 0.5 * (finald+game.enemies[m].kdist)
                 game.enemies[m].kdist = finald
-            sortklings()
+            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
                 attack(False)
             for m in range(game.nenhere):
@@ -6294,7 +6295,7 @@ def newqad(shutup):
 		game.quad[QUADSIZE-1][0] = 'X'
 	    if game.quad[QUADSIZE-1][QUADSIZE-1]==IHDOT:
 		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
-    sortklings()
+    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     # Put in a few black holes
     for i in range(1, 3+1):
 	if withprob(0.5): 
@@ -6309,34 +6310,6 @@ def newqad(shutup):
 	    game.quad[QUADSIZE-1][0] = IHDOT
 	if game.quad[QUADSIZE-1][QUADSIZE-1]=='X':
 	    game.quad[QUADSIZE-1][QUADSIZE-1] = IHDOT
-
-def sortklings():
-    # sort Klingons by distance from us 
-    # The author liked bubble sort. So we will use it. :-(
-    if game.nenhere-(thing==game.quadrant)-(game.tholian!=None) < 2:
-	return
-    while True:
-	sw = False
-	for j in range(game.nenhere-1):
-	    if game.enemies[j].kdist > game.enemies[j+1].kdist:
-		sw = True
-		t = game.enemies[j].kdist
-		game.enemies[j].kdist = game.enemies[j+1].kdist
-		game.enemies[j+1].kdist = t
-		t = game.enemies[j].kavgd
-		game.enemies[j].kavgd = game.enemies[j+1].kavgd
-		game.enemies[j+1].kavgd = t
-		k = game.enemies[j].kloc.x
-		game.enemies[j].kloc.x = game.enemies[j+1].kloc.x
-		game.enemies[j+1].kloc.x = k
-		k = game.enemies[j].kloc.y
-		game.enemies[j].kloc.y = game.enemies[j+1].kloc.y
-		game.enemies[j+1].kloc.y = k
-		t = game.enemies[j].kpower
-		game.enemies[j].kpower = game.enemies[j+1].kpower
-		game.enemies[j+1].kpower = t
-        if not sw:
-            break
 
 def setpassword():
     # set the self-destruct password 
@@ -6924,4 +6897,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print""
         pass
-
