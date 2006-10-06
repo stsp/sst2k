@@ -1568,8 +1568,6 @@ def torpedo(course, r, incoming, i, n):
 
 def fry(hit):
     # critical-hit resolution 
-    ktr=1
-    # a critical hit occured 
     if hit < (275.0-25.0*game.skill)*randreal(1.0, 1.5):
 	return
     ncrit = int(1.0 + hit/(500.0+randreal(100)))
@@ -1585,17 +1583,14 @@ def fry(hit):
 	cdam.append(j)
 	extradm = (hit*game.damfac)/(ncrit*randreal(75, 100))
 	game.damage[j] += extradm
-	if loop1 > 0:
-            for loop2 in range(loop1):
-                if j == cdam[loop2]:
-                    break
-	    if loop2 < loop1:
-		continue
-	    ktr += 1
-	    if ktr==3:
-		skip(1)
-	    proutn(_(" and "))
+    skipcount = 0
+    for (i, j) in enumerate(cdam):
 	proutn(device[j])
+        if skipcount % 3 == 2 and i < len(cdam)-1:
+            skip()
+        skipcount += 1
+        if i < len(cdam)-1:
+            proutn(_(" and "))
     prout(_(" damaged."))
     if damaged(DSHIELD) and game.shldup:
 	prout(_("***Shields knocked down."))
@@ -2568,10 +2563,9 @@ def events():
 	    game.iseenit = True
 	    announce()
 	    skip(1)
-	    proutn(_("Lt. Uhura-  \"Captain, the starbase in Quadrant %s") % game.battle)
+	    prout(_("Lt. Uhura-  \"Captain, the starbase in Quadrant %s") % game.battle)
 	    prout(_("   reports that it is under attack and that it can"))
-	    proutn(_("   hold out only until stardate %d") % (int(scheduled(FCDBAS))))
-            prout(".\"")
+	    prout(_("   hold out only until stardate %d.\"") % (int(scheduled(FCDBAS))))
 	    if cancelrest():
                 return
 	elif evcode == FSCDBAS: # Supercommander destroys base 
