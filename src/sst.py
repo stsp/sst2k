@@ -445,7 +445,7 @@ class gamestate:
         self.options = None	# Game options
         self.state = snapshot()	# A snapshot structure
         self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
-        self.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)	# contents of our quadrant
+        self.quad = None	# contents of our quadrant
         self.damage = [0.0] * NDEVICES	# damage encountered
         self.future = []		# future events
         for i in range(NEVENTS):
@@ -1788,7 +1788,8 @@ def targetcheck(w):
     return 1.90985932*math.atan2(deltx, delty)
 
 def photon():
-    # launch photon torpedo 
+    # launch photon torpedo
+    course = [0.0] * MAXBURST
     game.ididit = False
     if damaged(DPHOTON):
 	prout(_("Photon tubes damaged."))
@@ -1809,7 +1810,7 @@ def photon():
 	    proutn(_("Number of torpedoes to fire- "))
 	    key = scan()
 	else: # key == IHREAL  {
-	    n = aaitem + 0.5
+	    n = int(round(aaitem + 0.5))
 	    if n <= 0: # abort command 
 		chew()
 		return
@@ -1941,7 +1942,7 @@ def checkshctrl(rpow):
 
 def hittem(hits):
     # register a phaser hit on Klingons and Romulans
-    nenhr2 = game.nenhere; kk=0
+    nenhr2 = len(game.enemies); kk=0
     w = coord()
     skip(1)
     for (k, wham) in enumerate(hits):
@@ -2022,7 +2023,7 @@ def phasers():
 	key=scan()
 	if key == IHALPHA:
 	    if isit("manual"):
-		if game.nenhere==0:
+		if len(game.enemies)==0:
 		    prout(_("There is no enemy present to select."))
 		    chew()
 		    key = IHEOL
@@ -2031,10 +2032,10 @@ def phasers():
 		    automode = "MANUAL"
 		    key = scan()
 	    elif isit("automatic"):
-		if (not itarg) and game.nenhere != 0:
+		if (not itarg) and len(game.enemies) != 0:
 		    automode = "FORCEMAN"
 		else:
-		    if game.nenhere==0:
+		    if len(game.enemies)==0:
 			prout(_("Energy will be expended into space."))
 		    automode = "AUTOMATIC"
 		    key = scan()
@@ -2044,7 +2045,7 @@ def phasers():
 		huh()
 		return
 	elif key == IHREAL:
-	    if game.nenhere==0:
+	    if len(game.enemies)==0:
 		prout(_("Energy will be expended into space."))
 		automode = "AUTOMATIC"
 	    elif not itarg:
@@ -2053,7 +2054,7 @@ def phasers():
 		automode = "AUTOMATIC"
 	else:
 	    # IHEOL 
-	    if game.nenhere==0:
+	    if len(game.enemies)==0:
 		prout(_("Energy will be expended into space."))
 		automode = "AUTOMATIC"
 	    elif not itarg:
@@ -2068,13 +2069,13 @@ def phasers():
 	if key == IHALPHA and isit("no"):
 	    no = True
 	    key = scan()
-	if key != IHREAL and game.nenhere != 0:
+	if key != IHREAL and len(game.enemies) != 0:
 	    prout(_("Phasers locked on target. Energy available: %.2f")%avail)
 	irec=0
         while True:
 	    chew()
 	    if not kz:
-		for i in range(game.nenhere):
+		for i in range(len(game.enemies)):
 		    irec += math.fabs(game.enemies[i].kpower)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))*randreal(1.01, 1.06) + 1.0
 	    kz=1
 	    proutn(_("%d units required. ") % irec)
@@ -2104,10 +2105,10 @@ def phasers():
 	chew()
 	game.energy -= rpow
 	extra = rpow
-	if game.nenhere:
+	if len(game.enemies):
 	    extra = 0.0
 	    powrem = rpow
-	    for i in range(game.nenhere):
+	    for i in range(len(game.enemies)):
 		hits.append(0.0)
 		if powrem <= 0:
 		    continue
@@ -2127,7 +2128,7 @@ def phasers():
 	if extra > 0 and not game.alldone:
 	    if game.tholian:
 		proutn(_("*** Tholian web absorbs "))
-		if game.nenhere>0:
+		if len(game.enemies)>0:
 		    proutn(_("excess "))
 		prout(_("phaser energy."))
 	    else:
@@ -2147,7 +2148,7 @@ def phasers():
 	    skip(1)
     elif automode == "MANUAL":
 	rpow = 0.0
-        for k in range(game.nenhere):
+        for k in range(len(game.enemies)):
 	    aim = game.enemies[k].kloc
 	    ienm = game.quad[aim.x][aim.y]
 	    if msgflag:
@@ -2701,7 +2702,7 @@ def wait():
     origTime = delay = aaitem
     if delay <= 0.0:
 	return
-    if delay >= game.state.remtime or game.nenhere != 0:
+    if delay >= game.state.remtime or len(game.enemies) != 0:
 	proutn(_("Are you sure? "))
 	if ja() == False:
 	    return
@@ -2714,7 +2715,7 @@ def wait():
 	    prout(_("%d stardates left.") % int(game.state.remtime))
 	    return
 	temp = game.optime = delay
-	if game.nenhere:
+	if len(game.enemies):
 	    rtime = randreal(1.0, 2.0)
 	    if rtime < temp:
 		temp = rtime
@@ -2838,7 +2839,7 @@ def nova(nov):
                 elif iquad == IHK: # kill klingon 
                     deadkl(neighbor, iquad, neighbor)
                 elif iquad in (IHC,IHS,IHR): # Damage/destroy big enemies 
-                    for ll in range(game.nenhere):
+                    for ll in range(len(game.enemies)):
                         if game.enemies[ll].kloc == neighbor:
                             break
                     game.enemies[ll].kpower -= 800.0 # If firepower is lost, die 
@@ -3050,10 +3051,10 @@ def kaboom():
     skip(1)
     stars()
     skip(1)
-    if game.nenhere != 0:
+    if len(game.enemies) != 0:
 	whammo = 25.0 * game.energy
 	l=1
-	while l <= game.nenhere:
+	while l <= len(game.enemies):
 	    if game.enemies[l].kpower*game.enemies[l].kdist <= whammo: 
 		deadkl(game.enemies[l].kloc, game.quad[game.enemies[l].kloc.x][game.enemies[l].kloc.y], game.enemies[l].kloc)
 	    l += 1
@@ -3770,15 +3771,15 @@ def imove(novapush):
     def no_quad_change():
         # No quadrant change -- compute new average enemy distances 
         game.quad[game.sector.x][game.sector.y] = game.ship
-        if game.nenhere:
-            for m in range(game.nenhere):
+        if len(game.enemies):
+            for m in range(len(game.enemies)):
                 finald = distance(w, game.enemies[m].kloc)
                 game.enemies[m].kavgd = 0.5 * (finald+game.enemies[m].kdist)
                 game.enemies[m].kdist = finald
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
                 attack(torps_ok=False)
-            for m in range(game.nenhere):
+            for m in range(len(game.enemies)):
                 game.enemies[m].kavgd = game.enemies[m].kdist
         newcnd()
         drawmaps(0)
@@ -3816,9 +3817,9 @@ def imove(novapush):
 	    if not VALID_SECTOR(w.x, w.y):
 		# Leaving quadrant -- allow final enemy attack 
 		# Don't do it if being pushed by Nova 
-		if game.nenhere != 0 and not novapush:
+		if len(game.enemies) != 0 and not novapush:
 		    newcnd()
-		    for m in range(game.nenhere):
+		    for m in range(len(game.enemies)):
 			finald = distance(w, game.enemies[m].kloc)
 			game.enemies[m].kavgd = 0.5 * (finald + game.enemies[m].kdist)
 		    #
@@ -5100,7 +5101,7 @@ def deathray():
     if game.ship != IHE:
 	prout(_("Ye Faerie Queene has no death ray."))
 	return
-    if game.nenhere==0:
+    if len(game.enemies)==0:
 	prout(_("Sulu-  \"But Sir, there are no enemies in this quadrant.\""))
 	return
     if damaged(DDRAY):
@@ -5132,7 +5133,7 @@ def deathray():
     if r > dprob:
 	prouts(_("Sulu- \"Captain!  It's working!\""))
 	skip(2)
-	while game.nenhere > 0:
+	while len(game.enemies) > 0:
 	    deadkl(game.enemies[1].kloc, game.quad[game.enemies[1].kloc.x][game.enemies[1].kloc.y],game.enemies[1].kloc)
 	prout(_("Ensign Chekov-  \"Congratulations, Captain!\""))
 	if (game.state.remkl + game.state.remcom + game.state.nscrem) == 0:
@@ -5492,7 +5493,6 @@ def srscan():
 	for j in range(QUADSIZE):
 	    sectscan(goodScan, i, j)
 	skip(1)
-			
 			
 def eta():
     # use computer to get estimated time of arrival for a warp jump 
@@ -5944,7 +5944,7 @@ def setup(needprompt):
 	prout(_("  YOU'LL NEED IT."))
     waitfor()
     newqad(False)
-    if game.nenhere - (thing == game.quadrant) - (game.tholian != None):
+    if len(game.enemies) - (thing == game.quadrant) - (game.tholian != None):
 	game.shldup = True
     if game.neutz:	# bad luck to start in a Romulan Neutral Zone
 	attack(torps_ok=False)
@@ -6096,12 +6096,13 @@ def newqad(shutup):
     game.ishere = False
     game.irhere = 0
     game.iplnet = 0
-    game.nenhere = 0
     game.neutz = False
     game.inorbit = False
     game.landed = False
     game.ientesc = False
     game.iseenit = False
+    # Create a blank quadrant
+    game.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)
     if game.iscate:
 	# Attempt to escape Super-commander, so tbeam back!
 	game.iscate = False
@@ -6112,7 +6113,6 @@ def newqad(shutup):
 	return
     game.klhere = q.klingons
     game.irhere = q.romulans
-    game.nenhere = game.klhere + game.irhere
     # Position Starship
     game.quad[game.sector.x][game.sector.y] = game.ship
     game.enemies = []
@@ -6136,7 +6136,7 @@ def newqad(shutup):
 	    game.iscate = (game.state.remkl > 1)
 	    game.ishere = True
     # Put in Romulans if needed
-    for i in range(game.klhere, game.nenhere):
+    for i in range(game.klhere, len(game.enemies)):
         enemy(IHR, loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
     # If quadrant needs a starbase, put it in
     if q.starbase:
