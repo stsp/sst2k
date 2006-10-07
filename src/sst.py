@@ -581,25 +581,6 @@ FTRIBBLE = 19
 FHOLE = 20
 FCREW = 21
 
-# From enumerated type 'COLORS'
-DEFAULT = 0
-BLACK = 1
-BLUE = 2
-GREEN = 3
-CYAN = 4
-RED = 5
-MAGENTA = 6
-BROWN = 7
-LIGHTGRAY = 8
-DARKGRAY = 9
-LIGHTBLUE = 10
-LIGHTGREEN = 11
-LIGHTCYAN = 12
-LIGHTRED = 13
-LIGHTMAGENTA = 14
-YELLOW = 15
-WHITE = 16
-
 # Log the results of pulling random numbers so we can check determinism.
 
 import traceback
@@ -1721,7 +1702,7 @@ def attack(torps_ok):
     prout(_("%d%%,   torpedoes left %d") % (percent, game.torps))
     # Check if anyone was hurt 
     if hitmax >= 200 or hittot >= 500:
-	icas = randrange(hittot * 0.015)
+	icas = randrange(int(hittot * 0.015))
 	if icas >= 2:
 	    skip(1)
 	    prout(_("Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties") % icas)
@@ -1824,6 +1805,7 @@ def photon():
 	    return
 	elif key == IHEOL:
 	    prout(_("%d torpedoes left.") % game.torps)
+            chew()
 	    proutn(_("Number of torpedoes to fire- "))
 	    key = scan()
 	else: # key == IHREAL  {
@@ -1942,7 +1924,7 @@ def checkshctrl(rpow):
     prouts(_("Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""))
     skip(2)
     prout(_("Lt. Uhura-  \"Sir, all decks reporting damage.\""))
-    icas = randrange(hit*0.012)
+    icas = randrange(int(hit*0.012))
     skip(1)
     fry(0.8*hit)
     if icas:
@@ -3523,6 +3505,10 @@ def iostart():
 	setwnd(fullscreen_window)
 	textcolor(DEFAULT)
 
+def textcolor(color):
+    "Set text foreground color.  Presently a stub."
+    pass	# FIXME
+
 def ioend():
     "Wrap up I/O.  Presently a stub."
     pass
@@ -3652,45 +3638,7 @@ def clrscr():
        curwnd.move(0, 0)
        curwnd.refresh()
     linecount = 0
-
-def textcolor(color):
-    "Set the current text color"
-    if game.options & OPTION_CURSES:
-	if color == DEFAULT: 
-	    curwnd.attrset(0)
-	elif color == BLACK: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLACK))
-	elif color == BLUE: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLUE))
-	elif color == GREEN: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_GREEN))
-	elif color == CYAN: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_CYAN))
-	elif color == RED: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_RED))
-	elif color == MAGENTA: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_MAGENTA))
-	elif color == BROWN: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_YELLOW))
-	elif color == LIGHTGRAY: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_WHITE))
-	elif color == DARKGRAY: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLACK) | curses.A_BOLD)
-	elif color == LIGHTBLUE: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_BLUE) | curses.A_BOLD)
-	elif color == LIGHTGREEN: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_GREEN) | curses.A_BOLD)
-	elif color == LIGHTCYAN: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_CYAN) | curses.A_BOLD)
-	elif color == LIGHTRED: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_RED) | curses.A_BOLD)
-	elif color == LIGHTMAGENTA: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_MAGENTA) | curses.A_BOLD)
-	elif color == YELLOW: 
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_YELLOW) | curses.A_BOLD)
-	elif color == WHITE:
-	    curwnd.attron(curses.COLOR_PAIR(curses.COLOR_WHITE) | curses.A_BOLD)
-
+    
 def highvideo():
     "Set highlight video, if this is reasonable."
     if game.options & OPTION_CURSES:
@@ -4647,13 +4595,13 @@ def mayday():
 	proutn(_(" attempt to re-materialize "))
 	crmshp()
 	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
-	textcolor(RED)
+	textcolor("red")
 	warble()
 	if randreal() > probf:
 	    break
 	prout(_("fails."))
 	curses.delay_output(500)
-	textcolor(DEFAULT)
+	textcolor(None)
     if m > 3:
 	game.quad[ix][iy]=IHQUEST
 	game.alive = False
@@ -4662,9 +4610,9 @@ def mayday():
 	finish(FMATERIALIZE)
 	return
     game.quad[ix][iy]=game.ship
-    textcolor(GREEN)
+    textcolor("green")
     prout(_("succeeds."))
-    textcolor(DEFAULT)
+    textcolor(None)
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
@@ -5438,15 +5386,15 @@ def sectscan(goodScan, i, j):
     # light up an individual dot in a sector 
     if goodScan or (abs(i-game.sector.x)<= 1 and abs(j-game.sector.y) <= 1):
 	if (game.quad[i][j]==IHMATER0) or (game.quad[i][j]==IHMATER1) or (game.quad[i][j]==IHMATER2) or (game.quad[i][j]==IHE) or (game.quad[i][j]==IHF):
-	    if game.condition   == "red": textcolor(RED)
-	    elif game.condition == "green": textcolor(GREEN)
-	    elif game.condition == "yellow": textcolor(YELLOW)
-	    elif game.condition == "docked": textcolor(CYAN)
-	    elif game.condition == "dead": textcolor(BROWN)
+	    if game.condition   == "red": textcolor("red")
+	    elif game.condition == "green": textcolor("green")
+	    elif game.condition == "yellow": textcolor("yellow")
+	    elif game.condition == "docked": textcolor("cyan")
+	    elif game.condition == "dead": textcolor("brown")
 	    if game.quad[i][j] != game.ship: 
 		highvideo()
 	proutn("%c " % game.quad[i][j])
-	textcolor(DEFAULT)
+	textcolor(None)
     else:
 	proutn("- ")
 
