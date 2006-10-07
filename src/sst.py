@@ -3511,6 +3511,7 @@ def iostart():
 	#noecho()
         global fullscreen_window, srscan_window, report_window, status_window
         global lrscan_window, message_window, prompt_window
+        (rows, columns)   = stdscr.getmaxyx()
 	fullscreen_window = stdscr
 	srscan_window     = curses.newwin(12, 25, 0,       0)
 	report_window     = curses.newwin(11, 0,  1,       25)
@@ -3522,8 +3523,12 @@ def iostart():
 	setwnd(fullscreen_window)
 	textcolor(DEFAULT)
 
+def ioend():
+    "Wrap up I/O.  Presently a stub."
+    pass
+
 def waitfor():
-    "wait for user action -- OK to do nothing if on a TTY"
+    "Wait for user action -- OK to do nothing if on a TTY"
     if game.options & OPTION_CURSES:
 	stsdcr.getch()
 
@@ -6210,7 +6215,7 @@ def newqad(shutup):
     if shutup==0:
 	# Put in THING if needed
 	if thing == game.quadrant:
-	    enemy(symbol=IHQUEST, loc=dropin(),
+	    enemy(type=IHQUEST, loc=dropin(),
                       power=randreal(6000,6500.0)+250.0*game.skill)
 	    if not damaged(DSRSENS):
 		skip(1)
@@ -6227,7 +6232,7 @@ def newqad(shutup):
 		w.y = withprob(0.5) * (QUADSIZE-1)
                 if game.quad[w.x][w.y] == IHDOT:
                     break
-            game.tholian = enemy(symbol=IHT, loc=w,
+            game.tholian = enemy(type=IHT, loc=w,
                                  power=randrange(100, 500) + 25.0*game.skill)
 	    # Reserve unoccupied corners 
 	    if game.quad[0][0]==IHDOT:
@@ -6810,35 +6815,38 @@ if __name__ == '__main__':
             logfp.write("# seed %s\n" % seed)
             logfp.write("# options %s\n" % " ".join(arguments))
         random.seed(seed)
-        iostart()
         if arguments:
             inqueue = arguments
         else:
             inqueue = None
-        while True: # Play a game 
-            setwnd(fullscreen_window)
-            clrscr()
-            prelim()
-            setup(needprompt=not inqueue)
-            if game.alldone:
-                score()
-                game.alldone = False
-            else:
-                makemoves()
+        try:
+            iostart()
+            while True: # Play a game 
+                setwnd(fullscreen_window)
+                clrscr()
+                prelim()
+                setup(needprompt=not inqueue)
+                if game.alldone:
+                    score()
+                    game.alldone = False
+                else:
+                    makemoves()
+                skip(1)
+                stars()
+                skip(1)
+                if game.tourn and game.alldone:
+                    proutn(_("Do you want your score recorded?"))
+                    if ja() == True:
+                        chew2()
+                        freeze(False)
+                chew()
+                proutn(_("Do you want to play again? "))
+                if not ja():
+                    break
             skip(1)
-            stars()
-            skip(1)
-            if game.tourn and game.alldone:
-                proutn(_("Do you want your score recorded?"))
-                if ja() == True:
-                    chew2()
-                    freeze(False)
-            chew()
-            proutn(_("Do you want to play again? "))
-            if not ja():
-                break
-        skip(1)
-        prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
+            prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
+        finally:
+            ioend()
         raise SystemExit, 0
     except KeyboardInterrupt:
         print""
