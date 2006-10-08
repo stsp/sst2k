@@ -6365,6 +6365,8 @@ def makemoves():
 		if game.options & OPTION_CURSES:
 		    makechart()
 		continue
+            elif scanner.token == "":
+                continue
 	    game.ididit = False
 	    clrscr()
 	    setwnd(message_window)
@@ -6375,7 +6377,7 @@ def makemoves():
                 cmd = candidates[0]
                 break
             elif candidates and not (game.options & OPTION_PLAIN):
-                prout("Commands with that prefix: " + " ".join(candidates))
+                prout("Commands with prefix '%s': %s" % (scanner.token, " ".join(candidates)))
             else:
                 listCommands()
                 continue
@@ -6568,24 +6570,21 @@ class sstscanner:
         # Get a token from the user
         self.real = 0.0
         self.token = ''
-        # Read a line if nothing here
-        if self.inqueue == None:
+        # Fill the token quue if nothing here
+        while self.inqueue == None:
             line = cgetline()
             if curwnd==prompt_window:
                 clrscr()
                 setwnd(message_window)
                 clrscr()
+            if line == '':
+                return None
             # Skip leading white space
             line = line.lstrip()
-            if line:
-                self.inqueue = line.split()
+            if not line:
+                continue
             else:
-                self.inqueue = []
-                self.type = IHEOL
-                return IHEOL
-        elif not self.inqueue:
-            self.type = IHEOL
-            return IHEOL
+                self.inqueue = line.lstrip().split() + [IHEOL] 
         # From here on in it's all looking at the queue
         self.token = self.inqueue.pop(0)
         if self.token == IHEOL:
