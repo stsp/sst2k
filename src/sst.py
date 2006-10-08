@@ -251,6 +251,9 @@ class coord:
     def distance(self, other=None):
         if not other: other = coord(0, 0)
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+    def bearing(self, other=None):
+        if not other: other = coord(0, 0)
+        return 1.90985*math.atan2(self.x-other.x, self.y-other.y)
     def sgn(self):
         s = coord()
         if self.x == 0:
@@ -262,8 +265,6 @@ class coord:
         else:
             s.y = self.y / abs(self.y)
         return s
-    def course(self):
-        return 1.90985*math.atan2(self.y, self.x)
     def scatter(self):
         s = coord()
         s.x = self.x + randrange(-1, 2)
@@ -1631,6 +1632,7 @@ def attack(torps_ok):
 	    hit = enemy.kpower*math.pow(dustfac,enemy.kavgd)
 	    enemy.kpower *= 0.75
 	else: # Enemy uses photon torpedo 
+	    #course2 = (enemy.kloc-game.sector).bearing()
 	    course = 1.90985*math.atan2(game.sector.y-enemy.kloc.y, enemy.kloc.x-game.sector.x)
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
@@ -1777,20 +1779,19 @@ def deadkl(w, type, mv):
     return
 
 def targetcheck(w):
-    # Return None if target is invalid 
+    # Return None if target is invalid, otherwise return a course angle
     if not VALID_SECTOR(w.x, w.y):
 	huh()
 	return None
-    deltx = 0.1*(w.y - game.sector.y)
-    delty = 0.1*(w.x - game.sector.x)
-    if deltx==0 and delty== 0:
+    delta = 0.1*(w - game.sector)
+    if delta.x==0 and delta.y== 0:
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
 	prout(_("  I recommend an immediate review of"))
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return 1.90985932*math.atan2(deltx, delty)
+    return delta.bearing()
 
 def photon():
     # launch photon torpedo
@@ -3768,8 +3769,8 @@ def imove(novapush):
         game.quad[game.sector.x][game.sector.y] = game.ship
         if game.enemies:
             for enemy in game.enemies:
-                finald = (w-game.enemy.kloc).distance()
-                enemy.kavgd = 0.5 * (finald + ememy.kdist)
+                finald = (w-enemy.kloc).distance()
+                enemy.kavgd = 0.5 * (finald + enemy.kdist)
                 enemy.kdist = finald
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
@@ -4080,8 +4081,9 @@ def getcourse(isprobe, akey):
 	    else:
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
-	deltax = dquad.y-game.quadrant.y + 0.1*(dsect.x-game.sector.y)
-	deltay = game.quadrant.x-dquad.x + 0.1*(game.sector.x-dsect.y)
+        delta = coord()
+	delta.x = dquad.y-game.quadrant.y + 0.1*(dsect.x-game.sector.y)
+	delta.y = game.quadrant.x-dquad.x + 0.1*(game.sector.x-dsect.y)
     else: # manual 
 	while key == IHEOL:
 	    proutn(_("X and Y displacements- "))
@@ -4092,22 +4094,22 @@ def getcourse(isprobe, akey):
 	if key != IHREAL:
 	    huh()
 	    return False
-	deltax = scanner.real
+	delta.x = scanner.real
 	key = scanner.next()
 	if key != IHREAL:
 	    huh()
 	    return False
-	deltay = scanner.real
+	delta.y = scanner.real
     # Check for zero movement 
-    if deltax == 0 and deltay == 0:
+    if delta.x == 0 and delta.y == 0:
 	scanner.chew()
 	return False
     if itemp == "verbose" and not isprobe:
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
     # Course actually laid in.
-    game.dist = math.sqrt(deltax*deltax + deltay*deltay)
-    game.direc = math.atan2(deltax, deltay)*1.90985932
+    game.dist = delta.distance()
+    game.direc = delta.bearing()
     if game.direc < 0.0:
 	game.direc += 12.0
     scanner.chew()
