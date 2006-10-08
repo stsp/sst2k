@@ -206,11 +206,6 @@ MAXBURST	= 3
 def VALID_QUADRANT(x, y):	return ((x)>=0 and (x)<GALSIZE and (y)>=0 and (y)<GALSIZE)
 def VALID_SECTOR(x, y):	return ((x)>=0 and (x)<QUADSIZE and (y)>=0 and (y)<QUADSIZE)
 
-def square(i):		return ((i)*(i))
-def distance(c1, c2):	return math.sqrt(square(c1.x - c2.x) + square(c1.y - c2.y))
-def invalidate(w):	w.x = w.y = 0
-def is_valid(w):	return (w.x != 0 and w.y != 0)
-
 # How to represent features
 IHR = 'R',
 IHK = 'K',
@@ -249,7 +244,12 @@ class coord:
         return coord(self.x+self.x, self.y+self.y)
     def __sub__(self, other):
         return coord(self.x-other.x, self.y-other.y)
-    def distance(self, other):
+    def __mul__(self, other):
+        return coord(self.x*other, self.y*other)
+    def __rmul__(self, other):
+        return coord(self.x*other, self.y*other)
+    def distance(self, other=None):
+        if not other: other = coord(0, 0)
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
     def sgn(self):
         s = coord()
@@ -262,6 +262,8 @@ class coord:
         else:
             s.y = self.y / abs(self.y)
         return s
+    def course(self):
+        return 1.90985*math.atan2(self.y, self.x)
     def scatter(self):
         s = coord()
         s.x = self.x + randrange(-1, 2)
@@ -435,7 +437,7 @@ class enemy:
         if loc:
             self.kloc = copy.copy(loc)
             game.quad[self.kloc.x][self.kloc.y] = self.type
-            self.kdist = self.kavgd = distance(game.sector, loc)
+            self.kdist = self.kavgd = (game.sector - loc).distance()
         else:
             self.kloc = coord()
             self.kdist = self.kavgd = None
@@ -741,9 +743,9 @@ def movebaddy(enemy):
 	    motion = ((forces + randreal(200))/150.0) - 5.0
 	else:
             if forces > 1000.0: # Very strong -- move in for kill 
-		motion = (1.0-square(randreal()))*dist1 + 1.0
+		motion = (1.0 - randreal())**2 * dist1 + 1.0
 	    if game.condition=="docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
-		motion -= game.skill*(2.0-square(randreal()))
+		motion -= game.skill*(2.0-randreal()**2)
 	if idebug:
 	    proutn("=== MOTION = %d, FORCES = %1.2f, " % (motion, forces))
 	# don't move if no motion 
@@ -947,7 +949,7 @@ def supercommander():
 	    return
 	sc = game.state.kscmdr
 	for i in range(game.state.rembase):
-	    basetbl.append((i, distance(game.state.baseq[i], sc)))
+	    basetbl.append((i, (game.state.baseq[i] - sc).distance()))
 	if game.state.rembase > 1:
             basetbl.sort(lambda x, y: cmp(x[1]. y[1]))
 	# look for nearest base without a commander, no Enterprise, and
@@ -1348,7 +1350,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    crmshp()
 	    prout(".")
 	    hit = 700.0 + randreal(100) - \
-		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    newcnd(); # we're blown out of dock 
 	    # We may be displaced. 
 	    if game.landed or game.condition=="docked":
@@ -1385,7 +1387,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 		    break
 	    kp = math.fabs(e.kpower)
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if kp < h1:
 		h1 = kp
@@ -1443,7 +1445,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
-	    invalidate(game.plnet)
+	    game.plnet.invalidate()
 	    game.quad[w.x][w.y] = IHDOT
 	    if game.landed:
 		# captain perishes on planet 
@@ -1456,7 +1458,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
-	    invalidate(game.plnet)
+	    game.plnet.invalidate()
 	    game.quad[w.x][w.y] = IHDOT
 	    if game.landed:
 		# captain perishes on planet 
@@ -1502,7 +1504,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    return None
 	elif iquad == IHT:  # Hit a Tholian 
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * distance(w, origin) * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
 		game.quad[w.x][w.y] = IHDOT
@@ -1533,7 +1535,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	game.quad[jw.x][jw.y]=iquad
 	prout(_(" displaced by blast to Sector %s ") % jw)
 	for ll in range(len(game.enemies)):
-	    game.enemies[ll].kdist = game.enemies[ll].kavgd = distance(game.sector,game.enemies[ll].kloc)
+	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll]).kloc.distance()
         game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 	return None
     skip(1)
@@ -1629,7 +1631,7 @@ def attack(torps_ok):
 	    hit = enemy.kpower*math.pow(dustfac,enemy.kavgd)
 	    enemy.kpower *= 0.75
 	else: # Enemy uses photon torpedo 
-	    course = 1.90985*math.atan2(game.sector.y-enemy.kloc.y, enemy.kloc.x-game.sector.x)
+	    course = (enemy.kloc - game.sector).course()
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
 	    if not damaged(DSRSENS):
@@ -1779,16 +1781,15 @@ def targetcheck(w):
     if not VALID_SECTOR(w.x, w.y):
 	huh()
 	return None
-    deltx = 0.1*(w.y - game.sector.y)
-    delty = 0.1*(w.x - game.sector.x)
-    if deltx==0 and delty== 0:
+    delt = 0.1*(w - game.sector)
+    if delt.x==0 and delt.y==0:
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
 	prout(_("  I recommend an immediate review of"))
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return 1.90985932*math.atan2(deltx, delty)
+    return delt.course()
 
 def photon():
     # launch photon torpedo
@@ -2161,7 +2162,7 @@ def phasers():
 		msgflag = False
 		rpow = 0.0
 	    if damaged(DSRSENS) and \
-               not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
+                   (aim-game.sector).distance()>2**0.5 and ienm in (IHC, IHS):
 		cramen(ienm)
 		prout(_(" can't be located without short range scan."))
 		scanner.chew()
@@ -2371,7 +2372,7 @@ def events():
             game.battle = hold
             game.isatb = 0
         else:
-            invalidate(game.battle)
+            game.battle.invalidate()
 
     if idebug:
 	prout("=== EVENTS from %.2f to %.2f:" % (game.state.date, fintim))
@@ -2468,7 +2469,7 @@ def events():
                  (game.torps < 5 or damaged(DPHOTON))):
 		# Tractor-beam her! 
 		istract = ictbeam = True
-                tractorbeam(distance(game.state.kscmdr, game.quadrant))
+                tractorbeam((game.state.kscmdr-game.quadrant).distance())
 	    else:
 		return
 	elif evcode == FTBEAM: # Tractor beam 
@@ -2476,7 +2477,7 @@ def events():
                 unschedule(FTBEAM)
                 continue
             i = randrange(game.state.remcom)
-            yank = distance(game.state.kcmdr[i], game.quadrant)
+            yank = (game.state.kcmdr[i]-game.quadrant).distance()
             if istract or game.condition == "docked" or yank == 0:
                 # Drats! Have to reschedule 
                 schedule(FTBEAM, 
@@ -2543,7 +2544,7 @@ def events():
 		if i > game.state.remcom or game.state.rembase == 0 or \
 		    not game.state.galaxy[game.battle.x][game.battle.y].starbase:
 		    # No action to take after all 
-		    invalidate(game.battle)
+		    game.battle.invalidate()
 		    continue
             destroybase()
 	elif evcode == FSCMOVE: # Supercommander moves 
@@ -2803,7 +2804,7 @@ def nova(nov):
                     prout(_(" destroyed."))
                     game.iplnet.pclass = "destroyed"
                     game.iplnet = None
-                    invalidate(game.plnet)
+                    game.plnet.invalidate()
                     if game.landed:
                         finish(FPNOVA)
                         return
@@ -2815,7 +2816,7 @@ def nova(nov):
                             break
                     game.state.baseq[i] = game.state.baseq[game.state.rembase]
                     game.state.rembase -= 1
-                    invalidate(game.base)
+                    game.base.invalidate()
                     game.state.basekl += 1
                     newcnd()
                     crmena(True, IHB, "sector", neighbor)
@@ -2936,13 +2937,12 @@ def supernova(induced, w=None):
 	prouts(_("***RED ALERT!  RED ALERT!"))
 	skip(1)
 	prout(_("***Incipient supernova detected at Sector %s") % ns)
-	if square(ns.x-game.sector.x) + square(ns.y-game.sector.y) <= 2.1:
+	if (ns-game - sector).distance() <= 2.1**0.5:
 	    proutn(_("Emergency override attempts t"))
 	    prouts("***************")
 	    skip(1)
 	    stars()
 	    game.alldone = True
-
     # destroy any Klingons in supernovaed quadrant 
     kldead = game.state.galaxy[nq.x][nq.y].klingons
     game.state.galaxy[nq.x][nq.y].klingons = 0
@@ -2952,17 +2952,13 @@ def supernova(induced, w=None):
 	game.iscate = False
 	unschedule(FSCMOVE)
 	unschedule(FSCDBAS)
-    if game.state.remcom:
-	maxloop = game.state.remcom
-	for l in range(maxloop):
-	    if game.state.kcmdr[l] == nq:
-		game.state.kcmdr[l] = game.state.kcmdr[game.state.remcom]
-		invalidate(game.state.kcmdr[game.state.remcom])
-		game.state.remcom -= 1
-		kldead -= 1
-		if game.state.remcom==0:
-		    unschedule(FTBEAM)
-		break
+    survivors = filter(lambda w: w != nq, game.state.kcmdr)
+    comkills = len(game.state.kcmdr) - len(survivors)
+    game.state.kcmdr = survivors
+    kldead -= comkills
+    game.state.remcom -= comkills
+    if game.state.remcom==0:
+        unschedule(FTBEAM)
     game.state.remkl -= kldead
     # destroy Romulans and planets in supernovaed quadrant 
     nrmdead = game.state.galaxy[nq.x][nq.y].romulans
@@ -2979,7 +2975,7 @@ def supernova(induced, w=None):
 	for loop in range(maxloop):
 	    if game.state.baseq[loop] == nq:
 		game.state.baseq[loop] = game.state.baseq[game.state.rembase]
-		invalidate(game.state.baseq[game.state.rembase])
+		game.state.baseq[game.state.rembase].invalidate()
 		game.state.rembase -= 1
 		break
     # If starship caused supernova, tally up destruction 
@@ -3775,16 +3771,16 @@ def imove(novapush):
     def no_quad_change():
         # No quadrant change -- compute new average enemy distances 
         game.quad[game.sector.x][game.sector.y] = game.ship
-        if len(game.enemies):
-            for m in range(len(game.enemies)):
-                finald = distance(w, game.enemies[m].kloc)
-                game.enemies[m].kavgd = 0.5 * (finald+game.enemies[m].kdist)
-                game.enemies[m].kdist = finald
+        if game.enemies:
+            for enemy in game.enemies:
+                finald = (w-game.enemy.kloc).distance()
+                enemy.kavgd = 0.5 * (finald + ememy.kdist)
+                enemy.kdist = finald
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
                 attack(torps_ok=False)
-            for m in range(len(game.enemies)):
-                game.enemies[m].kavgd = game.enemies[m].kdist
+            for enemy in game.enemies:
+                enemy.kavgd = enemy.kdist
         newcnd()
         drawmaps(0)
         setwnd(message_window)
@@ -3823,9 +3819,9 @@ def imove(novapush):
 		# Don't do it if being pushed by Nova 
 		if len(game.enemies) != 0 and not novapush:
 		    newcnd()
-		    for m in range(len(game.enemies)):
-			finald = distance(w, game.enemies[m].kloc)
-			game.enemies[m].kavgd = 0.5 * (finald + game.enemies[m].kdist)
+		    for enemy in game.enemies:
+			finald = (w - enemy.kloc).distance()
+			enemy.kavgd = 0.5 * (finald + enemy.kdist)
 		    #
 		    # Stas Sergeev added the condition
 		    # that attacks only happen if Klingons
@@ -3888,7 +3884,7 @@ def imove(novapush):
 	    if iquad != IHDOT:
 		# object encountered in flight path 
 		stopegy = 50.0*game.dist/game.optime
-		game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
+		game.dist = (game.sector - w).distance() / (QUADSIZE * 1.0)
                 if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
 		    game.sector = w
                     for enemy in game.enemies:
@@ -3953,7 +3949,7 @@ def dock(verbose):
     if game.inorbit:
 	prout(_("You must first leave standard orbit."))
 	return
-    if not is_valid(game.base) or abs(game.sector.x-game.base.x) > 1 or abs(game.sector.y-game.base.y) > 1:
+    if not game.base.is_valid() or abs(game.sector.x-game.base.x) > 1 or abs(game.sector.y-game.base.y) > 1:
 	crmshp()
 	prout(_(" not adjacent to base."))
 	return
@@ -4115,8 +4111,8 @@ def getcourse(isprobe, akey):
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
     # Course actually laid in.
-    game.dist = math.sqrt(deltax*deltax + deltay*deltay)
-    game.direc = math.atan2(deltax, deltay)*1.90985932
+    game.dist = coord(deltax, deltay).distance()
+    game.direc = coord(deltax, deltay).course()
     if game.direc < 0.0:
 	game.direc += 12.0
     scanner.chew()
@@ -4227,7 +4223,7 @@ def warp(timewarp):
     if game.warpfac > 6.0:
 	# Decide if engine damage will occur
         # ESR: Seems wrong. Probability of damage goes *down* with distance? 
-	prob = game.dist*square(6.0-game.warpfac)/66.666666666
+	prob = game.dist*(6.0-game.warpfac)**2/66.666666666
 	if prob > randreal():
 	    blooey = True
 	    game.dist = randreal(game.dist)
@@ -4429,7 +4425,7 @@ def timwrp():
 	game.isatb = 0
 	unschedule(FCDBAS)
 	unschedule(FSCDBAS)
-	invalidate(game.battle)
+	game.battle.invalidate()
 
 	# Make sure Galileo is consistant -- Snapshot may have been taken
         # when on planet, which would give us two Galileos! 
@@ -4564,11 +4560,11 @@ def mayday():
     game.nhelp += 1
     if game.base.x!=0:
 	# There's one in this quadrant 
-	ddist = distance(game.base, game.sector)
+	ddist = (game.base - game.sector).distance()
     else:
 	ddist = FOREVER
 	for m in range(game.state.rembase):
-	    xdist = QUADSIZE * distance(game.state.baseq[m], game.quadrant)
+	    xdist = QUADSIZE * (game.state.baseq[m] - game.quadrant).distance()
 	    if xdist < ddist:
 		ddist = xdist
 		line = m
@@ -4587,7 +4583,7 @@ def mayday():
 	    # found one -- finish up 
             game.sector = w
 	    break
-    if not is_valid(game.sector):
+    if not game.sector.is_valid():
 	prout(_("You have been lost in space..."))
 	finish(FMATERIALIZE)
 	return
@@ -4786,7 +4782,7 @@ def orbit():
     if damaged(DWARPEN) and damaged(DIMPULS):
 	prout(_("Both warp and impulse engines damaged."))
 	return
-    if not is_valid(game.plnet) or abs(game.sector.x-game.plnet.x) > 1 or abs(game.sector.y-game.plnet.y) > 1:
+    if not game.plnet.is_valid() or abs(game.sector.x-game.plnet.x) > 1 or abs(game.sector.y-game.plnet.y) > 1:
 	crmshp()
 	prout(_(" not adjacent to planet."))
 	skip(1)
@@ -5536,8 +5532,7 @@ def eta():
     if not VALID_QUADRANT(w1.x, w1.y) or not VALID_SECTOR(w2.x, w2.y):
 	huh()
 	return
-    game.dist = math.sqrt(square(w1.y-game.quadrant.y+0.1*(w2.y-game.sector.y))+
-		square(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x)))
+    game.dist = ((w1 - game.quadrant) + 0.1 * (w2 - game.sector)).distance()
     wfl = False
     if prompt:
 	prout(_("Answer \"no\" if you don't know the value:"))
@@ -5568,7 +5563,7 @@ def eta():
 	prout(_("Captain, certainly you can give me one of these."))
     while True:
 	scanner.chew()
-	ttime = (10.0*game.dist)/square(twarp)
+	ttime = (10.0*game.dist)/twarp**2
 	tpower = game.dist*twarp*twarp*twarp*(game.shldup+1)
 	if tpower >= game.energy:
 	    prout(_("Insufficient energy, sir."))
@@ -5832,7 +5827,7 @@ def setup():
             # so it did them in the opposite order.
             for j in range(1, i):
 		# Improved placement algorithm to spread out bases
-		distq = w.distance(game.state.baseq[j])
+		distq = (w - game.state.baseq[j]).distance()
 		if distq < 6.0*(BASEMAX+1-game.inbase) and withprob(0.75):
 		    contflag = True
 		    if idebug:
