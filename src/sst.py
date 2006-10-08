@@ -1535,7 +1535,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	game.quad[jw.x][jw.y]=iquad
 	prout(_(" displaced by blast to Sector %s ") % jw)
 	for ll in range(len(game.enemies)):
-	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll]).kloc.distance()
+	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll].kloc).distance()
         game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 	return None
     skip(1)
@@ -1627,11 +1627,11 @@ def attack(torps_ok):
 	    if game.condition == "docked":
 		continue; # Don't waste the effort! 
 	    attempt = True; # Attempt to attack 
-	    dustfac = 0.8 + randreal(0.5)
+	    dustfac = randreal(0.8, 0.85)
 	    hit = enemy.kpower*math.pow(dustfac,enemy.kavgd)
 	    enemy.kpower *= 0.75
 	else: # Enemy uses photon torpedo 
-	    course = (enemy.kloc - game.sector).course()
+	    course = 1.90985*math.atan2(game.sector.y-enemy.kloc.y, enemy.kloc.x-game.sector.x)
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
 	    if not damaged(DSRSENS):
@@ -1781,15 +1781,16 @@ def targetcheck(w):
     if not VALID_SECTOR(w.x, w.y):
 	huh()
 	return None
-    delt = 0.1*(w - game.sector)
-    if delt.x==0 and delt.y==0:
+    deltx = 0.1*(w.y - game.sector.y)
+    delty = 0.1*(w.x - game.sector.x)
+    if deltx==0 and delty== 0:
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
 	prout(_("  I recommend an immediate review of"))
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return delt.course()
+    return 1.90985932*math.atan2(deltx, delty)
 
 def photon():
     # launch photon torpedo
@@ -2162,7 +2163,7 @@ def phasers():
 		msgflag = False
 		rpow = 0.0
 	    if damaged(DSRSENS) and \
-                   (aim-game.sector).distance()>2**0.5 and ienm in (IHC, IHS):
+               not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
 		cramen(ienm)
 		prout(_(" can't be located without short range scan."))
 		scanner.chew()
@@ -2937,7 +2938,7 @@ def supernova(induced, w=None):
 	prouts(_("***RED ALERT!  RED ALERT!"))
 	skip(1)
 	prout(_("***Incipient supernova detected at Sector %s") % ns)
-	if (ns-game - sector).distance() <= 2.1**0.5:
+	if (ns.x-game.sector.x)**2 + (ns.y-game.sector.y)**2 <= 2.1:
 	    proutn(_("Emergency override attempts t"))
 	    prouts("***************")
 	    skip(1)
@@ -2969,15 +2970,9 @@ def supernova(induced, w=None):
 	if game.state.planets[loop].w == nq:
 	    game.state.planets[loop].pclass = "destroyed"
 	    npdead += 1
-    # Destroy any base in supernovaed quadrant 
-    if game.state.rembase:
-	maxloop = game.state.rembase
-	for loop in range(maxloop):
-	    if game.state.baseq[loop] == nq:
-		game.state.baseq[loop] = game.state.baseq[game.state.rembase]
-		game.state.baseq[game.state.rembase].invalidate()
-		game.state.rembase -= 1
-		break
+    # Destroy any base in supernovaed quadrant
+    game.state.baseq = filter(lambda x: x != nq, game.state.baseq)
+    game.state.rembase = len(game.state.baseq)
     # If starship caused supernova, tally up destruction 
     if induced:
 	game.state.starkl += game.state.galaxy[nq.x][nq.y].stars
@@ -3934,7 +3929,7 @@ def imove(novapush):
                 # We're here!
 		no_quad_change()
                 return
-	game.dist = distance(game.sector, w) / (QUADSIZE * 1.0)
+	game.dist = (game.sector - w).distance() / (QUADSIZE * 1.0)
 	game.sector = w
     final = game.sector
     no_quad_change()
@@ -4111,8 +4106,8 @@ def getcourse(isprobe, akey):
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
     # Course actually laid in.
-    game.dist = coord(deltax, deltay).distance()
-    game.direc = coord(deltax, deltay).course()
+    game.dist = math.sqrt(deltax*deltax + deltay*deltay)
+    game.direc = math.atan2(deltax, deltay)*1.90985932
     if game.direc < 0.0:
 	game.direc += 12.0
     scanner.chew()
@@ -5532,7 +5527,8 @@ def eta():
     if not VALID_QUADRANT(w1.x, w1.y) or not VALID_SECTOR(w2.x, w2.y):
 	huh()
 	return
-    game.dist = ((w1 - game.quadrant) + 0.1 * (w2 - game.sector)).distance()
+    game.dist = math.sqrt((w1.y-game.quadrant.y+0.1*(w2.y-game.sector.y))**2+
+		(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x))**2)
     wfl = False
     if prompt:
 	prout(_("Answer \"no\" if you don't know the value:"))
@@ -5861,7 +5857,7 @@ def setup():
         if krem <= 0:
             break
     # Position Klingon Commander Ships
-    for i in range(1, game.incom+1):
+    for i in range(game.incom):
         while True:
             w = randplace(GALSIZE)
 	    if (game.state.galaxy[w.x][w.y].klingons or withprob(0.25)) and \
