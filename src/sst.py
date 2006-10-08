@@ -248,7 +248,7 @@ class coord:
     def __add__(self, other):
         return coord(self.x+self.x, self.y+self.y)
     def __sub__(self, other):
-        return coord(self.x-self.x, self.y-self.y)
+        return coord(self.x-other.x, self.y-other.y)
     def distance(self, other):
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
     def sgn(self):
@@ -427,13 +427,17 @@ class enemy:
     def move(self, loc):
         motion = (loc != self.kloc)
         if self.kloc.x is not None and self.kloc.y is not None:
-            game.quad[self.kloc.x][self.kloc.y] = IHDOT
+            if motion:
+                if self.type == IHT:
+                    game.quad[self.kloc.x][self.kloc.y] = IHWEB
+                else:
+                    game.quad[self.kloc.x][self.kloc.y] = IHDOT
         if loc:
-            self.kloc = loc
+            self.kloc = copy.copy(loc)
             game.quad[self.kloc.x][self.kloc.y] = self.type
             self.kdist = self.kavgd = distance(game.sector, loc)
         else:
-            self.kloc = coord()	# enemy sector location
+            self.kloc = coord()
             self.kdist = self.kavgd = None
             game.enemies.remove(self)
         return motion
@@ -1043,41 +1047,40 @@ def supercommander():
     return
 
 def movetholian():
-    # move the Tholian 
+    # move the Tholian
     if not game.tholian or game.justin:
 	return
+    id = coord()
     if game.tholian.kloc.x == 0 and game.tholian.kloc.y == 0:
-	idx = 0; idy = QUADSIZE-1
+	id.x = 0; id.y = QUADSIZE-1
     elif game.tholian.kloc.x == 0 and game.tholian.kloc.y == QUADSIZE-1:
-	idx = QUADSIZE-1; idy = QUADSIZE-1
+	id.x = QUADSIZE-1; id.y = QUADSIZE-1
     elif game.tholian.kloc.x == QUADSIZE-1 and game.tholian.kloc.y == QUADSIZE-1:
-	idx = QUADSIZE-1; idy = 0
+	id.x = QUADSIZE-1; id.y = 0
     elif game.tholian.kloc.x == QUADSIZE-1 and game.tholian.kloc.y == 0:
-	idx = 0; idy = 0
+	id.x = 0; id.y = 0
     else:
 	# something is wrong! 
-	game.tholian = None
+	game.tholian.move(None)
+        prout("***Internal error: Tholian in a bad spot.")
 	return
     # do nothing if we are blocked 
-    if game.quad[idx][idy]!= IHDOT and game.quad[idx][idy]!= IHWEB:
+    if game.quad[id.x][id.y] not in (IHDOT, IHWEB):
 	return
-    game.quad[game.tholian.kloc.x][game.tholian.kloc.y] = IHWEB
-    if game.tholian.kloc.x != idx:
-	# move in x axis 
-	im = math.fabs(idx - game.tholian.kloc.x)*1.0/(idx - game.tholian.kloc.x)
-	while game.tholian.kloc.x != idx:
-	    game.tholian.kloc.x += im
-	    if game.quad[game.tholian.kloc.x][game.tholian.kloc.y]==IHDOT:
-		game.quad[game.tholian.kloc.x][game.tholian.kloc.y] = IHWEB
-    elif game.tholian.kloc.y != idy:
-	# move in y axis 
-	im = math.fabs(idy - game.tholian.kloc.y)*1.0/(idy - game.tholian.kloc.y)
-	while game.tholian.kloc.y != idy:
-	    game.tholian.kloc.y += im
-	    if game.quad[game.tholian.kloc.x][game.tholian.kloc.y]==IHDOT:
-		game.quad[game.tholian.kloc.x][game.tholian.kloc.y] = IHWEB
-    game.quad[game.tholian.kloc.x][game.tholian.kloc.y] = IHT
-    #game.enemies[-1].kloc = game.tholian	#FIXME
+    here = copy.copy(game.tholian.kloc)
+    delta = (id - game.tholian.kloc).sgn()
+    # move in x axis 
+    while here.x != id.x:
+        #print "Moving in X", delta
+        here.x += delta.x
+        if game.quad[here.kloc.x][here.y]==IHDOT:
+            game.tholian.move(here)
+    # move in y axis 
+    while here.y != id.y:
+        #print "Moving in Y", delta
+        here.y += delta.y
+        if game.quad[here.x][here.y]==IHDOT:
+            game.tholian.move(here)
     # check to see if all holes plugged 
     for i in range(QUADSIZE):
 	if game.quad[0][i]!=IHWEB and game.quad[0][i]!=IHT:
@@ -1094,6 +1097,7 @@ def movetholian():
     crmena(True, IHT, "sector", game.tholian)
     prout(_(" completes web."))
     game.tholian.move(None)
+    print "Tholian movement ends"
     return
 
 # Code from battle.c begins here
@@ -1995,7 +1999,7 @@ def phasers():
     automode = "NOTSET"
     key=0
     skip(1)
-    # SR sensors and Computer are needed fopr automode 
+    # SR sensors and Computer are needed for automode 
     if damaged(DSRSENS) or damaged(DCOMPTR):
 	itarg = False
     if game.condition == "docked":
@@ -2156,8 +2160,8 @@ def phasers():
 		skip(1)
 		msgflag = False
 		rpow = 0.0
-	    if damaged(DSRSENS) and not (abs(game.sector.x-aim.x) < 2 and abs(game.sector.y-aim.y) < 2) and \
-		(ienm == IHC or ienm == IHS):
+	    if damaged(DSRSENS) and \
+               not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
 		cramen(ienm)
 		prout(_(" can't be located without short range scan."))
 		chew()
@@ -5959,7 +5963,7 @@ def choose(needprompt):
 	game.length = 0
 	if needprompt: # Can start with command line options 
 	    proutn(_("Would you like a regular, tournament, or saved game? "))
-	scan()
+        print "About to call scan()"
 	if len(citem)==0: # Try again
 	    continue
         if isit("tournament"):
@@ -6409,7 +6413,7 @@ def makemoves():
 	elif cmd == "IMPULSE":		# impulse
 	    impulse()
 	elif cmd == "REST":		# rest
-	    os.wait()
+	    wait()
 	    if game.ididit:
 		hitme = True
 	elif cmd == "WARP":		# warp
