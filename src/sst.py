@@ -5963,7 +5963,7 @@ def choose(needprompt):
 	game.length = 0
 	if needprompt: # Can start with command line options 
 	    proutn(_("Would you like a regular, tournament, or saved game? "))
-        print "About to call scan()"
+        scan()
 	if len(citem)==0: # Try again
 	    continue
         if isit("tournament"):
