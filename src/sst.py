@@ -602,9 +602,9 @@ def randrange(*args):
 def randreal(*args):
     v = random.random()
     if len(args) == 1:
-        v *= args[0] 		# returns from [0, a1)
+        v *= args[0] 		# returns from [0, args[0])
     elif len(args) == 2:
-        v = args[0] + v*args[1]	# returns from [a1, a2)
+        v = args[0] + v*(args[1]-args[0])	# returns from [args[0], args[1])
     #logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
     return v
 
@@ -1073,7 +1073,7 @@ def movetholian():
     while here.x != id.x:
         #print "Moving in X", delta
         here.x += delta.x
-        if game.quad[here.kloc.x][here.y]==IHDOT:
+        if game.quad[here.x][here.y]==IHDOT:
             game.tholian.move(here)
     # move in y axis 
     while here.y != id.y:
@@ -1114,7 +1114,6 @@ def doshield(shraise):
 	    if scanner.sees("transfer"):
 		action = "NRG"
 	    else:
-		scanner.chew()
 		if damaged(DSHIELD):
 		    prout(_("Shields damaged and down."))
 		    return
@@ -1336,7 +1335,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	if not VALID_SECTOR(w.x, w.y):
 	    break
 	iquad=game.quad[w.x][w.y]
-	tracktorpedo(w, step, number, nburst, iquad)
+	tracktorpedo(origin, w, step, number, nburst, iquad)
 	if iquad==IHDOT:
 	    continue
 	# hit something 
@@ -1562,7 +1561,7 @@ def fry(hit):
     for (i, j) in enumerate(cdam):
 	proutn(device[j])
         if skipcount % 3 == 2 and i < len(cdam)-1:
-            skip()
+            skip(1)
         skipcount += 1
         if i < len(cdam)-1:
             proutn(_(" and "))
@@ -1844,17 +1843,17 @@ def photon():
 	if key != IHREAL:
 	    huh()
 	    return
-	targ[i].x = scanner.real
+	targ[i].x = scanner.int()
 	key = scanner.next()
 	if key != IHREAL:
 	    huh()
 	    return
-	targ[i].y = scanner.real
+	targ[i].y = scanner.int()
 	course[i] = targetcheck(targ[i])
         if course[i] == None:
 	    return
     scanner.chew()
-    if i == 1 and key == IHEOL:
+    if i == 0 and key == IHEOL:
 	# prompt for each one 
 	for i in range(n):
 	    proutn(_("Target sector for torpedo number %d- ") % (i+1))
@@ -1862,12 +1861,12 @@ def photon():
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i].x = int(scanner.real-0.5)
+	    targ[i].x = scanner.int()
 	    key = scanner.next()
 	    if key != IHREAL:
 		huh()
 		return
-	    targ[i].y = int(scanner.real-0.5)
+	    targ[i].y = scanner.int()
 	    scanner.chew()
             course[i] = targetcheck(targ[i])
             if course[i] == None:
@@ -1949,6 +1948,7 @@ def hittem(hits):
     nenhr2 = len(game.enemies); kk=0
     w = coord()
     skip(1)
+    print "Hits are:", hits
     for (k, wham) in enumerate(hits):
 	if wham==0:
 	    continue
@@ -3707,13 +3707,13 @@ def warble():
 	#nosound()
         pass
 
-def tracktorpedo(w, step, i, n, iquad):
+def tracktorpedo(origin, w, step, i, n, iquad):
     "Torpedo-track animation." 
     if not game.options & OPTION_CURSES:
 	if step == 1:
 	    if n != 1:
 		skip(1)
-		proutn(_("Track for torpedo number %d-  ") % i)
+		proutn(_("Track for %s torpedo number %d-  ") % (game.quad[origin.x][origin.y],i+1))
 	    else:
 		skip(1)
 		proutn(_("Torpedo track- "))
@@ -5990,7 +5990,7 @@ def choose():
 	    return True
         if scanner.sees("regular"):
 	    break
-	proutn(_("What is \"%s\"?"), scanner.token)
+	proutn(_("What is \"%s\"?") % scanner.token)
 	scanner.chew()
     while game.length==0 or game.skill==SKILL_NONE:
 	if scanner.next() == IHALPHA:
@@ -6571,7 +6571,7 @@ class sstscanner:
         self.real = 0.0
         self.token = ''
         # Fill the token quue if nothing here
-        while self.inqueue == None:
+        while not self.inqueue:
             line = cgetline()
             if curwnd==prompt_window:
                 clrscr()
@@ -6616,7 +6616,7 @@ class sstscanner:
         return s.startswith(self.token)
     def int(self):
         # Round token value to nearest integer
-        return int(round(scanner.real + 0.5))
+        return int(round(scanner.real))
 
 def ja():
     # yes-or-no confirmation 
