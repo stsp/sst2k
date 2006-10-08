@@ -201,6 +201,7 @@ MAXKLQUAD	= 9
 FULLCREW	= 428	# BSD Trek was 387, that's wrong 
 FOREVER 	= 1e30
 MAXBURST	= 3
+MINCMDR 	= 10
 
 # These functions hide the difference between 0-origin and 1-origin addressing.
 def VALID_QUADRANT(x, y):	return ((x)>=0 and (x)<GALSIZE and (y)>=0 and (y)<GALSIZE)
@@ -605,15 +606,20 @@ def randreal(*args):
 
 # Code from ai.c begins here
 
+def welcoming(iq):
+    # Would this quadrant welcome another Klingon?
+    return VALID_QUADRANT(iq.x,iq.y) and \
+	not game.state.galaxy[iq.x][iq.y].supernova or \
+	game.state.galaxy[iq.x][iq.y].klingons < MAXKLQUAD
+
+
 def tryexit(enemy, look, irun):
     # a bad guy attempts to bug out 
     iq = coord()
     iq.x = game.quadrant.x+(look.x+(QUADSIZE-1))/QUADSIZE - 1
     iq.y = game.quadrant.y+(look.y+(QUADSIZE-1))/QUADSIZE - 1
-    if not VALID_QUADRANT(iq.x,iq.y) or \
-	game.state.galaxy[iq.x][iq.y].supernova or \
-	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1:
-	return False; # no can do -- neg energy, supernovae, or >MAXKLQUAD-1 Klingons 
+    if not welcoming(iq):
+	return False;
     if enemy.type == IHR:
 	return False; # Romulans cannot escape! 
     if not irun:
@@ -870,13 +876,9 @@ def moveklings():
 
 def movescom(iq, avoid):
     # commander movement helper 
-    if iq == game.quadrant or not VALID_QUADRANT(iq.x, iq.y) or \
-	game.state.galaxy[iq.x][iq.y].supernova or \
-	game.state.galaxy[iq.x][iq.y].klingons > MAXKLQUAD-1:
-	return 1
     # Avoid quadrants with bases if we want to avoid Enterprise 
-    if avoid and iq in game.state.baseq:
-        return True
+    if not welcoming(iq) or (avoid and iq in game.state.baseq):
+	return True
     if game.justin and not game.iscate:
 	return True
     # do the move 
@@ -944,9 +946,7 @@ def supercommander():
 	ifindit = iwhichb = 0
 	for (i2, base) in enumerate(game.state.baseq):
 	    i = basetbl[i2][0];	# bug in original had it not finding nearest
-	    if base == game.quadrant or base == game.battle or \
-		game.state.galaxy[base.x][base.y].supernova or \
-		game.state.galaxy[base.x][base.y].klingons > MAXKLQUAD-1:
+	    if base==game.quadrant or base==game.battle or not welcoming(base):
 		continue
 	    # if there is a commander, and no other base is appropriate,
 	    # we will take the one with the commander
@@ -5842,7 +5842,7 @@ def setup():
     if game.state.nscrem > 0:
         while True:
             w = randplace(GALSIZE)
-            if not game.state.galaxy[w.x][w.y].supernova and game.state.galaxy[w.x][w.y].klingons <= MAXKLQUAD:
+            if not welcoming(w):
                 break
 	game.state.kscmdr = w
 	game.state.galaxy[w.x][w.y].klingons += 1
@@ -6008,7 +6008,7 @@ def choose():
     game.state.remtime = 7.0 * game.length
     game.intime = game.state.remtime
     game.state.remkl = game.inkling = 2.0*game.intime*((game.skill+1 - 2*randreal())*game.skill*0.1+.15)
-    game.incom = min(10, int(game.skill + 0.0625*game.inkling*randreal()))
+    game.incom = min(MINCMDR, int(game.skill + 0.0625*game.inkling*randreal()))
     game.state.remres = (game.inkling+4*game.incom)*game.intime
     game.inresor = game.state.remres
     if game.inkling > 50:
