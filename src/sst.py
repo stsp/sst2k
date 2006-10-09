@@ -292,14 +292,14 @@ class planet:
 
 class quadrant:
     def __init__(self):
-        self.stars = None
+        self.stars = 0
         self.planet = None
-	self.starbase = None
-	self.klingons = None
-	self.romulans = None
-	self.supernova = None
-	self.charted = None
-        self.status = None	# Could be "secure", "distressed", "enslaved"
+	self.starbase = False
+	self.klingons = 0
+	self.romulans = 0
+	self.supernova = False
+	self.charted = False
+        self.status = "secure"	# Could be "secure", "distressed", "enslaved"
 
 class page:
     def __init__(self):
@@ -4739,7 +4739,10 @@ def orbit():
     if damaged(DWARPEN) and damaged(DIMPULS):
 	prout(_("Both warp and impulse engines damaged."))
 	return
-    if not game.plnet.is_valid() or abs(game.sector.x-game.plnet.x) > 1 or abs(game.sector.y-game.plnet.y) > 1:
+    if not game.plnet.is_valid():
+        prout("There is no planet in this sector.")
+        return
+    if abs(game.sector.x-game.plnet.x)>1 or abs(game.sector.y-game.plnet.y)>1:
 	crmshp()
 	prout(_(" not adjacent to planet."))
 	skip(1)
@@ -5736,16 +5739,6 @@ def setup():
     game.landed = False
     game.alive = True
     game.docfac = 0.25
-    for i in range(GALSIZE):
-	for j in range(GALSIZE):
-	    quad = game.state.galaxy[i][j]
-	    quad.charted = 0
-	    quad.planet = None
-	    quad.romulans = 0
-	    quad.klingons = 0
-	    quad.starbase = False
-	    quad.supernova = False
-	    quad.status = "secure"
     # Starchart is functional but we've never seen it
     game.lastchart = FOREVER
     # Put stars in the galaxy
@@ -5779,8 +5772,7 @@ def setup():
             if not contflag:
                 break
 	game.state.baseq.append(w)
-	game.state.galaxy[w.x][w.y].starbase = True
-	game.state.chart[w.x][w.y].starbase = True
+	game.state.galaxy[w.x][w.y].starbase = game.state.chart[w.x][w.y].starbase = True
     # Position ordinary Klingon Battle Cruisers
     krem = game.inkling
     klumper = 0.25*game.skill*(9.0-game.length)+1.0
@@ -5804,10 +5796,9 @@ def setup():
     for i in range(game.incom):
         while True:
             w = randplace(GALSIZE)
-	    if (game.state.galaxy[w.x][w.y].klingons or withprob(0.25)) and \
-		   not game.state.galaxy[w.x][w.y].supernova and \
-		   game.state.galaxy[w.x][w.y].klingons <= MAXKLQUAD-1 and \
-                   not w in game.state.kcmdr[:i]:
+            if not welcoming(w) or w in game.state.kcmdr:
+                continue
+            if (game.state.galaxy[w.x][w.y].klingons or withprob(0.25)):
                 break
 	game.state.galaxy[w.x][w.y].klingons += 1
 	game.state.kcmdr.append(w)
@@ -6097,6 +6088,7 @@ def newqad(shutup):
 	    game.plnet = dropin(IHP)
 	else:
 	    game.plnet = dropin(IHW)
+        
     # Check for condition
     newcnd()
     # Check for RNZ
@@ -6171,7 +6163,7 @@ def setpassword():
 		break
     else:
         game.passwd = ""
-        for i in range(3):
+        for i in range(8):
 	    game.passwd += chr(ord('a')+randrange(26))
 
 # Code from sst.c begins here
