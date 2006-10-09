@@ -1453,11 +1453,9 @@ def torpedo(course, dispersion, origin, number, nburst):
 		skip(1)
 		deadkl(w, iquad, w)
 	    else:
-		#
 		# Stas Sergeev added the possibility that
 		# you can shove the Thingy and piss it off.
 		# It then becomes an enemy and may fire at you.
-		#
 		thing.angry = True
 		shoved = True
 	    return None
@@ -1542,12 +1540,12 @@ def fry(hit):
 def attack(torps_ok):
     # bad guy attacks us 
     # torps_ok == False forces use of phasers in an attack 
-    attempt = False; ihurt = False;
-    hitmax=0.0; hittot=0.0; chgfac=1.0
-    where = "neither"
     # game could be over at this point, check 
     if game.alldone:
 	return
+    attempt = False; ihurt = False;
+    hitmax=0.0; hittot=0.0; chgfac=1.0
+    where = "neither"
     if idebug:
 	prout("=== ATTACK!")
     # Tholian gets to move before attacking 
@@ -2124,8 +2122,7 @@ def phasers():
 		else:
 		    proutn("??")
 		proutn(")  ")
-		proutn(_("units to fire at %s-  ") % crmena(False, ienm, "sector", aim))
-		
+		proutn(_("units to fire at %s-  ") % crmena(False, ienm, "sector", aim))		
 		key = scanner.next()
 	    if key == IHALPHA and scanner.sees("no"):
 		no = True
@@ -2269,7 +2266,7 @@ def events():
                 game.shldchg = False
             else:
                 prout(_("(Shields not currently useable.)"))
-        newqad(False)
+        newqad()
         # Adjust finish time to time of tractor beaming 
         fintim = game.state.date+game.optime
         attack(torps_ok=False)
@@ -2604,8 +2601,7 @@ def events():
                     else:
                         continue	# search for eligible quadrant failed
                 except "FOUNDIT":
-                    w.x = i
-                    w.y = j
+                    w.x = i; w.y = j
 	    # deliver the child 
 	    game.state.remkl += 1
 	    q.klingons += 1
@@ -3772,7 +3768,7 @@ def imove(novapush):
 		skip(1)
 		prout(_("Entering Quadrant %s.") % game.quadrant)
 		game.quad[game.sector.x][game.sector.y] = game.ship
-		newqad(False)
+		newqad()
 		if game.skill>SKILL_NOVICE:
 		    attack(torps_ok=False)  
 		return
@@ -4342,7 +4338,7 @@ def timwrp():
 	# cheat to make sure no tractor beams occur during time warp 
 	postpone(FTBEAM, game.optime)
 	game.damage[DRADIO] += game.optime
-    newqad(False)
+    newqad()
     events()	# Stas Sergeev added this -- do pending events 
 
 def probe():
@@ -4455,7 +4451,7 @@ def mayday():
 		ddist = xdist
 	# Since starbase not in quadrant, set up new quadrant 
 	game.quadrant = ibq
-	newqad(True)
+	newqad()
     # dematerialize starship 
     game.quad[game.sector.x][game.sector.y]=IHDOT
     proutn(_("Starbase in Quadrant %s responds--%s dematerializes") \
@@ -4578,7 +4574,7 @@ def abandon():
 	if not game.quadrant == game.state.baseq[nb]:
 	    game.quadrant = game.state.baseq[nb]
 	    game.sector.x = game.sector.y = 5
-	    newqad(True)
+	    newqad()
 	while True:
 	    # position next to base by trial and error 
 	    game.quad[game.sector.x][game.sector.y] = IHDOT
@@ -4591,7 +4587,7 @@ def abandon():
 		break # found a spot 
 	    game.sector.x=QUADSIZE/2
 	    game.sector.y=QUADSIZE/2
-	    newqad(True)
+	    newqad()
     # Get new commission 
     game.quad[game.sector.x][game.sector.y] = game.ship = IHF
     game.state.crew = FULLCREW
@@ -5773,9 +5769,14 @@ def setup():
     unschedule(FENSLV)
     unschedule(FREPRO)
     # Place thing (in tournament game, we don't want one!)
+    # New in SST2K: never place the Thing near a starbase.
+    # This makes sense and avoids a special case in the old code.
     global thing
     if game.tourn is None:
-        thing = randplace(GALSIZE)
+        while True:
+            thing = randplace(GALSIZE)
+            if thing not in game.state.baseq:
+                break
     skip(2)
     game.state.snap = False
     if game.skill == SKILL_NOVICE:
@@ -5808,7 +5809,7 @@ def setup():
     if game.state.nscrem:
 	prout(_("  YOU'LL NEED IT."))
     waitfor()
-    newqad(False)
+    newqad()
     if len(game.enemies) - (thing == game.quadrant) - (game.tholian != None):
 	game.shldup = True
     if game.neutz:	# bad luck to start in a Romulan Neutral Zone
@@ -5946,18 +5947,12 @@ def newkling():
     "Drop new Klingon into current quadrant."
     return enemy(IHK, loc=dropin(), power=randreal(300,450)+25.0*game.skill)
 
-def newqad(shutup):
+def newqad():
     "Set up a new state of quadrant, for when we enter or re-enter it."
-    w = coord()
     game.justin = True
-    game.klhere = 0
-    game.irhere = 0
-    game.iplnet = 0
-    game.neutz = False
-    game.inorbit = False
-    game.landed = False
-    game.ientesc = False
-    game.iseenit = False
+    game.iplnet = None
+    game.neutz = game.inorbit = game.landed = False
+    game.ientesc = game.iseenit = False
     # Create a blank quadrant
     game.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)
     if game.iscate:
@@ -6015,15 +6010,14 @@ def newqad(shutup):
 	    skip(1)
 	    prout(_("INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."))
 	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
-    if shutup==0:
-	# Put in THING if needed
-	if thing == game.quadrant:
-	    enemy(type=IHQUEST, loc=dropin(),
-                      power=randreal(6000,6500.0)+250.0*game.skill)
-	    if not damaged(DSRSENS):
-		skip(1)
-		prout(_("Mr. Spock- \"Captain, this is most unusual."))
-		prout(_("    Please examine your short-range scan.\""))
+    # Put in THING if needed
+    if thing == game.quadrant:
+        enemy(type=IHQUEST, loc=dropin(),
+                  power=randreal(6000,6500.0)+250.0*game.skill)
+        if not damaged(DSRSENS):
+            skip(1)
+            prout(_("Mr. Spock- \"Captain, this is most unusual."))
+            prout(_("    Please examine your short-range scan.\""))
     # Decide if quadrant needs a Tholian; lighten up if skill is low 
     if game.options & OPTION_THOLIAN:
 	if (game.skill < SKILL_GOOD and withprob(0.02)) or \
