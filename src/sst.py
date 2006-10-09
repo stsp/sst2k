@@ -1196,8 +1196,7 @@ def doshield(shraise):
 	return
 
 def randdevice():
-    # choose a device to damage, at random. 
-    #
+    "Choose a device to damage, at random."
     # Quoth Eric Allman in the code of BSD-Trek:
     # "Under certain conditions you can get a critical hit.  This
     # sort of hit damages devices.  The probability that a given
@@ -1220,7 +1219,6 @@ def randdevice():
     # We don't have a cloaking device.  The shuttle got the allocation
     # for the cloaking device, then we shaved a half-percent off
     # everything to have some weight to give DSHCTRL/DDRAY/DDSP.
-    # 
     weights = (
 	105,	# DSRSENS: short range scanners	10.5% 
 	105,	# DLRSENS: long range scanners		10.5% 
@@ -1270,11 +1268,9 @@ def collision(rammed, enemy):
     prout(_("***Sickbay reports %d casualties"), icas)
     game.casual += icas
     game.state.crew -= icas
-    #
     # In the pre-SST2K version, all devices got equiprobably damaged,
     # which was silly.  Instead, pick up to half the devices at
     # random according to our weighting table,
-    # 
     ncrits = randrange(NDEVICES/2)
     for m in range(ncrits):
 	dev = randdevice()
@@ -4144,7 +4140,6 @@ def warp(timewarp):
 		bigger = math.fabs(deltax)
 	    else:
 		bigger = math.fabs(deltay)
-			
 	    deltax /= bigger
 	    deltay /= bigger
 	    n = 10.0 * game.dist * bigger +0.5
@@ -4572,7 +4567,6 @@ def abandon():
 		    game.state.crew)
 	    game.casual += game.state.crew
 	    game.abandoned += game.state.crew
-
 	# If at least one base left, give 'em the Faerie Queene 
 	skip(1)
 	game.icrystl = False # crystals are lost 
@@ -5499,7 +5493,6 @@ def eta():
 	    scanner.chew()
 	    skip(1)
 	    return
-			
 
 # Code from setup.c begins here
 
@@ -5931,7 +5924,6 @@ def choose():
 
 def dropin(iquad=None):
     "Drop a feature on a random dot in the current quadrant."
-    w = coord()
     while True:
         w = randplace(QUADSIZE)
         if game.quad[w.x][w.y] == IHDOT:
@@ -6132,18 +6124,14 @@ commands = {
     "HELP":		0,
 }
 
-def ACCEPT(cmd):	return (not commands[cmd] or (commands[cmd] & game.options))
-
 def listCommands():
     "Generate a list of legal commands."
-    k = 0
     proutn(_("LEGAL COMMANDS ARE:"))
-    for key in commands:
-	if ACCEPT(key):
+    for (k, key) in enumerate(commands):
+	if not commands[cmd] or (commands[key] & game.options):
             if k % 5 == 0:
                 skip(1)
             proutn("%-12s " % key) 
-            k += 1
     skip(1)
 
 def helpme():
@@ -6204,7 +6192,6 @@ def helpme():
 
 def makemoves():
     "Command-interpretation loop."
-    v = 0
     clrscr()
     setwnd(message_window)
     while True: 	# command loop 
@@ -6392,13 +6379,7 @@ def crmena(stars, enemy, loctype, w):
 
 def crmshp():
     "Emit our ship name." 
-    if game.ship == IHE:
-        s = _("Enterprise")
-    elif game.ship == IHF:
-        s = _("Faerie Queene")
-    else:
-        s = "Ship???"
-    return s
+    return{IHE:_("Enterprise"),IHF:_("Faerie Queene")}.get(game.ship,"Ship???")
 
 def stars():
     "Emit a line of stars" 
@@ -6530,9 +6511,7 @@ def debugme():
     proutn("Cause selective damage? ")
     if ja() == True:
 	for i in range(NDEVICES):
-	    proutn("Kill ")
-	    proutn(device[i])
-	    proutn("? ")
+	    proutn("Kill %s?" % device[i])
 	    scanner.chew()
 	    key = scanner.next()
             if key == IHALPHA and scanner.sees("y"):
