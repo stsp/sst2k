@@ -240,7 +240,7 @@ class coord:
     def is_valid(self):
         return self.x != None and self.y != None
     def __eq__(self, other):
-        return other != None and self.x == other.y and self.x == other.y
+        return other != None and self.x == other.y and self.y == other.y
     def __add__(self, other):
         return coord(self.x+other.x, self.y+other.y)
     def __sub__(self, other):
@@ -1734,8 +1734,8 @@ def targetcheck(w):
 	return None
     delta = coord()
     # FIXME: C code this was translated from is wacky -- why the sign reversal?
-    delta.y = 0.1*(w.y - game.sector.y);
-    delta.x = 0.1*(game.sector.x - w.x);
+    delta.y = (w.y - game.sector.y);
+    delta.x = (game.sector.x - w.x);
     if delta == coord(0, 0):
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
