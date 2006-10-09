@@ -242,7 +242,7 @@ class coord:
     def __eq__(self, other):
         return other != None and self.x == other.y and self.x == other.y
     def __add__(self, other):
-        return coord(self.x+self.x, self.y+self.y)
+        return coord(self.x+other.x, self.y+other.y)
     def __sub__(self, other):
         return coord(self.x-other.x, self.y-other.y)
     def __mul__(self, other):
@@ -615,9 +615,8 @@ def randreal(*args):
 def welcoming(iq):
     "Would this quadrant welcome another Klingon?"
     return VALID_QUADRANT(iq.x,iq.y) and \
-	not game.state.galaxy[iq.x][iq.y].supernova or \
+	not game.state.galaxy[iq.x][iq.y].supernova and \
 	game.state.galaxy[iq.x][iq.y].klingons < MAXKLQUAD
-
 
 def tryexit(enemy, look, irun):
     "A bad guy attempts to bug out."
@@ -3987,12 +3986,12 @@ def getcourse(isprobe, akey):
 	if key != IHREAL:
 	    huh()
 	    return False
-	delta.x = scanner.real
+	delta.y = scanner.real
 	key = scanner.next()
 	if key != IHREAL:
 	    huh()
 	    return False
-	delta.y = scanner.real
+	delta.x = scanner.real
     # Check for zero movement 
     if delta.x == 0 and delta.y == 0:
 	scanner.chew()
