@@ -233,56 +233,56 @@ IHALPHA = " "
 
 class coord:
     def __init__(self, x=None, y=None):
-        self.x = x
-        self.y = y
+        self.i = x
+        self.j = y
     def invalidate(self):
-        self.x = self.y = None
+        self.i = self.j = None
     def is_valid(self):
-        return self.x != None and self.y != None
+        return self.i != None and self.j != None
     def __eq__(self, other):
-        return other != None and self.x == other.x and self.y == other.y
+        return other != None and self.i == other.i and self.j == other.j
     def __add__(self, other):
-        return coord(self.x+other.x, self.y+other.y)
+        return coord(self.i+other.i, self.j+other.j)
     def __sub__(self, other):
-        return coord(self.x-other.x, self.y-other.y)
+        return coord(self.i-other.i, self.j-other.j)
     def __mul__(self, other):
-        return coord(self.x*other, self.y*other)
+        return coord(self.i*other, self.j*other)
     def __rmul__(self, other):
-        return coord(self.x*other, self.y*other)
+        return coord(self.i*other, self.j*other)
     def __div__(self, other):
-        return coord(self.x/other, self.y/other)
+        return coord(self.i/other, self.j/other)
     def __rdiv__(self, other):
-        return coord(self.x/other, self.y/other)
+        return coord(self.i/other, self.j/other)
     def snaptogrid(self):
-        return coord(int(round(self.x)), int(round(self.y)))
+        return coord(int(round(self.i)), int(round(self.j)))
     def distance(self, other=None):
         if not other: other = coord(0, 0)
-        return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+        return math.sqrt((self.i - other.i)**2 + (self.j - other.j)**2)
     def bearing(self, other=None):
         if not other: other = coord(0, 0)
-        return 1.90985*math.atan2(self.x-other.x, self.y-other.y)
+        return 1.90985*math.atan2(self.i-other.i, self.j-other.j)
     def sgn(self):
         s = coord()
-        if self.x == 0:
-            s.x = 0
+        if self.i == 0:
+            s.i = 0
         else:
-            s.x = self.x / abs(self.x)
-        if self.y == 0:
-            s.y = 0
+            s.i = self.i / abs(self.i)
+        if self.j == 0:
+            s.j = 0
         else:
-            s.y = self.y / abs(self.y)
+            s.j = self.j / abs(self.j)
         return s
     def scatter(self):
         s = coord()
-        s.x = self.x + randrange(-1, 2)
-        s.y = self.y + randrange(-1, 2)
+        s.i = self.i + randrange(-1, 2)
+        s.j = self.j + randrange(-1, 2)
         return s
     def __hash__(self):
         return hash((x, y))
     def __str__(self):
-        if self.x == None or self.y == None:
+        if self.i == None or self.j == None:
             return "Nowhere"
-        return "%s - %s" % (self.x+1, self.y+1)
+        return "%s - %s" % (self.i+1, self.j+1)
     __repr__ = __str__
 
 class planet:
@@ -430,15 +430,15 @@ class enemy:
         game.enemies.append(self)
     def move(self, loc):
         motion = (loc != self.kloc)
-        if self.kloc.x is not None and self.kloc.y is not None:
+        if self.kloc.i is not None and self.kloc.j is not None:
             if motion:
                 if self.type == IHT:
-                    game.quad[self.kloc.x][self.kloc.y] = IHWEB
+                    game.quad[self.kloc.i][self.kloc.j] = IHWEB
                 else:
-                    game.quad[self.kloc.x][self.kloc.y] = IHDOT
+                    game.quad[self.kloc.i][self.kloc.j] = IHDOT
         if loc:
             self.kloc = copy.copy(loc)
-            game.quad[self.kloc.x][self.kloc.y] = self.type
+            game.quad[self.kloc.i][self.kloc.j] = self.type
             self.kdist = self.kavgd = (game.sector - loc).distance()
         else:
             self.kloc = coord()
@@ -614,15 +614,15 @@ def randreal(*args):
 
 def welcoming(iq):
     "Would this quadrant welcome another Klingon?"
-    return VALID_QUADRANT(iq.x,iq.y) and \
-	not game.state.galaxy[iq.x][iq.y].supernova and \
-	game.state.galaxy[iq.x][iq.y].klingons < MAXKLQUAD
+    return VALID_QUADRANT(iq.i,iq.j) and \
+	not game.state.galaxy[iq.i][iq.j].supernova and \
+	game.state.galaxy[iq.i][iq.j].klingons < MAXKLQUAD
 
 def tryexit(enemy, look, irun):
     "A bad guy attempts to bug out."
     iq = coord()
-    iq.x = game.quadrant.x+(look.x+(QUADSIZE-1))/QUADSIZE - 1
-    iq.y = game.quadrant.y+(look.y+(QUADSIZE-1))/QUADSIZE - 1
+    iq.i = game.quadrant.i+(look.i+(QUADSIZE-1))/QUADSIZE - 1
+    iq.j = game.quadrant.j+(look.j+(QUADSIZE-1))/QUADSIZE - 1
     if not welcoming(iq):
 	return False;
     if enemy.type == IHR:
@@ -650,8 +650,8 @@ def tryexit(enemy, look, irun):
     if game.condition != "docked":
 	newcnd()
     # Handle global matters related to escape 
-    game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons -= 1
-    game.state.galaxy[iq.x][iq.y].klingons += 1
+    game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
+    game.state.galaxy[iq.i][iq.j].klingons += 1
     if enemy.type==IHS:
 	game.iscate = False
 	game.ientesc = False
@@ -773,20 +773,20 @@ def movebaddy(enemy):
 	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
     m = game.sector - enemy.kloc
-    if 2.0 * abs(m.x) < abs(m.y):
-	m.x = 0
-    if 2.0 * abs(m.y) < abs(game.sector.x-enemy.kloc.x):
-	m.y = 0
-    if m.x != 0:
-        if m.x*motion < 0:
-            m.x = -1
+    if 2.0 * abs(m.i) < abs(m.j):
+	m.i = 0
+    if 2.0 * abs(m.j) < abs(game.sector.i-enemy.kloc.i):
+	m.j = 0
+    if m.i != 0:
+        if m.i*motion < 0:
+            m.i = -1
         else:
-            m.x = 1
-    if m.y != 0:
-        if m.y*motion < 0:
-            m.y = -1
+            m.i = 1
+    if m.j != 0:
+        if m.j*motion < 0:
+            m.j = -1
         else:
-            m.y = 1
+            m.j = 1
     next = enemy.kloc
     # main move loop 
     for ll in range(nsteps):
@@ -794,11 +794,11 @@ def movebaddy(enemy):
 	    proutn(" %d" % (ll+1))
 	# Check if preferred position available 
 	look = next + m
-        if m.x < 0:
+        if m.i < 0:
             krawlx = 1
         else:
             krawlx = -1
-        if m.y < 0:
+        if m.j < 0:
             krawly = 1
         else:
             krawly = -1
@@ -806,31 +806,31 @@ def movebaddy(enemy):
 	attempts = 0; # Settle mysterious hang problem 
 	while attempts < 20 and not success:
             attempts += 1
-	    if look.x < 0 or look.x >= QUADSIZE:
+	    if look.i < 0 or look.i >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawlx == m.x or m.y == 0:
+		if krawlx == m.i or m.j == 0:
 		    break
-		look.x = next.x + krawlx
+		look.i = next.i + krawlx
 		krawlx = -krawlx
-	    elif look.y < 0 or look.y >= QUADSIZE:
+	    elif look.j < 0 or look.j >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawly == m.y or m.x == 0:
+		if krawly == m.j or m.i == 0:
 		    break
-		look.y = next.y + krawly
+		look.j = next.j + krawly
 		krawly = -krawly
-	    elif (game.options & OPTION_RAMMING) and game.quad[look.x][look.y] != IHDOT:
+	    elif (game.options & OPTION_RAMMING) and game.quad[look.i][look.j] != IHDOT:
 		# See if enemy should ram ship 
-		if game.quad[look.x][look.y] == game.ship and \
+		if game.quad[look.i][look.j] == game.ship and \
 		    (enemy.type == IHC or enemy.type == IHS):
 		    collision(rammed=True, enemy=enemy)
 		    return
-		if krawlx != m.x and m.y != 0:
-		    look.x = next.x + krawlx
+		if krawlx != m.i and m.j != 0:
+		    look.i = next.i + krawlx
 		    krawlx = -krawlx
-		elif krawly != m.y and m.x != 0:
-		    look.y = next.y + krawly
+		elif krawly != m.j and m.i != 0:
+		    look.j = next.j + krawly
 		    krawly = -krawly
 		else:
 		    break; # we have failed 
@@ -885,9 +885,9 @@ def movescom(iq, avoid):
     if game.justin and not game.iscate:
 	return True
     # do the move 
-    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].klingons -= 1
+    game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons -= 1
     game.state.kscmdr = iq
-    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].klingons += 1
+    game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons += 1
     if game.state.kscmdr==game.quadrant:
 	# SC has scooted, Remove him from current quadrant 
 	game.iscate=False
@@ -908,7 +908,7 @@ def movescom(iq, avoid):
 	    game.state.planets[i].crystals == "present":
 	    # destroy the planet 
 	    game.state.planets[i].pclass = "destroyed"
-	    game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].planet = None
+	    game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].planet = None
 	    if communicating():
 		announce()
 		prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
@@ -929,10 +929,10 @@ def supercommander():
     if not game.iscate and avoid:
 	# compute move away from Enterprise 
 	idelta = game.state.kscmdr-game.quadrant
-	if math.sqrt(idelta.x*idelta.x+idelta.y*idelta.y) > 2.0:
+	if math.sqrt(idelta.i*idelta.i+idelta.j*idelta.j) > 2.0:
 	    # circulate in space 
-	    idelta.x = game.state.kscmdr.y-game.quadrant.y
-	    idelta.y = game.quadrant.x-game.state.kscmdr.x
+	    idelta.i = game.state.kscmdr.j-game.quadrant.j
+	    idelta.j = game.quadrant.i-game.state.kscmdr.i
     else:
 	# compute distances to starbases 
 	if not game.state.baseq:
@@ -975,24 +975,24 @@ def supercommander():
     iq = game.state.kscmdr + idelta
     if movescom(iq, avoid):
 	# failed -- try some other maneuvers 
-	if idelta.x==0 or idelta.y==0:
+	if idelta.i==0 or idelta.j==0:
 	    # attempt angle move 
-	    if idelta.x != 0:
-		iq.y = game.state.kscmdr.y + 1
+	    if idelta.i != 0:
+		iq.j = game.state.kscmdr.j + 1
 		if movescom(iq, avoid):
-		    iq.y = game.state.kscmdr.y - 1
+		    iq.j = game.state.kscmdr.j - 1
 		    movescom(iq, avoid)
 	    else:
-		iq.x = game.state.kscmdr.x + 1
+		iq.i = game.state.kscmdr.i + 1
 		if movescom(iq, avoid):
-		    iq.x = game.state.kscmdr.x - 1
+		    iq.i = game.state.kscmdr.i - 1
 		    movescom(iq, avoid)
 	else:
 	    # try moving just in x or y 
-	    iq.y = game.state.kscmdr.y
+	    iq.j = game.state.kscmdr.j
 	    if movescom(iq, avoid):
-		iq.y = game.state.kscmdr.y + idelta.y
-		iq.x = game.state.kscmdr.x
+		iq.j = game.state.kscmdr.j + idelta.j
+		iq.i = game.state.kscmdr.i
 		movescom(iq, avoid)
     # check for a base 
     if len(game.state.baseq) == 0:
@@ -1029,7 +1029,7 @@ def supercommander():
     if not idebug and \
 	(withprob(0.8) or \
 	 (not communicating()) or \
-	 not game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].charted):
+	 not game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].charted):
 	return
     announce()
     prout(_("Lt. Uhura-  \"Captain, Starfleet Intelligence reports"))
@@ -1041,33 +1041,33 @@ def movetholian():
     if not game.tholian or game.justin:
 	return
     id = coord()
-    if game.tholian.kloc.x == 0 and game.tholian.kloc.y == 0:
-	id.x = 0; id.y = QUADSIZE-1
-    elif game.tholian.kloc.x == 0 and game.tholian.kloc.y == QUADSIZE-1:
-	id.x = QUADSIZE-1; id.y = QUADSIZE-1
-    elif game.tholian.kloc.x == QUADSIZE-1 and game.tholian.kloc.y == QUADSIZE-1:
-	id.x = QUADSIZE-1; id.y = 0
-    elif game.tholian.kloc.x == QUADSIZE-1 and game.tholian.kloc.y == 0:
-	id.x = 0; id.y = 0
+    if game.tholian.kloc.i == 0 and game.tholian.kloc.j == 0:
+	id.i = 0; id.j = QUADSIZE-1
+    elif game.tholian.kloc.i == 0 and game.tholian.kloc.j == QUADSIZE-1:
+	id.i = QUADSIZE-1; id.j = QUADSIZE-1
+    elif game.tholian.kloc.i == QUADSIZE-1 and game.tholian.kloc.j == QUADSIZE-1:
+	id.i = QUADSIZE-1; id.j = 0
+    elif game.tholian.kloc.i == QUADSIZE-1 and game.tholian.kloc.j == 0:
+	id.i = 0; id.j = 0
     else:
 	# something is wrong! 
 	game.tholian.move(None)
         prout("***Internal error: Tholian in a bad spot.")
 	return
     # do nothing if we are blocked 
-    if game.quad[id.x][id.y] not in (IHDOT, IHWEB):
+    if game.quad[id.i][id.j] not in (IHDOT, IHWEB):
 	return
     here = copy.copy(game.tholian.kloc)
     delta = (id - game.tholian.kloc).sgn()
     # move in x axis 
-    while here.x != id.x:
-        here.x += delta.x
-        if game.quad[here.x][here.y]==IHDOT:
+    while here.i != id.i:
+        here.i += delta.i
+        if game.quad[here.i][here.j]==IHDOT:
             game.tholian.move(here)
     # move in y axis 
-    while here.y != id.y:
-        here.y += delta.y
-        if game.quad[here.x][here.y]==IHDOT:
+    while here.j != id.j:
+        here.j += delta.j
+        if game.quad[here.i][here.j]==IHDOT:
             game.tholian.move(here)
     # check to see if all holes plugged 
     for i in range(QUADSIZE):
@@ -1080,7 +1080,7 @@ def movetholian():
 	if game.quad[i][QUADSIZE]!=IHWEB and game.quad[i][QUADSIZE]!=IHT:
 	    return
     # All plugged up -- Tholian splits 
-    game.quad[game.tholian.kloc.x][game.tholian.kloc.y]=IHWEB
+    game.quad[game.tholian.kloc.i][game.tholian.kloc.j]=IHWEB
     dropin(IHBLANK)
     prout(crmena(True, IHT, "sector", game.tholian) + _(" completes web."))
     game.tholian.move(None)
@@ -1294,9 +1294,9 @@ def torpedo(origin, course, dispersion, number, nburst):
     angle = (15.0-ac)*0.5235988
     bullseye = (15.0 - course)*0.5235988
     delta = coord(-math.sin(angle), math.cos(angle))          
-    bigger = max(abs(delta.x), abs(delta.y))
+    bigger = max(abs(delta.i), abs(delta.j))
     delta /= bigger
-    x = origin.x; y = origin.y
+    x = origin.i; y = origin.j
     w = coord(0, 0); jw = coord(0, 0)
     if not damaged(DSRSENS) or game.condition=="docked":
 	setwnd(srscan_window)
@@ -1304,12 +1304,12 @@ def torpedo(origin, course, dispersion, number, nburst):
 	setwnd(message_window)
     # Loop to move a single torpedo 
     for step in range(1, 15+1):
-	x += delta.x
-	y += delta.y
+	x += delta.i
+	y += delta.j
 	w = coord(x, y).snaptogrid()
-	if not VALID_SECTOR(w.x, w.y):
+	if not VALID_SECTOR(w.i, w.j):
 	    break
-	iquad=game.quad[w.x][w.y]
+	iquad=game.quad[w.i][w.j]
 	tracktorpedo(origin, w, step, number, nburst, iquad)
 	if iquad==IHDOT:
 	    continue
@@ -1332,14 +1332,14 @@ def torpedo(origin, course, dispersion, number, nburst):
 		temp = math.fabs(math.cos(ang))
 	    xx = -math.sin(ang)/temp
 	    yy = math.cos(ang)/temp
-	    jw.x = int(w.x+xx+0.5)
-	    jw.y = int(w.y+yy+0.5)
-	    if not VALID_SECTOR(jw.x, jw.y):
+	    jw.i = int(w.i+xx+0.5)
+	    jw.j = int(w.j+yy+0.5)
+	    if not VALID_SECTOR(jw.i, jw.j):
 		return hit
-	    if game.quad[jw.x][jw.y]==IHBLANK:
+	    if game.quad[jw.i][jw.j]==IHBLANK:
 		finish(FHOLE)
 		return hit
-	    if game.quad[jw.x][jw.y]!=IHDOT:
+	    if game.quad[jw.i][jw.j]!=IHDOT:
 		# can't move into object 
 		return hit
 	    game.sector = jw
@@ -1376,16 +1376,16 @@ def torpedo(origin, course, dispersion, number, nburst):
 		temp = math.fabs(math.cos(ang))
 	    xx = -math.sin(ang)/temp
 	    yy = math.cos(ang)/temp
-	    jw.x = int(w.x+xx+0.5)
-	    jw.y = int(w.y+yy+0.5)
-	    if not VALID_SECTOR(jw.x, jw.y):
+	    jw.i = int(w.i+xx+0.5)
+	    jw.j = int(w.j+yy+0.5)
+	    if not VALID_SECTOR(jw.i, jw.j):
 		prout(_(" damaged but not destroyed."))
 		return
-	    if game.quad[jw.x][jw.y]==IHBLANK:
+	    if game.quad[jw.i][jw.j]==IHBLANK:
 		prout(_(" buffeted into black hole."))
 		deadkl(w, iquad, jw)
 		return None
-	    if game.quad[jw.x][jw.y]!=IHDOT:
+	    if game.quad[jw.i][jw.j]!=IHDOT:
 		# can't move into object 
 		prout(_(" damaged but not destroyed."))
 		return None
@@ -1397,21 +1397,21 @@ def torpedo(origin, course, dispersion, number, nburst):
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
             game.state.baseq = filter(lambda x: x != game.quadrant, game.state.baseq)
-	    game.quad[w.x][w.y]=IHDOT
+	    game.quad[w.i][w.j]=IHDOT
 	    game.base.invalidate()
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase -= 1
-	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase -= 1
+	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase -= 1
+	    game.state.chart[game.quadrant.i][game.quadrant.j].starbase -= 1
 	    game.state.basekl += 1
 	    newcnd()
 	    return None
 	elif iquad == IHP: # Hit a planet 
 	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nplankl += 1
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
+	    game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
 	    game.plnet.invalidate()
-	    game.quad[w.x][w.y] = IHDOT
+	    game.quad[w.i][w.j] = IHDOT
 	    if game.landed:
 		# captain perishes on planet 
 		finish(FDPLANET)
@@ -1419,11 +1419,11 @@ def torpedo(origin, course, dispersion, number, nburst):
 	elif iquad == IHW: # Hit an inhabited world -- very bad! 
 	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nworldkl += 1
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
+	    game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
 	    game.plnet.invalidate()
-	    game.quad[w.x][w.y] = IHDOT
+	    game.quad[w.i][w.j] = IHDOT
 	    if game.landed:
 		# captain perishes on planet 
 		finish(FDPLANET)
@@ -1467,7 +1467,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
-		game.quad[w.x][w.y] = IHDOT
+		game.quad[w.i][w.j] = IHDOT
 		deadkl(w, iquad, w)
 		game.tholian = None
 		return None
@@ -1478,7 +1478,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 		return None
 	    prout(_(" disappears."))
 	    game.tholian.move(None)
-	    game.quad[w.x][w.y] = IHWEB
+	    game.quad[w.i][w.j] = IHWEB
 	    dropin(IHBLANK)
 	    return None
         else: # Problem!
@@ -1491,8 +1491,8 @@ def torpedo(origin, course, dispersion, number, nburst):
     if curwnd!=message_window:
 	setwnd(message_window)
     if shoved:
-	game.quad[w.x][w.y]=IHDOT
-	game.quad[jw.x][jw.y]=iquad
+	game.quad[w.i][w.j]=IHDOT
+	game.quad[jw.i][jw.j]=iquad
 	prout(_(" displaced by blast to Sector %s ") % jw)
 	for ll in range(len(game.enemies)):
 	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll].kloc).distance()
@@ -1592,7 +1592,7 @@ def attack(torps_ok):
 	    enemy.kpower *= 0.75
 	else: # Enemy uses photon torpedo 
 	    #course2 = (enemy.kloc-game.sector).bearing()
-	    course = 1.90985*math.atan2(game.sector.y-enemy.kloc.y, enemy.kloc.x-game.sector.x)
+	    course = 1.90985*math.atan2(game.sector.j-enemy.kloc.j, enemy.kloc.i-game.sector.i)
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
 	    if not damaged(DSRSENS):
@@ -1604,7 +1604,7 @@ def attack(torps_ok):
 	    hit = torpedo(enemy.kloc, course, dispersion, number=1, nburst=1)
 	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
 		finish(FWON); # Klingons did themselves in! 
-	    if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova or game.alldone:
+	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova or game.alldone:
 		return # Supernova or finished 
 	    if hit == None:
 		continue
@@ -1685,7 +1685,7 @@ def deadkl(w, type, mv):
     # Decide what kind of enemy it is and update appropriately 
     if type == IHR:
         # chalk up a Romulan 
-        game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans -= 1
+        game.state.galaxy[game.quadrant.i][game.quadrant.j].romulans -= 1
         game.irhere -= 1
         game.state.nromrem -= 1
     elif type == IHT:
@@ -1697,7 +1697,7 @@ def deadkl(w, type, mv):
         thing = None
     else:
         # Some type of a Klingon 
-        game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons -= 1
+        game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
         game.klhere -= 1
         if type == IHC:
             game.state.kcmdr.remove(game.quadrant)
@@ -1729,13 +1729,13 @@ def deadkl(w, type, mv):
 
 def targetcheck(w):
     "Return None if target is invalid, otherwise return a course angle."
-    if not VALID_SECTOR(w.x, w.y):
+    if not VALID_SECTOR(w.i, w.j):
 	huh()
 	return None
     delta = coord()
     # FIXME: C code this was translated from is wacky -- why the sign reversal?
-    delta.y = (w.y - game.sector.y);
-    delta.x = (game.sector.x - w.x);
+    delta.j = (w.j - game.sector.j);
+    delta.i = (game.sector.i - w.i);
     if delta == coord(0, 0):
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
@@ -1743,7 +1743,7 @@ def targetcheck(w):
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return 1.90985932*math.atan2(delta.y, delta.x)
+    return 1.90985932*math.atan2(delta.j, delta.i)
 
 def photon():
     "Launch photon torpedo."
@@ -1836,7 +1836,7 @@ def photon():
 	if game.shldup or game.condition == "docked":
 	    dispersion *= 1.0 + 0.0001*game.shield
 	torpedo(game.sector, course[i], dispersion, number=i, nburst=n)
-	if game.alldone or game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+	if game.alldone or game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 	    return
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
 	finish(FWON);
@@ -1911,7 +1911,7 @@ def hittem(hits):
 	    proutn(_("%d unit hit on ") % int(hit))
 	else:
 	    proutn(_("Very small hit on "))
-	ienm = game.quad[w.x][w.y]
+	ienm = game.quad[w.i][w.j]
 	if ienm==IHQUEST:
 	    thing.angry = True
 	proutn(crmena(False, ienm, "sector", w))
@@ -2095,7 +2095,7 @@ def phasers():
 	rpow = 0.0
         for k in range(len(game.enemies)):
 	    aim = game.enemies[k].kloc
-	    ienm = game.quad[aim.x][aim.y]
+	    ienm = game.quad[aim.i][aim.j]
 	    if msgflag:
 		proutn(_("Energy available= %.2f") % (avail-0.006))
 		skip(1)
@@ -2278,8 +2278,8 @@ def events():
         # Not perfect, but will have to do 
         # Handle case where base is in same quadrant as starship 
         if game.battle == game.quadrant:
-            game.state.chart[game.battle.x][game.battle.y].starbase = False
-            game.quad[game.base.x][game.base.y] = IHDOT
+            game.state.chart[game.battle.i][game.battle.j].starbase = False
+            game.quad[game.base.i][game.base.j] = IHDOT
             game.base.invalidate()
             newcnd()
             skip(1)
@@ -2294,9 +2294,9 @@ def events():
                 prout(_("the Klingon Super-Commander"))
             else:
                 prout(_("a Klingon Commander"))
-            game.state.chart[game.battle.x][game.battle.y].starbase = False
+            game.state.chart[game.battle.i][game.battle.j].starbase = False
         # Remove Starbase from galaxy 
-        game.state.galaxy[game.battle.x][game.battle.y].starbase = False
+        game.state.galaxy[game.battle.i][game.battle.j].starbase = False
         game.state.baseq = filter(lambda x: x != game.battle, game.state.baseq)
         if game.isatb == 2:
             # reinstate a commander's base attack 
@@ -2323,7 +2323,7 @@ def events():
 	    else:
 		prout("never")
     radio_was_broken = damaged(DRADIO)
-    hold.x = hold.y = 0
+    hold.i = hold.j = 0
     while True:
 	# Select earliest extraneous event, evcode==0 if no events 
 	evcode = FSPY
@@ -2384,7 +2384,7 @@ def events():
 	    announce()
 	    supernova(False)
 	    schedule(FSNOVA, expran(0.5*game.intime))
-	    if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 		return
 	elif evcode == FSPY: # Check with spy to see if SC should tractor beam 
 	    if game.state.nscrem == 0 or \
@@ -2436,7 +2436,7 @@ def events():
 		unschedule(FCDBAS)
 		continue
 	    # commander + starbase combination found -- launch attack 
-	    game.battle = game.state.baseq[j]
+	    game.battle = ibq
 	    schedule(FCDBAS, randreal(1.0, 4.0))
 	    if game.isatb: # extra time if SC already attacking 
 		postpone(FCDBAS, scheduled(FSCDBAS)-game.state.date)
@@ -2455,7 +2455,7 @@ def events():
 	elif evcode == FSCDBAS: # Supercommander destroys base 
 	    unschedule(FSCDBAS)
 	    game.isatb = 2
-	    if not game.state.galaxy[game.state.kscmdr.x][game.state.kscmdr.y].starbase: 
+	    if not game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].starbase: 
 		continue # WAS RETURN! 
 	    hold = game.battle
 	    game.battle = game.state.kscmdr
@@ -2464,7 +2464,7 @@ def events():
 	    if evcode==FCDBAS:
 		unschedule(FCDBAS)
                 if not game.state.baseq() \
-                       or not game.state.galaxy[game.battle.x][game.battle.y].starbase:
+                       or not game.state.galaxy[game.battle.i][game.battle.j].starbase:
 		    game.battle.invalidate()
                     continue
 		# find the lucky pair 
@@ -2486,11 +2486,11 @@ def events():
 	    game.probey += game.probeiny
 	    i = (int)(game.probex/QUADSIZE +0.05)
 	    j = (int)(game.probey/QUADSIZE + 0.05)
-	    if game.probec.x != i or game.probec.y != j:
-		game.probec.x = i
-		game.probec.y = j
+	    if game.probec.i != i or game.probec.j != j:
+		game.probec.i = i
+		game.probec.j = j
 		if not VALID_QUADRANT(i, j) or \
-		    game.state.galaxy[game.probec.x][game.probec.y].supernova:
+		    game.state.galaxy[game.probec.i][game.probec.j].supernova:
 		    # Left galaxy or ran into supernova
                     if comunicating():
 			announce()
@@ -2507,10 +2507,10 @@ def events():
 		    announce()
 		    skip(1)
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probec)
-	    pdest = game.state.galaxy[game.probec.x][game.probec.y]
+	    pdest = game.state.galaxy[game.probec.i][game.probec.j]
 	    # Update star chart if Radio is working or have access to radio
 	    if communicating():
-		chp = game.state.chart[game.probec.x][game.probec.y]
+		chp = game.state.chart[game.probec.i][game.probec.j]
 		chp.klingons = pdest.klingons
 		chp.starbase = pdest.starbase
 		chp.stars = pdest.stars
@@ -2520,7 +2520,7 @@ def events():
 		# lets blow the sucker! 
 		supernova(True, game.probec)
 		unschedule(FDSPROB)
-		if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova: 
+		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova: 
 		    return
 	elif evcode == FDISTR: # inhabited system issues distress call 
 	    unschedule(FDISTR)
@@ -2531,7 +2531,7 @@ def events():
 		# not already under attack, which is not
 		# supernova'ed, and which has some Klingons in it
 		w = randplace(GALSIZE)
-		q = game.state.galaxy[w.x][w.y]
+		q = game.state.galaxy[w.i][w.j]
                 if not (game.quadrant == w or q.planet == None or \
 		      not q.planet.inhabited or \
 		      q.supernova or q.status!="secure" or q.klingons<=0):
@@ -2544,8 +2544,7 @@ def events():
 	    # got one!!  Schedule its enslavement 
 	    ev = schedule(FENSLV, expran(game.intime))
 	    ev.quadrant = w
-	    q.status = distressed
-
+	    q.status = "distressed"
 	    # tell the captain about it if we can 
 	    if communicating():
 		prout(_("Uhura- Captain, %s in Quadrant %s reports it is under attack") \
@@ -2556,7 +2555,7 @@ def events():
 	elif evcode == FENSLV:		# starsystem is enslaved 
 	    ev = unschedule(FENSLV)
 	    # see if current distress call still active 
-	    q = game.state.galaxy[ev.quadrant.x][ev.quadrant.y]
+	    q = game.state.galaxy[ev.quadrant.i][ev.quadrant.j]
 	    if q.klingons <= 0:
 		q.status = "secure"
 		continue
@@ -2576,7 +2575,7 @@ def events():
 	    # explicitly retrieve and restore the x and y.
 	    ev = schedule(FREPRO, expran(1.0 * game.intime))
 	    # see if current distress call still active 
-	    q = game.state.galaxy[ev.quadrant.x][ev.quadrant.y]
+	    q = game.state.galaxy[ev.quadrant.i][ev.quadrant.j]
 	    if q.klingons <= 0:
 		q.status = "secure"
 		continue
@@ -2587,11 +2586,11 @@ def events():
 	    if game.klhere >= MAXKLQUAD:
                 try:
                     # this quadrant not ok, pick an adjacent one 
-                    for i in range(w.x - 1, w.x + 2):
-                        for j in range(w.y - 1, w.y + 2):
+                    for i in range(w.i - 1, w.i + 2):
+                        for j in range(w.j - 1, w.j + 2):
                             if not VALID_QUADRANT(i, j):
                                 continue
-                            q = game.state.galaxy[w.x][w.y]
+                            q = game.state.galaxy[w.i][w.j]
                             # check for this quad ok (not full & no snova) 
                             if q.klingons >= MAXKLQUAD or q.supernova:
                                 continue
@@ -2599,7 +2598,7 @@ def events():
                     else:
                         continue	# search for eligible quadrant failed
                 except "FOUNDIT":
-                    w.x = i; w.y = j
+                    w.i = i; w.j = j
 	    # deliver the child 
 	    game.state.remkl += 1
 	    q.klingons += 1
@@ -2665,7 +2664,7 @@ def wait():
 	if origTime-delay >= 9.99 and game.condition == "docked":
 	    game.damage[DDRAY] = 0.0
 	# leave if quadrant supernovas
-        if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+        if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
             break
     game.resting = False
     game.optime = 0
@@ -2686,9 +2685,9 @@ def nova(nov):
 	supernova(False, nov)
 	return
     # handle initial nova 
-    game.quad[nov.x][nov.y] = IHDOT
+    game.quad[nov.i][nov.j] = IHDOT
     prout(crmena(False, IHSTAR, "sector", nov) + _(" novas."))
-    game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
+    game.state.galaxy[game.quadrant.i][game.quadrant.j].stars -= 1
     game.state.starkl += 1
     # Set up queue to recursively trigger adjacent stars 
     hits = [nov]
@@ -2696,14 +2695,14 @@ def nova(nov):
     while hits:
         offset = coord()
         start = hits.pop()
-        for offset.x in range(-1, 1+1):
-            for offset.y in range(-1, 1+1):
-                if offset.y==0 and offset.x==0:
+        for offset.i in range(-1, 1+1):
+            for offset.j in range(-1, 1+1):
+                if offset.j==0 and offset.i==0:
                     continue
                 neighbor = start + offset
-                if not VALID_SECTOR(neighbor.y, neighbor.x):
+                if not VALID_SECTOR(neighbor.j, neighbor.i):
                     continue
-                iquad = game.quad[neighbor.x][neighbor.y]
+                iquad = game.quad[neighbor.i][neighbor.j]
                 # Empty space ends reaction
                 if iquad in (IHDOT, IHQUEST, IHBLANK, IHT, IHWEB):
                     pass
@@ -2714,14 +2713,14 @@ def nova(nov):
                         return
                     else:
                         hits.append(neighbor)
-			game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
+			game.state.galaxy[game.quadrant.i][game.quadrant.j].stars -= 1
 			game.state.starkl += 1
 			proutn(crmena(True, IHSTAR, "sector", neighbor))
 			prout(_(" novas."))
-                        game.quad[neighbor.x][neighbor.y] = IHDOT
+                        game.quad[neighbor.i][neighbor.j] = IHDOT
                         kount += 1
                 elif iquad in (IHP, IHW): # Destroy planet 
-                    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
+                    game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
                     if iquad == IHP:
                         game.state.nplankl += 1
                     else:
@@ -2733,15 +2732,15 @@ def nova(nov):
                     if game.landed:
                         finish(FPNOVA)
                         return
-                    game.quad[neighbor.x][neighbor.y] = IHDOT
+                    game.quad[neighbor.i][neighbor.j] = IHDOT
                 elif iquad == IHB: # Destroy base 
-                    game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase = False
+                    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase = False
                     game.state.baseq = filter(lambda x: x!= game.quadrant, game.state.baseq)
                     game.base.invalidate()
                     game.state.basekl += 1
                     newcnd()
                     prout(crmena(True, IHB, "sector", neighbor) + _(" destroyed."))
-                    game.quad[neighbor.x][neighbor.y] = IHDOT
+                    game.quad[neighbor.i][neighbor.j] = IHDOT
                 elif iquad in (IHE, IHF): # Buffet ship 
                     prout(_("***Starship buffeted by nova."))
                     if game.shldup:
@@ -2773,11 +2772,11 @@ def nova(nov):
                         break
                     newc = neighbor + neighbor - hits[mm]
                     proutn(crmena(True, iquad, "sector", neighbor) + _(" damaged"))
-                    if not VALID_SECTOR(newc.x, newc.y):
+                    if not VALID_SECTOR(newc.i, newc.j):
                         # can't leave quadrant 
                         skip(1)
                         break
-                    iquad1 = game.quad[newc.x][newc.y]
+                    iquad1 = game.quad[newc.i][newc.j]
                     if iquad1 == IHBLANK:
                         proutn(_(", blasted into ") + crmena(False, IHBLANK, "sector", newc))
                         skip(1)
@@ -2788,12 +2787,12 @@ def nova(nov):
                         skip(1)
                         break
                     proutn(_(", buffeted to Sector %s") % newc)
-                    game.quad[neighbor.x][neighbor.y] = IHDOT
-                    game.quad[newc.x][newc.y] = iquad
+                    game.quad[neighbor.i][neighbor.j] = IHDOT
+                    game.quad[newc.i][newc.j] = iquad
                     game.enemies[ll].move(newc)
     # Starship affected by nova -- kick it away. 
     game.dist = kount*0.1
-    game.direc = course[3*(bump.x+1)+bump.y+2]
+    game.direc = course[3*(bump.i+1)+bump.j+2]
     if game.direc == 0.0:
 	game.dist = 0.0
     if game.dist == 0.0:
@@ -2816,15 +2815,15 @@ def supernova(induced, w=None):
 	# Scheduled supernova -- select star 
 	# logic changed here so that we won't favor quadrants in top
         # left of universe 
-	for nq.x in range(GALSIZE):
-	    for nq.y in range(GALSIZE):
-		stars += game.state.galaxy[nq.x][nq.y].stars
+	for nq.i in range(GALSIZE):
+	    for nq.j in range(GALSIZE):
+		stars += game.state.galaxy[nq.i][nq.j].stars
 	if stars == 0:
 	    return # nothing to supernova exists 
 	num = randrange(stars) + 1
-	for nq.x in range(GALSIZE):
-	    for nq.y in range(GALSIZE):
-		num -= game.state.galaxy[nq.x][nq.y].stars
+	for nq.i in range(GALSIZE):
+	    for nq.j in range(GALSIZE):
+		num -= game.state.galaxy[nq.i][nq.j].stars
 		if num <= 0:
 		    break
 	    if num <=0:
@@ -2842,10 +2841,10 @@ def supernova(induced, w=None):
     else:
 	ns = coord()
 	# we are in the quadrant! 
-	num = randrange(game.state.galaxy[nq.x][nq.y].stars) + 1
-	for ns.x in range(QUADSIZE):
-	    for ns.y in range(QUADSIZE):
-		if game.quad[ns.x][ns.y]==IHSTAR:
+	num = randrange(game.state.galaxy[nq.i][nq.j].stars) + 1
+	for ns.i in range(QUADSIZE):
+	    for ns.j in range(QUADSIZE):
+		if game.quad[ns.i][ns.j]==IHSTAR:
 		    num -= 1
 		    if num==0:
 			break
@@ -2855,18 +2854,18 @@ def supernova(induced, w=None):
 	prouts(_("***RED ALERT!  RED ALERT!"))
 	skip(1)
 	prout(_("***Incipient supernova detected at Sector %s") % ns)
-	if (ns.x-game.sector.x)**2 + (ns.y-game.sector.y)**2 <= 2.1:
+	if (ns.i-game.sector.i)**2 + (ns.j-game.sector.j)**2 <= 2.1:
 	    proutn(_("Emergency override attempts t"))
 	    prouts("***************")
 	    skip(1)
 	    stars()
 	    game.alldone = True
     # destroy any Klingons in supernovaed quadrant 
-    kldead = game.state.galaxy[nq.x][nq.y].klingons
-    game.state.galaxy[nq.x][nq.y].klingons = 0
+    kldead = game.state.galaxy[nq.i][nq.j].klingons
+    game.state.galaxy[nq.i][nq.j].klingons = 0
     if nq == game.state.kscmdr:
 	# did in the Supercommander! 
-	game.state.nscrem = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb =  0
+	game.state.nscrem = game.state.kscmdr.i = game.state.kscmdr.j = game.isatb =  0
 	game.iscate = False
 	unschedule(FSCMOVE)
 	unschedule(FSCDBAS)
@@ -2878,8 +2877,8 @@ def supernova(induced, w=None):
         unschedule(FTBEAM)
     game.state.remkl -= kldead
     # destroy Romulans and planets in supernovaed quadrant 
-    nrmdead = game.state.galaxy[nq.x][nq.y].romulans
-    game.state.galaxy[nq.x][nq.y].romulans = 0
+    nrmdead = game.state.galaxy[nq.i][nq.j].romulans
+    game.state.galaxy[nq.i][nq.j].romulans = 0
     game.state.nromrem -= nrmdead
     # Destroy planets 
     for loop in range(game.inplan):
@@ -2890,12 +2889,12 @@ def supernova(induced, w=None):
     game.state.baseq = filter(lambda x: x != nq, game.state.baseq)
     # If starship caused supernova, tally up destruction 
     if induced:
-	game.state.starkl += game.state.galaxy[nq.x][nq.y].stars
-	game.state.basekl += game.state.galaxy[nq.x][nq.y].starbase
+	game.state.starkl += game.state.galaxy[nq.i][nq.j].stars
+	game.state.basekl += game.state.galaxy[nq.i][nq.j].starbase
 	game.state.nplankl += npdead
     # mark supernova in galaxy and in star chart 
     if game.quadrant == nq or communicating():
-	game.state.galaxy[nq.x][nq.y].supernova = True
+	game.state.galaxy[nq.i][nq.j].supernova = True
     # If supernova destroys last Klingons give special message 
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0 and not nq == game.quadrant:
 	skip(2)
@@ -2963,7 +2962,7 @@ def kaboom():
 	l=1
 	while l <= len(game.enemies):
 	    if game.enemies[l].kpower*game.enemies[l].kdist <= whammo: 
-		deadkl(game.enemies[l].kloc, game.quad[game.enemies[l].kloc.x][game.enemies[l].kloc.y], game.enemies[l].kloc)
+		deadkl(game.enemies[l].kloc, game.quad[game.enemies[l].kloc.i][game.enemies[l].kloc.j], game.enemies[l].kloc)
 	    l += 1
     finish(FDILITHIUM)
 				
@@ -3562,7 +3561,7 @@ def drawmaps(mode):
 
 def put_srscan_sym(w, sym):
     "Emit symbol for short-range scan."
-    srscan_window.move(w.x+1, w.y*2+2)
+    srscan_window.move(w.i+1, w.j*2+2)
     srscan_window.addch(sym)
     srscan_window.refresh()
 
@@ -3572,12 +3571,12 @@ def boom(w):
 	drawmaps(2)
 	setwnd(srscan_window)
 	srscan_window.attron(curses.A_REVERSE)
-	put_srscan_sym(w, game.quad[w.x][w.y])
+	put_srscan_sym(w, game.quad[w.i][w.j])
 	#sound(500)
 	#time.sleep(1.0)
 	#nosound()
 	srscan_window.attroff(curses.A_REVERSE)
-	put_srscan_sym(w, game.quad[w.x][w.y])
+	put_srscan_sym(w, game.quad[w.i][w.j])
 	curses.delay_output(500)
 	setwnd(message_window) 
 
@@ -3599,7 +3598,7 @@ def tracktorpedo(origin, w, step, i, n, iquad):
 	if step == 1:
 	    if n != 1:
 		skip(1)
-		proutn(_("Track for %s torpedo number %d-  ") % (game.quad[origin.x][origin.y],i+1))
+		proutn(_("Track for %s torpedo number %d-  ") % (game.quad[origin.i][origin.j],i+1))
 	    else:
 		skip(1)
 		proutn(_("Torpedo track- "))
@@ -3660,21 +3659,21 @@ def imove(novapush):
 
     def no_quad_change():
         # No quadrant change -- compute new average enemy distances 
-        game.quad[game.sector.x][game.sector.y] = game.ship
+        game.quad[game.sector.i][game.sector.j] = game.ship
         if game.enemies:
             for enemy in game.enemies:
                 finald = (w-enemy.kloc).distance()
                 enemy.kavgd = 0.5 * (finald + enemy.kdist)
                 enemy.kdist = finald
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
-            if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+            if not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
                 attack(torps_ok=False)
             for enemy in game.enemies:
                 enemy.kavgd = enemy.kdist
         newcnd()
         drawmaps(0)
         setwnd(message_window)
-    w.x = w.y = 0
+    w.i = w.j = 0
     if game.inorbit:
 	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
 	game.inorbit = False
@@ -3694,17 +3693,17 @@ def imove(novapush):
 	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move within the quadrant 
-    game.quad[game.sector.x][game.sector.y] = IHDOT
-    x = game.sector.x
-    y = game.sector.y
+    game.quad[game.sector.i][game.sector.j] = IHDOT
+    x = game.sector.i
+    y = game.sector.j
     n = int(10.0*game.dist*bigger+0.5)
     if n > 0:
 	for m in range(1, n+1):
             x += deltax
             y += deltay
-	    w.x = int(round(x))
-	    w.y = int(round(y))
-	    if not VALID_SECTOR(w.x, w.y):
+	    w.i = int(round(x))
+	    w.j = int(round(y))
+	    if not VALID_SECTOR(w.i, w.j):
 		# Leaving quadrant -- allow final enemy attack 
 		# Don't do it if being pushed by Nova 
 		if len(game.enemies) != 0 and not novapush:
@@ -3717,30 +3716,30 @@ def imove(novapush):
 		    # that attacks only happen if Klingons
 		    # are present and your skill is good.
 		    # 
-		    if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+		    if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 			attack(torps_ok=False)
 		    if game.alldone:
 			return
 		# compute final position -- new quadrant and sector 
-		x = (QUADSIZE*game.quadrant.x)+game.sector.x
-		y = (QUADSIZE*game.quadrant.y)+game.sector.y
-		w.x = int(round(x+10.0*game.dist*bigger*deltax))
-		w.y = int(round(y+10.0*game.dist*bigger*deltay))
+		x = (QUADSIZE*game.quadrant.i)+game.sector.i
+		y = (QUADSIZE*game.quadrant.j)+game.sector.j
+		w.i = int(round(x+10.0*game.dist*bigger*deltax))
+		w.j = int(round(y+10.0*game.dist*bigger*deltay))
 		# check for edge of galaxy 
 		kinks = 0
                 while True:
 		    kink = False
-		    if w.x < 0:
-			w.x = -w.x
+		    if w.i < 0:
+			w.i = -w.i
 			kink = True
-		    if w.y < 0:
-			w.y = -w.y
+		    if w.j < 0:
+			w.j = -w.j
 			kink = True
-		    if w.x >= GALSIZE*QUADSIZE:
-			w.x = (GALSIZE*QUADSIZE*2) - w.x
+		    if w.i >= GALSIZE*QUADSIZE:
+			w.i = (GALSIZE*QUADSIZE*2) - w.i
 			kink = True
-		    if w.y >= GALSIZE*QUADSIZE:
-			w.y = (GALSIZE*QUADSIZE*2) - w.y
+		    if w.j >= GALSIZE*QUADSIZE:
+			w.j = (GALSIZE*QUADSIZE*2) - w.j
 			kink = True
 		    if kink:
 			kinks += 1
@@ -3759,18 +3758,18 @@ def imove(novapush):
 		# Compute final position in new quadrant 
 		if trbeam: # Don't bother if we are to be beamed 
 		    return
-		game.quadrant.x = w.x/QUADSIZE
-		game.quadrant.y = w.y/QUADSIZE
-		game.sector.x = w.x - (QUADSIZE*game.quadrant.x)
-		game.sector.y = w.y - (QUADSIZE*game.quadrant.y)
+		game.quadrant.i = w.i/QUADSIZE
+		game.quadrant.j = w.j/QUADSIZE
+		game.sector.i = w.i - (QUADSIZE*game.quadrant.i)
+		game.sector.j = w.j - (QUADSIZE*game.quadrant.j)
 		skip(1)
 		prout(_("Entering Quadrant %s.") % game.quadrant)
-		game.quad[game.sector.x][game.sector.y] = game.ship
+		game.quad[game.sector.i][game.sector.j] = game.ship
 		newqad()
 		if game.skill>SKILL_NOVICE:
 		    attack(torps_ok=False)  
 		return
-	    iquad = game.quad[w.x][w.y]
+	    iquad = game.quad[w.i][w.j]
 	    if iquad != IHDOT:
 		# object encountered in flight path 
 		stopegy = 50.0*game.dist/game.optime
@@ -3814,8 +3813,8 @@ def imove(novapush):
 		    proutn(_("Emergency stop required "))
 		    prout(_("%2d units of energy.") % int(stopegy))
 		    game.energy -= stopegy
-		    final.x = int(round(deltax))
-		    final.y = int(round(deltay))
+		    final.i = int(round(deltax))
+		    final.j = int(round(deltay))
 		    game.sector = final
 		    if game.energy <= 0:
 			finish(FNRG)
@@ -3838,7 +3837,7 @@ def dock(verbose):
     if game.inorbit:
 	prout(_("You must first leave standard orbit."))
 	return
-    if not game.base.is_valid() or abs(game.sector.x-game.base.x) > 1 or abs(game.sector.y-game.base.y) > 1:
+    if not game.base.is_valid() or abs(game.sector.i-game.base.i) > 1 or abs(game.sector.j-game.base.j) > 1:
 	prout(crmshp() + _(" not adjacent to base."))
 	return
     game.condition = "docked"
@@ -3946,23 +3945,23 @@ def getcourse(isprobe, akey):
 		huh()
 		return False
 	    xl = int(round(scanner.real))-1
-	    dquad.x = xi
-	    dquad.y = xj
-	    dsect.y = xk
-	    dsect.x = xl
+	    dquad.i = xi
+	    dquad.j = xj
+	    dsect.j = xk
+	    dsect.i = xl
 	else:
             # only one pair of numbers was specified
 	    if isprobe:
 		# only quadrant specified -- go to center of dest quad 
-		dquad.x = xi
-		dquad.y = xj
-		dsect.y = dsect.x = 4	# preserves 1-origin behavior
+		dquad.i = xi
+		dquad.j = xj
+		dsect.j = dsect.i = 4	# preserves 1-origin behavior
 	    else:
                 # only sector specified
-		dsect.y = xi
-		dsect.x = xj
+		dsect.j = xi
+		dsect.i = xj
 	    itemp = "normal"
-	if not VALID_QUADRANT(dquad.y,dquad.x) or not VALID_SECTOR(dsect.x,dsect.y):
+	if not VALID_QUADRANT(dquad.j,dquad.i) or not VALID_SECTOR(dsect.i,dsect.j):
 	    huh()
 	    return False
 	skip(1)
@@ -3974,8 +3973,8 @@ def getcourse(isprobe, akey):
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
         delta = coord()
-	delta.x = dquad.y-game.quadrant.y + 0.1*(dsect.x-game.sector.y)
-	delta.y = game.quadrant.x-dquad.x + 0.1*(game.sector.x-dsect.y)
+	delta.i = dquad.j-game.quadrant.j + 0.1*(dsect.i-game.sector.j)
+	delta.j = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.j)
     else: # manual 
 	while key == IHEOL:
 	    proutn(_("X and Y displacements- "))
@@ -3986,14 +3985,14 @@ def getcourse(isprobe, akey):
 	if key != IHREAL:
 	    huh()
 	    return False
-	delta.y = scanner.real
+	delta.j = scanner.real
 	key = scanner.next()
 	if key != IHREAL:
 	    huh()
 	    return False
-	delta.x = scanner.real
+	delta.i = scanner.real
     # Check for zero movement 
-    if delta.x == 0 and delta.y == 0:
+    if delta.i == 0 and delta.j == 0:
 	scanner.chew()
 	return False
     if itemp == "verbose" and not isprobe:
@@ -4137,8 +4136,8 @@ def warp(timewarp):
 	    deltax /= bigger
 	    deltay /= bigger
 	    n = 10.0 * game.dist * bigger +0.5
-	    x = game.sector.x
-	    y = game.sector.y
+	    x = game.sector.i
+	    y = game.sector.j
 	    for l in range(1, n+1):
 		x += deltax
 		ix = x + 0.5
@@ -4255,7 +4254,7 @@ def atover(igrab):
 	skip(1)
 	prout(_("safely out of quadrant."))
 	if not damaged(DRADIO):
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = True
+	    game.state.galaxy[game.quadrant.i][game.quadrant.j].charted = True
 	# Try to use warp engines 
 	if damaged(DWARPEN):
 	    skip(1)
@@ -4284,7 +4283,7 @@ def atover(igrab):
 	    finish(FSNOVAED)
 	    return
 	# Repeat if another snova
-        if not game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+        if not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
             break
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0: 
 	finish(FWON) # Snova killed remaining enemy. 
@@ -4394,8 +4393,8 @@ def probe():
     game.probeiny /= bigger
     game.probeinx /= bigger
     game.proben = 10.0*game.dist*bigger +0.5
-    game.probex = game.quadrant.x*QUADSIZE + game.sector.x - 1	# We will use better packing than original
-    game.probey = game.quadrant.y*QUADSIZE + game.sector.y - 1
+    game.probex = game.quadrant.i*QUADSIZE + game.sector.i - 1	# We will use better packing than original
+    game.probey = game.quadrant.j*QUADSIZE + game.sector.j - 1
     game.probec = game.quadrant
     schedule(FDSPROB, 0.01) # Time to move one sector
     prout(_("Ensign Chekov-  \"The deep space probe is launched, Captain.\""))
@@ -4438,7 +4437,7 @@ def mayday():
 	return
     # OK -- call for help from nearest starbase 
     game.nhelp += 1
-    if game.base.x!=0:
+    if game.base.i!=0:
 	# There's one in this quadrant 
 	ddist = (game.base - game.sector).distance()
     else:
@@ -4451,13 +4450,13 @@ def mayday():
 	game.quadrant = ibq
 	newqad()
     # dematerialize starship 
-    game.quad[game.sector.x][game.sector.y]=IHDOT
+    game.quad[game.sector.i][game.sector.j]=IHDOT
     proutn(_("Starbase in Quadrant %s responds--%s dematerializes") \
            % (game.quadrant, crmshp()))
     game.sector.invalidate()
     for m in range(1, 5+1):
         w = game.base.scatter() 
-	if VALID_SECTOR(w.x,w.y) and game.quad[w.x][w.y]==IHDOT:
+	if VALID_SECTOR(w.i,w.j) and game.quad[w.i][w.j]==IHDOT:
 	    # found one -- finish up 
             game.sector = w
 	    break
@@ -4548,7 +4547,7 @@ def abandon():
 	    # Oops! no place to go... 
 	    finish(FABANDN)
 	    return
-	q = game.state.galaxy[game.quadrant.x][game.quadrant.y]
+	q = game.state.galaxy[game.quadrant.i][game.quadrant.j]
 	# Dispose of crew 
 	if not (game.options & OPTION_WORLDS) and not damaged(DTRANSP):
 	    prout(_("Remainder of ship's complement beam down"))
@@ -4571,23 +4570,23 @@ def abandon():
 	# Set up quadrant and position FQ adjacient to base 
 	if not game.quadrant == game.state.baseq[nb]:
 	    game.quadrant = game.state.baseq[nb]
-	    game.sector.x = game.sector.y = 5
+	    game.sector.i = game.sector.j = 5
 	    newqad()
 	while True:
 	    # position next to base by trial and error 
-	    game.quad[game.sector.x][game.sector.y] = IHDOT
+	    game.quad[game.sector.i][game.sector.j] = IHDOT
 	    for l in range(QUADSIZE):
 		game.sector = game.base.scatter()
-		if VALID_SECTOR(game.sector.x, game.sector.y) and \
-                       game.quad[game.sector.x][game.sector.y] == IHDOT:
+		if VALID_SECTOR(game.sector.i, game.sector.j) and \
+                       game.quad[game.sector.i][game.sector.j] == IHDOT:
                     break
 	    if l < QUADSIZE+1:
 		break # found a spot 
-	    game.sector.x=QUADSIZE/2
-	    game.sector.y=QUADSIZE/2
+	    game.sector.i=QUADSIZE/2
+	    game.sector.j=QUADSIZE/2
 	    newqad()
     # Get new commission 
-    game.quad[game.sector.x][game.sector.y] = game.ship = IHF
+    game.quad[game.sector.i][game.sector.j] = game.ship = IHF
     game.state.crew = FULLCREW
     prout(_("Starfleet puts you in command of another ship,"))
     prout(_("the Faerie Queene, which is antiquated but,"))
@@ -4616,7 +4615,7 @@ def consumeTime():
     "Abort a lengthy operation if an event interrupts it." 
     game.ididit = True
     events()
-    if game.alldone or game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova or game.justin: 
+    if game.alldone or game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova or game.justin: 
 	return True
     return False
 
@@ -4661,7 +4660,7 @@ def orbit():
     if not game.plnet.is_valid():
         prout("There is no planet in this sector.")
         return
-    if abs(game.sector.x-game.plnet.x)>1 or abs(game.sector.y-game.plnet.y)>1:
+    if abs(game.sector.i-game.plnet.i)>1 or abs(game.sector.j-game.plnet.j)>1:
 	prout(crmshp() + _(" not adjacent to planet."))
 	skip(1)
 	return
@@ -5007,7 +5006,7 @@ def deathray():
 	prouts(_("Sulu- \"Captain!  It's working!\""))
 	skip(2)
 	while len(game.enemies) > 0:
-	    deadkl(game.enemies[1].kloc, game.quad[game.enemies[1].kloc.x][game.enemies[1].kloc.y],game.enemies[1].kloc)
+	    deadkl(game.enemies[1].kloc, game.quad[game.enemies[1].kloc.i][game.enemies[1].kloc.j],game.enemies[1].kloc)
 	prout(_("Ensign Chekov-  \"Congratulations, Captain!\""))
 	if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) == 0:
 	    finish(FWON)    
@@ -5171,10 +5170,10 @@ def lrscan(silent):
             prout(_("Starbase's long-range scan"))
     elif not silent:
 	prout(_("Long-range scan"))
-    for x in range(game.quadrant.x-1, game.quadrant.x+2):
+    for x in range(game.quadrant.i-1, game.quadrant.i+2):
         if not silent:
             proutn(" ")
-        for y in range(game.quadrant.y-1, game.quadrant.y+2):
+        for y in range(game.quadrant.j-1, game.quadrant.j+2):
 	    if not VALID_QUADRANT(x, y):
                 if not silent:
                     proutn("  -1")
@@ -5234,7 +5233,7 @@ def chart():
     for i in range(GALSIZE):
 	proutn("%d |" % (i+1))
 	for j in range(GALSIZE):
-	    if (game.options & OPTION_SHOWME) and i == game.quadrant.x and j == game.quadrant.y:
+	    if (game.options & OPTION_SHOWME) and i == game.quadrant.i and j == game.quadrant.j:
 		proutn("<")
 	    else:
 		proutn(" ")
@@ -5247,7 +5246,7 @@ def chart():
 	    else:
 		show = "..."
 	    proutn(show)
-	    if (game.options & OPTION_SHOWME) and i == game.quadrant.x and j == game.quadrant.y:
+	    if (game.options & OPTION_SHOWME) and i == game.quadrant.i and j == game.quadrant.j:
 		proutn(">")
 	    else:
 		proutn(" ")
@@ -5257,7 +5256,7 @@ def chart():
 
 def sectscan(goodScan, i, j):
     "Light up an individual dot in a sector."
-    if goodScan or (abs(i-game.sector.x)<= 1 and abs(j-game.sector.y) <= 1):
+    if goodScan or (abs(i-game.sector.i)<= 1 and abs(j-game.sector.j) <= 1):
 	if (game.quad[i][j]==IHMATER0) or (game.quad[i][j]==IHMATER1) or (game.quad[i][j]==IHMATER2) or (game.quad[i][j]==IHE) or (game.quad[i][j]==IHF):
 	    if game.condition   == "red": textcolor("red")
 	    elif game.condition == "green": textcolor("green")
@@ -5319,7 +5318,7 @@ def status(req=0):
                % (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem))
     if not req or req == 10:
 	if game.options & OPTION_WORLDS:
-	    plnet = game.state.galaxy[game.quadrant.x][game.quadrant.y].planet
+	    plnet = game.state.galaxy[game.quadrant.i][game.quadrant.j].planet
 	    if plnet and plnet.inhabited:
 		prstat(_("Major system"), plnet.name)
 	    else:
@@ -5353,10 +5352,10 @@ def srscan():
     else:
 	prout(_("     Short-range scan"))
     if goodScan and not damaged(DRADIO): 
-	game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons
-	game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase
-	game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars
-	game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = True
+	game.state.chart[game.quadrant.i][game.quadrant.j].klingons = game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons
+	game.state.chart[game.quadrant.i][game.quadrant.j].starbase = game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase
+	game.state.chart[game.quadrant.i][game.quadrant.j].stars = game.state.galaxy[game.quadrant.i][game.quadrant.j].stars
+	game.state.galaxy[game.quadrant.i][game.quadrant.j].charted = True
     prout("    1 2 3 4 5 6 7 8 9 10")
     if game.condition != "docked":
 	newcnd()
@@ -5381,31 +5380,31 @@ def eta():
 	if scanner.next()!=IHREAL:
 	    huh()
 	    return
-    w1.y = int(scanner.real-0.5)
+    w1.j = int(scanner.real-0.5)
     if scanner.next() != IHREAL:
 	huh()
 	return
-    w1.x = int(scanner.real-0.5)
+    w1.i = int(scanner.real-0.5)
     if scanner.next() == IHREAL:
-	w2.y = int(scanner.real-0.5)
+	w2.j = int(scanner.real-0.5)
 	if scanner.next() != IHREAL:
 	    huh()
 	    return
-	w2.x = int(scanner.real-0.5)
+	w2.i = int(scanner.real-0.5)
     else:
-	if game.quadrant.y>w1.x:
-	    w2.x = 0
+	if game.quadrant.j>w1.i:
+	    w2.i = 0
 	else:
-	    w2.x=QUADSIZE-1
-	if game.quadrant.x>w1.y:
-	    w2.y = 0
+	    w2.i=QUADSIZE-1
+	if game.quadrant.i>w1.j:
+	    w2.j = 0
 	else:
-	    w2.y=QUADSIZE-1
-    if not VALID_QUADRANT(w1.x, w1.y) or not VALID_SECTOR(w2.x, w2.y):
+	    w2.j=QUADSIZE-1
+    if not VALID_QUADRANT(w1.i, w1.j) or not VALID_SECTOR(w2.i, w2.j):
 	huh()
 	return
-    game.dist = math.sqrt((w1.y-game.quadrant.y+0.1*(w2.y-game.sector.y))**2+
-		(w1.x-game.quadrant.x+0.1*(w2.x-game.sector.x))**2)
+    game.dist = math.sqrt((w1.j-game.quadrant.j+0.1*(w2.j-game.sector.j))**2+
+		(w1.i-game.quadrant.i+0.1*(w2.i-game.sector.i))**2)
     wfl = False
     if prompt:
 	prout(_("Answer \"no\" if you don't know the value:"))
@@ -5664,7 +5663,7 @@ def setup():
         while True:
             while True:
                 w = randplace(GALSIZE)
-                if not game.state.galaxy[w.x][w.y].starbase:
+                if not game.state.galaxy[w.i][w.j].starbase:
                     break
 	    contflag = False
             # C version: for (j = i-1; j > 0; j--)
@@ -5683,7 +5682,7 @@ def setup():
             if not contflag:
                 break
 	game.state.baseq.append(w)
-	game.state.galaxy[w.x][w.y].starbase = game.state.chart[w.x][w.y].starbase = True
+	game.state.galaxy[w.i][w.j].starbase = game.state.chart[w.i][w.j].starbase = True
     # Position ordinary Klingon Battle Cruisers
     krem = game.inkling
     klumper = 0.25*game.skill*(9.0-game.length)+1.0
@@ -5697,10 +5696,10 @@ def setup():
 	krem -= klump
         while True:
             w = randplace(GALSIZE)
-            if not game.state.galaxy[w.x][w.y].supernova and \
-               game.state.galaxy[w.x][w.y].klingons + klump <= MAXKLQUAD:
+            if not game.state.galaxy[w.i][w.j].supernova and \
+               game.state.galaxy[w.i][w.j].klingons + klump <= MAXKLQUAD:
                 break
-	game.state.galaxy[w.x][w.y].klingons += int(klump)
+	game.state.galaxy[w.i][w.j].klingons += int(klump)
         if krem <= 0:
             break
     # Position Klingon Commander Ships
@@ -5709,15 +5708,15 @@ def setup():
             w = randplace(GALSIZE)
             if not welcoming(w) or w in game.state.kcmdr:
                 continue
-            if (game.state.galaxy[w.x][w.y].klingons or withprob(0.25)):
+            if (game.state.galaxy[w.i][w.j].klingons or withprob(0.25)):
                 break
-	game.state.galaxy[w.x][w.y].klingons += 1
+	game.state.galaxy[w.i][w.j].klingons += 1
 	game.state.kcmdr.append(w)
     # Locate planets in galaxy
     for i in range(game.inplan):
         while True:
             w = randplace(GALSIZE) 
-            if game.state.galaxy[w.x][w.y].planet == None:
+            if game.state.galaxy[w.i][w.j].planet == None:
                 break
         new = planet()
 	new.quadrant = w
@@ -5734,12 +5733,12 @@ def setup():
                 new.crystals = "present"
 	    new.known = "unknown"
 	    new.inhabited = False
-	game.state.galaxy[w.x][w.y].planet = new
+	game.state.galaxy[w.i][w.j].planet = new
         game.state.planets.append(new)
     # Locate Romulans
     for i in range(game.state.nromrem):
 	w = randplace(GALSIZE)
-	game.state.galaxy[w.x][w.y].romulans += 1
+	game.state.galaxy[w.i][w.j].romulans += 1
     # Place the Super-Commander if needed
     if game.state.nscrem > 0:
         while True:
@@ -5747,7 +5746,7 @@ def setup():
             if welcoming(w):
                 break
 	game.state.kscmdr = w
-	game.state.galaxy[w.x][w.y].klingons += 1
+	game.state.galaxy[w.i][w.j].klingons += 1
     # Initialize times for extraneous events
     schedule(FSNOVA, expran(0.5 * game.intime))
     schedule(FTBEAM, expran(1.5 * (game.intime / len(game.state.kcmdr))))
@@ -5925,10 +5924,10 @@ def dropin(iquad=None):
     "Drop a feature on a random dot in the current quadrant."
     while True:
         w = randplace(QUADSIZE)
-        if game.quad[w.x][w.y] == IHDOT:
+        if game.quad[w.i][w.j] == IHDOT:
             break
     if iquad is not None:
-        game.quad[w.x][w.y] = iquad
+        game.quad[w.i][w.j] = iquad
     return w
 
 def newcnd():
@@ -5936,7 +5935,7 @@ def newcnd():
     game.condition = "green"
     if game.energy < 1000.0:
 	game.condition = "yellow"
-    if game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons or game.state.galaxy[game.quadrant.x][game.quadrant.y].romulans:
+    if game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons or game.state.galaxy[game.quadrant.i][game.quadrant.j].romulans:
 	game.condition = "red"
     if not game.alive:
 	game.condition="dead"
@@ -5957,14 +5956,14 @@ def newqad():
 	# Attempt to escape Super-commander, so tbeam back!
 	game.iscate = False
 	game.ientesc = True
-    q = game.state.galaxy[game.quadrant.x][game.quadrant.y]
+    q = game.state.galaxy[game.quadrant.i][game.quadrant.j]
     # cope with supernova
     if q.supernova:
 	return
     game.klhere = q.klingons
     game.irhere = q.romulans
     # Position Starship
-    game.quad[game.sector.x][game.sector.y] = game.ship
+    game.quad[game.sector.i][game.sector.j] = game.ship
     game.enemies = []
     if q.klingons:
 	# Position ordinary Klingons
@@ -5974,13 +5973,13 @@ def newqad():
         for cmdr in game.state.kcmdr:
 	    if cmdr == game.quadrant:
                 e = game.enemies[game.klhere-1]
-                game.quad[e.kloc.x][e.kloc.y] = IHC
+                game.quad[e.kloc.i][e.kloc.j] = IHC
                 e.kpower = randreal(950,1350) + 50.0*game.skill
 		break	
 	# If we need a super-commander, promote a Klingon
 	if game.quadrant == game.state.kscmdr:
             e = game.enemies[0]
-	    game.quad[e.kloc.x][e.kloc.y] = IHS
+	    game.quad[e.kloc.i][e.kloc.j] = IHS
 	    e.kpower = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
     # Put in Romulans if needed
@@ -6023,9 +6022,9 @@ def newqad():
             (game.skill > SKILL_GOOD and withprob(0.08)):
             w = coord()
             while True:
-		w.x = withprob(0.5) * (QUADSIZE-1)
-		w.y = withprob(0.5) * (QUADSIZE-1)
-                if game.quad[w.x][w.y] == IHDOT:
+		w.i = withprob(0.5) * (QUADSIZE-1)
+		w.j = withprob(0.5) * (QUADSIZE-1)
+                if game.quad[w.i][w.j] == IHDOT:
                     break
             game.tholian = enemy(type=IHT, loc=w,
                                  power=randrange(100, 500) + 25.0*game.skill)
@@ -6120,7 +6119,7 @@ def listCommands():
     "Generate a list of legal commands."
     proutn(_("LEGAL COMMANDS ARE:"))
     for (k, key) in enumerate(commands):
-	if not commands[cmd] or (commands[key] & game.options):
+	if not commands[key] or (commands[key] & game.options):
             if k % 5 == 0:
                 skip(1)
             proutn("%-12s " % key) 
@@ -6323,14 +6322,14 @@ def makemoves():
 		events()
 		if game.alldone:
 		    break	# Events did us in
-	    if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 		atover(False)
 		continue
 	    if hitme and not game.justin:
 		attack(torps_ok=True)
 		if game.alldone:
 		    break
-		if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
+		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 		    atover(False)
 		    hitme = True
 		    continue
@@ -6384,8 +6383,8 @@ def expran(avrage):
 def randplace(size):
     "Choose a random location."
     w = coord()
-    w.x = randrange(size) 
-    w.y = randrange(size)
+    w.i = randrange(size) 
+    w.j = randrange(size)
     return w
 
 class sstscanner:
@@ -6453,12 +6452,12 @@ class sstscanner:
     	if scanner.type != IHREAL:
 	    huh()
 	    return None
-	s.x = scanner.int()-1
+	s.i = scanner.int()-1
         scanner.next()
 	if scanner.type != IHREAL:
 	    huh()
 	    return None
-	s.y = scanner.int()-1
+	s.j = scanner.int()-1
         return s
 
 def ja():
@@ -6552,18 +6551,18 @@ def debugme():
 			    prout("Event %d canceled, no x coordinate." % (i))
 			    unschedule(i)
 			    continue
-			w.x = int(round(scanner.real))
+			w.i = int(round(scanner.real))
 			key = scanner.next()
 			if key != IHREAL:
 			    prout("Event %d canceled, no y coordinate." % (i))
 			    unschedule(i)
 			    continue
-			w.y = int(round(scanner.real))
+			w.j = int(round(scanner.real))
 			ev.quadrant = w
 	scanner.chew()
     proutn("Induce supernova here? ")
     if ja() == True:
-	game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova = True
+	game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova = True
 	atover(True)
 
 if __name__ == '__main__':
