@@ -3424,10 +3424,7 @@ def waitfor():
 
 def announce():
     skip(1)
-    if game.skill > SKILL_FAIR:
-	prouts(_("[ANOUNCEMENT ARRIVING...]"))
-    else:
-	prouts(_("[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]"))
+    prouts(_("[ANOUNCEMENT ARRIVING...]"))
     skip(1)
 
 def pause_game():
