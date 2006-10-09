@@ -1288,30 +1288,26 @@ def collision(rammed, enemy):
 	finish(FWON)
     return
 
-def torpedo(course, dispersion, origin, number, nburst):
+def torpedo(origin, course, dispersion, number, nburst):
     "Let a photon torpedo fly" 
-    iquad = 0
     shoved = False
     ac = course + 0.25*dispersion
     angle = (15.0-ac)*0.5235988
     bullseye = (15.0 - course)*0.5235988
-    deltax = -math.sin(angle);
-    deltay = math.cos(angle);
+    delta = coord(-math.sin(angle), math.cos(angle))          
+    bigger = max(abs(delta.x), abs(delta.y))
+    delta /= bigger
     x = origin.x; y = origin.y
     w = coord(0, 0); jw = coord(0, 0)
-    bigger = max(math.fabs(deltax), math.fabs(deltay))
-    deltax /= bigger
-    deltay /= bigger
     if not damaged(DSRSENS) or game.condition=="docked":
 	setwnd(srscan_window)
     else: 
 	setwnd(message_window)
     # Loop to move a single torpedo 
     for step in range(1, 15+1):
-	x += deltax
-	w.x = int(x + 0.5)
-	y += deltay
-	w.y = int(y + 0.5)
+	x += delta.x
+	y += delta.y
+	w = coord(x, y).snaptogrid()
 	if not VALID_SECTOR(w.x, w.y):
 	    break
 	iquad=game.quad[w.x][w.y]
@@ -1358,9 +1354,9 @@ def torpedo(course, dispersion, origin, number, nburst):
 	elif iquad in (IHR, IHK): # Hit a regular enemy 
 	    # find the enemy 
             for enemy in game.enemies:
-		if w == game.enemies[ll].kloc:
+		if w == enemy.kloc:
 		    break
-	    kp = math.fabs(e.kpower)
+	    kp = math.fabs(enemy.kpower)
 	    h1 = 700.0 + randrange(100) - \
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
@@ -1606,7 +1602,7 @@ def attack(torps_ok):
 	    prout("  ")
 	    dispersion = (randreal()+randreal())*0.5 - 0.5
 	    dispersion += 0.002*enemy.kpower*dispersion
-	    hit = torpedo(course, dispersion, origin=enemy.kloc, number=1, nburst=1)
+	    hit = torpedo(enemy.kloc, course, dispersion, number=1, nburst=1)
 	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
 		finish(FWON); # Klingons did themselves in! 
 	    if game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova or game.alldone:
@@ -1737,19 +1733,22 @@ def targetcheck(w):
     if not VALID_SECTOR(w.x, w.y):
 	huh()
 	return None
-    delta = 0.1*(w - game.sector)
-    if delta.x==0 and delta.y== 0:
+    delta = coord()
+    # FIXME: C code this was translated from is wacky -- why the sign reversal?
+    delta.y = 0.1*(w.y - game.sector.y);
+    delta.x = 0.1*(game.sector.x - w.x);
+    if delta == coord(0, 0):
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
 	prout(_("  I recommend an immediate review of"))
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return delta.bearing()
+    return 1.90985932*math.atan2(delta.y, delta.x)
 
 def photon():
     "Launch photon torpedo."
-    course = [0.0] * MAXBURST
+    course = []
     game.ididit = False
     if damaged(DPHOTON):
 	prout(_("Photon tubes damaged."))
@@ -1837,7 +1836,7 @@ def photon():
 	    break
 	if game.shldup or game.condition == "docked":
 	    dispersion *= 1.0 + 0.0001*game.shield
-	torpedo(course[i], dispersion, origin=game.sector, number=i, nburst=n)
+	torpedo(game.sector, course[i], dispersion, number=i, nburst=n)
 	if game.alldone or game.state.galaxy[game.quadrant.x][game.quadrant.y].supernova:
 	    return
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
