@@ -240,7 +240,7 @@ class coord:
     def is_valid(self):
         return self.x != None and self.y != None
     def __eq__(self, other):
-        return other != None and self.x == other.y and self.y == other.y
+        return other != None and self.x == other.x and self.y == other.y
     def __add__(self, other):
         return coord(self.x+other.x, self.y+other.y)
     def __sub__(self, other):
@@ -1535,7 +1535,7 @@ def fry(hit):
 def attack(torps_ok):
     # bad guy attacks us 
     # torps_ok == False forces use of phasers in an attack 
-    # game could be over at this point, check 
+    # game could be over at this point, check
     if game.alldone:
 	return
     attempt = False; ihurt = False;
