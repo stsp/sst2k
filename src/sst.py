@@ -440,7 +440,7 @@ class enemy:
             game.enemies.remove(self)
         return motion
     def __repr__(self):
-        return "<%s=%f>" % (self.kloc, self.kpower)	# For debugging
+        return "<%s,%s.%f>" % (self.type, self.kloc, self.kpower)	# For debugging
 
 class gamestate:
     def __init__(self):
@@ -3877,14 +3877,14 @@ def imove(novapush):
 		    skip(1)
 		    crmshp()
 		    if iquad == IHWEB:
-			proutn(_(" encounters Tholian web at %s;") % w)
+			prout(_(" encounters Tholian web at %s;") % w)
 		    else:
-			proutn(_(" blocked by object at %s;") % w)
+			prout(_(" blocked by object at %s;") % w)
 		    proutn(_("Emergency stop required "))
 		    prout(_("%2d units of energy.") % int(stopegy))
 		    game.energy -= stopegy
-		    final.x = x-deltax+0.5
-		    final.y = y-deltay+0.5
+		    final.x = int(round(deltax))
+		    final.y = int(round(deltay))
 		    game.sector = final
 		    if game.energy <= 0:
 			finish(FNRG)
@@ -5829,11 +5829,11 @@ def setup():
     for i in range(game.state.nromrem):
 	w = randplace(GALSIZE)
 	game.state.galaxy[w.x][w.y].romulans += 1
-    # Locate the Super Commander
+    # Place the Super-Commander if needed
     if game.state.nscrem > 0:
         while True:
             w = randplace(GALSIZE)
-            if not welcoming(w):
+            if welcoming(w):
                 break
 	game.state.kscmdr = w
 	game.state.galaxy[w.x][w.y].klingons += 1
@@ -6076,7 +6076,7 @@ def newqad(shutup):
 	    e.kpower = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
     # Put in Romulans if needed
-    for i in range(game.klhere, len(game.enemies)):
+    for i in range(q.romulans):
         enemy(IHR, loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
     # If quadrant needs a starbase, put it in
     if q.starbase:
@@ -6088,7 +6088,6 @@ def newqad(shutup):
 	    game.plnet = dropin(IHP)
 	else:
 	    game.plnet = dropin(IHW)
-        
     # Check for condition
     newcnd()
     # Check for RNZ
@@ -6208,8 +6207,6 @@ commands = {
     "CALL":		0,	# Synonym for MAYDAY
     "QUIT":		0,
     "HELP":		0,
-    "SEED":		0,
-    "VISUAL":		0,
 }
 
 def ACCEPT(cmd):	return (not commands[cmd] or (commands[cmd] & game.options))
@@ -6573,7 +6570,6 @@ def huh():
     skip(1)
     prout(_("Beg your pardon, Captain?"))
 
-
 def debugme():
     # access to the internals for debugging 
     proutn("Reset levels? ")
@@ -6678,7 +6674,7 @@ if __name__ == '__main__':
         #    else:
         game.options |= OPTION_TTY
         seed = int(time.time())
-        (options, arguments) = getopt.getopt(sys.argv[1:], "r:tx")
+        (options, arguments) = getopt.getopt(sys.argv[1:], "r:s:tx")
         for (switch, val) in options:
             if switch == '-r':
                 try:
@@ -6698,6 +6694,8 @@ if __name__ == '__main__':
                     raise SystemExit(1)
                 game.options |= OPTION_TTY
                 game.options &=~ OPTION_CURSES
+            elif switch == '-s':
+                seed = int(val)
             elif switch == '-t':
                 game.options |= OPTION_TTY
                 game.options &=~ OPTION_CURSES
