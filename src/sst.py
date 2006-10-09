@@ -643,8 +643,8 @@ def tryexit(enemy, look, irun):
     # we know this if either short or long range sensors are working
     if not damaged(DSRSENS) or not damaged(DLRSENS) or \
 	game.condition == "docked":
-	crmena(True, enemy.type, "sector", enemy.kloc)
-	prout(_(" escapes to Quadrant %s (and regains strength).") % q)
+	prout(crmena(True, enemy.type, "sector", enemy.kloc) + \
+              (_(" escapes to Quadrant %s (and regains strength).") % q))
     # handle local matters related to escape
     enemy.move(None)
     game.klhere -= 1
@@ -847,9 +847,7 @@ def movebaddy(enemy):
 	skip(1)
     if enemy.move(next):
 	if not damaged(DSRSENS) or game.condition == "docked":
-	    proutn("***")
-	    cramen(enemy.type)
-	    proutn(_(" from Sector %s") % enemy.kloc)
+	    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.kloc))
 	    if enemy.kdist < dist1:
 		proutn(_(" advances to "))
 	    else:
@@ -1085,8 +1083,7 @@ def movetholian():
     # All plugged up -- Tholian splits 
     game.quad[game.tholian.kloc.x][game.tholian.kloc.y]=IHWEB
     dropin(IHBLANK)
-    crmena(True, IHT, "sector", game.tholian)
-    prout(_(" completes web."))
+    prout(crmena(True, IHT, "sector", game.tholian) + _(" completes web."))
     game.tholian.move(None)
     return
 
@@ -1257,20 +1254,18 @@ def collision(rammed, enemy):
     prout(_("***COLLISION IMMINENT."))
     skip(2)
     proutn("***")
-    crmshp()
+    proutn(crmshp())
     hardness = {IHR:1.5, IHC:2.0, IHS:2.5, IHT:0.5, IHQUEST:4.0}.get(enemy.type, 1.0)
     if rammed:
         proutn(_(" rammed by "))
     else:
         proutn(_(" rams "))
-    crmena(False, enemy.type, "sector", enemy.kloc)
+    proutn(crmena(False, enemy.type, "sector", enemy.kloc))
     if rammed:
 	proutn(_(" (original position)"))
     skip(1)
     deadkl(enemy.kloc, enemy.type, game.sector)
-    proutn("***")
-    crmshp()
-    prout(_(" heavily damaged."))
+    proutn("***" + crmship() + " heavily damaged.")
     icas = randrange(10, 30)
     prout(_("***Sickbay reports %d casualties"), icas)
     game.casual += icas
@@ -1307,8 +1302,7 @@ def torpedo(course, dispersion, origin, number, nburst):
     deltax = -math.sin(angle);
     deltay = math.cos(angle);
     x = origin.x; y = origin.y
-    w = coord(); jw = coord()
-    w.x = w.y = jw.x = jw.y = 0
+    w = coord(0, 0); jw = coord(0, 0)
     bigger = max(math.fabs(deltax), math.fabs(deltay))
     deltax /= bigger
     deltay /= bigger
@@ -1334,9 +1328,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    skip(1);	# start new line after text track 
 	if iquad in (IHE, IHF): # Hit our ship 
 	    skip(1)
-	    proutn(_("Torpedo hits "))
-	    crmshp()
-	    prout(".")
+	    prout(_("Torpedo hits %s.") % crmshp())
 	    hit = 700.0 + randreal(100) - \
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    newcnd(); # we're blown out of dock 
@@ -1360,12 +1352,11 @@ def torpedo(course, dispersion, origin, number, nburst):
 		# can't move into object 
 		return hit
 	    game.sector = jw
-	    crmshp()
+	    proutn(crmshp())
 	    shoved = True
 	elif iquad in (IHC, IHS): # Hit a commander 
 	    if withprob(0.05):
-		crmena(True, iquad, "sector", w)
-		prout(_(" uses anti-photon device;"))
+		prout(crmena(True, iquad, "sector", w) + _(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
 		return None
 	elif iquad in (IHR, IHK): # Hit a regular enemy 
@@ -1386,7 +1377,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    if enemy.kpower == 0:
 		deadkl(w, iquad, w)
 		return None
-	    crmena(True, iquad, "sector", w)
+	    proutn(crmena(True, iquad, "sector", w))
 	    # If enemy damaged but not destroyed, try to displace 
 	    ang = angle + 2.5*(randreal()-0.5)
 	    temp = math.fabs(math.sin(ang))
@@ -1423,8 +1414,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    newcnd()
 	    return None
 	elif iquad == IHP: # Hit a planet 
-	    crmena(True, iquad, "sector", w)
-	    prout(_(" destroyed."))
+	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nplankl += 1
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 	    game.iplnet.pclass = "destroyed"
@@ -1436,8 +1426,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 		finish(FDPLANET)
 	    return None
 	elif iquad == IHW: # Hit an inhabited world -- very bad! 
-	    crmena(True, iquad, "sector", w)
-	    prout(_(" destroyed."))
+	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nworldkl += 1
 	    game.state.galaxy[game.quadrant.x][game.quadrant.y].planet = None
 	    game.iplnet.pclass = "destroyed"
@@ -1454,8 +1443,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    if withprob(0.9):
 		nova(w)
             else:
-                crmena(True, IHSTAR, "sector", w)
-                prout(_(" unaffected by photon blast."))
+                prout(crmena(True, IHSTAR, "sector", w) + _(" unaffected by photon blast."))
 	    return None
 	elif iquad == IHQUEST: # Hit a thingy 
 	    if not (game.options & OPTION_THINGY) or withprob(0.3):
@@ -1479,8 +1467,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 	    return None
 	elif iquad == IHBLANK: # Black hole 
 	    skip(1)
-	    crmena(True, IHBLANK, "sector", w)
-	    prout(_(" swallows torpedo."))
+	    prout(crmena(True, IHBLANK, "sector", w) + _(" swallows torpedo."))
 	    return None
 	elif iquad == IHWEB: # hit the web 
 	    skip(1)
@@ -1496,7 +1483,7 @@ def torpedo(course, dispersion, origin, number, nburst):
 		game.tholian = None
 		return None
 	    skip(1)
-	    crmena(True, IHT, "sector", w)
+	    proutn(crmena(True, IHT, "sector", w))
 	    if withprob(0.05):
 		prout(_(" survives photon blast."))
 		return None
@@ -1508,7 +1495,7 @@ def torpedo(course, dispersion, origin, number, nburst):
         else: # Problem!
 	    skip(1)
 	    proutn("Don't know how to handle torpedo collision with ")
-	    crmena(True, iquad, "sector", w)
+	    proutn(crmena(True, iquad, "sector", w))
 	    skip(1)
 	    return None
 	break
@@ -1620,8 +1607,7 @@ def attack(torps_ok):
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
 	    if not damaged(DSRSENS):
-		proutn(_(" From "))
-		crmena(False, enemy.type, where, enemy.kloc)
+		proutn(_(" From ") + crmena(False, enemy.type, where, enemy.kloc))
 	    attempt = True
 	    prout("  ")
 	    dispersion = (randreal()+randreal())*0.5 - 0.5
@@ -1657,11 +1643,9 @@ def attack(torps_ok):
 	ihurt = True
 	proutn(_("%d unit hit") % int(hit))
 	if (damaged(DSRSENS) and usephasers) or game.skill<=SKILL_FAIR:
-	    proutn(_(" on the "))
-	    crmshp()
+	    proutn(_(" on the ") + crmshp())
 	if not damaged(DSRSENS) and usephasers:
-	    proutn(_(" from "))
-	    crmena(False, enemy.type, where, enemy.kloc)
+	    prout(_(" from ") + crmena(False, enemy.type, where, enemy.kloc))
 	skip(1)
 	# Decide if hit is critical 
 	if hit > hitmax:
@@ -1708,7 +1692,7 @@ def attack(torps_ok):
 def deadkl(w, type, mv):
     "Kill a Klingon, Tholian, Romulan, or Thingy." 
     # Added mv to allow enemy to "move" before dying 
-    crmena(True, type, "sector", mv)
+    proutn(crmena(True, type, "sector", mv))
     # Decide what kind of enemy it is and update appropriately 
     if type == IHR:
         # chalk up a Romulan 
@@ -1938,7 +1922,7 @@ def hittem(hits):
 	ienm = game.quad[w.x][w.y]
 	if ienm==IHQUEST:
 	    thing.angry = True
-	crmena(False, ienm, "sector", w)
+	proutn(crmena(False, ienm, "sector", w))
 	skip(1)
 	if kpow == 0:
 	    deadkl(w, ienm, w)
@@ -2127,8 +2111,7 @@ def phasers():
 		rpow = 0.0
 	    if damaged(DSRSENS) and \
                not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
-		cramen(ienm)
-		prout(_(" can't be located without short range scan."))
+		prout(cramen(ienm) + _(" can't be located without short range scan."))
 		scanner.chew()
 		key = IHEOL
 		hits[k] = 0; # prevent overflow -- thanks to Alexei Voitenko 
@@ -2145,9 +2128,8 @@ def phasers():
 		else:
 		    proutn("??")
 		proutn(")  ")
-		proutn(_("units to fire at "))
-		crmena(False, ienm, "sector", aim)
-		proutn("-  ")
+		proutn(_("units to fire at %s-  ") % crmena(False, ienm, "sector", aim))
+		
 		key = scanner.next()
 	    if key == IHALPHA and scanner.sees("no"):
 		no = True
@@ -2257,9 +2239,7 @@ def events():
         announce()
         game.optime = (10.0/(7.5*7.5))*yank # 7.5 is yank rate (warp 7.5) 
         skip(1)
-        proutn("***")
-        crmshp()
-        prout(_(" caught in long range tractor beam--"))
+        prout("***" + crmshp() + _(" caught in long range tractor beam--"))
         # If Kirk & Co. screwing around on planet, handle 
         atover(True) # atover(true) is Grab 
         if game.alldone:
@@ -2282,8 +2262,7 @@ def events():
         else:
             game.quadrant = game.state.kcmdr[i]
         game.sector = randplace(QUADSIZE)
-        crmshp()
-        prout(_(" is pulled to Quadrant %s, Sector %s") \
+        prout(crmshp() + _(" is pulled to Quadrant %s, Sector %s") \
                % (game.quadrant, game.sector))
         if game.resting:
             prout(_("(Remainder of rest/repair period cancelled.)"))
@@ -2718,8 +2697,7 @@ def nova(nov):
 	return
     # handle initial nova 
     game.quad[nov.x][nov.y] = IHDOT
-    crmena(False, IHSTAR, "sector", nov)
-    prout(_(" novas."))
+    prout(crmena(False, IHSTAR, "sector", nov) + _(" novas."))
     game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
     game.state.starkl += 1
     # Set up queue to recursively trigger adjacent stars 
@@ -2748,7 +2726,7 @@ def nova(nov):
                         hits.append(neighbor)
 			game.state.galaxy[game.quadrant.x][game.quadrant.y].stars -= 1
 			game.state.starkl += 1
-			crmena(True, IHSTAR, "sector", neighbor)
+			proutn(crmena(True, IHSTAR, "sector", neighbor))
 			prout(_(" novas."))
                         game.quad[neighbor.x][neighbor.y] = IHDOT
                         kount += 1
@@ -2758,8 +2736,7 @@ def nova(nov):
                         game.state.nplankl += 1
                     else:
                         game.state.worldkl += 1
-                    crmena(True, iquad, "sector", neighbor)
-                    prout(_(" destroyed."))
+                    prout(crmena(True, IHB, "sector", neighbor) + _(" destroyed."))
                     game.iplnet.pclass = "destroyed"
                     game.iplnet = None
                     game.plnet.invalidate()
@@ -2773,8 +2750,7 @@ def nova(nov):
                     game.base.invalidate()
                     game.state.basekl += 1
                     newcnd()
-                    crmena(True, IHB, "sector", neighbor)
-                    prout(_(" destroyed."))
+                    prout(crmena(True, IHB, "sector", neighbor) + _(" destroyed."))
                     game.quad[neighbor.x][neighbor.y] = IHDOT
                 elif iquad in (IHE, IHF): # Buffet ship 
                     prout(_("***Starship buffeted by nova."))
@@ -2806,16 +2782,14 @@ def nova(nov):
                         deadkl(neighbor, iquad, neighbor)
                         break
                     newc = neighbor + neighbor - hits[mm]
-                    crmena(True, iquad, "sector", neighbor)
-                    proutn(_(" damaged"))
+                    proutn(crmena(True, iquad, "sector", neighbor) + _(" damaged"))
                     if not VALID_SECTOR(newc.x, newc.y):
                         # can't leave quadrant 
                         skip(1)
                         break
                     iquad1 = game.quad[newc.x][newc.y]
                     if iquad1 == IHBLANK:
-                        proutn(_(", blasted into "))
-                        crmena(False, IHBLANK, "sector", newc)
+                        proutn(_(", blasted into ") + crmena(False, IHBLANK, "sector", newc))
                         skip(1)
                         deadkl(neighbor, iquad, newc)
                         break
@@ -2990,9 +2964,7 @@ def kaboom():
     stars()
     if game.ship==IHE:
 	prouts("***")
-    prouts(_("********* Entropy of "))
-    crmshp()
-    prouts(_(" maximized *********"))
+    prouts(_("********* Entropy of %s maximized *********") % crmshp())
     skip(1)
     stars()
     skip(1)
@@ -3121,9 +3093,7 @@ def finish(ifin):
 	skip(1)
 	prout(_("Your starship is a derelict in space."))
     elif ifin == FBATTLE:
-	proutn(_("The "))
-	crmshp()
-	prout(_(" has been destroyed in battle."))
+	prout(_("The %s has been destroyed in battle.") % crmshp())
 	skip(1)
 	prout(_("Dulce et decorum est pro patria mori."))
     elif ifin == FNEG3:
@@ -3137,9 +3107,7 @@ def finish(ifin):
 	prout(_("That was a great shot."))
 	skip(1)
     elif ifin == FSNOVAED:
-	proutn(_("The "))
-	crmshp()
-	prout(_(" has been fried by a supernova."))
+	prout(_("The %s has been fried by a supernova.") % crmshp())
 	prout(_("...Not even cinders remain..."))
     elif ifin == FABANDN:
 	prout(_("You have been captured by the Klingons. If you still"))
@@ -3152,9 +3120,7 @@ def finish(ifin):
 	prout(_("Starbase was unable to re-materialize your starship."))
 	prout(_("Sic transit gloria mundi"))
     elif ifin == FPHASER:
-	proutn(_("The "))
-	crmshp()
-	prout(_(" has been cremated by its own phasers."))
+	prout(_("The %s has been cremated by its own phasers.") % crmshp())
     elif ifin == FLOST:
 	prout(_("You and your landing party have been"))
 	prout(_("converted to energy, disipating through space."))
@@ -3164,9 +3130,7 @@ def finish(ifin):
 	skip(1)
 	prout(_("They are very fond of \"Captain Kirk\" soup."))
 	skip(1)
-	proutn(_("Without your leadership, the "))
-	crmshp()
-	prout(_(" is destroyed."))
+	prout(_("Without your leadership, the %s is destroyed.") % crmshp())
     elif ifin == FDPLANET:
 	prout(_("You and your mining party perish."))
 	skip(1)
@@ -3176,25 +3140,19 @@ def finish(ifin):
 	prout(_("The Galileo is instantly annihilated by the supernova."))
 	prout(_("You and your mining party are atomized."))
 	skip(1)
-	proutn(_("Mr. Spock takes command of the "))
-	crmshp()
-	prout(_(" and"))
-	prout(_("joins the Romulans, reigning terror on the Federation."))
+	prout(_("Mr. Spock takes command of the %s and") % crmshp())
+	prout(_("joins the Romulans, wreaking terror on the Federation."))
     elif ifin == FPNOVA:
 	prout(_("You and your mining party are atomized."))
 	skip(1)
-	proutn(_("Mr. Spock takes command of the "))
-	crmshp()
-	prout(_(" and"))
-	prout(_("joins the Romulans, reigning terror on the Federation."))
+	prout(_("Mr. Spock takes command of the %s and") % crmshp())
+	prout(_("joins the Romulans, wreaking terror on the Federation."))
     elif ifin == FSTRACTOR:
 	prout(_("The shuttle craft Galileo is also caught,"))
 	prout(_("and breaks up under the strain."))
 	skip(1)
 	prout(_("Your debris is scattered for millions of miles."))
-	proutn(_("Without your leadership, the "))
-	crmshp()
-	prout(_(" is destroyed."))
+	prout(_("Without your leadership, the %s is destroyed.") % crmshp())
     elif ifin == FDRAY:
 	prout(_("The mutants attack and kill Spock."))
 	prout(_("Your ship is captured by Klingons, and"))
@@ -3841,8 +3799,7 @@ def imove(novapush):
 		    skip(1)
 		    prouts(_("***RED ALERT!  RED ALERT!"))
 		    skip(1)
-		    proutn("***")
-		    crmshp()
+		    proutn("***" + crmshp())
 		    proutn(_(" pulled into black hole at Sector %s") % w)
 		    #
 		    # Getting pulled into a black hole was certain
@@ -3862,7 +3819,7 @@ def imove(novapush):
 		else:
 		    # something else 
 		    skip(1)
-		    crmshp()
+		    proutn(crmshp())
 		    if iquad == IHWEB:
 			prout(_(" encounters Tholian web at %s;") % w)
 		    else:
@@ -3895,8 +3852,7 @@ def dock(verbose):
 	prout(_("You must first leave standard orbit."))
 	return
     if not game.base.is_valid() or abs(game.sector.x-game.base.x) > 1 or abs(game.sector.y-game.base.y) > 1:
-	crmshp()
-	prout(_(" not adjacent to base."))
+	prout(crmshp() + _(" not adjacent to base."))
 	return
     game.condition = "docked"
     if "verbose":
@@ -4306,13 +4262,10 @@ def atover(igrab):
 	if game.justin:
 	    prouts(_("***RED ALERT!  RED ALERT!"))
 	    skip(1)
-	    proutn(_("The "))
-	    crmshp()
-	    prout(_(" has stopped in a quadrant containing"))
+	    proutn(_("The %s has stopped in a quadrant containing") % crmshp())
 	    prouts(_("   a supernova."))
 	    skip(2)
-	proutn(_("***Emergency automatic override attempts to hurl "))
-	crmshp()
+	prout(_("***Emergency automatic override attempts to hurl ")+crmshp())
 	skip(1)
 	prout(_("safely out of quadrant."))
 	if not damaged(DRADIO):
@@ -4495,9 +4448,7 @@ def mayday():
 	prout(_("Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\""))
 	return
     if game.landed:
-	proutn(_("You must be aboard the "))
-	crmshp()
-	prout(".")
+	prout(_("You must be aboard the %s.") % crmshp())
 	return
     # OK -- call for help from nearest starbase 
     game.nhelp += 1
@@ -4515,13 +4466,12 @@ def mayday():
 	newqad(True)
     # dematerialize starship 
     game.quad[game.sector.x][game.sector.y]=IHDOT
-    proutn(_("Starbase in Quadrant %s responds--") % game.quadrant)
-    crmshp()
-    prout(_(" dematerializes."))
-    game.sector.x=0
+    proutn(_("Starbase in Quadrant %s responds--%s dematerializes") \
+           % (game.quadrant, crmshp()))
+    game.sector.invalidate()
     for m in range(1, 5+1):
         w = game.base.scatter() 
-	if VALID_SECTOR(ix,iy) and game.quad[ix][iy]==IHDOT:
+	if VALID_SECTOR(w.x,w.y) and game.quad[w.x][w.y]==IHDOT:
 	    # found one -- finish up 
             game.sector = w
 	    break
@@ -4535,8 +4485,7 @@ def mayday():
 	if m == 1: proutn(_("1st"))
 	elif m == 2: proutn(_("2nd"))
 	elif m == 3: proutn(_("3rd"))
-	proutn(_(" attempt to re-materialize "))
-	crmshp()
+	proutn(_(" attempt to re-materialize ") + crmshp())
 	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
 	textcolor("red")
 	warble()
@@ -4728,8 +4677,7 @@ def orbit():
         prout("There is no planet in this sector.")
         return
     if abs(game.sector.x-game.plnet.x)>1 or abs(game.sector.y-game.plnet.y)>1:
-	crmshp()
-	prout(_(" not adjacent to planet."))
+	prout(crmshp() + _(" not adjacent to planet."))
 	skip(1)
 	return
     game.optime = randreal(0.02, 0.05)
@@ -4783,8 +4731,7 @@ def beam():
 		shuttle()
 	return
     if not game.inorbit:
-	crmshp()
-	prout(_(" not in standard orbit."))
+	prout(crmshp() + _(" not in standard orbit."))
 	return
     if game.shldup:
 	prout(_("Impossible to transport through shields."))
@@ -4878,9 +4825,7 @@ def mine():
 	prout(_("You've already mined enough crystals for this trip."))
 	return
     if game.icrystl and game.cryprob == 0.05:
-	proutn(_("With all those fresh crystals aboard the "))
-	crmshp()
-	skip(1)
+	prout(_("With all those fresh crystals aboard the ") + crmshp())
 	prout(_("there's no reason to mine more at this time."))
 	return
     game.optime = randreal(0.1, 0.3)*(ord(game.iplnet.pclass)-ord("L"))
@@ -4952,8 +4897,7 @@ def shuttle():
 	    prout(_("Shuttle craft is now serving Big Macs."))
 	return
     if not game.inorbit:
-	crmshp()
-	prout(_(" not in standard orbit."))
+	prout(crmshp() + _(" not in standard orbit."))
 	return
     if (game.iplnet.known != "shuttle_down") and game.iscraft != "onship":
 	prout(_("Shuttle craft not currently available."))
@@ -6420,35 +6364,34 @@ def makemoves():
     if idebug:
 	prout("=== Ending")
 
-def cramen(cmd):
+def cramen(type):
     "Emit the name of an enemy or feature." 
-    if   cmd == IHR: s = _("Romulan")
-    elif cmd == IHK: s = _("Klingon")
-    elif cmd == IHC: s = _("Commander")
-    elif cmd == IHS: s = _("Super-commander")
-    elif cmd == IHSTAR: s = _("Star")
-    elif cmd == IHP: s = _("Planet")
-    elif cmd == IHB: s = _("Starbase")
-    elif cmd == IHBLANK: s = _("Black hole")
-    elif cmd == IHT: s = _("Tholian")
-    elif cmd == IHWEB: s = _("Tholian web")
-    elif cmd == IHQUEST: s = _("Stranger")
-    elif cmd == IHW: s = _("Inhabited World")
+    if   type == IHR: s = _("Romulan")
+    elif type == IHK: s = _("Klingon")
+    elif type == IHC: s = _("Commander")
+    elif type == IHS: s = _("Super-commander")
+    elif type == IHSTAR: s = _("Star")
+    elif type == IHP: s = _("Planet")
+    elif type == IHB: s = _("Starbase")
+    elif type == IHBLANK: s = _("Black hole")
+    elif type == IHT: s = _("Tholian")
+    elif type == IHWEB: s = _("Tholian web")
+    elif type == IHQUEST: s = _("Stranger")
+    elif type == IHW: s = _("Inhabited World")
     else: s = "Unknown??"
-    proutn(s)
+    return s
 
 def crmena(stars, enemy, loctype, w):
-    "Emit the name of an enemy and his location." 
-    if stars:
-	proutn("***")
-    cramen(enemy)
-    proutn(_(" at "))
+    "Emit the name of an enemy and his location."
     buf = ""
+    if stars:
+	buf += "***"
+    buf += cramen(enemy) + _(" at ")
     if loctype == "quadrant":
-	buf = _("Quadrant ")
+	buf += _("Quadrant ")
     elif loctype == "sector":
-	buf = _("Sector ")
-    proutn(buf + `w`)
+	buf += _("Sector ")
+    return buf + `w`
 
 def crmshp():
     "Emit our ship name." 
@@ -6458,7 +6401,7 @@ def crmshp():
         s = _("Faerie Queene")
     else:
         s = "Ship???"
-    proutn(s)
+    return s
 
 def stars():
     "Emit a line of stars" 
