@@ -179,13 +179,12 @@ more:
 the LRSCAN command is no longer needed.  (Controlled by OPTION_AUTOSCAN
 and turned off if game type is "plain" or "almy".)
 """
-import os, sys, math, curses, time, readline, cPickle, random, copy
+import os, sys, math, curses, time, readline, cPickle, random, copy, gettext
 
 SSTDOC  	= "/usr/share/doc/sst/sst.doc"
 DOC_NAME	= "sst.doc"
 
-# Stub to be replaced
-def _(str): return str
+def _(str): return gettext.gettext(str)
 
 PHASEFAC	= 2.0
 GALSIZE 	= 8
@@ -3305,6 +3304,8 @@ curwnd = None
 
 def iostart():
     global stdscr, rows
+    gettext.bindtextdomain("sst", "/usr/local/share/locale")
+    gettext.textdomain("sst")
     if not (game.options & OPTION_CURSES):
 	ln_env = os.getenv("LINES")
         if ln_env:
