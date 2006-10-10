@@ -1573,7 +1573,7 @@ def attack(torps_ok):
 	    hit = enemy.kpower*math.pow(dustfac,enemy.kavgd)
 	    enemy.kpower *= 0.75
 	else: # Enemy uses photon torpedo 
-	    #course2 = (enemy.kloc-game.sector).bearing()
+	    # We should be able to make the bearing() method work here
 	    course = 1.90985*math.atan2(game.sector.j-enemy.kloc.j, enemy.kloc.i-game.sector.i)
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
@@ -6552,11 +6552,10 @@ if __name__ == '__main__':
         game = gamestate()
         idebug = 0
         game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_PLAIN | OPTION_ALMY)
-        # Disable curses mode until the game logic is working.
-        #    if os.getenv("TERM"):
-        #	game.options |= OPTION_CURSES | OPTION_SHOWME
-        #    else:
-        game.options |= OPTION_TTY
+        if os.getenv("TERM"):
+            game.options |= OPTION_CURSES
+        else:
+            game.options |= OPTION_TTY
         seed = int(time.time())
         (options, arguments) = getopt.getopt(sys.argv[1:], "r:s:tx")
         for (switch, val) in options:
