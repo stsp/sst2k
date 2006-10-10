@@ -853,9 +853,9 @@ def movescom(iq, avoid):
     "Commander movement helper." 
     # Avoid quadrants with bases if we want to avoid Enterprise 
     if not welcoming(iq) or (avoid and iq in game.state.baseq):
-	return True
+	return False
     if game.justin and not game.iscate:
-	return True
+	return False
     # do the move 
     game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons -= 1
     game.state.kscmdr = iq
@@ -887,7 +887,7 @@ def movescom(iq, avoid):
 		proutn(_("   a planet in Quadrant %s has been destroyed") % game.state.kscmdr)
 		prout(_("   by the Super-commander.\""))
 	    break
-    return False; # looks good! 
+    return True; # looks good! 
 			
 def supercommander():
     "Move the Super Commander." 
@@ -945,24 +945,24 @@ def supercommander():
     # there was what looked like a bug in the Almy C code here,
     # but it might be this translation is just wrong.
     iq = game.state.kscmdr + idelta
-    if movescom(iq, avoid):
+    if not movescom(iq, avoid):
 	# failed -- try some other maneuvers 
 	if idelta.i==0 or idelta.j==0:
 	    # attempt angle move 
 	    if idelta.i != 0:
 		iq.j = game.state.kscmdr.j + 1
-		if movescom(iq, avoid):
+		if not movescom(iq, avoid):
 		    iq.j = game.state.kscmdr.j - 1
 		    movescom(iq, avoid)
-	    else:
+	    elif idelta.j != 0:
 		iq.i = game.state.kscmdr.i + 1
-		if movescom(iq, avoid):
+		if not movescom(iq, avoid):
 		    iq.i = game.state.kscmdr.i - 1
 		    movescom(iq, avoid)
 	else:
 	    # try moving just in x or y 
 	    iq.j = game.state.kscmdr.j
-	    if movescom(iq, avoid):
+	    if not movescom(iq, avoid):
 		iq.j = game.state.kscmdr.j + idelta.j
 		iq.i = game.state.kscmdr.i
 		movescom(iq, avoid)
@@ -970,7 +970,7 @@ def supercommander():
     if len(game.state.baseq) == 0:
 	unschedule(FSCMOVE)
     else:
-        for (i, ibq) in enumerate(game.state.baseq):
+        for ibq in game.state.baseq:
 	    if ibq == game.state.kscmdr and game.state.kscmdr == game.battle:
 		# attack the base 
 		if avoid:
@@ -1654,7 +1654,7 @@ def deadkl(w, type, mv):
     proutn(crmena(True, type, "sector", mv))
     # Decide what kind of enemy it is and update appropriately 
     if type == IHR:
-        # chalk up a Romulan 
+        # Chalk up a Romulan 
         game.state.galaxy[game.quadrant.i][game.quadrant.j].romulans -= 1
         game.irhere -= 1
         game.state.nromrem -= 1
@@ -1666,7 +1666,7 @@ def deadkl(w, type, mv):
         global thing
         thing = None
     else:
-        # Some type of a Klingon 
+        # Killed some type of Klingon 
         game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
         game.klhere -= 1
         if type == IHC:
