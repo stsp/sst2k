@@ -795,13 +795,13 @@ def movebaddy(enemy):
 	# Check if preferred position available 
 	look = next + m
         if m.i < 0:
-            krawlx = 1
+            krawli = 1
         else:
-            krawlx = -1
+            krawli = -1
         if m.j < 0:
-            krawly = 1
+            krawlj = 1
         else:
-            krawly = -1
+            krawlj = -1
 	success = False
 	attempts = 0; # Settle mysterious hang problem 
 	while attempts < 20 and not success:
@@ -809,29 +809,29 @@ def movebaddy(enemy):
 	    if look.i < 0 or look.i >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawlx == m.i or m.j == 0:
+		if krawli == m.i or m.j == 0:
 		    break
-		look.i = next.i + krawlx
-		krawlx = -krawlx
+		look.i = next.i + krawli
+		krawli = -krawli
 	    elif look.j < 0 or look.j >= QUADSIZE:
 		if motion < 0 and tryexit(enemy, look, irun):
 		    return
-		if krawly == m.j or m.i == 0:
+		if krawlj == m.j or m.i == 0:
 		    break
-		look.j = next.j + krawly
-		krawly = -krawly
+		look.j = next.j + krawlj
+		krawlj = -krawlj
 	    elif (game.options & OPTION_RAMMING) and game.quad[look.i][look.j] != IHDOT:
 		# See if enemy should ram ship 
 		if game.quad[look.i][look.j] == game.ship and \
 		    (enemy.type == IHC or enemy.type == IHS):
 		    collision(rammed=True, enemy=enemy)
 		    return
-		if krawlx != m.i and m.j != 0:
-		    look.i = next.i + krawlx
-		    krawlx = -krawlx
-		elif krawly != m.j and m.i != 0:
-		    look.j = next.j + krawly
-		    krawly = -krawly
+		if krawli != m.i and m.j != 0:
+		    look.i = next.i + krawli
+		    krawli = -krawli
+		elif krawlj != m.j and m.i != 0:
+		    look.j = next.j + krawlj
+		    krawlj = -krawlj
 		else:
 		    break; # we have failed 
 	    else:
@@ -2382,7 +2382,7 @@ def events():
 	game.optime -= xtime
 	if evcode == FSNOVA: # Supernova 
 	    announce()
-	    supernova(False)
+	    supernova(None)
 	    schedule(FSNOVA, expran(0.5*game.intime))
 	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 		return
@@ -2518,7 +2518,7 @@ def events():
 	    game.proben -= 1 # One less to travel
 	    if game.proben == 0 and game.isarmed and pdest.stars:
 		# lets blow the sucker! 
-		supernova(True, game.probec)
+		supernova(game.probec)
 		unschedule(FDSPROB)
 		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova: 
 		    return
@@ -2682,7 +2682,7 @@ def nova(nov):
     newc = coord(); neighbor = coord(); bump = coord(0, 0)
     if withprob(0.05):
 	# Wow! We've supernova'ed 
-	supernova(False, nov)
+	supernova(game.quadrant)
 	return
     # handle initial nova 
     game.quad[nov.i][nov.j] = IHDOT
@@ -2709,7 +2709,7 @@ def nova(nov):
                 elif iquad == IHSTAR: # Affect another star 
                     if withprob(0.05):
                         # This star supernovas 
-                        supernova(False)
+                        supernova(game.quadrant)
                         return
                     else:
                         hits.append(neighbor)
@@ -2804,17 +2804,15 @@ def nova(nov):
     game.optime = 10.0*game.dist/16.0
     return
 	
-def supernova(induced, w=None):
+def supernova(w):
     "Star goes supernova."
     num = 0; npdead = 0
-    nq = coord()
     if w != None: 
-	nq = w
+	nq = copy.copy(w)
     else:
+	# Scheduled supernova -- select star at random. 
 	stars = 0
-	# Scheduled supernova -- select star 
-	# logic changed here so that we won't favor quadrants in top
-        # left of universe 
+        nq = coord()
 	for nq.i in range(GALSIZE):
 	    for nq.j in range(GALSIZE):
 		stars += game.state.galaxy[nq.i][nq.j].stars
@@ -2860,7 +2858,7 @@ def supernova(induced, w=None):
 	    skip(1)
 	    stars()
 	    game.alldone = True
-    # destroy any Klingons in supernovaed quadrant 
+    # destroy any Klingons in supernovaed quadrant
     kldead = game.state.galaxy[nq.i][nq.j].klingons
     game.state.galaxy[nq.i][nq.j].klingons = 0
     if nq == game.state.kscmdr:
@@ -2888,7 +2886,7 @@ def supernova(induced, w=None):
     # Destroy any base in supernovaed quadrant
     game.state.baseq = filter(lambda x: x != nq, game.state.baseq)
     # If starship caused supernova, tally up destruction 
-    if induced:
+    if w != None:
 	game.state.starkl += game.state.galaxy[nq.i][nq.j].stars
 	game.state.basekl += game.state.galaxy[nq.i][nq.j].starbase
 	game.state.nplankl += npdead
@@ -2898,7 +2896,7 @@ def supernova(induced, w=None):
     # If supernova destroys last Klingons give special message 
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0 and not nq == game.quadrant:
 	skip(2)
-	if not induced:
+	if w == None:
 	    prout(_("Lucky you!"))
 	proutn(_("A supernova in %s has just destroyed the last Klingons.") % nq)
 	finish(FWON)
@@ -3947,8 +3945,8 @@ def getcourse(isprobe, akey):
 	    xl = int(round(scanner.real))-1
 	    dquad.i = xi
 	    dquad.j = xj
-	    dsect.j = xk
-	    dsect.i = xl
+	    dsect.i = xk
+	    dsect.j = xl
 	else:
             # only one pair of numbers was specified
 	    if isprobe:
@@ -3958,10 +3956,10 @@ def getcourse(isprobe, akey):
 		dsect.j = dsect.i = 4	# preserves 1-origin behavior
 	    else:
                 # only sector specified
-		dsect.j = xi
-		dsect.i = xj
+		dsect.i = xi
+		dsect.j = xj
 	    itemp = "normal"
-	if not VALID_QUADRANT(dquad.j,dquad.i) or not VALID_SECTOR(dsect.i,dsect.j):
+	if not VALID_QUADRANT(dquad.i,dquad.j) or not VALID_SECTOR(dsect.i,dsect.j):
 	    huh()
 	    return False
 	skip(1)
@@ -3973,8 +3971,8 @@ def getcourse(isprobe, akey):
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
         delta = coord()
-	delta.i = dquad.j-game.quadrant.j + 0.1*(dsect.i-game.sector.j)
-	delta.j = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.j)
+	delta.i = dquad.j-game.quadrant.j + 0.1*(dsect.j-game.sector.j)
+	delta.j = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.i)
     else: # manual 
 	while key == IHEOL:
 	    proutn(_("X and Y displacements- "))
@@ -6465,11 +6463,11 @@ def ja():
     scanner.chew()
     while True:
 	scanner.next()
-	scanner.chew()
 	if scanner.token == 'y':
 	    return True
 	if scanner.token == 'n':
 	    return False
+	scanner.chew()
 	proutn(_("Please answer with \"y\" or \"n\": "))
 
 def huh():
