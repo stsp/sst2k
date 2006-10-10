@@ -227,10 +227,6 @@ IHMATER0 = '-',
 IHMATER1 = 'o',
 IHMATER2 = '0'
 
-IHEOL = '\n'
-IHREAL = 0.0
-IHALPHA = " "
-
 class coord:
     def __init__(self, x=None, y=None):
         self.i = x
@@ -1096,7 +1092,7 @@ def doshield(shraise):
 	action = "SHUP"
     else:
 	key = scanner.next()
-	if key == IHALPHA:
+	if key == "IHALPHA":
 	    if scanner.sees("transfer"):
 		action = "NRG"
 	    else:
@@ -1155,7 +1151,7 @@ def doshield(shraise):
 	game.ididit = True
 	return
     elif action == "NRG":
-	while scanner.next() != IHREAL:
+	while scanner.next() != "IHREAL":
 	    scanner.chew()
 	    proutn(_("Energy to transfer to shields- "))
 	scanner.chew()
@@ -1759,15 +1755,15 @@ def photon():
     # First, get torpedo count
     while True:
         scanner.next()
-	if scanner.token == IHALPHA:
+	if scanner.token == "IHALPHA":
 	    huh()
 	    return
-	elif scanner.token == IHEOL or not scanner.waiting():
+	elif scanner.token == "IHEOL" or not scanner.waiting():
 	    prout(_("%d torpedoes left.") % game.torps)
             scanner.chew()
 	    proutn(_("Number of torpedoes to fire- "))
             continue	# Go back around to get a number
-	else: # key == IHREAL
+	else: # key == "IHREAL"
 	    n = scanner.int()
 	    if n <= 0: # abort command 
 		scanner.chew()
@@ -1784,9 +1780,9 @@ def photon():
     target = []
     for i in range(n):
 	key = scanner.next()
-	if i==0 and key == IHEOL:
+	if i==0 and key == "IHEOL":
 	    break;	# no coordinate waiting, we will try prompting 
-	if i==1 and key == IHEOL:
+	if i==1 and key == "IHEOL":
 	    # direct all torpedoes at one target 
 	    while i < n:
 		target.append(targets[0])
@@ -1965,12 +1961,12 @@ def phasers():
     # (That was Tom Almy talking about the C code, I think -- ESR)
     while automode=="NOTSET":
 	key=scanner.next()
-	if key == IHALPHA:
+	if key == "IHALPHA":
 	    if scanner.sees("manual"):
 		if len(game.enemies)==0:
 		    prout(_("There is no enemy present to select."))
 		    scanner.chew()
-		    key = IHEOL
+		    key = "IHEOL"
 		    automode="AUTOMATIC"
 		else:
 		    automode = "MANUAL"
@@ -1988,7 +1984,7 @@ def phasers():
 	    else:
 		huh()
 		return
-	elif key == IHREAL:
+	elif key == "IHREAL":
 	    if len(game.enemies)==0:
 		prout(_("Energy will be expended into space."))
 		automode = "AUTOMATIC"
@@ -1997,7 +1993,7 @@ def phasers():
 	    else:
 		automode = "AUTOMATIC"
 	else:
-	    # IHEOL 
+	    # "IHEOL" 
 	    if len(game.enemies)==0:
 		prout(_("Energy will be expended into space."))
 		automode = "AUTOMATIC"
@@ -2010,10 +2006,10 @@ def phasers():
     if ifast:
         avail -= 200.0
     if automode == "AUTOMATIC":
-	if key == IHALPHA and scanner.sees("no"):
+	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	    key = scanner.next()
-	if key != IHREAL and len(game.enemies) != 0:
+	if key != "IHREAL" and len(game.enemies) != 0:
 	    prout(_("Phasers locked on target. Energy available: %.2f")%avail)
 	irec=0
         while True:
@@ -2026,13 +2022,13 @@ def phasers():
 	    scanner.chew()
 	    proutn(_("Units to fire= "))
 	    key = scanner.next()
-	    if key!=IHREAL:
+	    if key!="IHREAL":
 		return
 	    rpow = scanner.real
 	    if rpow > avail:
 		proutn(_("Energy available= %.2f") % avail)
 		skip(1)
-		key = IHEOL
+		key = "IHEOL"
             if not rpow > avail:
                 break
 	if rpow<=0:
@@ -2040,7 +2036,7 @@ def phasers():
 	    scanner.chew()
 	    return
         key=scanner.next()
-	if key == IHALPHA and scanner.sees("no"):
+	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	if ifast:
 	    game.energy -= 200; # Go and do it! 
@@ -2079,7 +2075,7 @@ def phasers():
 		prout(_("%d expended on empty space.") % int(extra))
     elif automode == "FORCEMAN":
 	scanner.chew()
-	key = IHEOL
+	key = "IHEOL"
 	if damaged(DCOMPTR):
 	    prout(_("Battle computer damaged, manual fire only."))
 	else:
@@ -2104,11 +2100,11 @@ def phasers():
                not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
 		prout(cramen(ienm) + _(" can't be located without short range scan."))
 		scanner.chew()
-		key = IHEOL
+		key = "IHEOL"
 		hits[k] = 0; # prevent overflow -- thanks to Alexei Voitenko 
 		k += 1
 		continue
-	    if key == IHEOL:
+	    if key == "IHEOL":
 		scanner.chew()
 		if itarg and k > kz:
 		    irec=(abs(game.enemies[k].kpower)/(PHASEFAC*math.pow(0.9,game.enemies[k].kdist))) *	randreal(1.01, 1.06) + 1.0
@@ -2121,14 +2117,14 @@ def phasers():
 		proutn(")  ")
 		proutn(_("units to fire at %s-  ") % crmena(False, ienm, "sector", aim))		
 		key = scanner.next()
-	    if key == IHALPHA and scanner.sees("no"):
+	    if key == "IHALPHA" and scanner.sees("no"):
 		no = True
 		key = scanner.next()
 		continue
-	    if key == IHALPHA:
+	    if key == "IHALPHA":
 		huh()
 		return
-	    if key == IHEOL:
+	    if key == "IHEOL":
 		if k==1: # Let me say I'm baffled by this 
 		    msgflag = True
 		continue
@@ -2149,7 +2145,7 @@ def phasers():
 	    # zero energy -- abort 
 	    scanner.chew()
 	    return
-	if key == IHALPHA and scanner.sees("no"):
+	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	game.energy -= rpow
 	scanner.chew()
@@ -2624,11 +2620,11 @@ def wait():
     game.ididit = False
     while True:
 	key = scanner.next()
-	if key  != IHEOL:
+	if key  != "IHEOL":
 	    break
 	proutn(_("How long? "))
     scanner.chew()
-    if key != IHREAL:
+    if key != "IHREAL":
 	huh()
 	return
     origTime = delay = scanner.real
@@ -3885,7 +3881,7 @@ def getcourse(isprobe, akey):
 		prout(_("Computer damaged; manual movement only"))
 	    scanner.chew()
 	    navmode = "manual"
-	    key = IHEOL
+	    key = "IHEOL"
 	    break
 	if isprobe and akey != -1:
 	    # For probe launch, use pre-scanned value first time 
@@ -3893,11 +3889,11 @@ def getcourse(isprobe, akey):
 	    akey = -1
 	else: 
 	    key = scanner.next()
-	if key == IHEOL:
+	if key == "IHEOL":
 	    proutn(_("Manual or automatic- "))
 	    iprompt = True
 	    scanner.chew()
-	elif key == IHALPHA:
+	elif key == "IHALPHA":
             if scanner.sees("manual"):
 		navmode = "manual"
 		key = scanner.next()
@@ -3918,7 +3914,7 @@ def getcourse(isprobe, akey):
 	    navmode = "manual"
 	    break
     if navmode == "automatic":
-	while key == IHEOL:
+	while key == "IHEOL":
 	    if isprobe:
 		proutn(_("Target quadrant or quadrant&sector- "))
 	    else:
@@ -3926,21 +3922,21 @@ def getcourse(isprobe, akey):
 	    scanner.chew()
 	    iprompt = True
 	    key = scanner.next()
-	if key != IHREAL:
+	if key != "IHREAL":
 	    huh()
 	    return False
 	xi = int(round(scanner.real))-1
 	key = scanner.next()
-	if key != IHREAL:
+	if key != "IHREAL":
 	    huh()
 	    return False
 	xj = int(round(scanner.real))-1
 	key = scanner.next()
-	if key == IHREAL:
+	if key == "IHREAL":
 	    # both quadrant and sector specified 
 	    xk = int(round(scanner.real))-1
 	    key = scanner.next()
-	    if key != IHREAL:
+	    if key != "IHREAL":
 		huh()
 		return False
 	    xl = int(round(scanner.real))-1
@@ -3975,18 +3971,18 @@ def getcourse(isprobe, akey):
 	delta.i = dquad.j-game.quadrant.j + 0.1*(dsect.j-game.sector.j)
 	delta.j = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.i)
     else: # manual 
-	while key == IHEOL:
+	while key == "IHEOL":
 	    proutn(_("X and Y displacements- "))
 	    scanner.chew()
 	    iprompt = True
 	    key = scanner.next()
 	itemp = "verbose"
-	if key != IHREAL:
+	if key != "IHREAL":
 	    huh()
 	    return False
 	delta.j = scanner.real
 	key = scanner.next()
-	if key != IHREAL:
+	if key != "IHREAL":
 	    huh()
 	    return False
 	delta.i = scanner.real
@@ -4170,12 +4166,12 @@ def setwarp():
     "Change the warp factor."
     while True:
         key=scanner.next()
-        if key != IHEOL:
+        if key != "IHEOL":
             break
 	scanner.chew()
 	proutn(_("Warp factor- "))
     scanner.chew()
-    if key != IHREAL:
+    if key != "IHREAL":
 	huh()
 	return
     if game.damage[DWARPEN] > 10.0:
@@ -4363,7 +4359,7 @@ def probe():
 	    prout(_("Uhura- \"The previous probe is still reporting data, Sir.\""))
 	return
     key = scanner.next()
-    if key == IHEOL:
+    if key == "IHEOL":
 	# slow mode, so let Kirk know how many probes there are left
         if game.nprobes == 1:
             prout(_("1 probe left."))
@@ -4373,10 +4369,10 @@ def probe():
 	if ja() == False:
 	    return
     game.isarmed = False
-    if key == IHALPHA and scanner.token == "armed":
+    if key == "IHALPHA" and scanner.token == "armed":
 	game.isarmed = True
 	key = scanner.next()
-    elif key == IHEOL:
+    elif key == "IHEOL":
 	proutn(_("Arm NOVAMAX warhead? "))
 	game.isarmed = ja()
     if not getcourse(isprobe=True, akey=key):
@@ -5328,7 +5324,7 @@ def status(req=0):
 def request():
     "Request specified status data, a historical relic from slow TTYs."
     requests = ("da","co","po","ls","wa","en","to","sh","kl","sy", "ti")
-    while scanner.next() == IHEOL:
+    while scanner.next() == "IHEOL":
 	proutn(_("Information desired? "))
     scanner.chew()
     if scanner.token in requests:
@@ -5372,21 +5368,21 @@ def eta():
 	prout(_("COMPUTER DAMAGED, USE A POCKET CALCULATOR."))
 	skip(1)
 	return
-    if scanner.next() != IHREAL:
+    if scanner.next() != "IHREAL":
 	prompt = True
 	scanner.chew()
 	proutn(_("Destination quadrant and/or sector? "))
-	if scanner.next()!=IHREAL:
+	if scanner.next()!="IHREAL":
 	    huh()
 	    return
     w1.j = int(scanner.real-0.5)
-    if scanner.next() != IHREAL:
+    if scanner.next() != "IHREAL":
 	huh()
 	return
     w1.i = int(scanner.real-0.5)
-    if scanner.next() == IHREAL:
+    if scanner.next() == "IHREAL":
 	w2.j = int(scanner.real-0.5)
-	if scanner.next() != IHREAL:
+	if scanner.next() != "IHREAL":
 	    huh()
 	    return
 	w2.i = int(scanner.real-0.5)
@@ -5410,7 +5406,7 @@ def eta():
     while True:
 	scanner.chew()
 	proutn(_("Time or arrival date? "))
-	if scanner.next()==IHREAL:
+	if scanner.next()=="IHREAL":
 	    ttime = scanner.real
 	    if ttime > game.state.date:
 		ttime -= game.state.date # Actually a star date
@@ -5424,7 +5420,7 @@ def eta():
 	    break
 	scanner.chew()
 	proutn(_("Warp factor? "))
-	if scanner.next()== IHREAL:
+	if scanner.next()== "IHREAL":
 	    wfl = True
 	    twarp = scanner.real
 	    if twarp<1.0 or twarp > 10.0:
@@ -5442,7 +5438,7 @@ def eta():
 		if not wfl:
 		    return
 		proutn(_("New warp factor to try? "))
-		if scanner.next() == IHREAL:
+		if scanner.next() == "IHREAL":
 		    wfl = True
 		    twarp = scanner.real
 		    if twarp<1.0 or twarp > 10.0:
@@ -5475,7 +5471,7 @@ def eta():
 	    (scheduled(FCDBAS)<ttime+game.state.date and game.battle == w1):
 	    prout(_("The starbase there will be destroyed by then."))
 	proutn(_("New warp factor to try? "))
-	if scanner.next() == IHREAL:
+	if scanner.next() == "IHREAL":
 	    wfl = True
 	    twarp = scanner.real
 	    if twarp<1.0 or twarp > 10.0:
@@ -5503,10 +5499,10 @@ def freeze(boss):
 	scanner.token = "emsave.trk"
     else:
         key = scanner.next()
-	if key == IHEOL:
+	if key == "IHEOL":
 	    proutn(_("File name: "))
 	    key = scanner.next()
-	if key != IHALPHA:
+	if key != "IHALPHA":
 	    huh()
 	    return
 	scanner.chew()
@@ -5524,10 +5520,10 @@ def thaw():
     "Retrieve saved game." 
     game.passwd[0] = '\0'
     key = scanner.next()
-    if key == IHEOL:
+    if key == "IHEOL":
 	proutn(_("File name: "))
 	key = scanner.next()
-    if key != IHALPHA:
+    if key != "IHALPHA":
 	huh()
 	return True
     scanner.chew()
@@ -5825,7 +5821,7 @@ def choose():
 	if len(scanner.token)==0: # Try again
 	    continue
         if scanner.sees("tournament"):
-	    while scanner.next() == IHEOL:
+	    while scanner.next() == "IHEOL":
 		proutn(_("Type in tournament number-"))
 	    if scanner.real == 0:
 		scanner.chew()
@@ -5851,7 +5847,7 @@ def choose():
 	proutn(_("What is \"%s\"?") % scanner.token)
 	scanner.chew()
     while game.length==0 or game.skill==SKILL_NONE:
-	if scanner.next() == IHALPHA:
+	if scanner.next() == "IHALPHA":
             if scanner.sees("short"):
 		game.length = 1
 	    elif scanner.sees("medium"):
@@ -5879,7 +5875,7 @@ def choose():
 	    elif game.skill == SKILL_NONE:
 		proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "))
     # Choose game options -- added by ESR for SST2K
-    if scanner.next() != IHALPHA:
+    if scanner.next() != "IHALPHA":
 	scanner.chew()
 	proutn(_("Choose your game style (or just press enter): "))
 	scanner.next()
@@ -6128,18 +6124,18 @@ def helpme():
     "Browse on-line help."
     key = scanner.next()
     while True:
-	if key == IHEOL:
+	if key == "IHEOL":
 	    setwnd(prompt_window)
 	    proutn(_("Help on what command? "))
 	    key = scanner.next()
 	setwnd(message_window)
-	if key == IHEOL:
+	if key == "IHEOL":
 	    return
         if scanner.token in commands or scanner.token == "ABBREV":
 	    break
 	skip(1)
 	listCommands()
-	key = IHEOL
+	key = "IHEOL"
 	scanner.chew()
 	skip(1)
     cmd = scanner.token.upper()
@@ -6194,7 +6190,7 @@ def makemoves():
 	    setwnd(prompt_window)
 	    clrscr()
 	    proutn("COMMAND> ")
-	    if scanner.next() == IHEOL:
+	    if scanner.next() == "IHEOL":
 		if game.options & OPTION_CURSES:
 		    makechart()
 		continue
@@ -6410,23 +6406,23 @@ class sstscanner:
             if not line:
                 continue
             else:
-                self.inqueue = line.lstrip().split() + [IHEOL] 
+                self.inqueue = line.lstrip().split() + ["IHEOL"] 
         # From here on in it's all looking at the queue
         self.token = self.inqueue.pop(0)
-        if self.token == IHEOL:
-            self.type = IHEOL
-            return IHEOL
+        if self.token == "IHEOL":
+            self.type = "IHEOL"
+            return "IHEOL"
         try:
             self.real = float(self.token)
-            self.type = IHREAL
-            return IHREAL
+            self.type = "IHREAL"
+            return "IHREAL"
         except ValueError:
             pass
         # Treat as alpha
         self.token = self.token.lower()
-        self.type = IHALPHA
+        self.type = "IHALPHA"
         self.real = None
-        return IHALPHA
+        return "IHALPHA"
     def push(self, tok):
         self.inqueue.append(tok)
     def waiting(self):
@@ -6436,8 +6432,8 @@ class sstscanner:
         self.inqueue = []
         self.real = self.token = None
     def chew2(self):
-        # return IHEOL next time 
-        self.inqueue = [IHEOL]
+        # return "IHEOL" next time 
+        self.inqueue = ["IHEOL"]
         self.real = self.token = None
     def sees(self, s):
         # compares s to item and returns true if it matches to the length of s
@@ -6448,16 +6444,18 @@ class sstscanner:
     def getcoord(self):
         s = coord()
         scanner.next()
-    	if scanner.type != IHREAL:
+    	if scanner.type != "IHREAL":
 	    huh()
 	    return None
 	s.i = scanner.int()-1
         scanner.next()
-	if scanner.type != IHREAL:
+	if scanner.type != "IHREAL":
 	    huh()
 	    return None
 	s.j = scanner.int()-1
         return s
+    def __repr__(str):
+        return "<sstcanner: token=%s, type=%s, queue=%s>" % (scanner.token, scanner.type, scanner.inqueue)
 
 def ja():
     "Yes-or-no confirmation."
@@ -6504,7 +6502,7 @@ def debugme():
 	    proutn("Kill %s?" % device[i])
 	    scanner.chew()
 	    key = scanner.next()
-            if key == IHALPHA and scanner.sees("y"):
+            if key == "IHALPHA" and scanner.sees("y"):
 		game.damage[i] = 10.0
     proutn("Examine/change events? ")
     if ja() == True:
@@ -6538,21 +6536,21 @@ def debugme():
 	    if key == 'n':
 		unschedule(i)
 		scanner.chew()
-	    elif key == IHREAL:
+	    elif key == "IHREAL":
 		ev = schedule(i, scanner.real)
 		if i == FENSLV or i == FREPRO:
 		    scanner.chew()
 		    proutn("In quadrant- ")
 		    key = scanner.next()
-		    # IHEOL says to leave coordinates as they are 
-		    if key != IHEOL:
-			if key != IHREAL:
+		    # "IHEOL" says to leave coordinates as they are 
+		    if key != "IHEOL":
+			if key != "IHREAL":
 			    prout("Event %d canceled, no x coordinate." % (i))
 			    unschedule(i)
 			    continue
 			w.i = int(round(scanner.real))
 			key = scanner.next()
-			if key != IHREAL:
+			if key != "IHREAL":
 			    prout("Event %d canceled, no y coordinate." % (i))
 			    unschedule(i)
 			    continue
