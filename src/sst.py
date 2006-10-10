@@ -3400,7 +3400,10 @@ def skip(i):
 		pause_game()
 		clrscr()
 	    else:
-		proutn("\n")
+                try:
+                    curwnd.move(y+1, 0)
+                except curses.error:
+                    pass
 	else:
             global linecount
 	    linecount += 1
@@ -5311,7 +5314,7 @@ def srscan():
 	for j in range(QUADSIZE):
 	    sectscan(goodScan, i, j)
 	skip(1)
-			
+		
 def eta():
     "Use computer to get estimated time of arrival for a warp jump."
     w1 = coord(); w2 = coord()
