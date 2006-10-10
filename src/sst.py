@@ -6064,12 +6064,14 @@ commands = {
 
 def listCommands():
     "Generate a list of legal commands."
-    proutn(_("LEGAL COMMANDS ARE:"))
-    for (k, key) in enumerate(commands):
+    prout(_("LEGAL COMMANDS ARE:"))
+    emitted = 0
+    for key in commands:
 	if not commands[key] or (commands[key] & game.options):
-            if k % 5 == 0:
+            proutn("%-12s " % key)
+            emitted += 1
+            if emitted % 5 == 4:
                 skip(1)
-            proutn("%-12s " % key) 
     skip(1)
 
 def helpme():
