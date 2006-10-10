@@ -5388,18 +5388,17 @@ def prelim():
 def freeze(boss):
     "Save game."
     if boss:
-	scanner.token = "emsave.trk"
-    else:
+	scanner.push("emsave.trk")
+    key = scanner.next()
+    if key == "IHEOL":
+        proutn(_("File name: "))
         key = scanner.next()
-	if key == "IHEOL":
-	    proutn(_("File name: "))
-	    key = scanner.next()
-	if key != "IHALPHA":
-	    huh()
-	    return
-	scanner.chew()
-        if '.' not in scanner.token:
-	    scanner.token += ".trk"
+    if key != "IHALPHA":
+        huh()
+        return
+    scanner.chew()
+    if '.' not in scanner.token:
+        scanner.token += ".trk"
     try:
         fp = open(scanner.token, "wb")
     except IOError:
@@ -5774,7 +5773,7 @@ def choose():
 	# Approximates Tom Almy's version.
 	game.options &=~ (OPTION_THINGY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS)
 	game.options |= OPTION_ALMY
-    elif scanner.sees("fancy"):
+    elif scanner.sees("fancy") or scanner.sees("\n"):
 	pass
     elif len(scanner.token):
         proutn(_("What is \"%s\"?") % scanner.token)
@@ -6293,10 +6292,10 @@ class sstscanner:
             if not line:
                 continue
             else:
-                self.inqueue = line.lstrip().split() + ["IHEOL"] 
+                self.inqueue = line.lstrip().split() + ["\n"]
         # From here on in it's all looking at the queue
         self.token = self.inqueue.pop(0)
-        if self.token == "IHEOL":
+        if self.token == "\n":
             self.type = "IHEOL"
             return "IHEOL"
         try:
