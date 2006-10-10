@@ -3342,11 +3342,12 @@ def iostart():
 	setwnd(fullscreen_window)
 
 def ioend():
-    "Wrap up I/O.  Presently a stub."
-    stdscr.keypad(False)
-    curses.echo()
-    curses.nocbreak()
-    curses.endwin()
+    "Wrap up I/O."
+    if game.options & OPTION_CURSES:
+        stdscr.keypad(False)
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
 
 def waitfor():
     "Wait for user action -- OK to do nothing if on a TTY"
