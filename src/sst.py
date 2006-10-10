@@ -1345,13 +1345,12 @@ def torpedo(origin, course, dispersion, number, nburst):
 	    game.sector = jw
 	    proutn(crmshp())
 	    shoved = True
-	elif iquad in (IHC, IHS): # Hit a commander 
+	elif iquad in (IHC, IHS, IHR, IHK): # Hit a regular enemy 
+	    # find the enemy 
 	    if withprob(0.05):
 		prout(crmena(True, iquad, "sector", w) + _(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
 		return None
-	elif iquad in (IHR, IHK): # Hit a regular enemy 
-	    # find the enemy 
             for enemy in game.enemies:
 		if w == enemy.kloc:
 		    break
@@ -2429,12 +2428,14 @@ def events():
                 for ibq in game.state.baseq:
                    for cmdr in game.state.kcmdr: 
                        if ibq == cmdr and ibq != game.quadrant and ibq != game.state.kscmdr:
-                           raise "foundit"
-            except "foundit":
-		# no match found -- try later 
-		schedule(FBATTAK, expran(0.3*game.intime))
-		unschedule(FCDBAS)
-		continue
+                           raise ibq
+                else:
+                    # no match found -- try later 
+                    schedule(FBATTAK, expran(0.3*game.intime))
+                    unschedule(FCDBAS)
+                    continue
+            except coord:
+                pass
 	    # commander + starbase combination found -- launch attack 
 	    game.battle = ibq
 	    schedule(FCDBAS, randreal(1.0, 4.0))
