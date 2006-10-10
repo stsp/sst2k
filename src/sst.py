@@ -653,7 +653,6 @@ def tryexit(enemy, look, irun):
 		break
     return True; # success 
 
-#
 # The bad-guy movement algorithm:
 # 
 # 1. Enterprise has "force" based on condition of phaser and photon torpedoes.
@@ -691,7 +690,6 @@ def tryexit(enemy, look, irun):
 # retreat, especially at high skill levels.
 # 
 # 5.  Motion is limited to skill level, except for SC hi-tailing it out.
-# 
 
 def movebaddy(enemy):
     "Tactical movement for the bad guys."
@@ -904,7 +902,7 @@ def supercommander():
     if not game.iscate and avoid:
 	# compute move away from Enterprise 
 	idelta = game.state.kscmdr-game.quadrant
-	if math.sqrt(idelta.i*idelta.i+idelta.j*idelta.j) > 2.0:
+	if idelta.distance() > 2.0:
 	    # circulate in space 
 	    idelta.i = game.state.kscmdr.j-game.quadrant.j
 	    idelta.j = game.quadrant.i-game.state.kscmdr.i
@@ -3904,8 +3902,8 @@ def getcourse(isprobe):
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
         delta = coord()
-	delta.j = dquad.j-game.quadrant.j + 0.1*(dsect.j-game.sector.j)
-	delta.i = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.i)
+	delta.j = dquad.j-game.quadrant.j + (dsect.j-game.sector.j)/(QUADSIZE*1.0)
+	delta.i = game.quadrant.i-dquad.i + (game.sector.i-dsect.i)/(QUADSIZE*1.0)
     else: # manual 
 	while key == "IHEOL":
 	    proutn(_("X and Y displacements- "))
@@ -5291,8 +5289,8 @@ def eta():
     if not VALID_QUADRANT(w1.i, w1.j) or not VALID_SECTOR(w2.i, w2.j):
 	huh()
 	return
-    game.dist = math.sqrt((w1.j-game.quadrant.j+0.1*(w2.j-game.sector.j))**2+
-		(w1.i-game.quadrant.i+0.1*(w2.i-game.sector.i))**2)
+    game.dist = math.sqrt((w1.j-game.quadrant.j+(w2.j-game.sector.j)/(QUADSIZE*1.0))**2+
+		(w1.i-game.quadrant.i+(w2.i-game.sector.i)/(QUADSIZE*1.0))**2)
     wfl = False
     if prompt:
 	prout(_("Answer \"no\" if you don't know the value:"))
@@ -5443,11 +5441,11 @@ systnames = (
     _("Tellar Prime (Miracht)"),	# TOS: "Journey to Babel" 
     _("Vulcan (T'Khasi)"),	# many episodes 
     _("Medusa"),		# TOS: "Is There in Truth No Beauty?" 
-    _("Argelius II (Nelphia)"),# TOS: "Wolf in the Fold" ("IV" in BSD) 
+    _("Argelius II (Nelphia)"),	# TOS: "Wolf in the Fold" ("IV" in BSD) 
     _("Ardana"),		# TOS: "The Cloud Minders" 
     _("Catulla (Cendo-Prae)"),	# TOS: "The Way to Eden" 
     _("Gideon"),		# TOS: "The Mark of Gideon" 
-    _("Aldebaran III"),	# TOS: "The Deadly Years" 
+    _("Aldebaran III"),		# TOS: "The Deadly Years" 
     _("Alpha Majoris I"),	# TOS: "Wolf in the Fold" 
     _("Altair IV"),		# TOS: "Amok Time 
     _("Ariannus"),		# TOS: "Let That Be Your Last Battlefield" 
@@ -5708,8 +5706,6 @@ def choose():
 	if not scanner.inqueue: # Can start with command line options 
 	    proutn(_("Would you like a regular, tournament, or saved game? "))
         scanner.next()
-	if len(scanner.token)==0: # Try again
-	    continue
         if scanner.sees("tournament"):
 	    while scanner.next() == "IHEOL":
 		proutn(_("Type in tournament number-"))
@@ -6323,10 +6319,6 @@ class sstscanner:
         # Demand input for next scan
         self.inqueue = []
         self.real = self.token = None
-    def chew2(self):
-        # return "IHEOL" next time 
-        self.inqueue = ["IHEOL"]
-        self.real = self.token = None
     def sees(self, s):
         # compares s to item and returns true if it matches to the length of s
         return s.startswith(self.token)
@@ -6530,7 +6522,8 @@ if __name__ == '__main__':
                 if game.tourn and game.alldone:
                     proutn(_("Do you want your score recorded?"))
                     if ja() == True:
-                        scanner.chew2()
+                        scanner.chew()
+                        scanner.push("\n")
                         freeze(False)
                 scanner.chew()
                 proutn(_("Do you want to play again? "))
@@ -6545,4 +6538,3 @@ if __name__ == '__main__':
         if logfp:
             logfp.close()
         print ""
-        pass
