@@ -3353,19 +3353,9 @@ def iostart():
     else:
 	stdscr = curses.initscr()
 	stdscr.keypad(True)
-	#saveterm()
 	curses.nonl()
 	curses.cbreak()
         curses.start_color()
-        curses.init_pair(curses.COLOR_BLACK, curses.COLOR_BLACK, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_GREEN, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_RED, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_CYAN, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_WHITE, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_MAGENTA, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_BLUE, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        curses.init_pair(curses.COLOR_YELLOW, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-	#noecho()
         global fullscreen_window, srscan_window, report_window, status_window
         global lrscan_window, message_window, prompt_window
         (rows, columns)   = stdscr.getmaxyx()
