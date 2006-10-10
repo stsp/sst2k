@@ -4090,7 +4090,7 @@ def warp(timewarp):
 	    return
 						
 	# Make sure enough time is left for the trip 
-	game.optime = 10.0*game.dist/game.wfacsq
+	game.optime = 10.0*game.dist/game.warpfac**2
 	if game.optime >= 0.8*game.state.remtime:
 	    skip(1)
 	    prout(_("First Officer Spock- \"Captain, I compute that such"))
@@ -4150,7 +4150,7 @@ def warp(timewarp):
     game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
     if game.energy <= 0:
 	finish(FNRG)
-    game.optime = 10.0*game.dist/game.wfacsq
+    game.optime = 10.0*game.dist/game.warpfac**2
     if twarp:
 	timwrp()
     if blooey:
@@ -4189,7 +4189,6 @@ def setwarp():
 	return
     oldfac = game.warpfac
     game.warpfac = scanner.real
-    game.wfacsq=game.warpfac*game.warpfac
     if game.warpfac <= oldfac or game.warpfac <= 6.0:
 	prout(_("Helmsman Sulu- \"Warp factor %d, Captain.\"") %
 	       int(game.warpfac))
@@ -4257,14 +4256,13 @@ def atover(igrab):
 	    finish(FSNOVAED)
 	    return
 	game.warpfac = randreal(6.0, 8.0)
-	game.wfacsq = game.warpfac * game.warpfac
 	prout(_("Warp factor set to %d") % int(game.warpfac))
 	power = 0.75*game.energy
 	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
 	distreq = randreal(math.sqrt(2))
 	if distreq < game.dist:
 	    game.dist = distreq
-	game.optime = 10.0*game.dist/game.wfacsq
+	game.optime = 10.0*game.dist/game.warpfac**2
 	game.direc = randreal(12)	# How dumb! 
 	game.justin = False
 	game.inorbit = False
@@ -4601,7 +4599,6 @@ def abandon():
     game.lsupres=game.inlsr=3.0
     game.shldup=False
     game.warpfac=5.0
-    game.wfacsq=25.0
     return
 
 # Code from planets.c begins here.
@@ -5616,13 +5613,11 @@ def setup():
     if choose():
 	return # frozen game
     # Prepare the Enterprise
-    game.alldone = game.gamewon = False
+    game.alldone = game.gamewon = game.shldchg = game.shldup = False
     game.ship = IHE
     game.state.crew = FULLCREW
     game.energy = game.inenrg = 5000.0
     game.shield = game.inshld = 2500.0
-    game.shldchg = False
-    game.shldup = False
     game.inlsr = 4.0
     game.lsupres = 4.0
     game.quadrant = randplace(GALSIZE)
@@ -5630,7 +5625,6 @@ def setup():
     game.torps = game.intorps = 10
     game.nprobes = randrange(2, 5)
     game.warpfac = 5.0
-    game.wfacsq = game.warpfac * game.warpfac
     for i in range(NDEVICES): 
 	game.damage[i] = 0.0
     # Set up assorted game parameters
