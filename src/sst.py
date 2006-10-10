@@ -3357,7 +3357,7 @@ def pause_game():
     if game.options & OPTION_CURSES:
         drawmaps(0)
         setwnd(prompt_window)
-        prompt_window.wclear()
+        prompt_window.clear()
         prompt_window.addstr(prompt)
         prompt_window.getstr()
         prompt_window.clear()
@@ -3452,8 +3452,8 @@ def setwnd(wnd):
 def clreol():
     "Clear to end of line -- can be a no-op in tty mode" 
     if game.options & OPTION_CURSES:
-        wclrtoeol(curwnd)
-        wrefresh(curwnd)
+        curwnd.clrtoeol()
+        curwnd.refresh()
 
 def clrscr():
     "Clear screen -- can be a no-op in tty mode."
