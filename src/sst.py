@@ -755,10 +755,7 @@ def movebaddy(enemy):
             else:
                 motion = game.skill
     # calculate preferred number of steps 
-    if motion < 0:
-        nsteps = -motion
-    else:
-        nsteps = motion
+    nsteps = abs(int(motion))
     if motion > 0 and nsteps > mdist:
 	nsteps = mdist; # don't overshoot 
     if nsteps > QUADSIZE:
@@ -773,16 +770,7 @@ def movebaddy(enemy):
 	m.i = 0
     if 2.0 * abs(m.j) < abs(game.sector.i-enemy.kloc.i):
 	m.j = 0
-    if m.i != 0:
-        if m.i*motion < 0:
-            m.i = -1
-        else:
-            m.i = 1
-    if m.j != 0:
-        if m.j*motion < 0:
-            m.j = -1
-        else:
-            m.j = 1
+    m = (motion * m).sgn()
     next = enemy.kloc
     # main move loop 
     for ll in range(nsteps):
@@ -1285,6 +1273,10 @@ def collision(rammed, enemy):
 
 def torpedo(origin, course, dispersion, number, nburst):
     "Let a photon torpedo fly" 
+    if not damaged(DSRSENS) or game.condition=="docked":
+	setwnd(srscan_window)
+    else: 
+	setwnd(message_window)
     shoved = False
     ac = course + 0.25*dispersion
     angle = (15.0-ac)*0.5235988
@@ -1292,17 +1284,12 @@ def torpedo(origin, course, dispersion, number, nburst):
     delta = coord(-math.sin(angle), math.cos(angle))          
     bigger = max(abs(delta.i), abs(delta.j))
     delta /= bigger
-    x = origin.i; y = origin.j
     w = coord(0, 0); jw = coord(0, 0)
-    if not damaged(DSRSENS) or game.condition=="docked":
-	setwnd(srscan_window)
-    else: 
-	setwnd(message_window)
+    ungridded = copy.copy(origin)
     # Loop to move a single torpedo 
-    for step in range(1, 15+1):
-	x += delta.i
-	y += delta.j
-	w = coord(x, y).snaptogrid()
+    for step in range(1, QUADSIZE*2):
+	ungridded += delta
+	w = ungridded.snaptogrid()
 	if not VALID_SECTOR(w.i, w.j):
 	    break
 	iquad=game.quad[w.i][w.j]
@@ -1785,19 +1772,19 @@ def photon():
 	if i==1 and key == "IHEOL":
 	    # direct all torpedoes at one target 
 	    while i < n:
-		target.append(targets[0])
+		target.append(target[0])
 		course.append(course[0])
 		i += 1
 	    break
-        scanner.push(key)
+        scanner.push(scanner.token)
         target.append(scanner.getcoord())
         if target[-1] == None:
             return
-        course.append(targetcheck(target[1]))
-        if course[i] == None:
+        course.append(targetcheck(target[-1]))
+        if course[-1] == None:
 	    return
     scanner.chew()
-    if i == 0:
+    if len(target) == 0:
 	# prompt for each one 
 	for i in range(n):
 	    proutn(_("Target sector for torpedo number %d- ") % (i+1))
@@ -6395,8 +6382,6 @@ class sstscanner:
                 clrscr()
             if line == '':
                 return None
-            # Skip leading white space
-            line = line.lstrip()
             if not line:
                 continue
             else:
@@ -6417,8 +6402,10 @@ class sstscanner:
         self.type = "IHALPHA"
         self.real = None
         return "IHALPHA"
-    def push(self, tok):
+    def append(self, tok):
         self.inqueue.append(tok)
+    def push(self, tok):
+        self.inqueue.insert(0, tok)
     def waiting(self):
         return self.inqueue
     def chew(self):
@@ -6611,7 +6598,7 @@ if __name__ == '__main__':
             logfp.write("# options %s\n" % " ".join(arguments))
         random.seed(seed)
         scanner = sstscanner()
-        map(scanner.push, arguments)
+        map(scanner.append, arguments)
         try:
             iostart()
             while True: # Play a game 
@@ -6642,5 +6629,5 @@ if __name__ == '__main__':
             ioend()
         raise SystemExit, 0
     except KeyboardInterrupt:
-        print""
+        print ""
         pass
