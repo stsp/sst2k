@@ -2,10 +2,9 @@
 """
 sst.py =-- Super Star Trek in Python
 
-This code is a Python translation of a C translation of a FORTRAN original.
-The FORTRANness still shows in many ways, notably the use of a lot of
-parallel arrays where a more modern language would use structures
-or objects.  (However, 1-origin array indexing was fixed.)
+This code is a Python translation of a C translation of a FORTRAN
+original dating back to 1973.  Beautiful Python it is not.  But it
+works.
 
 Dave Matuszek says:
 
@@ -46,11 +45,11 @@ however mine had some feature it didn't have. So I merged its
 features that I liked. I also took a peek at the DECUS version (a
 port, less sources, to the PDP-10), and some other variations.
 
-1, Compared to the original UT version, I've changed the "help" command to
-"call" and the "terminate" command to "quit" to better match
-user expectations. The DECUS version apparently made those changes
-as well as changing "freeze" to "save". However I like "freeze".
-(Both "freeze" and "save" work in SST2K.)
+1, Compared to the original UT version, I've changed the "help"
+command to "call" and the "terminate" command to "quit" to better
+match user expectations. The DECUS version apparently made those
+changes as well as changing "freeze" to "save". However I like
+"freeze".  (Both "freeze" and "save" work in SST2K.)
 
 2. The experimental deathray originally had only a 5% chance of
 success, but could be used repeatedly. I guess after a couple
@@ -2653,13 +2652,6 @@ def wait():
     game.resting = False
     game.optime = 0
 
-# A nova occurs.  It is the result of having a star hit with a
-# photon torpedo, or possibly of a probe warhead going off.
-# Stars that go nova cause stars which surround them to undergo
-# the same probabilistic process.  Klingons next to them are
-# destroyed.  And if the starship is next to it, it gets zapped.
-# If the zap is too much, it gets destroyed.
-        
 def nova(nov):
     "Star goes nova." 
     course = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
@@ -4352,23 +4344,6 @@ def probe():
     game.ididit = True
     return
 
-# Here's how the mayday code works:
-# 
-# First, the closest starbase is selected.  If there is a a starbase
-# in your own quadrant, you are in good shape.  This distance takes
-# quadrant distances into account only.
-#
-# A magic number is computed based on the distance which acts as the
-# probability that you will be rematerialized.  You get three tries.
-#
-# When it is determined that you should be able to be rematerialized
-# (i.e., when the probability thing mentioned above comes up
-# positive), you are put into that quadrant (anywhere).  Then, we try
-# to see if there is a spot adjacent to the star- base.  If not, you
-# can't be rematerialized!!!  Otherwise, it drops you there.  It only
-# tries five times to find a spot to drop you.  After that, it's your
-# problem.
-
 def mayday():
     "Yell for help from nearest starbase."
     # There's more than one way to move in this game! 
@@ -4444,24 +4419,6 @@ def mayday():
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
-
-# Abandon Ship (the BSD-Trek description)
-# 
-# The ship is abandoned.  If your current ship is the Faire
-# Queene, or if your shuttlecraft is dead, you're out of
-# luck.  You need the shuttlecraft in order for the captain
-# (that's you!!) to escape.
-# 
-# Your crew can beam to an inhabited starsystem in the
-# quadrant, if there is one and if the transporter is working.
-# If there is no inhabited starsystem, or if the transporter
-# is out, they are left to die in outer space.
-# 
-# If there are no starbases left, you are captured by the
-# Klingons, who torture you mercilessly.  However, if there
-# is at least one starbase, you are returned to the
-# Federation in a prisoner of war exchange.  Of course, this
-# can't happen unless you have taken some prisoners.
 
 def abandon():
     "Abandon ship."
