@@ -1057,11 +1057,11 @@ def movetholian():
     for i in range(QUADSIZE):
 	if game.quad[0][i]!=IHWEB and game.quad[0][i]!=IHT:
 	    return
-	if game.quad[QUADSIZE][i]!=IHWEB and game.quad[QUADSIZE][i]!=IHT:
+	if game.quad[QUADSIZE-1][i]!=IHWEB and game.quad[QUADSIZE-1][i]!=IHT:
 	    return
 	if game.quad[i][0]!=IHWEB and game.quad[i][0]!=IHT:
 	    return
-	if game.quad[i][QUADSIZE]!=IHWEB and game.quad[i][QUADSIZE]!=IHT:
+	if game.quad[i][QUADSIZE-1]!=IHWEB and game.quad[i][QUADSIZE-1]!=IHT:
 	    return
     # All plugged up -- Tholian splits 
     game.quad[game.tholian.kloc.i][game.tholian.kloc.j]=IHWEB
@@ -3432,7 +3432,7 @@ def prouts(line):
             time.sleep(0.03)
 	proutn(c)
 	if game.options & OPTION_CURSES:
-	    wrefresh(curwnd)
+	    curwnd.refresh()
 	else:
 	    sys.stdout.flush()
     if not replayfp or replayfp.closed:
