@@ -256,7 +256,7 @@ class coord:
         return math.sqrt((self.i - other.i)**2 + (self.j - other.j)**2)
     def bearing(self, other=None):
         if not other: other = coord(0, 0)
-        return 1.90985*math.atan2(self.i-other.i, self.j-other.j)
+        return 1.90985*math.atan2(self.j-other.j, self.i-other.i)
     def sgn(self):
         s = coord()
         if self.i == 0:
@@ -1330,7 +1330,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 	    shoved = True
 	elif iquad in (IHC, IHS, IHR, IHK): # Hit a regular enemy 
 	    # find the enemy 
-	    if withprob(0.05):
+	    if iquad in (IHC, IHS) and withprob(0.05):
 		prout(crmena(True, iquad, "sector", w) + _(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
 		return None
@@ -1725,7 +1725,7 @@ def targetcheck(w):
 	prout(_("  the Captain's psychological profile.\""))
 	scanner.chew()
 	return None
-    return 1.90985932*math.atan2(delta.j, delta.i)
+    return delta.bearing()
 
 def photon():
     "Launch photon torpedo."
@@ -3926,8 +3926,8 @@ def getcourse(isprobe, akey):
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
         delta = coord()
-	delta.i = dquad.j-game.quadrant.j + 0.1*(dsect.j-game.sector.j)
-	delta.j = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.i)
+	delta.j = dquad.j-game.quadrant.j + 0.1*(dsect.j-game.sector.j)
+	delta.i = game.quadrant.i-dquad.i + 0.1*(game.sector.i-dsect.i)
     else: # manual 
 	while key == "IHEOL":
 	    proutn(_("X and Y displacements- "))
