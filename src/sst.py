@@ -335,9 +335,9 @@ class snapshot:
         self.baseq = [] 	# Base quadrant coordinates
         self.kcmdr = [] 	# Commander quadrant coordinates
 	self.kscmdr = coord()	# Supercommander quadrant coordinates
-        # the galaxy (subscript 0 not used)
+        # the galaxy
         self.galaxy = fill2d(GALSIZE, lambda i, j: quadrant())
-        # the starchart (subscript 0 not used)
+        # the starchart
     	self.chart = fill2d(GALSIZE, lambda i, j: page())
 
 class event:
@@ -524,10 +524,8 @@ class gamestate:
         self.damfac = 0.0	# damage factor
         self.lastchart = 0.0	# time star chart was last updated
         self.cryprob = 0.0	# probability that crystal will work
-        self.probex = 0.0	# location of probe
-        self.probey = 0.0	#
-        self.probeinx = 0.0	# probe x,y increment
-        self.probeiny = 0.0	#
+        self.probe = None	# location of probe
+        self.probein = None	# probe i,j increment
         self.height = 0.0	# height of orbit around planet
     def recompute(self):
         # Stas thinks this should be (C expression): 
@@ -537,7 +535,7 @@ class gamestate:
         # after killing the last klingon when score is shown -- perhaps also
         # if the only remaining klingon is SCOM.
         game.state.remtime = game.state.remres/(game.state.remkl + 4*len(game.state.kcmdr))
-# From enumerated type 'feature'
+
 IHR = 'R'
 IHK = 'K'
 IHC = 'C'
@@ -557,8 +555,6 @@ IHMATER0 = '-'
 IHMATER1 = 'o'
 IHMATER2 = '0'
 
-
-# From enumerated type 'FINTYPE'
 FWON = 0
 FDEPLETE = 1
 FLIFESUP = 2
@@ -581,10 +577,6 @@ FDRAY = 18
 FTRIBBLE = 19
 FHOLE = 20
 FCREW = 21
-
-# Log the results of pulling random numbers so we can check determinism.
-
-import traceback
 
 def withprob(p):
     v = random.random()
@@ -2465,21 +2457,20 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-	    game.probex += game.probeinx
-	    game.probey += game.probeiny
-	    i = (int)(game.probex/QUADSIZE +0.05)
-	    j = (int)(game.probey/QUADSIZE + 0.05)
+	    game.probe += game.probein
+	    i = int(round(game.probe.i/float(QUADSIZE)))
+	    j = int(round(game.probe.j/float(QUADSIZE)))
 	    if game.probec.i != i or game.probec.j != j:
 		game.probec.i = i
 		game.probec.j = j
 		if not VALID_QUADRANT(i, j) or \
 		    game.state.galaxy[game.probec.i][game.probec.j].supernova:
 		    # Left galaxy or ran into supernova
-                    if comunicating():
+                    if communicating():
 			announce()
 			skip(1)
 			proutn(_("Lt. Uhura-  \"The deep space probe "))
-			if not VALID_QUADRANT(j, i):
+			if not VALID_QUADRANT(i, j):
 			    proutn(_("has left the galaxy"))
 			else:
 			    proutn(_("is no longer transmitting"))
@@ -2500,8 +2491,7 @@ def events():
 		pdest.charted = True
 	    game.proben -= 1 # One less to travel
 	    if game.proben == 0 and game.isarmed and pdest.stars:
-		# lets blow the sucker! 
-		supernova(game.probec)
+		supernova(game.probec)		# fire in the hole!
 		unschedule(FDSPROB)
 		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova: 
 		    return
@@ -3811,7 +3801,7 @@ def dock(verbose):
 # because it involves giving x and y motions, yet the coordinates
 # are always displayed y - x, where +y is downward!
 
-def getcourse(isprobe, akey):
+def getcourse(isprobe):
     "Get a course and distance from the user."
     key = 0
     dquad = copy.copy(game.quadrant)
@@ -3834,12 +3824,7 @@ def getcourse(isprobe, akey):
 	    navmode = "manual"
 	    key = "IHEOL"
 	    break
-	if isprobe and akey != -1:
-	    # For probe launch, use pre-scanned value first time 
-	    key = akey
-	    akey = -1
-	else: 
-	    key = scanner.next()
+        key = scanner.next()
 	if key == "IHEOL":
 	    proutn(_("Manual or automatic- "))
 	    iprompt = True
@@ -3961,7 +3946,7 @@ def impulse():
 	prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
 	return
     if game.energy > 30.0:
-        if not getcourse(isprobe=False, akey=0):
+        if not getcourse(isprobe=False):
 	    return
 	power = 20.0 + 100.0*game.dist
     else:
@@ -4016,7 +4001,7 @@ def warp(timewarp):
 	    prout(_("  is repaired, I can only give you warp 4.\""))
 	    return
        	# Read in course and distance 
-        if not getcourse(isprobe=False, akey=0):
+        if not getcourse(isprobe=False):
 	    return
 	# Make sure starship has enough energy for the trip 
 	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
@@ -4195,8 +4180,7 @@ def atover(igrab):
 	    proutn(_("The %s has stopped in a quadrant containing") % crmshp())
 	    prouts(_("   a supernova."))
 	    skip(2)
-	prout(_("***Emergency automatic override attempts to hurl ")+crmshp())
-	skip(1)
+	proutn(_("***Emergency automatic override attempts to hurl ")+crmshp())
 	prout(_("safely out of quadrant."))
 	if not damaged(DRADIO):
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].charted = True
@@ -4309,7 +4293,6 @@ def probe():
 	return
     key = scanner.next()
     if key == "IHEOL":
-	# slow mode, so let Kirk know how many probes there are left
         if game.nprobes == 1:
             prout(_("1 probe left."))
         else:
@@ -4324,22 +4307,19 @@ def probe():
     elif key == "IHEOL":
 	proutn(_("Arm NOVAMAX warhead? "))
 	game.isarmed = ja()
-    if not getcourse(isprobe=True, akey=key):
+    elif key == "IHREAL":		# first element of course
+        scanner.push(scanner.token)
+    if not getcourse(isprobe=True):
 	return
     game.nprobes -= 1
     angle = ((15.0 - game.direc) * 0.5235988)
-    game.probeinx = -math.sin(angle)
-    game.probeiny = math.cos(angle)
-    if math.fabs(game.probeinx) > math.fabs(game.probeiny):
-	bigger = math.fabs(game.probeinx)
-    else:
-	bigger = math.fabs(game.probeiny)
-    game.probeiny /= bigger
-    game.probeinx /= bigger
+    game.probein = coord(-math.sin(angle), math.cos(angle))
+    bigger = max(abs(game.probein.i), abs(game.probein.j))
+    game.probein /= bigger
     game.proben = 10.0*game.dist*bigger +0.5
-    game.probex = game.quadrant.i*QUADSIZE + game.sector.i - 1	# We will use better packing than original
-    game.probey = game.quadrant.j*QUADSIZE + game.sector.j - 1
-    game.probec = game.quadrant
+    game.probe = coord(game.quadrant.i*QUADSIZE + game.sector.i, 
+                       game.quadrant.j*QUADSIZE + game.sector.j)
+    game.probec = copy.copy(game.quadrant)
     schedule(FDSPROB, 0.01) # Time to move one sector
     prout(_("Ensign Chekov-  \"The deep space probe is launched, Captain.\""))
     game.ididit = True
