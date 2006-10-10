@@ -3323,27 +3323,8 @@ message_window    = None
 prompt_window     = None
 curwnd = None
 
-def outro():
-    "Wrap up, either normally or due to signal"
-    if game.options & OPTION_CURSES:
-	#clear()
-	#curs_set(1)
-	#refresh()
-	#resetterm()
-	#echo()
-	curses.endwin()
-	sys.stdout.write('\n')
-    if logfp:
-	logfp.close()
-
 def iostart():
     global stdscr, rows
-    #setlocale(LC_ALL, "")
-    #bindtextdomain(PACKAGE, LOCALEDIR)
-    #textdomain(PACKAGE)
-    if atexit.register(outro):
-	sys.stderr.write("Unable to register outro(), exiting...\n")
-	raise SysExit,1
     if not (game.options & OPTION_CURSES):
 	ln_env = os.getenv("LINES")
         if ln_env:
@@ -3355,7 +3336,6 @@ def iostart():
 	stdscr.keypad(True)
 	curses.nonl()
 	curses.cbreak()
-        curses.start_color()
         global fullscreen_window, srscan_window, report_window, status_window
         global lrscan_window, message_window, prompt_window
         (rows, columns)   = stdscr.getmaxyx()
@@ -3368,20 +3348,18 @@ def iostart():
 	prompt_window     = curses.newwin(1,  0,  rows-2,  0) 
 	message_window.scrollok(True)
 	setwnd(fullscreen_window)
-	textcolor(DEFAULT)
-
-def textcolor(color):
-    "Set text foreground color.  Presently a stub."
-    pass	# FIXME
 
 def ioend():
     "Wrap up I/O.  Presently a stub."
-    pass
+    stdscr.keypad(False)
+    curses.echo()
+    curses.nocbreak()
+    curses.endwin()
 
 def waitfor():
     "Wait for user action -- OK to do nothing if on a TTY"
     if game.options & OPTION_CURSES:
-	stsdcr.getch()
+	stdscr.getch()
 
 def announce():
     skip(1)
@@ -4442,13 +4420,13 @@ def mayday():
 	elif m == 3: proutn(_("3rd"))
 	proutn(_(" attempt to re-materialize ") + crmshp())
 	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
-	textcolor("red")
+	#textcolor("red")
 	warble()
 	if randreal() > probf:
 	    break
 	prout(_("fails."))
 	curses.delay_output(500)
-	textcolor(None)
+	#textcolor(None)
     if m > 3:
 	game.quad[ix][iy]=IHQUEST
 	game.alive = False
@@ -4457,9 +4435,9 @@ def mayday():
 	finish(FMATERIALIZE)
 	return
     game.quad[ix][iy]=game.ship
-    textcolor("green")
+    #textcolor("green")
     prout(_("succeeds."))
-    textcolor(None)
+    #textcolor(None)
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
@@ -5227,15 +5205,15 @@ def sectscan(goodScan, i, j):
     "Light up an individual dot in a sector."
     if goodScan or (abs(i-game.sector.i)<= 1 and abs(j-game.sector.j) <= 1):
 	if (game.quad[i][j]==IHMATER0) or (game.quad[i][j]==IHMATER1) or (game.quad[i][j]==IHMATER2) or (game.quad[i][j]==IHE) or (game.quad[i][j]==IHF):
-	    if game.condition   == "red": textcolor("red")
-	    elif game.condition == "green": textcolor("green")
-	    elif game.condition == "yellow": textcolor("yellow")
-	    elif game.condition == "docked": textcolor("cyan")
-	    elif game.condition == "dead": textcolor("brown")
+	    #if game.condition   == "red": textcolor("red")
+	    #elif game.condition == "green": textcolor("green")
+	    #elif game.condition == "yellow": textcolor("yellow")
+	    #elif game.condition == "docked": textcolor("cyan")
+	    #elif game.condition == "dead": textcolor("brown")
 	    if game.quad[i][j] != game.ship: 
 		highvideo()
 	proutn("%c " % game.quad[i][j])
-	textcolor(None)
+	#textcolor(None)
     else:
 	proutn("- ")
 
@@ -6618,5 +6596,7 @@ if __name__ == '__main__':
             ioend()
         raise SystemExit, 0
     except KeyboardInterrupt:
+        if logfp:
+            logfp.close()
         print ""
         pass
