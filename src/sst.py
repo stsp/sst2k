@@ -180,7 +180,7 @@ more:
 the LRSCAN command is no longer needed.  (Controlled by OPTION_AUTOSCAN
 and turned off if game type is "plain" or "almy".)
 """
-import os,sys,math,curses,time,atexit,readline,cPickle,random,getopt,copy
+import os, sys, math, curses, time, readline, cPickle, random, copy
 
 SSTDOC  	= "/usr/share/doc/sst/sst.doc"
 DOC_NAME	= "sst.doc"
@@ -6517,6 +6517,7 @@ def debugme():
 	atover(True)
 
 if __name__ == '__main__':
+    import getopt, socket
     try:
         global line, thing, game, idebug
         game = None
@@ -6568,6 +6569,8 @@ if __name__ == '__main__':
         if logfp:
             logfp.write("# seed %s\n" % seed)
             logfp.write("# options %s\n" % " ".join(arguments))
+            logfp.write("# recorded by %s@%s on %s\n" % \
+                    (os.getenv("LOGNAME"),socket.gethostname(),time.ctime()))
         random.seed(seed)
         scanner = sstscanner()
         map(scanner.append, arguments)

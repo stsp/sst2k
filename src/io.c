@@ -86,7 +86,7 @@ void waitfor(void)
 /* wait for user action -- OK to do nothing if on a TTY */
 {
     if (game.options & OPTION_CURSES)
-	getch();
+	wgetch(prompt_window);
 }
 
 void announce(void)

@@ -1,0 +1,14 @@
+#!/bin/sh
+# Replay the last SST game. With arg, use only that many lines of the log
+#
+# Because the replay log captures the random-number seed,
+# repeating this any number of times should produce identical games,
+# unless the code changes.
+#
+if [ $1 ]
+then
+    head -n `expr $1 + 2` </usr/tmp/sst-input.log >replay.log
+else
+    mv /usr/tmp/sst-input.log replay.log
+fi
+python sst.py -t -r replay.log
