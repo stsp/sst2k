@@ -2455,26 +2455,23 @@ def events():
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
 	    game.probe += game.probein
-	    i = int(round(game.probe.i/float(QUADSIZE)))
-	    j = int(round(game.probe.j/float(QUADSIZE)))
-	    if game.probec.i != i or game.probec.j != j:
-		game.probec.i = i
-		game.probec.j = j
-		if not VALID_QUADRANT(i, j) or \
+            newloc = (game.probe / float(QUADSIZE)).snaptogrid()
+            if newloc != game.probec:
+                game.probec = newloc
+		if not VALID_QUADRANT(game.probec.i, game.probec.j) or \
 		    game.state.galaxy[game.probec.i][game.probec.j].supernova:
 		    # Left galaxy or ran into supernova
                     if communicating():
 			announce()
 			skip(1)
 			proutn(_("Lt. Uhura-  \"The deep space probe "))
-			if not VALID_QUADRANT(i, j):
-			    proutn(_("has left the galaxy"))
+			if not VALID_QUADRANT(game.probec.i, game.probec.j):
+			    proutn(_("has left the galaxy.\""))
 			else:
-			    proutn(_("is no longer transmitting"))
-			prout(".\"")
+			    proutn(_("is no longer transmitting.\""))
 		    unschedule(FDSPROB)
 		    continue
-                if not communicating():
+                if communicating():
 		    announce()
 		    skip(1)
 		    proutn(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probec)
