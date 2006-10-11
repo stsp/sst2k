@@ -252,7 +252,9 @@ class coord:
         return coord(self.i/other, self.j/other)
     def __rdiv__(self, other):
         return coord(self.i/other, self.j/other)
-    def snaptogrid(self):
+    def roundtogrid(self):
+        return coord(int(round(self.i)), int(round(self.j)))
+    def trunctogrid(self):
         return coord(int(round(self.i)), int(round(self.j)))
     def distance(self, other=None):
         if not other: other = coord(0, 0)
@@ -1277,7 +1279,7 @@ def torpedo(origin, course, dispersion, number, nburst):
     # Loop to move a single torpedo 
     for step in range(1, QUADSIZE*2):
 	ungridded += delta
-	w = ungridded.snaptogrid()
+	w = ungridded.roundtogrid()
 	if not VALID_SECTOR(w.i, w.j):
 	    break
 	iquad=game.quad[w.i][w.j]
@@ -2454,7 +2456,7 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-            if game.probe.next():
+            if game.probe.nextquad():
 		if not VALID_QUADRANT(game.probe.loc.i, game.probe.loc.j) or \
 		    game.state.galaxy[game.probe.loc.i][game.probe.loc.j].supernova:
 		    # Left galaxy or ran into supernova
@@ -3950,10 +3952,10 @@ class course:
 	return self.distance*(self.warp**3)*(game.shldup+1)
     def time(self):
         return 10.0*self.distance/self.warp**2
-    def next(self):
-        "Next location on course, currently only at quadrant granularity."
+    def nextquad(self):
+        "Next location on course, at quadrant granularity."
         self.location += self.increment
-        newloc = (self.location / float(QUADSIZE)).snaptogrid()
+        newloc = (self.location / float(QUADSIZE)).trunctogrid()
         if not newloc == self.loc:
             self.loc = newloc
             return True
