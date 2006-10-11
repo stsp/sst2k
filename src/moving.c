@@ -511,7 +511,7 @@ void warp(bool timewarp)
 	if (game.damage[DWARPEN] > 10.0) {
 	    chew();
 	    skip(1);
-	    prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""));
+	    prout(_("Engineer Scott- \"The warp engines are damaged, Sir.\""));
 	    return;
 	}
 	if (damaged(DWARPEN) && game.warpfac > 4.0) {
