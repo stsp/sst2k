@@ -225,6 +225,9 @@ IHMATER0 = '-',
 IHMATER1 = 'o',
 IHMATER2 = '0'
 
+class TrekError:
+    pass
+
 class coord:
     def __init__(self, x=None, y=None):
         self.i = x
@@ -235,6 +238,8 @@ class coord:
         return self.i != None and self.j != None
     def __eq__(self, other):
         return other != None and self.i == other.i and self.j == other.j
+    def __ne__(self, other):
+        return other == None or self.i != other.i or self.j != other.j
     def __add__(self, other):
         return coord(self.i+other.i, self.j+other.j)
     def __sub__(self, other):
@@ -460,7 +465,6 @@ class gamestate:
         self.base = None	# position of base in current quadrant
         self.battle = None	# base coordinates being attacked
         self.plnet = None	# location of planet in quadrant
-        self.probec = None	# current probe quadrant
         self.gamewon = False	# Finished!
         self.ididit = False	# action taken -- allows enemy to attack
         self.alive = False	# we are alive (not killed)
@@ -503,7 +507,6 @@ class gamestate:
         self.irhere = 0		# Romulans in quadrant
         self.isatb = 0		# =1 if super commander is attacking base
         self.tourn = None	# tournament number
-        self.proben = 0		# number of moves for probe
         self.nprobes = 0	# number of probes available
         self.inresor = 0.0	# initial resources
         self.intime = 0.0	# initial time
@@ -516,15 +519,12 @@ class gamestate:
         self.warpfac = 0.0	# warp speed
         self.wfacsq = 0.0	# squared warp factor
         self.lsupres = 0.0	# life support reserves
-        self.dist = 0.0		# movement distance
-        self.direc = 0.0	# movement direction
         self.optime = 0.0	# time taken by current operation
         self.docfac = 0.0	# repair factor when docking (constant?)
         self.damfac = 0.0	# damage factor
         self.lastchart = 0.0	# time star chart was last updated
         self.cryprob = 0.0	# probability that crystal will work
-        self.probe = None	# location of probe
-        self.probein = None	# probe i,j increment
+        self.probe = None	# object holding probe course info
         self.height = 0.0	# height of orbit around planet
     def recompute(self):
         # Stas thinks this should be (C expression): 
@@ -2454,38 +2454,34 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-	    game.probe += game.probein
-            newloc = (game.probe / float(QUADSIZE)).snaptogrid()
-            if newloc != game.probec:
-                game.probec = newloc
-		if not VALID_QUADRANT(game.probec.i, game.probec.j) or \
-		    game.state.galaxy[game.probec.i][game.probec.j].supernova:
+            if game.probe.next():
+		if not VALID_QUADRANT(game.probe.loc.i, game.probe.loc.j) or \
+		    game.state.galaxy[game.probe.loc.i][game.probe.loc.j].supernova:
 		    # Left galaxy or ran into supernova
                     if communicating():
 			announce()
 			skip(1)
 			proutn(_("Lt. Uhura-  \"The deep space probe "))
-			if not VALID_QUADRANT(game.probec.i, game.probec.j):
+			if not VALID_QUADRANT(game.probe.loc.i, game.probe.loc.j):
 			    proutn(_("has left the galaxy.\""))
 			else:
 			    proutn(_("is no longer transmitting.\""))
 		    unschedule(FDSPROB)
 		    continue
                 if communicating():
-		    announce()
+		    #announce()
 		    skip(1)
-		    proutn(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probec)
-	    pdest = game.state.galaxy[game.probec.i][game.probec.j]
-	    # Update star chart if Radio is working or have access to radio
+		    prout(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probe.loc)
+	    pdest = game.state.galaxy[game.probe.loc.i][game.probe.loc.j]
 	    if communicating():
-		chp = game.state.chart[game.probec.i][game.probec.j]
+		chp = game.state.chart[game.probe.loc.i][game.probe.loc.j]
 		chp.klingons = pdest.klingons
 		chp.starbase = pdest.starbase
 		chp.stars = pdest.stars
 		pdest.charted = True
-	    game.proben -= 1 # One less to travel
-	    if game.proben == 0 and game.isarmed and pdest.stars:
-		supernova(game.probec)		# fire in the hole!
+	    game.probe.moves -= 1 # One less to travel
+	    if game.probe.moves == 0 and game.isarmed and pdest.stars:
+		supernova(game.probe)		# fire in the hole!
 		unschedule(FDSPROB)
 		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova: 
 		    return
@@ -2751,17 +2747,18 @@ def nova(nov):
                     game.quad[newc.i][newc.j] = iquad
                     game.enemies[ll].move(newc)
     # Starship affected by nova -- kick it away. 
-    game.dist = kount*0.1
-    game.direc = course[3*(bump.i+1)+bump.j+2]
-    if game.direc == 0.0:
-	game.dist = 0.0
-    if game.dist == 0.0:
+    dist = kount*0.1
+    direc = course[3*(bump.i+1)+bump.j+2]
+    if direc == 0.0:
+	dist = 0.0
+    if dist == 0.0:
 	return
-    game.optime = 10.0*game.dist/16.0
+    course = course(distance=dist, bearing=direc, warp=4)
+    game.optime = course.time()
     skip(1)
     prout(_("Force of nova displaces starship."))
-    imove(novapush=True)
-    game.optime = 10.0*game.dist/16.0
+    imove(course, novapush=True)
+    game.optime = course.time()
     return
 	
 def supernova(w):
@@ -3278,7 +3275,7 @@ def plaque():
         fp.write(_("Emeritus level\n\n"))
     else:
         fp.write(_(" Cheat level\n\n"))
-    timestring = ctime()
+    timestring = time.ctime()
     fp.write(_("                                                 This day of %.6s %.4s, %.8s\n\n") %
                     (timestring+4, timestring+20, timestring+11))
     fp.write(_("                                                        Your score:  %d\n\n") % iscore)
@@ -3342,7 +3339,7 @@ def waitfor():
 
 def announce():
     skip(1)
-    prouts(_("[ANOUNCEMENT ARRIVING...]"))
+    prouts(_("[ANNOUNCEMENT ARRIVING...]"))
     skip(1)
 
 def pause_game():
@@ -3584,7 +3581,7 @@ def prstat(txt, data):
 
 # Code from moving.c begins here
 
-def imove(novapush):
+def imove(course=None, novapush=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
     w = coord(); final = coord()
     trbeam = False
@@ -3609,7 +3606,7 @@ def imove(novapush):
     if game.inorbit:
 	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
 	game.inorbit = False
-    angle = ((15.0 - game.direc) * 0.5235988)
+    angle = ((15.0 - course.bearing) * 0.5235988)
     deltax = -math.sin(angle)
     deltay = math.cos(angle)
     if math.fabs(deltax) > math.fabs(deltay):
@@ -3622,13 +3619,13 @@ def imove(novapush):
     if game.state.date+game.optime >= scheduled(FTBEAM):
 	trbeam = True
 	game.condition = "red"
-	game.dist = game.dist*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
+	course.distance = course.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move within the quadrant 
     game.quad[game.sector.i][game.sector.j] = IHDOT
     x = game.sector.i
     y = game.sector.j
-    n = int(10.0*game.dist*bigger+0.5)
+    n = int(10.0*course.distance*bigger+0.5)
     if n > 0:
 	for m in range(1, n+1):
             x += deltax
@@ -3655,8 +3652,8 @@ def imove(novapush):
 		# compute final position -- new quadrant and sector 
 		x = (QUADSIZE*game.quadrant.i)+game.sector.i
 		y = (QUADSIZE*game.quadrant.j)+game.sector.j
-		w.i = int(round(x+10.0*game.dist*bigger*deltax))
-		w.j = int(round(y+10.0*game.dist*bigger*deltay))
+		w.i = int(round(x+QUADSIZE*course.distance*bigger*deltax))
+		w.j = int(round(y+QUADSIZE*course.distance*bigger*deltay))
 		# check for edge of galaxy 
 		kinks = 0
                 while True:
@@ -3704,8 +3701,8 @@ def imove(novapush):
 	    iquad = game.quad[w.i][w.j]
 	    if iquad != IHDOT:
 		# object encountered in flight path 
-		stopegy = 50.0*game.dist/game.optime
-		game.dist = (game.sector - w).distance() / (QUADSIZE * 1.0)
+		stopegy = 50.0*course.dist/game.optime
+		course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
                 if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
 		    game.sector = w
                     for enemy in game.enemies:
@@ -3719,11 +3716,9 @@ def imove(novapush):
 		    skip(1)
 		    proutn("***" + crmshp())
 		    proutn(_(" pulled into black hole at Sector %s") % w)
-		    #
 		    # Getting pulled into a black hole was certain
 		    # death in Almy's original.  Stas Sergeev added a
 		    # possibility that you'll get timewarped instead.
-		    # 
 		    n=0
 		    for m in range(NDEVICES):
 			if game.damage[m]>0: 
@@ -3754,7 +3749,7 @@ def imove(novapush):
                 # We're here!
 		no_quad_change()
                 return
-	game.dist = (game.sector - w).distance() / (QUADSIZE * 1.0)
+	course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
 	game.sector = w
     final = game.sector
     no_quad_change()
@@ -3809,7 +3804,7 @@ def getcourse(isprobe):
 	prout(_("Dummy! You can't leave standard orbit until you"))
 	proutn(_("are back aboard the ship."))
 	scanner.chew()
-	return False
+	raise TrekError
     while navmode == "unspecified":
 	if damaged(DNAVSYS):
 	    if isprobe:
@@ -3837,7 +3832,7 @@ def getcourse(isprobe):
 	    else:
 		huh()
 		scanner.chew()
-		return False
+		raise TrekError
 	else: # numeric 
 	    if isprobe:
 		prout(_("(Manual navigation assumed.)"))
@@ -3856,12 +3851,12 @@ def getcourse(isprobe):
 	    key = scanner.next()
 	if key != "IHREAL":
 	    huh()
-	    return False
+	    raise TrekError
 	xi = int(round(scanner.real))-1
 	key = scanner.next()
 	if key != "IHREAL":
 	    huh()
-	    return False
+	    raise TrekError
 	xj = int(round(scanner.real))-1
 	key = scanner.next()
 	if key == "IHREAL":
@@ -3870,7 +3865,7 @@ def getcourse(isprobe):
 	    key = scanner.next()
 	    if key != "IHREAL":
 		huh()
-		return False
+		raise TrekError
 	    xl = int(round(scanner.real))-1
 	    dquad.i = xi
 	    dquad.j = xj
@@ -3890,7 +3885,7 @@ def getcourse(isprobe):
 	    itemp = "normal"
 	if not VALID_QUADRANT(dquad.i,dquad.j) or not VALID_SECTOR(dsect.i,dsect.j):
 	    huh()
-	    return False
+	    raise TrekError
 	skip(1)
 	if not isprobe:
 	    if itemp > "curt":
@@ -3911,27 +3906,59 @@ def getcourse(isprobe):
 	itemp = "verbose"
 	if key != "IHREAL":
 	    huh()
-	    return False
+	    raise TrekError
 	delta.j = scanner.real
 	key = scanner.next()
 	if key != "IHREAL":
 	    huh()
-	    return False
+	    raise TrekError
 	delta.i = scanner.real
     # Check for zero movement 
     if delta.i == 0 and delta.j == 0:
 	scanner.chew()
-	return False
+	raise TrekError
     if itemp == "verbose" and not isprobe:
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
-    # Course actually laid in.
-    game.dist = delta.distance()
-    game.direc = delta.bearing()
-    if game.direc < 0.0:
-	game.direc += 12.0
     scanner.chew()
-    return True
+    return course(delta.distance(), delta.bearing(), isprobe=isprobe)
+
+class course:
+    # Eventually, we want to consolidate all course compuation here,
+    # including for torpedos and the Enterprise.
+    def __init__(self, distance, bearing, warp=None, isprobe=False): 
+        # Course actually laid in -- thisis straight from the old getcd().
+        self.distance = distance
+        self.bearing = bearing
+        self.warp = warp or game.warpfac
+        self.isprobe = isprobe
+        # This odd relic suggests that the bearing() code we inherited from
+        # FORTRAN is actually computing clockface directions.
+        if self.bearing < 0.0:
+            self.bearing += 12.0
+        # This code was moved from the probe() routine
+        if isprobe:
+            angle = ((15.0 - self.bearing) * 0.5235988)
+            self.increment = coord(-math.sin(angle), math.cos(angle))
+            bigger = max(abs(self.increment.i), abs(self.increment.j))
+            self.increment /= bigger
+            self.location = coord(game.quadrant.i*QUADSIZE + game.sector.i, 
+                               game.quadrant.j*QUADSIZE + game.sector.j)
+            self.loc = copy.copy(game.quadrant)
+            self.moves = 10.0*self.distance*bigger +0.5
+    def power(self):
+	return self.distance*(self.warp**3)*(game.shldup+1)
+    def time(self):
+        return 10.0*self.distance/self.warp**2
+    def next(self):
+        "Next location on course, currently only at quadrant granularity."
+        self.location += self.increment
+        newloc = (self.location / float(QUADSIZE)).snaptogrid()
+        if not newloc == self.loc:
+            self.loc = newloc
+            return True
+        else:
+            return False
 
 def impulse():
     "Move under impulse power."
@@ -3942,9 +3969,11 @@ def impulse():
 	prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
 	return
     if game.energy > 30.0:
-        if not getcourse(isprobe=False):
+        try:
+            course = getcourse(isprobe=False)
+        except TrekError:
 	    return
-	power = 20.0 + 100.0*game.dist
+	power = 20.0 + 100.0*course.distance
     else:
 	power = 30.0
     if power >= game.energy:
@@ -3961,7 +3990,7 @@ def impulse():
 	scanner.chew()
 	return
     # Make sure enough time is left for the trip 
-    game.optime = game.dist/0.095
+    game.optime = course.dist/0.095
     if game.optime >= game.state.remtime:
 	prout(_("First Officer Spock- \"Captain, our speed under impulse"))
 	prout(_("power is only 0.95 sectors per stardate. Are you sure"))
@@ -3969,26 +3998,26 @@ def impulse():
 	if ja() == False:
 	    return
     # Activate impulse engines and pay the cost 
-    imove(novapush=False)
+    imove(course, novapush=False)
     game.ididit = True
     if game.alldone:
 	return
-    power = 20.0 + 100.0*game.dist
+    power = 20.0 + 100.0*course.dist
     game.energy -= power
-    game.optime = game.dist/0.095
+    game.optime = course.dist/0.095
     if game.energy <= 0:
 	finish(FNRG)
     return
 
-def warp(timewarp):
+def warp(course, involuntary):
     "ove under warp drive."
     blooey = False; twarp = False
-    if not timewarp: # Not WARPX entry 
+    if not involuntary: # Not WARPX entry 
 	game.ididit = False
 	if game.damage[DWARPEN] > 10.0:
 	    scanner.chew()
 	    skip(1)
-	    prout(_("Engineer Scott- \"The impulse engines are damaged, Sir.\""))
+	    prout(_("Engineer Scott- \"The warp engines are damaged, Sir.\""))
 	    return
 	if damaged(DWARPEN) and game.warpfac > 4.0:
 	    scanner.chew()
@@ -3996,18 +4025,22 @@ def warp(timewarp):
 	    prout(_("Engineer Scott- \"Sorry, Captain. Until this damage"))
 	    prout(_("  is repaired, I can only give you warp 4.\""))
 	    return
-       	# Read in course and distance 
-        if not getcourse(isprobe=False):
-	    return
-	# Make sure starship has enough energy for the trip 
-	power = (game.dist+0.05)*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
-	if power >= game.energy:
+       	# Read in course and distance
+        if course==None:
+            try:
+                course = getcourse(isprobe=False)
+            except TrekError:
+                return
+	# Make sure starship has enough energy for the trip
+        # Note: this formula is slightly different from the C version,
+        # and lets you skate a bit closer to the edge.
+	if course.power() >= game.energy:
 	    # Insufficient power for trip 
 	    game.ididit = False
 	    skip(1)
 	    prout(_("Engineering to bridge--"))
 	    if not game.shldup or 0.5*power > game.energy:
-		iwarp = math.pow((game.energy/(game.dist+0.05)), 0.333333333)
+		iwarp = (game.energy/(course.dist+0.05)) ** 0.333333333
 		if iwarp <= 0:
 		    prout(_("We can't do it, Captain. We don't have enough energy."))
 		else:
@@ -4019,10 +4052,9 @@ def warp(timewarp):
 			prout(".")
 	    else:
 		prout(_("We haven't the energy to go that far with the shields up."))
-	    return
-						
+	    return				
 	# Make sure enough time is left for the trip 
-	game.optime = 10.0*game.dist/game.warpfac**2
+	game.optime = course.time()
 	if game.optime >= 0.8*game.state.remtime:
 	    skip(1)
 	    prout(_("First Officer Spock- \"Captain, I compute that such"))
@@ -4038,12 +4070,12 @@ def warp(timewarp):
     if game.warpfac > 6.0:
 	# Decide if engine damage will occur
         # ESR: Seems wrong. Probability of damage goes *down* with distance? 
-	prob = game.dist*(6.0-game.warpfac)**2/66.666666666
+	prob = course.dist*(6.0-game.warpfac)**2/66.666666666
 	if prob > randreal():
 	    blooey = True
-	    game.dist = randreal(game.dist)
+	    course.distance = randreal(course.distance)
 	# Decide if time warp will occur 
-	if 0.5*game.dist*math.pow(7.0,game.warpfac-10.0) > randreal():
+	if 0.5*course.dist*math.pow(7.0,game.warpfac-10.0) > randreal():
 	    twarp = True
 	if idebug and game.warpfac==10 and not twarp:
 	    blooey = False
@@ -4053,7 +4085,7 @@ def warp(timewarp):
 	if blooey or twarp:
 	    # If time warp or engine damage, check path 
 	    # If it is obstructed, don't do warp or damage 
-	    angle = ((15.0-game.direc)*0.5235998)
+	    angle = ((15.0-course.bearing)*0.5235998)
 	    deltax = -math.sin(angle)
 	    deltay = math.cos(angle)
 	    if math.fabs(deltax) > math.fabs(deltay):
@@ -4062,7 +4094,7 @@ def warp(timewarp):
 		bigger = math.fabs(deltay)
 	    deltax /= bigger
 	    deltay /= bigger
-	    n = 10.0 * game.dist * bigger +0.5
+	    n = 10.0 * course.distance * bigger +0.5
 	    x = game.sector.i
 	    y = game.sector.j
 	    for l in range(1, n+1):
@@ -4076,13 +4108,13 @@ def warp(timewarp):
 		    blooey = False
 		    twarp = False
     # Activate Warp Engines and pay the cost 
-    imove(novapush=False)
+    imove(course, novapush=False)
     if game.alldone:
 	return
-    game.energy -= game.dist*game.warpfac*game.warpfac*game.warpfac*(game.shldup+1)
+    game.energy -= course.power()
     if game.energy <= 0:
 	finish(FNRG)
-    game.optime = 10.0*game.dist/game.warpfac**2
+    game.optime = course.time()
     if twarp:
 	timwrp()
     if blooey:
@@ -4189,15 +4221,15 @@ def atover(igrab):
 	game.warpfac = randreal(6.0, 8.0)
 	prout(_("Warp factor set to %d") % int(game.warpfac))
 	power = 0.75*game.energy
-	game.dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
+	dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
 	distreq = randreal(math.sqrt(2))
 	if distreq < game.dist:
-	    game.dist = distreq
-	game.optime = 10.0*game.dist/game.warpfac**2
-	game.direc = randreal(12)	# How dumb! 
+	    dist = distreq
+        course = course(distance=dist, bearing=randreal(12))	# How dumb!
+	game.optime = course.time()
 	game.justin = False
 	game.inorbit = False
-	warp(True)
+	warp(course, involuntary=True)
 	if not game.justin:
 	    # This is bad news, we didn't leave quadrant. 
 	    if game.alldone:
@@ -4234,7 +4266,6 @@ def timwrp():
 	unschedule(FCDBAS)
 	unschedule(FSCDBAS)
 	game.battle.invalidate()
-
 	# Make sure Galileo is consistant -- Snapshot may have been taken
         # when on planet, which would give us two Galileos! 
 	gotit = False
@@ -4305,17 +4336,11 @@ def probe():
 	game.isarmed = ja()
     elif key == "IHREAL":		# first element of course
         scanner.push(scanner.token)
-    if not getcourse(isprobe=True):
-	return
+    try:
+        game.probe = getcourse(isprobe=True)
+    except TrekError:
+        return
     game.nprobes -= 1
-    angle = ((15.0 - game.direc) * 0.5235988)
-    game.probein = coord(-math.sin(angle), math.cos(angle))
-    bigger = max(abs(game.probein.i), abs(game.probein.j))
-    game.probein /= bigger
-    game.proben = 10.0*game.dist*bigger +0.5
-    game.probe = coord(game.quadrant.i*QUADSIZE + game.sector.i, 
-                       game.quadrant.j*QUADSIZE + game.sector.j)
-    game.probec = copy.copy(game.quadrant)
     schedule(FDSPROB, 0.01) # Time to move one sector
     prout(_("Ensign Chekov-  \"The deep space probe is launched, Captain.\""))
     game.ididit = True
@@ -5287,7 +5312,7 @@ def eta():
     if not VALID_QUADRANT(w1.i, w1.j) or not VALID_SECTOR(w2.i, w2.j):
 	huh()
 	return
-    game.dist = math.sqrt((w1.j-game.quadrant.j+(w2.j-game.sector.j)/(QUADSIZE*1.0))**2+
+    dist = math.sqrt((w1.j-game.quadrant.j+(w2.j-game.sector.j)/(QUADSIZE*1.0))**2+
 		(w1.i-game.quadrant.i+(w2.i-game.sector.i)/(QUADSIZE*1.0))**2)
     wfl = False
     if prompt:
@@ -5299,7 +5324,7 @@ def eta():
 	    ttime = scanner.real
 	    if ttime > game.state.date:
 		ttime -= game.state.date # Actually a star date
-            twarp=(math.floor(math.sqrt((10.0*game.dist)/ttime)*10.0)+1.0)/10.0
+            twarp=(math.floor(math.sqrt((10.0*dist)/ttime)*10.0)+1.0)/10.0
             if ttime <= 1e-10 or twarp > 10:
 		prout(_("We'll never make it, sir."))
 		scanner.chew()
@@ -5320,7 +5345,7 @@ def eta():
     while True:
 	scanner.chew()
 	ttime = (10.0*game.dist)/twarp**2
-	tpower = game.dist*twarp*twarp*twarp*(game.shldup+1)
+	tpower = dist*twarp*twarp*twarp*(game.shldup+1)
 	if tpower >= game.energy:
 	    prout(_("Insufficient energy, sir."))
 	    if not game.shldup or tpower > game.energy*2.0:
@@ -6037,10 +6062,8 @@ def helpme():
             proutn(_("   current directory or to "))
             proutn(SSTDOC)
             prout(".\"")
-            #
             # This used to continue: "You need to find SST.DOC and put 
             # it in the current directory."
-            # 
             return
     while True:
         linebuf = fp.readline()
@@ -6112,7 +6135,7 @@ def makemoves():
 	    if game.ididit:
 		hitme = True
 	elif cmd == "MOVE":		# move under warp
-	    warp(False)
+	    warp(course=None, involuntary=False)
 	elif cmd == "SHIELDS":		# shields
 	    doshield(shraise=False)
 	    if game.ididit:
