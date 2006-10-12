@@ -1356,21 +1356,17 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    if game.quad[bumpto.i][bumpto.j] == IHBLANK:
 		prout(_(" buffeted into black hole."))
 		deadkl(w, iquad, bumpto)
-		return None
 	    if game.quad[bumpto.i][bumpto.j] != IHDOT:
-		# can't move into object 
 		prout(_(" damaged but not destroyed."))
-		return None
-	    proutn(_(" damaged--"))
-	    enemy.kloc = bumpto
-            game.quad[w.i][w.j]=IHDOT
-            game.quad[bumpto.i][bumpto.j]=iquad
-            prout(_(" displaced by blast to Sector %s ") % bumpto)
-            for enemy in game.enemies:
-                enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
-            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+            else:
+                prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
+                enemy.kloc = bumpto
+                game.quad[w.i][w.j]=IHDOT
+                game.quad[bumpto.i][bumpto.j]=iquad
+                for enemy in game.enemies:
+                    enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
+                game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             return None
-	    break
 	elif iquad == IHB: # Hit a base 
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
