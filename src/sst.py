@@ -1283,7 +1283,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	if iquad==IHDOT:
 	    continue
 	# hit something 
-	if damaged(DSRSENS) and not game.condition=="docked":
+	if not damaged(DSRSENS) or game.condition == "docked":
 	    skip(1);	# start new line after text track 
 	if iquad in (IHE, IHF): # Hit our ship 
 	    skip(1)
@@ -3521,7 +3521,7 @@ def tracktorpedo(origin, w, step, i, n, iquad):
 	if step == 1:
 	    if n != 1:
 		skip(1)
-		proutn(_("Track for %s torpedo number %d-  ") % (game.quad[origin.i][origin.j],i+1))
+		proutn(_("Track for torpedo number %d-  ") % (i+1))
 	    else:
 		skip(1)
 		proutn(_("Torpedo track- "))
