@@ -1271,13 +1271,11 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     ac = bearing + 0.25*dispersion	# dispersion is a random variable
     bullseye = (15.0 - bearing)*0.5235988
     track = course(bearing=ac, distance=QUADSIZE, origin=cartesian(origin)) 
-    # delta === track.increment
-    w = coord(0, 0); jw = coord(0, 0)
-    ungridded = copy.copy(origin)
+    jw = coord(0, 0)
     # Loop to move a single torpedo 
     for step in range(1, QUADSIZE*2):
-	ungridded += track.increment
-	w = ungridded.roundtogrid()
+	track.next()
+        w = track.sector()
 	if not VALID_SECTOR(w.i, w.j):
 	    break
 	iquad=game.quad[w.i][w.j]
@@ -3942,6 +3940,8 @@ class course:
         self.angle = ((15.0 - self.bearing) * 0.5235988)
         if origin is None:
             self.location = cartesian(game.quadrant, game.sector)
+        else:
+            self.location = cartesian(game.quadrant, origin)
         self.increment = coord(-math.sin(self.angle), math.cos(self.angle))
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
@@ -3960,7 +3960,7 @@ class course:
     def quadrant(self):
         return (self.location / QUADSIZE).roundtogrid()
     def sector(self):
-        return coord(self.location.i % QUADSIZE, self.location.j % QUADSIZE)
+        return coord(int(round(self.location.i)) % QUADSIZE, int(round(self.location.j)) % QUADSIZE)
     def power(self, warp):
 	return self.distance*(warp**3)*(game.shldup+1)
     def time(self, warp):
