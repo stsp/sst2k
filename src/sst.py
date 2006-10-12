@@ -201,10 +201,6 @@ FOREVER 	= 1e30
 MAXBURST	= 3
 MINCMDR 	= 10
 
-# These functions hide the difference between 0-origin and 1-origin addressing.
-def VALID_QUADRANT(x, y):	return ((x)>=0 and (x)<GALSIZE and (y)>=0 and (y)<GALSIZE)
-def VALID_SECTOR(x, y):	return ((x)>=0 and (x)<QUADSIZE and (y)>=0 and (y)<QUADSIZE)
-
 # How to represent features
 IHR = 'R',
 IHK = 'K',
@@ -232,6 +228,10 @@ class coord:
     def __init__(self, x=None, y=None):
         self.i = x
         self.j = y
+    def valid_quadrant(self):
+        return self.i>=0 and self.i<GALSIZE and self.j>=0 and self.j<GALSIZE
+    def valid_sector(self):
+	return self.i>=0 and self.i<QUADSIZE and self.j>=0 and self.j<QUADSIZE
     def invalidate(self):
         self.i = self.j = None
     def is_valid(self):
@@ -602,7 +602,7 @@ def randreal(*args):
 
 def welcoming(iq):
     "Would this quadrant welcome another Klingon?"
-    return VALID_QUADRANT(iq.i,iq.j) and \
+    return iq.valid_quadrant() and \
 	not game.state.galaxy[iq.i][iq.j].supernova and \
 	game.state.galaxy[iq.i][iq.j].klingons < MAXKLQUAD
 
@@ -1276,7 +1276,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     for step in range(1, QUADSIZE*2):
 	track.next()
         w = track.sector()
-	if not VALID_SECTOR(w.i, w.j):
+	if not w.valid_sector():
 	    break
 	iquad=game.quad[w.i][w.j]
 	tracktorpedo(origin, w, step, number, nburst, iquad)
@@ -1303,7 +1303,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    yy = math.cos(ang)/temp
 	    jw.i = int(w.i+xx+0.5)
 	    jw.j = int(w.j+yy+0.5)
-	    if not VALID_SECTOR(jw.i, jw.j):
+	    if not jw.valid_sector():
 		return hit
 	    if game.quad[jw.i][jw.j]==IHBLANK:
 		finish(FHOLE)
@@ -1346,7 +1346,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    yy = math.cos(ang)/temp
 	    jw.i = int(w.i+xx+0.5)
 	    jw.j = int(w.j+yy+0.5)
-	    if not VALID_SECTOR(jw.i, jw.j):
+            if not jw.valid_sector():
 		prout(_(" damaged but not destroyed."))
 		return
 	    if game.quad[jw.i][jw.j]==IHBLANK:
@@ -1697,7 +1697,7 @@ def deadkl(w, type, mv):
 
 def targetcheck(w):
     "Return None if target is invalid, otherwise return a course angle."
-    if not VALID_SECTOR(w.i, w.j):
+    if not w.valid_sector():
 	huh()
 	return None
     delta = coord()
@@ -2453,14 +2453,14 @@ def events():
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
             if game.probe.next(grain=QUADSIZE):
-		if not VALID_QUADRANT(game.probe.quadrant().i, game.probe.quadrant().j) or \
+		if not game.probe.quadrant().valid_quadrant() or \
 		    game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j].supernova:
 		    # Left galaxy or ran into supernova
                     if communicating():
 			announce()
 			skip(1)
 			proutn(_("Lt. Uhura-  \"The deep space probe "))
-			if not VALID_QUADRANT(game.probe.quadrant().i, game.probe.quadrant().j):
+			if not game.probe.quadrant().valid_quadrant():
 			    prout(_("has left the galaxy.\""))
 			else:
 			    prout(_("is no longer transmitting.\""))
@@ -2544,14 +2544,15 @@ def events():
 		continue		# full right now 
 	    # reproduce one Klingon 
 	    w = ev.quadrant
+            m = coord()
 	    if game.klhere >= MAXKLQUAD:
                 try:
                     # this quadrant not ok, pick an adjacent one 
-                    for i in range(w.i - 1, w.i + 2):
-                        for j in range(w.j - 1, w.j + 2):
-                            if not VALID_QUADRANT(i, j):
+                    for m.i in range(w.i - 1, w.i + 2):
+                        for m.j in range(w.j - 1, w.j + 2):
+                            if not m.valid_quadrant():
                                 continue
-                            q = game.state.galaxy[w.i][w.j]
+                            q = game.state.galaxy[m.i][m.j]
                             # check for this quad ok (not full & no snova) 
                             if q.klingons >= MAXKLQUAD or q.supernova:
                                 continue
@@ -2559,7 +2560,7 @@ def events():
                     else:
                         continue	# search for eligible quadrant failed
                 except "FOUNDIT":
-                    w.i = i; w.j = j
+                    w = m
 	    # deliver the child 
 	    game.state.remkl += 1
 	    q.klingons += 1
@@ -2568,7 +2569,6 @@ def events():
 		game.enemies.append(newkling())
 	    # recompute time left
             game.recompute()
-	    # report the disaster if we can 
 	    if communicating():
 		if game.quadrant == w:
 		    prout(_("Spock- sensors indicate the Klingons have"))
@@ -2654,7 +2654,7 @@ def nova(nov):
                 if offset.j==0 and offset.i==0:
                     continue
                 neighbor = start + offset
-                if not VALID_SECTOR(neighbor.j, neighbor.i):
+                if not neighbor.valid_sector():
                     continue
                 iquad = game.quad[neighbor.i][neighbor.j]
                 # Empty space ends reaction
@@ -2726,7 +2726,7 @@ def nova(nov):
                         break
                     newc = neighbor + neighbor - hits[mm]
                     proutn(crmena(True, iquad, "sector", neighbor) + _(" damaged"))
-                    if not VALID_SECTOR(newc.i, newc.j):
+                    if not newc.valid_sector():
                         # can't leave quadrant 
                         skip(1)
                         break
@@ -3630,7 +3630,7 @@ def imove(course=None, novapush=False):
             y += deltay
 	    w.i = int(round(x))
 	    w.j = int(round(y))
-	    if not VALID_SECTOR(w.i, w.j):
+	    if not w.valid_sector():
 		# Leaving quadrant -- allow final enemy attack 
 		# Don't do it if being pushed by Nova 
 		if len(game.enemies) != 0 and not novapush:
@@ -3890,7 +3890,7 @@ def getcourse(isprobe):
 		dsect.i = xi
 		dsect.j = xj
 	    itemp = "normal"
-	if not VALID_QUADRANT(dquad.i,dquad.j) or not VALID_SECTOR(dsect.i,dsect.j):
+	if not dquad.valid_quadrant() or not dsect.valid_sector():
 	    huh()
 	    raise TrekError
 	skip(1)
@@ -4108,7 +4108,7 @@ def warp(course, involuntary):
 		ix = x + 0.5
 		y += deltay
 		iy = y +0.5
-		if not VALID_SECTOR(ix, iy):
+		if not coord(ix, iy).valid_sector():
 		    break
 		if game.quad[ix][iy] != IHDOT:
 		    blooey = False
@@ -4390,7 +4390,7 @@ def mayday():
     game.sector.invalidate()
     for m in range(1, 5+1):
         w = game.base.scatter() 
-	if VALID_SECTOR(w.i,w.j) and game.quad[w.i][w.j]==IHDOT:
+	if w.valid_sector() and game.quad[w.i][w.j]==IHDOT:
 	    # found one -- finish up 
             game.sector = w
 	    break
@@ -4493,7 +4493,7 @@ def abandon():
 	    game.quad[game.sector.i][game.sector.j] = IHDOT
 	    for l in range(QUADSIZE):
 		game.sector = game.base.scatter()
-		if VALID_SECTOR(game.sector.i, game.sector.j) and \
+		if game.sector.valid_sector() and \
                        game.quad[game.sector.i][game.sector.j] == IHDOT:
                     break
 	    if l < QUADSIZE+1:
@@ -5089,7 +5089,7 @@ def lrscan(silent):
         if not silent:
             proutn(" ")
         for y in range(game.quadrant.j-1, game.quadrant.j+2):
-	    if not VALID_QUADRANT(x, y):
+	    if not coord(x, y).valid_quadrant():
                 if not silent:
                     proutn("  -1")
 	    else:
@@ -5314,7 +5314,7 @@ def eta():
 	    w2.j = 0
 	else:
 	    w2.j=QUADSIZE-1
-    if not VALID_QUADRANT(w1.i, w1.j) or not VALID_SECTOR(w2.i, w2.j):
+    if not w1.valid_quadrant() or not w2.valid_sector():
 	huh()
 	return
     dist = math.sqrt((w1.j-game.quadrant.j+(w2.j-game.sector.j)/(QUADSIZE*1.0))**2+
