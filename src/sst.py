@@ -1267,12 +1267,12 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	setwnd(srscan_window)
     else: 
 	setwnd(message_window)
-    shoved = False
     ac = bearing + 0.25*dispersion	# dispersion is a random variable
     bullseye = (15.0 - bearing)*0.5235988
     track = course(bearing=ac, distance=QUADSIZE, origin=cartesian(origin)) 
     bumpto = coord(0, 0)
     # Loop to move a single torpedo 
+    setwnd(message_window)
     for step in range(1, QUADSIZE*2):
 	track.next()
         w = track.sector()
@@ -1283,7 +1283,6 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	if iquad==IHDOT:
 	    continue
 	# hit something 
-	setwnd(message_window)
 	if damaged(DSRSENS) and not game.condition=="docked":
 	    skip(1);	# start new line after text track 
 	if iquad in (IHE, IHF): # Hit our ship 
@@ -1312,7 +1311,13 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		return hit
 	    game.sector = bumpto
 	    proutn(crmshp())
-	    shoved = True
+            game.quad[w.i][w.j]=IHDOT
+            game.quad[bumpto.i][bumpto.j]=iquad
+            prout(_(" displaced by blast to Sector %s ") % bumpto)
+            for enemy in game.enemies:
+                enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
+            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+            return None
 	elif iquad in (IHC, IHS, IHR, IHK): # Hit a regular enemy 
 	    # find the enemy 
 	    if iquad in (IHC, IHS) and withprob(0.05):
@@ -1358,7 +1363,13 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		return None
 	    proutn(_(" damaged--"))
 	    enemy.kloc = bumpto
-	    shoved = True
+            game.quad[w.i][w.j]=IHDOT
+            game.quad[bumpto.i][bumpto.j]=iquad
+            prout(_(" displaced by blast to Sector %s ") % bumpto)
+            for enemy in game.enemies:
+                enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
+            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+            return None
 	    break
 	elif iquad == IHB: # Hit a base 
 	    skip(1)
@@ -1455,16 +1466,6 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    skip(1)
 	    return None
 	break
-    if curwnd!=message_window:
-	setwnd(message_window)
-    if shoved:
-	game.quad[w.i][w.j]=IHDOT
-	game.quad[bumpto.i][bumpto.j]=iquad
-	prout(_(" displaced by blast to Sector %s ") % bumpto)
-	for ll in range(len(game.enemies)):
-	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll].kloc).distance()
-        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
-	return None
     skip(1)
     prout(_("Torpedo missed."))
     return None;
