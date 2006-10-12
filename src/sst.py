@@ -1261,24 +1261,22 @@ def collision(rammed, enemy):
 	finish(FWON)
     return
 
-def torpedo(origin, course, dispersion, number, nburst):
+def torpedo(origin, bearing, dispersion, number, nburst):
     "Let a photon torpedo fly" 
     if not damaged(DSRSENS) or game.condition=="docked":
 	setwnd(srscan_window)
     else: 
 	setwnd(message_window)
     shoved = False
-    ac = course + 0.25*dispersion
-    angle = (15.0-ac)*0.5235988
-    bullseye = (15.0 - course)*0.5235988
-    delta = coord(-math.sin(angle), math.cos(angle))          
-    bigger = max(abs(delta.i), abs(delta.j))
-    delta /= bigger
+    ac = bearing + 0.25*dispersion	# dispersion is a random variable
+    bullseye = (15.0 - bearing)*0.5235988
+    track = course(bearing=ac, distance=QUADSIZE, origin=cartesian(origin)) 
+    # delta === track.increment
     w = coord(0, 0); jw = coord(0, 0)
     ungridded = copy.copy(origin)
     # Loop to move a single torpedo 
     for step in range(1, QUADSIZE*2):
-	ungridded += delta
+	ungridded += track.increment
 	w = ungridded.roundtogrid()
 	if not VALID_SECTOR(w.i, w.j):
 	    break
@@ -1299,7 +1297,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 	    # We may be displaced. 
 	    if game.landed or game.condition=="docked":
 		return hit # Cheat if on a planet 
-	    ang = angle + 2.5*(randreal()-0.5)
+	    ang = track.angle + 2.5*(randreal()-0.5)
 	    temp = math.fabs(math.sin(ang))
 	    if math.fabs(math.cos(ang)) > temp:
 		temp = math.fabs(math.cos(ang))
@@ -1329,7 +1327,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 		    break
 	    kp = math.fabs(enemy.kpower)
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
 	    h1 = math.fabs(h1)
 	    if kp < h1:
 		h1 = kp
@@ -1342,7 +1340,7 @@ def torpedo(origin, course, dispersion, number, nburst):
 		return None
 	    proutn(crmena(True, iquad, "sector", w))
 	    # If enemy damaged but not destroyed, try to displace 
-	    ang = angle + 2.5*(randreal()-0.5)
+	    ang = track.angle + 2.5*(randreal()-0.5)
 	    temp = math.fabs(math.sin(ang))
 	    if math.fabs(math.cos(ang)) > temp:
 		temp = math.fabs(math.cos(ang))
@@ -2456,27 +2454,27 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-            if game.probe.nextquad():
-		if not VALID_QUADRANT(game.probe.loc.i, game.probe.loc.j) or \
-		    game.state.galaxy[game.probe.loc.i][game.probe.loc.j].supernova:
+            if game.probe.next(grain=QUADSIZE):
+		if not VALID_QUADRANT(game.probe.quadrant().i, game.probe.quadrant().j) or \
+		    game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j].supernova:
 		    # Left galaxy or ran into supernova
                     if communicating():
 			announce()
 			skip(1)
 			proutn(_("Lt. Uhura-  \"The deep space probe "))
-			if not VALID_QUADRANT(game.probe.loc.i, game.probe.loc.j):
-			    proutn(_("has left the galaxy.\""))
+			if not VALID_QUADRANT(game.probe.quadrant().i, game.probe.quadrant().j):
+			    prout(_("has left the galaxy.\""))
 			else:
-			    proutn(_("is no longer transmitting.\""))
+			    prout(_("is no longer transmitting.\""))
 		    unschedule(FDSPROB)
 		    continue
                 if communicating():
 		    #announce()
 		    skip(1)
-		    prout(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probe.loc)
-	    pdest = game.state.galaxy[game.probe.loc.i][game.probe.loc.j]
+		    prout(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probe.quadrant())
+	    pdest = game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j]
 	    if communicating():
-		chp = game.state.chart[game.probe.loc.i][game.probe.loc.j]
+		chp = game.state.chart[game.probe.quadrant().i][game.probe.quadrant().j]
 		chp.klingons = pdest.klingons
 		chp.starbase = pdest.starbase
 		chp.stars = pdest.stars
@@ -2485,7 +2483,7 @@ def events():
 	    if game.probe.moves == 0 and game.isarmed and pdest.stars:
 		supernova(game.probe)		# fire in the hole!
 		unschedule(FDSPROB)
-		if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova: 
+		if game.state.galaxy[game.quadrant().i][game.quadrant().j].supernova: 
 		    return
 	elif evcode == FDISTR: # inhabited system issues distress call 
 	    unschedule(FDISTR)
@@ -2755,12 +2753,12 @@ def nova(nov):
 	dist = 0.0
     if dist == 0.0:
 	return
-    course = course(distance=dist, bearing=direc, warp=4)
-    game.optime = course.time()
+    course = course(bearing=direc, distance=dist)
+    game.optime = course.time(warp=4)
     skip(1)
     prout(_("Force of nova displaces starship."))
     imove(course, novapush=True)
-    game.optime = course.time()
+    game.optime = course.time(warp=4)
     return
 	
 def supernova(w):
@@ -3794,6 +3792,14 @@ def dock(verbose):
 # because it involves giving x and y motions, yet the coordinates
 # are always displayed y - x, where +y is downward!
 
+def cartesian(loc1=None, loc2=None):
+    if loc1 is None:
+        return game.quadrant * QUADSIZE + game.sector
+    elif loc2 is None:
+        return game.quadrant * QUADSIZE + loc1
+    else:
+        return loc1 * QUADSIZE + loc2
+
 def getcourse(isprobe):
     "Get a course and distance from the user."
     key = 0
@@ -3842,6 +3848,7 @@ def getcourse(isprobe):
 		prout(_("(Manual movement assumed.)"))
 	    navmode = "manual"
 	    break
+    delta = coord()
     if navmode == "automatic":
 	while key == "IHEOL":
 	    if isprobe:
@@ -3896,7 +3903,6 @@ def getcourse(isprobe):
 	    else:
 		prout(_("Ensign Chekov- \"Course laid in, Captain.\""))
         # the actual deltas get computed here
-        delta = coord()
 	delta.j = dquad.j-game.quadrant.j + (dsect.j-game.sector.j)/(QUADSIZE*1.0)
 	delta.i = game.quadrant.i-dquad.i + (game.sector.i-dsect.i)/(QUADSIZE*1.0)
     else: # manual 
@@ -3923,44 +3929,42 @@ def getcourse(isprobe):
 	skip(1)
 	prout(_("Helmsman Sulu- \"Aye, Sir.\""))
     scanner.chew()
-    return course(delta.distance(), delta.bearing(), isprobe=isprobe)
+    return course(bearing=delta.bearing(), distance=delta.distance())
 
 class course:
-    # Eventually, we want to consolidate all course compuation here,
-    # including for torpedos and the Enterprise.
-    def __init__(self, distance, bearing, warp=None, isprobe=False): 
-        # Course actually laid in -- thisis straight from the old getcd().
+    def __init__(self, bearing, distance, origin=None): 
         self.distance = distance
         self.bearing = bearing
-        self.warp = warp or game.warpfac
-        self.isprobe = isprobe
-        # This odd relic suggests that the bearing() code we inherited from
-        # FORTRAN is actually computing clockface directions.
+        # The bearing() code we inherited from FORTRAN is actually computing
+        # clockface directions!
         if self.bearing < 0.0:
             self.bearing += 12.0
-        # This code was moved from the probe() routine
-        if isprobe:
-            angle = ((15.0 - self.bearing) * 0.5235988)
-            self.increment = coord(-math.sin(angle), math.cos(angle))
-            bigger = max(abs(self.increment.i), abs(self.increment.j))
-            self.increment /= bigger
-            self.location = coord(game.quadrant.i*QUADSIZE + game.sector.i, 
-                               game.quadrant.j*QUADSIZE + game.sector.j)
-            self.loc = copy.copy(game.quadrant)
-            self.moves = 10.0*self.distance*bigger +0.5
-    def power(self):
-	return self.distance*(self.warp**3)*(game.shldup+1)
-    def time(self):
-        return 10.0*self.distance/self.warp**2
-    def nextquad(self):
-        "Next location on course, at quadrant granularity."
-        self.location += self.increment
-        newloc = (self.location / float(QUADSIZE)).trunctogrid()
-        if not newloc == self.loc:
-            self.loc = newloc
+        self.angle = ((15.0 - self.bearing) * 0.5235988)
+        if origin is None:
+            self.location = cartesian(game.quadrant, game.sector)
+        self.increment = coord(-math.sin(self.angle), math.cos(self.angle))
+        bigger = max(abs(self.increment.i), abs(self.increment.j))
+        self.increment /= bigger
+        self.moves = 10*self.distance*bigger +0.5
+    def next(self, grain=1):
+        "Next step on course."
+        self.moves -=1
+        self.nextlocation = self.location + self.increment
+        oldloc = (self.location/grain).roundtogrid()
+        newloc = (self.nextlocation/grain).roundtogrid()
+        self.location = self.nextlocation
+        if newloc != oldloc:
             return True
         else:
             return False
+    def quadrant(self):
+        return (self.location / QUADSIZE).roundtogrid()
+    def sector(self):
+        return coord(self.location.i % QUADSIZE, self.location.j % QUADSIZE)
+    def power(self, warp):
+	return self.distance*(warp**3)*(game.shldup+1)
+    def time(self, warp):
+        return 10.0*self.distance/warp**2
 
 def impulse():
     "Move under impulse power."
@@ -4036,7 +4040,7 @@ def warp(course, involuntary):
 	# Make sure starship has enough energy for the trip
         # Note: this formula is slightly different from the C version,
         # and lets you skate a bit closer to the edge.
-	if course.power() >= game.energy:
+	if course.power(game.warpfac) >= game.energy:
 	    # Insufficient power for trip 
 	    game.ididit = False
 	    skip(1)
@@ -4056,7 +4060,7 @@ def warp(course, involuntary):
 		prout(_("We haven't the energy to go that far with the shields up."))
 	    return				
 	# Make sure enough time is left for the trip 
-	game.optime = course.time()
+	game.optime = course.time(game.warpfac)
 	if game.optime >= 0.8*game.state.remtime:
 	    skip(1)
 	    prout(_("First Officer Spock- \"Captain, I compute that such"))
@@ -4113,10 +4117,10 @@ def warp(course, involuntary):
     imove(course, novapush=False)
     if game.alldone:
 	return
-    game.energy -= course.power()
+    game.energy -= course.power(game.warpfac)
     if game.energy <= 0:
 	finish(FNRG)
-    game.optime = course.time()
+    game.optime = course.time(game.warpfac)
     if twarp:
 	timwrp()
     if blooey:
@@ -4227,7 +4231,7 @@ def atover(igrab):
 	distreq = randreal(math.sqrt(2))
 	if distreq < game.dist:
 	    dist = distreq
-        course = course(distance=dist, bearing=randreal(12))	# How dumb!
+        course = course(bearing=randreal(12), distance=dist)	# How dumb!
 	game.optime = course.time()
 	game.justin = False
 	game.inorbit = False
@@ -5104,7 +5108,6 @@ def damagereport():
     "Damage report."
     jdam = False
     scanner.chew()
-
     for i in range(NDEVICES):
 	if damaged(i):
 	    if not jdam:
