@@ -1271,7 +1271,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     ac = bearing + 0.25*dispersion	# dispersion is a random variable
     bullseye = (15.0 - bearing)*0.5235988
     track = course(bearing=ac, distance=QUADSIZE, origin=cartesian(origin)) 
-    jw = coord(0, 0)
+    bumpto = coord(0, 0)
     # Loop to move a single torpedo 
     for step in range(1, QUADSIZE*2):
 	track.next()
@@ -1290,9 +1290,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    skip(1)
 	    prout(_("Torpedo hits %s.") % crmshp())
 	    hit = 700.0 + randreal(100) - \
-		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
 	    newcnd(); # we're blown out of dock 
-	    # We may be displaced. 
 	    if game.landed or game.condition=="docked":
 		return hit # Cheat if on a planet 
 	    ang = track.angle + 2.5*(randreal()-0.5)
@@ -1301,17 +1300,17 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		temp = math.fabs(math.cos(ang))
 	    xx = -math.sin(ang)/temp
 	    yy = math.cos(ang)/temp
-	    jw.i = int(w.i+xx+0.5)
-	    jw.j = int(w.j+yy+0.5)
-	    if not jw.valid_sector():
+	    bumpto.i = int(w.i+xx+0.5)
+	    bumpto.j = int(w.j+yy+0.5)
+	    if not bumpto.valid_sector():
 		return hit
-	    if game.quad[jw.i][jw.j]==IHBLANK:
+	    if game.quad[bumpto.i][bumpto.j]==IHBLANK:
 		finish(FHOLE)
 		return hit
-	    if game.quad[jw.i][jw.j]!=IHDOT:
+	    if game.quad[bumpto.i][bumpto.j]!=IHDOT:
 		# can't move into object 
 		return hit
-	    game.sector = jw
+	    game.sector = bumpto
 	    proutn(crmshp())
 	    shoved = True
 	elif iquad in (IHC, IHS, IHR, IHK): # Hit a regular enemy 
@@ -1344,21 +1343,21 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		temp = math.fabs(math.cos(ang))
 	    xx = -math.sin(ang)/temp
 	    yy = math.cos(ang)/temp
-	    jw.i = int(w.i+xx+0.5)
-	    jw.j = int(w.j+yy+0.5)
-            if not jw.valid_sector():
+	    bumpto.i = int(w.i+xx+0.5)
+	    bumpto.j = int(w.j+yy+0.5)
+            if not bumpto.valid_sector():
 		prout(_(" damaged but not destroyed."))
 		return
-	    if game.quad[jw.i][jw.j]==IHBLANK:
+	    if game.quad[bumpto.i][bumpto.j] == IHBLANK:
 		prout(_(" buffeted into black hole."))
-		deadkl(w, iquad, jw)
+		deadkl(w, iquad, bumpto)
 		return None
-	    if game.quad[jw.i][jw.j]!=IHDOT:
+	    if game.quad[bumpto.i][bumpto.j] != IHDOT:
 		# can't move into object 
 		prout(_(" damaged but not destroyed."))
 		return None
 	    proutn(_(" damaged--"))
-	    enemy.kloc = jw
+	    enemy.kloc = bumpto
 	    shoved = True
 	    break
 	elif iquad == IHB: # Hit a base 
@@ -1460,8 +1459,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	setwnd(message_window)
     if shoved:
 	game.quad[w.i][w.j]=IHDOT
-	game.quad[jw.i][jw.j]=iquad
-	prout(_(" displaced by blast to Sector %s ") % jw)
+	game.quad[bumpto.i][bumpto.j]=iquad
+	prout(_(" displaced by blast to Sector %s ") % bumpto)
 	for ll in range(len(game.enemies)):
 	    game.enemies[ll].kdist = game.enemies[ll].kavgd = (game.sector-game.enemies[ll].kloc).distance()
         game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
