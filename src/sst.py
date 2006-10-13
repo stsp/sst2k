@@ -2130,7 +2130,7 @@ def phasers():
     if ifast:
 	skip(1)
 	if no == 0:
-	    if withprob(0.99):
+	    if withprob(0.01):
 		prout(_("Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."))
 		prouts(_("         CLICK   CLICK   POP  . . ."))
 		prout(_(" No response, sir!"))
@@ -3693,7 +3693,7 @@ def imove(course=None, novapush=False):
         iquad = game.quad[w.i][w.j]
         if iquad != IHDOT:
             # object encountered in flight path 
-            stopegy = 50.0*course.dist/game.optime
+            stopegy = 50.0*course.distance/game.optime
             course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
             if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
                 game.sector = w
@@ -3940,6 +3940,7 @@ class course:
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
         self.moves = int(round(10*self.distance*bigger))
+        self.final = self.location + distance*bigger*self.increment
     def next(self, grain=1):
         "Next step on course."
         self.moves -=1
