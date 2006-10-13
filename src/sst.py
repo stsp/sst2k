@@ -2477,7 +2477,7 @@ def events():
 		chp.stars = pdest.stars
 		pdest.charted = True
 	    game.probe.moves -= 1 # One less to travel
-	    if game.probe.moves == 0 and game.isarmed and pdest.stars:
+	    if game.probe.arrived() and game.isarmed and pdest.stars:
 		supernova(game.probe)		# fire in the hole!
 		unschedule(FDSPROB)
 		if game.state.galaxy[game.quadrant().i][game.quadrant().j].supernova: 
@@ -3916,17 +3916,23 @@ class course:
             self.bearing += 12.0
         self.angle = ((15.0 - self.bearing) * 0.5235988)
         if origin is None:
-            self.location = cartesian(game.quadrant, game.sector)
+            self.origin = cartesian(game.quadrant, game.sector)
         else:
-            self.location = cartesian(game.quadrant, origin)
+            self.origin = cartesian(game.quadrant, origin)
         self.increment = coord(-math.sin(self.angle), math.cos(self.angle))
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
         self.moves = int(round(10*self.distance*bigger))
+        self.reset()
         self.final = (self.location + self.moves*self.increment).roundtogrid()
+    def reset(self):
+        self.location = self.origin
+        self.step = 0
+    def arrived(self):
+        return self.location.roundtogrid() == self.final
     def next(self, grain=1):
         "Next step on course."
-        self.moves -=1
+        self.step += 1
         self.nextlocation = self.location + self.increment
         oldloc = (self.location/grain).roundtogrid()
         newloc = (self.nextlocation/grain).roundtogrid()
@@ -4077,6 +4083,7 @@ def warp(course, involuntary):
 		if game.quad[w.x][w.y] != IHDOT:
 		    blooey = False
 		    twarp = False
+            course.reset()
     # Activate Warp Engines and pay the cost 
     imove(course, novapush=False)
     if game.alldone:
