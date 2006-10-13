@@ -3619,130 +3619,128 @@ def imove(course=None, novapush=False):
     game.quad[game.sector.i][game.sector.j] = IHDOT
     x = game.sector.i
     y = game.sector.j
-    n = course.moves
-    if n > 0:
-	for m in range(n):
-            x += deltax
-            y += deltay
-	    w.i = int(round(x))
-	    w.j = int(round(y))
-	    if not w.valid_sector():
-		# Leaving quadrant -- allow final enemy attack 
-		# Don't do it if being pushed by Nova 
-		if len(game.enemies) != 0 and not novapush:
-		    newcnd()
-		    for enemy in game.enemies:
-			finald = (w - enemy.kloc).distance()
-			enemy.kavgd = 0.5 * (finald + enemy.kdist)
-		    #
-		    # Stas Sergeev added the condition
-		    # that attacks only happen if Klingons
-		    # are present and your skill is good.
-		    # 
-		    if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
-			attack(torps_ok=False)
-		    if game.alldone:
-			return
-		# compute final position -- new quadrant and sector 
-		x = (QUADSIZE*game.quadrant.i)+game.sector.i
-		y = (QUADSIZE*game.quadrant.j)+game.sector.j
-		w.i = int(round(x+QUADSIZE*course.distance*bigger*deltax))
-		w.j = int(round(y+QUADSIZE*course.distance*bigger*deltay))
-		# check for edge of galaxy 
-		kinks = 0
-                while True:
-		    kink = False
-		    if w.i < 0:
-			w.i = -w.i
-			kink = True
-		    if w.j < 0:
-			w.j = -w.j
-			kink = True
-		    if w.i >= GALSIZE*QUADSIZE:
-			w.i = (GALSIZE*QUADSIZE*2) - w.i
-			kink = True
-		    if w.j >= GALSIZE*QUADSIZE:
-			w.j = (GALSIZE*QUADSIZE*2) - w.j
-			kink = True
-		    if kink:
-			kinks += 1
-                    else:
-                        break
-		if kinks:
-		    game.nkinks += 1
-		    if game.nkinks == 3:
-			# Three strikes -- you're out! 
-			finish(FNEG3)
-			return
-		    skip(1)
-		    prout(_("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"))
-		    prout(_("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"))
-		    prout(_("YOU WILL BE DESTROYED."))
-		# Compute final position in new quadrant 
-		if trbeam: # Don't bother if we are to be beamed 
-		    return
-		game.quadrant.i = w.i/QUADSIZE
-		game.quadrant.j = w.j/QUADSIZE
-		game.sector.i = w.i - (QUADSIZE*game.quadrant.i)
-		game.sector.j = w.j - (QUADSIZE*game.quadrant.j)
-		skip(1)
-		prout(_("Entering Quadrant %s.") % game.quadrant)
-		game.quad[game.sector.i][game.sector.j] = game.ship
-		newqad()
-		if game.skill>SKILL_NOVICE:
-		    attack(torps_ok=False)  
-		return
-	    iquad = game.quad[w.i][w.j]
-	    if iquad != IHDOT:
-		# object encountered in flight path 
-		stopegy = 50.0*course.dist/game.optime
-		course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
-                if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
-		    game.sector = w
-                    for enemy in game.enemies:
-                        if enemy.kloc == game.sector:
-                            break
-		    collision(rammed=False, enemy=enemy)
-		    final = game.sector
-		elif iquad == IHBLANK:
-		    skip(1)
-		    prouts(_("***RED ALERT!  RED ALERT!"))
-		    skip(1)
-		    proutn("***" + crmshp())
-		    proutn(_(" pulled into black hole at Sector %s") % w)
-		    # Getting pulled into a black hole was certain
-		    # death in Almy's original.  Stas Sergeev added a
-		    # possibility that you'll get timewarped instead.
-		    n=0
-		    for m in range(NDEVICES):
-			if game.damage[m]>0: 
-			    n += 1
-		    probf=math.pow(1.4,(game.energy+game.shield)/5000.0-1.0)*math.pow(1.3,1.0/(n+1)-1.0)
-		    if (game.options & OPTION_BLKHOLE) and withprob(1-probf): 
-			timwrp()
-		    else: 
-			finish(FHOLE)
-		    return
-		else:
-		    # something else 
-		    skip(1)
-		    proutn(crmshp())
-		    if iquad == IHWEB:
-			prout(_(" encounters Tholian web at %s;") % w)
-		    else:
-			prout(_(" blocked by object at %s;") % w)
-		    proutn(_("Emergency stop required "))
-		    prout(_("%2d units of energy.") % int(stopegy))
-		    game.energy -= stopegy
-		    final.i = int(round(deltax))
-		    final.j = int(round(deltay))
-		    game.sector = final
-		    if game.energy <= 0:
-			finish(FNRG)
-			return
-                # We're here!
-		no_quad_change()
+    for m in range(course.moves):
+        x += deltax
+        y += deltay
+        w.i = int(round(x))
+        w.j = int(round(y))
+        if not w.valid_sector():
+            # Leaving quadrant -- allow final enemy attack 
+            # Don't do it if being pushed by Nova 
+            if len(game.enemies) != 0 and not novapush:
+                newcnd()
+                for enemy in game.enemies:
+                    finald = (w - enemy.kloc).distance()
+                    enemy.kavgd = 0.5 * (finald + enemy.kdist)
+                #
+                # Stas Sergeev added the condition
+                # that attacks only happen if Klingons
+                # are present and your skill is good.
+                # 
+                if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
+                    attack(torps_ok=False)
+                if game.alldone:
+                    return
+            # compute final position -- new quadrant and sector 
+            x = (QUADSIZE*game.quadrant.i)+game.sector.i
+            y = (QUADSIZE*game.quadrant.j)+game.sector.j
+            w.i = int(round(x+QUADSIZE*course.distance*bigger*deltax))
+            w.j = int(round(y+QUADSIZE*course.distance*bigger*deltay))
+            # check for edge of galaxy 
+            kinks = 0
+            while True:
+                kink = False
+                if w.i < 0:
+                    w.i = -w.i
+                    kink = True
+                if w.j < 0:
+                    w.j = -w.j
+                    kink = True
+                if w.i >= GALSIZE*QUADSIZE:
+                    w.i = (GALSIZE*QUADSIZE*2) - w.i
+                    kink = True
+                if w.j >= GALSIZE*QUADSIZE:
+                    w.j = (GALSIZE*QUADSIZE*2) - w.j
+                    kink = True
+                if kink:
+                    kinks += 1
+                else:
+                    break
+            if kinks:
+                game.nkinks += 1
+                if game.nkinks == 3:
+                    # Three strikes -- you're out! 
+                    finish(FNEG3)
+                    return
+                skip(1)
+                prout(_("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"))
+                prout(_("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"))
+                prout(_("YOU WILL BE DESTROYED."))
+            # Compute final position in new quadrant 
+            if trbeam: # Don't bother if we are to be beamed 
                 return
+            game.quadrant.i = w.i/QUADSIZE
+            game.quadrant.j = w.j/QUADSIZE
+            game.sector.i = w.i - (QUADSIZE*game.quadrant.i)
+            game.sector.j = w.j - (QUADSIZE*game.quadrant.j)
+            skip(1)
+            prout(_("Entering Quadrant %s.") % game.quadrant)
+            game.quad[game.sector.i][game.sector.j] = game.ship
+            newqad()
+            if game.skill>SKILL_NOVICE:
+                attack(torps_ok=False)  
+            return
+        iquad = game.quad[w.i][w.j]
+        if iquad != IHDOT:
+            # object encountered in flight path 
+            stopegy = 50.0*course.dist/game.optime
+            course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
+            if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
+                game.sector = w
+                for enemy in game.enemies:
+                    if enemy.kloc == game.sector:
+                        break
+                collision(rammed=False, enemy=enemy)
+                final = game.sector
+            elif iquad == IHBLANK:
+                skip(1)
+                prouts(_("***RED ALERT!  RED ALERT!"))
+                skip(1)
+                proutn("***" + crmshp())
+                proutn(_(" pulled into black hole at Sector %s") % w)
+                # Getting pulled into a black hole was certain
+                # death in Almy's original.  Stas Sergeev added a
+                # possibility that you'll get timewarped instead.
+                n=0
+                for m in range(NDEVICES):
+                    if game.damage[m]>0: 
+                        n += 1
+                probf=math.pow(1.4,(game.energy+game.shield)/5000.0-1.0)*math.pow(1.3,1.0/(n+1)-1.0)
+                if (game.options & OPTION_BLKHOLE) and withprob(1-probf): 
+                    timwrp()
+                else: 
+                    finish(FHOLE)
+                return
+            else:
+                # something else 
+                skip(1)
+                proutn(crmshp())
+                if iquad == IHWEB:
+                    prout(_(" encounters Tholian web at %s;") % w)
+                else:
+                    prout(_(" blocked by object at %s;") % w)
+                proutn(_("Emergency stop required "))
+                prout(_("%2d units of energy.") % int(stopegy))
+                game.energy -= stopegy
+                final.i = int(round(deltax))
+                final.j = int(round(deltay))
+                game.sector = final
+                if game.energy <= 0:
+                    finish(FNRG)
+                    return
+            # We're here!
+            no_quad_change()
+            return
 	course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
 	game.sector = w
     final = game.sector
