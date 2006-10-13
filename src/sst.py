@@ -274,7 +274,8 @@ class coord:
             s.j = self.j / abs(self.j)
         return s
     def quadrant(self):
-        return (self / QUADSIZE).roundtogrid()
+        #print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
+        return self.roundtogrid() / QUADSIZE
     def sector(self):
         return self.roundtogrid() % QUADSIZE
     def scatter(self):
@@ -3598,19 +3599,10 @@ def imove(course=None, novapush=False):
         newcnd()
         drawmaps(0)
         setwnd(message_window)
-    w.i = w.j = 0
+
     if game.inorbit:
 	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
 	game.inorbit = False
-    angle = ((15.0 - course.bearing) * 0.5235988)
-    deltax = -math.sin(angle)
-    deltay = math.cos(angle)
-    if math.fabs(deltax) > math.fabs(deltay):
-	bigger = math.fabs(deltax)
-    else:
-	bigger = math.fabs(deltay)
-    deltay /= bigger
-    deltax /= bigger
     # If tractor beam is to occur, don't move full distance 
     if game.state.date+game.optime >= scheduled(FTBEAM):
 	trbeam = True
@@ -3619,14 +3611,10 @@ def imove(course=None, novapush=False):
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move within the quadrant 
     game.quad[game.sector.i][game.sector.j] = IHDOT
-    x = game.sector.i
-    y = game.sector.j
     for m in range(course.moves):
-        x += deltax
-        y += deltay
-        w.i = int(round(x))
-        w.j = int(round(y))
-        if not w.valid_sector():
+        course.next()
+        w = course.sector()
+        if course.origin.quadrant() != course.location.quadrant():
             # Leaving quadrant -- allow final enemy attack 
             # Don't do it if being pushed by Nova 
             if len(game.enemies) != 0 and not novapush:
@@ -3634,31 +3622,28 @@ def imove(course=None, novapush=False):
                 for enemy in game.enemies:
                     finald = (w - enemy.kloc).distance()
                     enemy.kavgd = 0.5 * (finald + enemy.kdist)
-                #
                 # Stas Sergeev added the condition
                 # that attacks only happen if Klingons
                 # are present and your skill is good.
-                # 
                 if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
                     attack(torps_ok=False)
                 if game.alldone:
                     return
             # check for edge of galaxy 
-            w = course.final
             kinks = 0
             while True:
                 kink = False
-                if w.i < 0:
-                    w.i = -w.i
+                if course.final.i < 0:
+                    course.final.i = -course.final.i
                     kink = True
-                if w.j < 0:
-                    w.j = -w.j
+                if course.final.j < 0:
+                    course.final.j = -course.final.j
                     kink = True
-                if w.i >= GALSIZE*QUADSIZE:
-                    w.i = (GALSIZE*QUADSIZE*2) - w.i
+                if course.final.i >= GALSIZE*QUADSIZE:
+                    course.final.i = (GALSIZE*QUADSIZE*2) - course.final.i
                     kink = True
-                if w.j >= GALSIZE*QUADSIZE:
-                    w.j = (GALSIZE*QUADSIZE*2) - w.j
+                if course.final.j >= GALSIZE*QUADSIZE:
+                    course.final.j = (GALSIZE*QUADSIZE*2) - course.final.j
                     kink = True
                 if kink:
                     kinks += 1
@@ -3677,10 +3662,8 @@ def imove(course=None, novapush=False):
             # Compute final position in new quadrant 
             if trbeam: # Don't bother if we are to be beamed 
                 return
-            game.quadrant.i = w.i/QUADSIZE
-            game.quadrant.j = w.j/QUADSIZE
-            game.sector.i = w.i - (QUADSIZE*game.quadrant.i)
-            game.sector.j = w.j - (QUADSIZE*game.quadrant.j)
+            game.quadrant = course.final.quadrant()
+            game.sector = course.final.sector()
             skip(1)
             prout(_("Entering Quadrant %s.") % game.quadrant)
             game.quad[game.sector.i][game.sector.j] = game.ship
@@ -3693,8 +3676,8 @@ def imove(course=None, novapush=False):
             # object encountered in flight path 
             stopegy = 50.0*course.distance/game.optime
             course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
+            game.sector = w
             if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
-                game.sector = w
                 for enemy in game.enemies:
                     if enemy.kloc == game.sector:
                         break
@@ -3730,9 +3713,7 @@ def imove(course=None, novapush=False):
                 proutn(_("Emergency stop required "))
                 prout(_("%2d units of energy.") % int(stopegy))
                 game.energy -= stopegy
-                final.i = int(round(deltax))
-                final.j = int(round(deltay))
-                game.sector = final
+                game.sector = w
                 if game.energy <= 0:
                     finish(FNRG)
                     return
