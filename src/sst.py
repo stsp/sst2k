@@ -3641,12 +3641,8 @@ def imove(course=None, novapush=False):
                     attack(torps_ok=False)
                 if game.alldone:
                     return
-            # compute final position -- new quadrant and sector 
-            x = (QUADSIZE*game.quadrant.i)+game.sector.i
-            y = (QUADSIZE*game.quadrant.j)+game.sector.j
-            w.i = int(round(x+QUADSIZE*course.distance*bigger*deltax))
-            w.j = int(round(y+QUADSIZE*course.distance*bigger*deltay))
             # check for edge of galaxy 
+            w = course.final
             kinks = 0
             while True:
                 kink = False
@@ -3940,7 +3936,7 @@ class course:
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
         self.moves = int(round(10*self.distance*bigger))
-        self.final = self.location + distance*bigger*self.increment
+        self.final = (self.location + self.moves*self.increment).roundtogrid()
     def next(self, grain=1):
         "Next step on course."
         self.moves -=1
