@@ -4069,26 +4069,12 @@ def warp(course, involuntary):
 	if blooey or twarp:
 	    # If time warp or engine damage, check path 
 	    # If it is obstructed, don't do warp or damage 
-	    angle = ((15.0-course.bearing)*0.5235998)
-	    deltax = -math.sin(angle)
-	    deltay = math.cos(angle)
-	    if math.fabs(deltax) > math.fabs(deltay):
-		bigger = math.fabs(deltax)
-	    else:
-		bigger = math.fabs(deltay)
-	    deltax /= bigger
-	    deltay /= bigger
-	    n = 10.0 * course.distance * bigger +0.5
-	    x = game.sector.i
-	    y = game.sector.j
-	    for l in range(1, n+1):
-		x += deltax
-		ix = x + 0.5
-		y += deltay
-		iy = y +0.5
-		if not coord(ix, iy).valid_sector():
-		    break
-		if game.quad[ix][iy] != IHDOT:
+            for m in range(course.moves):
+                course.next()
+                w = course.sector()
+                if not w.valid_sector():
+                    break
+		if game.quad[w.x][w.y] != IHDOT:
 		    blooey = False
 		    twarp = False
     # Activate Warp Engines and pay the cost 
