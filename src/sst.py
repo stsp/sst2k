@@ -250,11 +250,11 @@ class coord:
         return coord(self.i*other, self.j*other)
     def __div__(self, other):
         return coord(self.i/other, self.j/other)
+    def __mod__(self, other):
+        return coord(self.i % other, self.j % other)
     def __rdiv__(self, other):
         return coord(self.i/other, self.j/other)
     def roundtogrid(self):
-        return coord(int(round(self.i)), int(round(self.j)))
-    def trunctogrid(self):
         return coord(int(round(self.i)), int(round(self.j)))
     def distance(self, other=None):
         if not other: other = coord(0, 0)
@@ -273,13 +273,15 @@ class coord:
         else:
             s.j = self.j / abs(self.j)
         return s
+    def quadrant(self):
+        return (self / QUADSIZE).roundtogrid()
+    def sector(self):
+        return self.roundtogrid() % QUADSIZE
     def scatter(self):
         s = coord()
         s.i = self.i + randrange(-1, 2)
         s.j = self.j + randrange(-1, 2)
         return s
-    def __hash__(self):
-        return hash((x, y))
     def __str__(self):
         if self.i == None or self.j == None:
             return "Nowhere"
@@ -3923,6 +3925,10 @@ class course:
     def __init__(self, bearing, distance, origin=None): 
         self.distance = distance
         self.bearing = bearing
+        if origin is None:
+            self.origin = cartesian(game.quadrant, game.sector)
+        else:
+            self.origin = origin
         # The bearing() code we inherited from FORTRAN is actually computing
         # clockface directions!
         if self.bearing < 0.0:
@@ -3949,9 +3955,9 @@ class course:
         else:
             return False
     def quadrant(self):
-        return (self.location / QUADSIZE).roundtogrid()
+        return self.location.quadrant()
     def sector(self):
-        return coord(int(round(self.location.i)) % QUADSIZE, int(round(self.location.j)) % QUADSIZE)
+        return self.location.sector()
     def power(self, warp):
 	return self.distance*(warp**3)*(game.shldup+1)
     def time(self, warp):
