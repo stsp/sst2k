@@ -3619,9 +3619,9 @@ def imove(course=None, novapush=False):
     game.quad[game.sector.i][game.sector.j] = IHDOT
     x = game.sector.i
     y = game.sector.j
-    n = int(10.0*course.distance*bigger+0.5)
+    n = course.moves
     if n > 0:
-	for m in range(1, n+1):
+	for m in range(n):
             x += deltax
             y += deltay
 	    w.i = int(round(x))
@@ -3941,7 +3941,7 @@ class course:
         self.increment = coord(-math.sin(self.angle), math.cos(self.angle))
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
-        self.moves = 10*self.distance*bigger +0.5
+        self.moves = int(round(10*self.distance*bigger))
     def next(self, grain=1):
         "Next step on course."
         self.moves -=1
