@@ -259,9 +259,8 @@ class coord:
     def distance(self, other=None):
         if not other: other = coord(0, 0)
         return math.sqrt((self.i - other.i)**2 + (self.j - other.j)**2)
-    def bearing(self, other=None):
-        if not other: other = coord(0, 0)
-        return 1.90985*math.atan2(self.j-other.j, self.i-other.i)
+    def bearing(self):
+        return 1.90985*math.atan2(self.j, self.i)
     def sgn(self):
         s = coord()
         if self.i == 0:
@@ -1404,8 +1403,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    if game.landed:
 		# captain perishes on planet 
 		finish(FDPLANET)
-	    prout(_("You have just destroyed an inhabited planet."))
-	    prout(_("Celebratory rallies are being held on the Klingon homeworld."))
+	    prout(_("The torpedo destroyed an inhabited planet."))
 	    return None
 	elif iquad == IHSTAR: # Hit a star 
 	    if withprob(0.9):
@@ -2754,7 +2752,7 @@ def nova(nov):
     game.optime = course.time(warp=4)
     skip(1)
     prout(_("Force of nova displaces starship."))
-    imove(course, novapush=True)
+    imove(course, noattack=True)
     game.optime = course.time(warp=4)
     return
 	
@@ -3578,117 +3576,84 @@ def prstat(txt, data):
 
 # Code from moving.c begins here
 
-def imove(course=None, novapush=False):
+def imove(course=None, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
-    w = coord(); final = coord()
-    trbeam = False
+    w = coord()
 
-    def no_quad_change():
-        # No quadrant change -- compute new average enemy distances 
-        game.quad[game.sector.i][game.sector.j] = game.ship
-        if game.enemies:
+    def newquadrant(noattack):
+        # Leaving quadrant -- allow final enemy attack 
+        # Don't do it if being pushed by Nova 
+        if len(game.enemies) != 0 and not noattack:
+            newcnd()
             for enemy in game.enemies:
-                finald = (w-enemy.kloc).distance()
+                finald = (w - enemy.kloc).distance()
                 enemy.kavgd = 0.5 * (finald + enemy.kdist)
-                enemy.kdist = finald
-            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
-            if not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
+            # Stas Sergeev added the condition
+            # that attacks only happen if Klingons
+            # are present and your skill is good.
+            if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
                 attack(torps_ok=False)
-            for enemy in game.enemies:
-                enemy.kavgd = enemy.kdist
-        newcnd()
-        drawmaps(0)
-        setwnd(message_window)
-
-    if game.inorbit:
-	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
-	game.inorbit = False
-    # If tractor beam is to occur, don't move full distance 
-    if game.state.date+game.optime >= scheduled(FTBEAM):
-	trbeam = True
-	game.condition = "red"
-	course.distance = course.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
-	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
-    # Move within the quadrant 
-    game.quad[game.sector.i][game.sector.j] = IHDOT
-    for m in range(course.moves):
-        course.next()
-        w = course.sector()
-        if course.origin.quadrant() != course.location.quadrant():
-            # Leaving quadrant -- allow final enemy attack 
-            # Don't do it if being pushed by Nova 
-            if len(game.enemies) != 0 and not novapush:
-                newcnd()
-                for enemy in game.enemies:
-                    finald = (w - enemy.kloc).distance()
-                    enemy.kavgd = 0.5 * (finald + enemy.kdist)
-                # Stas Sergeev added the condition
-                # that attacks only happen if Klingons
-                # are present and your skill is good.
-                if game.skill > SKILL_GOOD and game.klhere > 0 and not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
-                    attack(torps_ok=False)
-                if game.alldone:
-                    return
-            # check for edge of galaxy 
-            kinks = 0
-            while True:
-                kink = False
-                if course.final.i < 0:
-                    course.final.i = -course.final.i
-                    kink = True
-                if course.final.j < 0:
-                    course.final.j = -course.final.j
-                    kink = True
-                if course.final.i >= GALSIZE*QUADSIZE:
-                    course.final.i = (GALSIZE*QUADSIZE*2) - course.final.i
-                    kink = True
-                if course.final.j >= GALSIZE*QUADSIZE:
-                    course.final.j = (GALSIZE*QUADSIZE*2) - course.final.j
-                    kink = True
-                if kink:
-                    kinks += 1
-                else:
-                    break
-            if kinks:
-                game.nkinks += 1
-                if game.nkinks == 3:
-                    # Three strikes -- you're out! 
-                    finish(FNEG3)
-                    return
-                skip(1)
-                prout(_("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"))
-                prout(_("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"))
-                prout(_("YOU WILL BE DESTROYED."))
-            # Compute final position in new quadrant 
-            if trbeam: # Don't bother if we are to be beamed 
+            if game.alldone:
                 return
-            game.quadrant = course.final.quadrant()
-            game.sector = course.final.sector()
+        # check for edge of galaxy 
+        kinks = 0
+        while True:
+            kink = False
+            if course.final.i < 0:
+                course.final.i = -course.final.i
+                kink = True
+            if course.final.j < 0:
+                course.final.j = -course.final.j
+                kink = True
+            if course.final.i >= GALSIZE*QUADSIZE:
+                course.final.i = (GALSIZE*QUADSIZE*2) - course.final.i
+                kink = True
+            if course.final.j >= GALSIZE*QUADSIZE:
+                course.final.j = (GALSIZE*QUADSIZE*2) - course.final.j
+                kink = True
+            if kink:
+                kinks += 1
+            else:
+                break
+        if kinks:
+            game.nkinks += 1
+            if game.nkinks == 3:
+                # Three strikes -- you're out! 
+                finish(FNEG3)
+                return
             skip(1)
-            prout(_("Entering Quadrant %s.") % game.quadrant)
-            game.quad[game.sector.i][game.sector.j] = game.ship
-            newqad()
-            if game.skill>SKILL_NOVICE:
-                attack(torps_ok=False)  
+            prout(_("YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"))
+            prout(_("AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"))
+            prout(_("YOU WILL BE DESTROYED."))
+        # Compute final position in new quadrant 
+        if trbeam: # Don't bother if we are to be beamed 
             return
-        iquad = game.quad[w.i][w.j]
+        game.quadrant = course.final.quadrant()
+        game.sector = course.final.sector()
+        skip(1)
+        prout(_("Entering Quadrant %s.") % game.quadrant)
+        game.quad[game.sector.i][game.sector.j] = game.ship
+        newqad()
+        if game.skill>SKILL_NOVICE:
+            attack(torps_ok=False)  
+
+    def check_collision(h):
+        iquad = game.quad[h.i][h.j]
         if iquad != IHDOT:
             # object encountered in flight path 
             stopegy = 50.0*course.distance/game.optime
-            course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
-            game.sector = w
             if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
                 for enemy in game.enemies:
                     if enemy.kloc == game.sector:
                         break
                 collision(rammed=False, enemy=enemy)
-                final = game.sector
+                return True
             elif iquad == IHBLANK:
                 skip(1)
                 prouts(_("***RED ALERT!  RED ALERT!"))
                 skip(1)
                 proutn("***" + crmshp())
-                proutn(_(" pulled into black hole at Sector %s") % w)
+                proutn(_(" pulled into black hole at Sector %s") % h)
                 # Getting pulled into a black hole was certain
                 # death in Almy's original.  Stas Sergeev added a
                 # possibility that you'll get timewarped instead.
@@ -3701,29 +3666,61 @@ def imove(course=None, novapush=False):
                     timwrp()
                 else: 
                     finish(FHOLE)
-                return
+                return True
             else:
                 # something else 
                 skip(1)
                 proutn(crmshp())
                 if iquad == IHWEB:
-                    prout(_(" encounters Tholian web at %s;") % w)
+                    prout(_(" encounters Tholian web at %s;") % h)
                 else:
-                    prout(_(" blocked by object at %s;") % w)
+                    prout(_(" blocked by object at %s;") % h)
                 proutn(_("Emergency stop required "))
                 prout(_("%2d units of energy.") % int(stopegy))
                 game.energy -= stopegy
-                game.sector = w
                 if game.energy <= 0:
                     finish(FNRG)
-                    return
-            # We're here!
-            no_quad_change()
-            return
-	course.distance = (game.sector - w).distance() / (QUADSIZE * 1.0)
-	game.sector = w
-    final = game.sector
-    no_quad_change()
+                return True
+        return False
+
+    trbeam = False
+    if game.inorbit:
+	prout(_("Helmsman Sulu- \"Leaving standard orbit.\""))
+	game.inorbit = False
+    # If tractor beam is to occur, don't move full distance 
+    if game.state.date+game.optime >= scheduled(FTBEAM):
+	trbeam = True
+	game.condition = "red"
+	course.distance = course.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
+	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
+    # Move out
+    game.quad[game.sector.i][game.sector.j] = IHDOT
+    for m in range(course.moves):
+        course.next()
+        w = course.sector()
+        if course.origin.quadrant() != course.location.quadrant():
+            newquadrant(noattack)
+            break
+        elif check_collision(w):
+            print "Collision detected"
+            break
+        else:
+            game.sector = w
+    # We're in destination quadrant -- compute new average enemy distances
+    game.quad[game.sector.i][game.sector.j] = game.ship
+    if game.enemies:
+        for enemy in game.enemies:
+            finald = (w-enemy.kloc).distance()
+            enemy.kavgd = 0.5 * (finald + enemy.kdist)
+            enemy.kdist = finald
+        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+        if not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
+            attack(torps_ok=False)
+        for enemy in game.enemies:
+            enemy.kavgd = enemy.kdist
+    newcnd()
+    drawmaps(0)
+    setwnd(message_window)
     return
 
 def dock(verbose):
@@ -3988,7 +3985,7 @@ def impulse():
 	if ja() == False:
 	    return
     # Activate impulse engines and pay the cost 
-    imove(course, novapush=False)
+    imove(course, noattack=False)
     game.ididit = True
     if game.alldone:
 	return
@@ -4060,12 +4057,12 @@ def warp(course, involuntary):
     if game.warpfac > 6.0:
 	# Decide if engine damage will occur
         # ESR: Seems wrong. Probability of damage goes *down* with distance? 
-	prob = course.dist*(6.0-game.warpfac)**2/66.666666666
+	prob = course.distance*(6.0-game.warpfac)**2/66.666666666
 	if prob > randreal():
 	    blooey = True
 	    course.distance = randreal(course.distance)
 	# Decide if time warp will occur 
-	if 0.5*course.dist*math.pow(7.0,game.warpfac-10.0) > randreal():
+	if 0.5*course.distance*math.pow(7.0,game.warpfac-10.0) > randreal():
 	    twarp = True
 	if idebug and game.warpfac==10 and not twarp:
 	    blooey = False
@@ -4080,12 +4077,12 @@ def warp(course, involuntary):
                 w = course.sector()
                 if not w.valid_sector():
                     break
-		if game.quad[w.x][w.y] != IHDOT:
+		if game.quad[w.i][w.j] != IHDOT:
 		    blooey = False
 		    twarp = False
             course.reset()
     # Activate Warp Engines and pay the cost 
-    imove(course, novapush=False)
+    imove(course, noattack=False)
     if game.alldone:
 	return
     game.energy -= course.power(game.warpfac)
@@ -4185,7 +4182,7 @@ def atover(igrab):
 	    proutn(_("The %s has stopped in a quadrant containing") % crmshp())
 	    prouts(_("   a supernova."))
 	    skip(2)
-	proutn(_("***Emergency automatic override attempts to hurl ")+crmshp())
+	prout(_("***Emergency automatic override attempts to hurl ")+crmshp())
 	prout(_("safely out of quadrant."))
 	if not damaged(DRADIO):
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].charted = True
@@ -4199,14 +4196,12 @@ def atover(igrab):
 	prout(_("Warp factor set to %d") % int(game.warpfac))
 	power = 0.75*game.energy
 	dist = power/(game.warpfac*game.warpfac*game.warpfac*(game.shldup+1))
-	distreq = randreal(math.sqrt(2))
-	if distreq < game.dist:
-	    dist = distreq
-        course = course(bearing=randreal(12), distance=dist)	# How dumb!
-	game.optime = course.time()
+	dist = max(dist, randreal(math.sqrt(2)))
+        bugout = course(bearing=randreal(12), distance=dist)	# How dumb!
+	game.optime = bugout.time(game.warpfac)
 	game.justin = False
 	game.inorbit = False
-	warp(course, involuntary=True)
+	warp(bugout, involuntary=True)
 	if not game.justin:
 	    # This is bad news, we didn't leave quadrant. 
 	    if game.alldone:
@@ -5200,7 +5195,7 @@ def status(req=0):
 	prstat(_("Shields"), s+data)
     if not req or req == 9:
         prstat(_("Klingons Left"), "%d" \
-               % (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem))
+               % (game.state.remkl+len(game.state.kcmdr)+game.state.nscrem))
     if not req or req == 10:
 	if game.options & OPTION_WORLDS:
 	    plnet = game.state.galaxy[game.quadrant.i][game.quadrant.j].planet
@@ -5320,7 +5315,7 @@ def eta():
 	prout(_("Captain, certainly you can give me one of these."))
     while True:
 	scanner.chew()
-	ttime = (10.0*game.dist)/twarp**2
+	ttime = (10.0*dist)/twarp**2
 	tpower = dist*twarp*twarp*twarp*(game.shldup+1)
 	if tpower >= game.energy:
 	    prout(_("Insufficient energy, sir."))
