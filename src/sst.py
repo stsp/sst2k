@@ -1295,14 +1295,11 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    newcnd(); # we're blown out of dock 
 	    if game.landed or game.condition=="docked":
 		return hit # Cheat if on a planet 
-	    ang = track.angle + 2.5*(randreal()-0.5)
-	    temp = math.fabs(math.sin(ang))
-	    if math.fabs(math.cos(ang)) > temp:
-		temp = math.fabs(math.cos(ang))
-	    xx = -math.sin(ang)/temp
-	    yy = math.cos(ang)/temp
-	    bumpto.i = int(w.i+xx+0.5)
-	    bumpto.j = int(w.j+yy+0.5)
+            # In the C/FORTRAN version, dispersion was 2.5 radians, which
+            # is 143 degrees, which is almost exactly 4.8 clockface units
+            displacement = course(track.bearing+randreal(-2.4,2.4), distance=2**0.5)
+            displacement.next()
+            bumpto = displacement.sector()
 	    if not bumpto.valid_sector():
 		return hit
 	    if game.quad[bumpto.i][bumpto.j]==IHBLANK:
@@ -1343,15 +1340,9 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		deadkl(w, iquad, w)
 		return None
 	    proutn(crmena(True, iquad, "sector", w))
-	    # If enemy damaged but not destroyed, try to displace 
-	    ang = track.angle + 2.5*(randreal()-0.5)
-	    temp = math.fabs(math.sin(ang))
-	    if math.fabs(math.cos(ang)) > temp:
-		temp = math.fabs(math.cos(ang))
-	    xx = -math.sin(ang)/temp
-	    yy = math.cos(ang)/temp
-	    bumpto.i = int(w.i+xx+0.5)
-	    bumpto.j = int(w.j+yy+0.5)
+            displacement = course(track.bearing+randreal(-2.4,2.4), distance=2**0.5)
+            displacement.next()
+            bumpto = displacement.sector()
             if not bumpto.valid_sector():
 		prout(_(" damaged but not destroyed."))
 		return
