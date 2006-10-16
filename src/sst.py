@@ -5145,11 +5145,8 @@ def status(req=0):
     if not req or req == 2:
 	if game.condition != "docked":
 	    newcnd()
-        dam = 0
-	for t in range(NDEVICES):
-	    if game.damage[t]>0: 
-		dam += 1
-	prstat(_("Condition"), _("%s, %i DAMAGES") % (game.condition.upper(), dam))
+	prstat(_("Condition"), _("%s, %i DAMAGES") % \
+               (game.condition.upper(), sum(map(lambda x: x > 0, damages))))
     if not req or req == 3:
 	prstat(_("Position"), "%s , %s" % (game.quadrant, game.sector))
     if not req or req == 4:
