@@ -1276,7 +1276,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     # Loop to move a single torpedo 
     setwnd(message_window)
     for step in range(1, QUADSIZE*2):
-	track.next()
+        if not track.next(): break
         w = track.sector()
 	if not w.valid_sector():
 	    break
@@ -2449,7 +2449,7 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-            if game.probe.next(grain=QUADSIZE):
+            if not game.probe.next():
 		if not game.probe.quadrant().valid_quadrant() or \
 		    game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j].supernova:
 		    # Left galaxy or ran into supernova
@@ -3927,17 +3927,13 @@ class course:
         self.step = 0
     def arrived(self):
         return self.location.roundtogrid() == self.final
-    def next(self, grain=1):
+    def next(self):
         "Next step on course."
         self.step += 1
         self.nextlocation = self.location + self.increment
-        oldloc = (self.location/grain).roundtogrid()
-        newloc = (self.nextlocation/grain).roundtogrid()
+        samequad = (self.location.quadrant() == self.nextlocation.quadrant())
         self.location = self.nextlocation
-        if newloc != oldloc:
-            return True
-        else:
-            return False
+        return samequad
     def quadrant(self):
         return self.location.quadrant()
     def sector(self):
