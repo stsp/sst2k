@@ -92,7 +92,7 @@ void waitfor(void)
 void announce(void)
 {
     skip(1);
-    prouts(_("[ANOUNCEMENT ARRIVING...]"));
+    prouts(_("[ANNOUNCEMENT ARRIVING...]"));
     skip(1);
 }
 

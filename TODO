@@ -9,8 +9,11 @@ Short-term items:
 
 * Add the attacked inhabited planets to the status report
 
-
 Long-term items:
+
+* Python's random module supports the von Mises distribution (circular
+  equivalent of the Gaussian).  Tweak the code that handles dispersion
+  in torpedos and explosion displacements to use it.
 
 * Wrap a GUI around it.
 
