@@ -33,26 +33,6 @@ FOREVER 	= 1e30
 MAXBURST	= 3
 MINCMDR 	= 10
 
-# How to represent features
-IHR = 'R',
-IHK = 'K',
-IHC = 'C',
-IHS = 'S',
-IHSTAR = '*',
-IHP = 'P',
-IHW = '@',
-IHB = 'B',
-IHBLANK = ' ',
-IHDOT = '.',
-IHQUEST = '?',
-IHE = 'E',
-IHF = 'F',
-IHT = 'T',
-IHWEB = '#',
-IHMATER0 = '-',
-IHMATER1 = 'o',
-IHMATER2 = '0'
-
 class TrekError:
     pass
 
@@ -267,10 +247,10 @@ class enemy:
         motion = (loc != self.kloc)
         if self.kloc.i is not None and self.kloc.j is not None:
             if motion:
-                if self.type == IHT:
-                    game.quad[self.kloc.i][self.kloc.j] = IHWEB
+                if self.type == 'T':
+                    game.quad[self.kloc.i][self.kloc.j] = '#'
                 else:
-                    game.quad[self.kloc.i][self.kloc.j] = IHDOT
+                    game.quad[self.kloc.i][self.kloc.j] = '.'
         if loc:
             self.kloc = copy.copy(loc)
             game.quad[self.kloc.i][self.kloc.j] = self.type
@@ -371,25 +351,6 @@ class gamestate:
         # if the only remaining klingon is SCOM.
         game.state.remtime = game.state.remres/(game.state.remkl + 4*len(game.state.kcmdr))
 
-IHR = 'R'
-IHK = 'K'
-IHC = 'C'
-IHS = 'S'
-IHSTAR = '*'
-IHP = 'P'
-IHW = '@'
-IHB = 'B'
-IHBLANK = ' '
-IHDOT = '.'
-IHQUEST = '?'
-IHE = 'E'
-IHF = 'F'
-IHT = 'T'
-IHWEB = '#'
-IHMATER0 = '-'
-IHMATER1 = 'o'
-IHMATER2 = '0'
-
 FWON = 0
 FDEPLETE = 1
 FLIFESUP = 2
@@ -447,11 +408,11 @@ def tryexit(enemy, look, irun):
     iq.j = game.quadrant.j+(look.j+(QUADSIZE-1))/QUADSIZE - 1
     if not welcoming(iq):
 	return False;
-    if enemy.type == IHR:
+    if enemy.type == 'R':
 	return False; # Romulans cannot escape! 
     if not irun:
 	# avoid intruding on another commander's territory 
-	if enemy.type == IHC:
+	if enemy.type == 'C':
             if iq in game.state.kcmdr:
                 return False
 	    # refuse to leave if currently attacking starbase 
@@ -474,7 +435,7 @@ def tryexit(enemy, look, irun):
     # Handle global matters related to escape 
     game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
     game.state.galaxy[iq.i][iq.j].klingons += 1
-    if enemy.type==IHS:
+    if enemy.type=='S':
 	game.iscate = False
 	game.ientesc = False
 	game.isatb = 0
@@ -538,7 +499,7 @@ def movebaddy(enemy):
     dist1 = enemy.kdist
     mdist = int(dist1 + 0.5); # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
-    if enemy.type==IHS and \
+    if enemy.type=='S' and \
 	(enemy.kpower <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
 	irun = True
 	motion = -QUADSIZE
@@ -628,10 +589,10 @@ def movebaddy(enemy):
 		    break
 		look.j = next.j + krawlj
 		krawlj = -krawlj
-	    elif (game.options & OPTION_RAMMING) and game.quad[look.i][look.j] != IHDOT:
+	    elif (game.options & OPTION_RAMMING) and game.quad[look.i][look.j] != '.':
 		# See if enemy should ram ship 
 		if game.quad[look.i][look.j] == game.ship and \
-		    (enemy.type == IHC or enemy.type == IHS):
+		    (enemy.type == 'C' or enemy.type == 'S'):
 		    collision(rammed=True, enemy=enemy)
 		    return
 		if krawli != m.i and m.j != 0:
@@ -669,11 +630,11 @@ def moveklings():
     # and do move
     if game.quadrant in game.state.kcmdr:
         for enemy in game.enemies:
-	    if enemy.type == IHC:
+	    if enemy.type == 'C':
 		movebaddy(enemy)
     if game.state.kscmdr==game.quadrant:
         for enemy in game.enemies:
-	    if enemy.type == IHS:
+	    if enemy.type == 'S':
 		movebaddy(enemy)
 		break
     # If skill level is high, move other Klingons and Romulans too!
@@ -681,7 +642,7 @@ def moveklings():
     # commander(s) do.
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
         for enemy in game.enemies:
-            if enemy.type in (IHK, IHR):
+            if enemy.type in ('K', 'R'):
 		movebaddy(enemy)
     game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
 
@@ -703,7 +664,7 @@ def movescom(iq, avoid):
 	game.ientesc = False
 	unschedule(FSCDBAS)
 	for enemy in game.enemies:
-	    if enemy.type == IHS:
+	    if enemy.type == 'S':
 		break
 	enemy.move(None)
 	game.klhere -= 1
@@ -863,34 +824,34 @@ def movetholian():
         prout("***Internal error: Tholian in a bad spot.")
 	return
     # do nothing if we are blocked 
-    if game.quad[id.i][id.j] not in (IHDOT, IHWEB):
+    if game.quad[id.i][id.j] not in ('.', '#'):
 	return
     here = copy.copy(game.tholian.kloc)
     delta = (id - game.tholian.kloc).sgn()
     # move in x axis 
     while here.i != id.i:
         here.i += delta.i
-        if game.quad[here.i][here.j]==IHDOT:
+        if game.quad[here.i][here.j]=='.':
             game.tholian.move(here)
     # move in y axis 
     while here.j != id.j:
         here.j += delta.j
-        if game.quad[here.i][here.j]==IHDOT:
+        if game.quad[here.i][here.j]=='.':
             game.tholian.move(here)
     # check to see if all holes plugged 
     for i in range(QUADSIZE):
-	if game.quad[0][i]!=IHWEB and game.quad[0][i]!=IHT:
+	if game.quad[0][i]!='#' and game.quad[0][i]!='T':
 	    return
-	if game.quad[QUADSIZE-1][i]!=IHWEB and game.quad[QUADSIZE-1][i]!=IHT:
+	if game.quad[QUADSIZE-1][i]!='#' and game.quad[QUADSIZE-1][i]!='T':
 	    return
-	if game.quad[i][0]!=IHWEB and game.quad[i][0]!=IHT:
+	if game.quad[i][0]!='#' and game.quad[i][0]!='T':
 	    return
-	if game.quad[i][QUADSIZE-1]!=IHWEB and game.quad[i][QUADSIZE-1]!=IHT:
+	if game.quad[i][QUADSIZE-1]!='#' and game.quad[i][QUADSIZE-1]!='T':
 	    return
     # All plugged up -- Tholian splits 
-    game.quad[game.tholian.kloc.i][game.tholian.kloc.j]=IHWEB
-    dropin(IHBLANK)
-    prout(crmena(True, IHT, "sector", game.tholian) + _(" completes web."))
+    game.quad[game.tholian.kloc.i][game.tholian.kloc.j]='#'
+    dropin(' ')
+    prout(crmena(True, 'T', "sector", game.tholian) + _(" completes web."))
     game.tholian.move(None)
     return
 
@@ -1060,7 +1021,7 @@ def collision(rammed, enemy):
     skip(2)
     proutn("***")
     proutn(crmshp())
-    hardness = {IHR:1.5, IHC:2.0, IHS:2.5, IHT:0.5, IHQUEST:4.0}.get(enemy.type, 1.0)
+    hardness = {'R':1.5, 'C':2.0, 'S':2.5, 'T':0.5, '?':4.0}.get(enemy.type, 1.0)
     if rammed:
         proutn(_(" rammed by "))
     else:
@@ -1114,12 +1075,12 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    break
 	iquad=game.quad[w.i][w.j]
 	tracktorpedo(origin, w, step, number, nburst, iquad)
-	if iquad==IHDOT:
+	if iquad=='.':
 	    continue
 	# hit something 
 	if not damaged(DSRSENS) or game.condition == "docked":
 	    skip(1);	# start new line after text track 
-	if iquad in (IHE, IHF): # Hit our ship 
+	if iquad in ('E', 'F'): # Hit our ship 
 	    skip(1)
 	    prout(_("Torpedo hits %s.") % crmshp())
 	    hit = 700.0 + randreal(100) - \
@@ -1134,24 +1095,24 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             bumpto = displacement.sector()
 	    if not bumpto.valid_sector():
 		return hit
-	    if game.quad[bumpto.i][bumpto.j]==IHBLANK:
+	    if game.quad[bumpto.i][bumpto.j]==' ':
 		finish(FHOLE)
 		return hit
-	    if game.quad[bumpto.i][bumpto.j]!=IHDOT:
+	    if game.quad[bumpto.i][bumpto.j]!='.':
 		# can't move into object 
 		return hit
 	    game.sector = bumpto
 	    proutn(crmshp())
-            game.quad[w.i][w.j]=IHDOT
+            game.quad[w.i][w.j]='.'
             game.quad[bumpto.i][bumpto.j]=iquad
             prout(_(" displaced by blast to Sector %s ") % bumpto)
             for enemy in game.enemies:
                 enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             return None
-	elif iquad in (IHC, IHS, IHR, IHK): # Hit a regular enemy 
+	elif iquad in ('C', 'S', 'R', 'K'): # Hit a regular enemy 
 	    # find the enemy 
-	    if iquad in (IHC, IHS) and withprob(0.05):
+	    if iquad in ('C', 'S') and withprob(0.05):
 		prout(crmena(True, iquad, "sector", w) + _(" uses anti-photon device;"))
 		prout(_("   torpedo neutralized."))
 		return None
@@ -1178,63 +1139,63 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             if not bumpto.valid_sector():
 		prout(_(" damaged but not destroyed."))
 		return
-	    if game.quad[bumpto.i][bumpto.j] == IHBLANK:
+	    if game.quad[bumpto.i][bumpto.j] == ' ':
 		prout(_(" buffeted into black hole."))
 		deadkl(w, iquad, bumpto)
-	    if game.quad[bumpto.i][bumpto.j] != IHDOT:
+	    if game.quad[bumpto.i][bumpto.j] != '.':
 		prout(_(" damaged but not destroyed."))
             else:
                 prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
                 enemy.kloc = bumpto
-                game.quad[w.i][w.j]=IHDOT
+                game.quad[w.i][w.j]='.'
                 game.quad[bumpto.i][bumpto.j]=iquad
                 for enemy in game.enemies:
                     enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
                 game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             return None
-	elif iquad == IHB: # Hit a base 
+	elif iquad == 'B': # Hit a base 
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
             game.state.baseq = filter(lambda x: x != game.quadrant, game.state.baseq)
-	    game.quad[w.i][w.j]=IHDOT
+	    game.quad[w.i][w.j]='.'
 	    game.base.invalidate()
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase -= 1
 	    game.state.chart[game.quadrant.i][game.quadrant.j].starbase -= 1
 	    game.state.basekl += 1
 	    newcnd()
 	    return None
-	elif iquad == IHP: # Hit a planet 
+	elif iquad == 'P': # Hit a planet 
 	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nplankl += 1
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
 	    game.plnet.invalidate()
-	    game.quad[w.i][w.j] = IHDOT
+	    game.quad[w.i][w.j] = '.'
 	    if game.landed:
 		# captain perishes on planet 
 		finish(FDPLANET)
 	    return None
-	elif iquad == IHW: # Hit an inhabited world -- very bad! 
+	elif iquad == '@': # Hit an inhabited world -- very bad! 
 	    prout(crmena(True, iquad, "sector", w) + _(" destroyed."))
 	    game.state.nworldkl += 1
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
 	    game.iplnet.pclass = "destroyed"
 	    game.iplnet = None
 	    game.plnet.invalidate()
-	    game.quad[w.i][w.j] = IHDOT
+	    game.quad[w.i][w.j] = '.'
 	    if game.landed:
 		# captain perishes on planet 
 		finish(FDPLANET)
 	    prout(_("The torpedo destroyed an inhabited planet."))
 	    return None
-	elif iquad == IHSTAR: # Hit a star 
+	elif iquad == '*': # Hit a star 
 	    if withprob(0.9):
 		nova(w)
             else:
-                prout(crmena(True, IHSTAR, "sector", w) + _(" unaffected by photon blast."))
+                prout(crmena(True, '*', "sector", w) + _(" unaffected by photon blast."))
 	    return None
-	elif iquad == IHQUEST: # Hit a thingy 
+	elif iquad == '?': # Hit a thingy 
 	    if not (game.options & OPTION_THINGY) or withprob(0.3):
 		skip(1)
 		prouts(_("AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!"))
@@ -1252,32 +1213,32 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		thing.angry = True
 		shoved = True
 	    return None
-	elif iquad == IHBLANK: # Black hole 
+	elif iquad == ' ': # Black hole 
 	    skip(1)
-	    prout(crmena(True, IHBLANK, "sector", w) + _(" swallows torpedo."))
+	    prout(crmena(True, ' ', "sector", w) + _(" swallows torpedo."))
 	    return None
-	elif iquad == IHWEB: # hit the web 
+	elif iquad == '#': # hit the web 
 	    skip(1)
 	    prout(_("***Torpedo absorbed by Tholian web."))
 	    return None
-	elif iquad == IHT:  # Hit a Tholian 
+	elif iquad == 'T':  # Hit a Tholian 
 	    h1 = 700.0 + randrange(100) - \
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
-		game.quad[w.i][w.j] = IHDOT
+		game.quad[w.i][w.j] = '.'
 		deadkl(w, iquad, w)
 		game.tholian = None
 		return None
 	    skip(1)
-	    proutn(crmena(True, IHT, "sector", w))
+	    proutn(crmena(True, 'T', "sector", w))
 	    if withprob(0.05):
 		prout(_(" survives photon blast."))
 		return None
 	    prout(_(" disappears."))
 	    game.tholian.move(None)
-	    game.quad[w.i][w.j] = IHWEB
-	    dropin(IHBLANK)
+	    game.quad[w.i][w.j] = '#'
+	    dropin(' ')
 	    return None
         else: # Problem!
 	    skip(1)
@@ -1362,15 +1323,15 @@ def attack(torps_ok):
 	    r *= 0.25
 	if enemy.kpower < 500:
 	    r *= 0.25; 
-	if enemy.type==IHT or (enemy.type==IHQUEST and not thing.angry):
+	if enemy.type=='T' or (enemy.type=='?' and not thing.angry):
 	    continue
 	# different enemies have different probabilities of throwing a torp 
 	usephasers = not torps_ok or \
-	    (enemy.type == IHK and r > 0.0005) or \
-	    (enemy.type==IHC and r > 0.015) or \
-	    (enemy.type==IHR and r > 0.3) or \
-	    (enemy.type==IHS and r > 0.07) or \
-	    (enemy.type==IHQUEST and r > 0.05)
+	    (enemy.type == 'K' and r > 0.0005) or \
+	    (enemy.type=='C' and r > 0.015) or \
+	    (enemy.type=='R' and r > 0.3) or \
+	    (enemy.type=='S' and r > 0.07) or \
+	    (enemy.type=='?' and r > 0.05)
 	if usephasers:	    # Enemy uses phasers 
 	    if game.condition == "docked":
 		continue; # Don't waste the effort! 
@@ -1471,15 +1432,15 @@ def deadkl(w, type, mv):
     # Added mv to allow enemy to "move" before dying 
     proutn(crmena(True, type, "sector", mv))
     # Decide what kind of enemy it is and update appropriately 
-    if type == IHR:
+    if type == 'R':
         # Chalk up a Romulan 
         game.state.galaxy[game.quadrant.i][game.quadrant.j].romulans -= 1
         game.irhere -= 1
         game.state.nromrem -= 1
-    elif type == IHT:
+    elif type == 'T':
         # Killed a Tholian 
         game.tholian = None
-    elif type == IHQUEST:
+    elif type == '?':
         # Killed a Thingy
         global thing
         thing = None
@@ -1487,16 +1448,16 @@ def deadkl(w, type, mv):
         # Killed some type of Klingon 
         game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
         game.klhere -= 1
-        if type == IHC:
+        if type == 'C':
             game.state.kcmdr.remove(game.quadrant)
             unschedule(FTBEAM)
             if game.state.kcmdr:
                 schedule(FTBEAM, expran(1.0*game.incom/len(game.state.kcmdr)))
             if is_scheduled(FCDBAS) and game.battle == game.quadrant:
                 unschedule(FCDBAS)    
-        elif type ==  IHK:
+        elif type ==  'K':
             game.state.remkl -= 1
-        elif type ==  IHS:
+        elif type ==  'S':
             game.state.nscrem -= 1
             game.state.kscmdr.invalidate()
             game.isatb = 0
@@ -1700,7 +1661,7 @@ def hittem(hits):
 	else:
 	    proutn(_("Very small hit on "))
 	ienm = game.quad[w.i][w.j]
-	if ienm==IHQUEST:
+	if ienm=='?':
 	    thing.angry = True
 	proutn(crmena(False, ienm, "sector", w))
 	skip(1)
@@ -1890,7 +1851,7 @@ def phasers():
 		msgflag = False
 		rpow = 0.0
 	    if damaged(DSRSENS) and \
-               not game.sector.distance(aim)<2**0.5 and ienm in (IHC, IHS):
+               not game.sector.distance(aim)<2**0.5 and ienm in ('C', 'S'):
 		prout(cramen(ienm) + _(" can't be located without short range scan."))
 		scanner.chew()
 		key = "IHEOL"
@@ -2067,7 +2028,7 @@ def events():
         # Handle case where base is in same quadrant as starship 
         if game.battle == game.quadrant:
             game.state.chart[game.battle.i][game.battle.j].starbase = False
-            game.quad[game.base.i][game.base.j] = IHDOT
+            game.quad[game.base.i][game.base.j] = '.'
             game.base.invalidate()
             newcnd()
             skip(1)
@@ -2459,8 +2420,8 @@ def nova(nov):
 	supernova(game.quadrant)
 	return
     # handle initial nova 
-    game.quad[nov.i][nov.j] = IHDOT
-    prout(crmena(False, IHSTAR, "sector", nov) + _(" novas."))
+    game.quad[nov.i][nov.j] = '.'
+    prout(crmena(False, '*', "sector", nov) + _(" novas."))
     game.state.galaxy[game.quadrant.i][game.quadrant.j].stars -= 1
     game.state.starkl += 1
     # Set up queue to recursively trigger adjacent stars 
@@ -2478,9 +2439,9 @@ def nova(nov):
                     continue
                 iquad = game.quad[neighbor.i][neighbor.j]
                 # Empty space ends reaction
-                if iquad in (IHDOT, IHQUEST, IHBLANK, IHT, IHWEB):
+                if iquad in ('.', '?', ' ', 'T', '#'):
                     pass
-                elif iquad == IHSTAR: # Affect another star 
+                elif iquad == '*': # Affect another star 
                     if withprob(0.05):
                         # This star supernovas 
                         supernova(game.quadrant)
@@ -2489,33 +2450,33 @@ def nova(nov):
                         hits.append(neighbor)
 			game.state.galaxy[game.quadrant.i][game.quadrant.j].stars -= 1
 			game.state.starkl += 1
-			proutn(crmena(True, IHSTAR, "sector", neighbor))
+			proutn(crmena(True, '*', "sector", neighbor))
 			prout(_(" novas."))
-                        game.quad[neighbor.i][neighbor.j] = IHDOT
+                        game.quad[neighbor.i][neighbor.j] = '.'
                         kount += 1
-                elif iquad in (IHP, IHW): # Destroy planet 
+                elif iquad in ('P', '@'): # Destroy planet 
                     game.state.galaxy[game.quadrant.i][game.quadrant.j].planet = None
-                    if iquad == IHP:
+                    if iquad == 'P':
                         game.state.nplankl += 1
                     else:
                         game.state.worldkl += 1
-                    prout(crmena(True, IHB, "sector", neighbor) + _(" destroyed."))
+                    prout(crmena(True, 'B', "sector", neighbor) + _(" destroyed."))
                     game.iplnet.pclass = "destroyed"
                     game.iplnet = None
                     game.plnet.invalidate()
                     if game.landed:
                         finish(FPNOVA)
                         return
-                    game.quad[neighbor.i][neighbor.j] = IHDOT
-                elif iquad == IHB: # Destroy base 
+                    game.quad[neighbor.i][neighbor.j] = '.'
+                elif iquad == 'B': # Destroy base 
                     game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase = False
                     game.state.baseq = filter(lambda x: x!= game.quadrant, game.state.baseq)
                     game.base.invalidate()
                     game.state.basekl += 1
                     newcnd()
-                    prout(crmena(True, IHB, "sector", neighbor) + _(" destroyed."))
-                    game.quad[neighbor.i][neighbor.j] = IHDOT
-                elif iquad in (IHE, IHF): # Buffet ship 
+                    prout(crmena(True, 'B', "sector", neighbor) + _(" destroyed."))
+                    game.quad[neighbor.i][neighbor.j] = '.'
+                elif iquad in ('E', 'F'): # Buffet ship 
                     prout(_("***Starship buffeted by nova."))
                     if game.shldup:
                         if game.shield >= 2000.0:
@@ -2534,9 +2495,9 @@ def nova(nov):
                         return
                     # add in course nova contributes to kicking starship
                     bump += (game.sector-hits[mm]).sgn()
-                elif iquad == IHK: # kill klingon 
+                elif iquad == 'K': # kill klingon 
                     deadkl(neighbor, iquad, neighbor)
-                elif iquad in (IHC,IHS,IHR): # Damage/destroy big enemies 
+                elif iquad in ('C','S','R'): # Damage/destroy big enemies 
                     for ll in range(len(game.enemies)):
                         if game.enemies[ll].kloc == neighbor:
                             break
@@ -2551,17 +2512,17 @@ def nova(nov):
                         skip(1)
                         break
                     iquad1 = game.quad[newc.i][newc.j]
-                    if iquad1 == IHBLANK:
-                        proutn(_(", blasted into ") + crmena(False, IHBLANK, "sector", newc))
+                    if iquad1 == ' ':
+                        proutn(_(", blasted into ") + crmena(False, ' ', "sector", newc))
                         skip(1)
                         deadkl(neighbor, iquad, newc)
                         break
-                    if iquad1 != IHDOT:
+                    if iquad1 != '.':
                         # can't move into something else 
                         skip(1)
                         break
                     proutn(_(", buffeted to Sector %s") % newc)
-                    game.quad[neighbor.i][neighbor.j] = IHDOT
+                    game.quad[neighbor.i][neighbor.j] = '.'
                     game.quad[newc.i][newc.j] = iquad
                     game.enemies[ll].move(newc)
     # Starship affected by nova -- kick it away. 
@@ -2617,7 +2578,7 @@ def supernova(w):
 	num = randrange(game.state.galaxy[nq.i][nq.j].stars) + 1
 	for ns.i in range(QUADSIZE):
 	    for ns.j in range(QUADSIZE):
-		if game.quad[ns.i][ns.j]==IHSTAR:
+		if game.quad[ns.i][ns.j]=='*':
 		    num -= 1
 		    if num==0:
 			break
@@ -2724,7 +2685,7 @@ def selfdestruct():
 
 def kaboom():
     stars()
-    if game.ship==IHE:
+    if game.ship=='E':
 	prouts("***")
     prouts(_("********* Entropy of %s maximized *********") % crmshp())
     skip(1)
@@ -2758,7 +2719,7 @@ def badpoints():
             45.0*game.nhelp +\
             100.0*game.state.basekl +\
             3.0*game.abandoned
-    if game.ship == IHF:
+    if game.ship == 'F':
         badpt += 100.0
     elif game.ship == None:
         badpt += 200.0
@@ -2930,10 +2891,10 @@ def finish(ifin):
 	prout(_("You are crushed into extremely dense matter."))
     elif ifin == FCREW:
 	prout(_("Your last crew member has died."))
-    if game.ship == IHF:
+    if game.ship == 'F':
 	game.ship = None
-    elif game.ship == IHE:
-	game.ship = IHF
+    elif game.ship == 'E':
+	game.ship = 'F'
     game.alive = False
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) != 0:
 	goodies = game.state.remres/game.inresor
@@ -2968,9 +2929,9 @@ def score():
     iwon = 0
     if game.gamewon:
 	iwon = 100*game.skill
-    if game.ship == IHE: 
+    if game.ship == 'E': 
 	klship = 0
-    elif game.ship == IHF: 
+    elif game.ship == 'F': 
 	klship = 1
     else:
 	klship = 2
@@ -3276,11 +3237,6 @@ def clrscr():
        curwnd.refresh()
     linecount = 0
     
-def highvideo():
-    "Set highlight video, if this is reasonable."
-    if game.options & OPTION_CURSES:
-	curwnd.attron(curses.A_REVERSE)
- 
 #
 # Things past this point have policy implications.
 # 
@@ -3357,7 +3313,7 @@ def tracktorpedo(origin, w, step, i, n, iquad):
 	    if i != 0 and step == 1:
 		drawmaps(2)
 		time.sleep(0.4)
-	    if (iquad==IHDOT) or (iquad==IHBLANK):
+	    if (iquad=='.') or (iquad==' '):
 		put_srscan_sym(w, '+')
 		#sound(step*10)
 		#time.sleep(0.1)
@@ -3462,16 +3418,16 @@ def imove(course=None, noattack=False):
 
     def check_collision(h):
         iquad = game.quad[h.i][h.j]
-        if iquad != IHDOT:
+        if iquad != '.':
             # object encountered in flight path 
             stopegy = 50.0*course.distance/game.optime
-            if iquad in (IHT, IHK, IHC, IHS, IHR, IHQUEST):
+            if iquad in ('T', 'K', 'C', 'S', 'R', '?'):
                 for enemy in game.enemies:
                     if enemy.kloc == game.sector:
                         break
                 collision(rammed=False, enemy=enemy)
                 return True
-            elif iquad == IHBLANK:
+            elif iquad == ' ':
                 skip(1)
                 prouts(_("***RED ALERT!  RED ALERT!"))
                 skip(1)
@@ -3494,7 +3450,7 @@ def imove(course=None, noattack=False):
                 # something else 
                 skip(1)
                 proutn(crmshp())
-                if iquad == IHWEB:
+                if iquad == '#':
                     prout(_(" encounters Tholian web at %s;") % h)
                 else:
                     prout(_(" blocked by object at %s;") % h)
@@ -3517,7 +3473,7 @@ def imove(course=None, noattack=False):
 	course.distance = course.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move out
-    game.quad[game.sector.i][game.sector.j] = IHDOT
+    game.quad[game.sector.i][game.sector.j] = '.'
     for m in range(course.moves):
         course.next()
         w = course.sector()
@@ -3896,7 +3852,7 @@ def warp(course, involuntary):
                 w = course.sector()
                 if not w.valid_sector():
                     break
-		if game.quad[w.i][w.j] != IHDOT:
+		if game.quad[w.i][w.j] != '.':
 		    blooey = False
 		    twarp = False
             course.reset()
@@ -4063,7 +4019,7 @@ def timwrp():
 	for l in range(game.inplan):
 	    if game.state.planets[l].known == "shuttle_down":
 		gotit = True
-		if game.iscraft == "onship" and game.ship==IHE:
+		if game.iscraft == "onship" and game.ship=='E':
 		    prout(_("Chekov-  \"Security reports the Galileo has disappeared, Sir!"))
 		    game.iscraft = "offship"
 	# Likewise, if in the original time the Galileo was abandoned, but
@@ -4090,7 +4046,7 @@ def probe():
     if game.nprobes == 0:
 	scanner.chew()
 	skip(1)
-	if game.ship == IHE: 
+	if game.ship == 'E': 
 	    prout(_("Engineer Scott- \"We have no more deep space probes, Sir.\""))
 	else:
 	    prout(_("Ye Faerie Queene has no deep space probes."))
@@ -4169,13 +4125,13 @@ def mayday():
 	game.quadrant = ibq
 	newqad()
     # dematerialize starship 
-    game.quad[game.sector.i][game.sector.j]=IHDOT
+    game.quad[game.sector.i][game.sector.j]='.'
     proutn(_("Starbase in Quadrant %s responds--%s dematerializes") \
            % (game.quadrant, crmshp()))
     game.sector.invalidate()
     for m in range(1, 5+1):
         w = game.base.scatter() 
-	if w.valid_sector() and game.quad[w.i][w.j]==IHDOT:
+	if w.valid_sector() and game.quad[w.i][w.j]=='.':
 	    # found one -- finish up 
             game.sector = w
 	    break
@@ -4190,25 +4146,21 @@ def mayday():
 	elif m == 2: proutn(_("2nd"))
 	elif m == 3: proutn(_("3rd"))
 	proutn(_(" attempt to re-materialize ") + crmshp())
-	game.quad[ix][iy]=(IHMATER0,IHMATER1,IHMATER2)[m-1]
-	#textcolor("red")
+	game.quad[ix][iy]=('-','o','O')[m-1]
 	warble()
 	if randreal() > probf:
 	    break
 	prout(_("fails."))
 	curses.delay_output(500)
-	#textcolor(None)
     if m > 3:
-	game.quad[ix][iy]=IHQUEST
+	game.quad[ix][iy]='?'
 	game.alive = False
 	drawmaps(1)
 	setwnd(message_window)
 	finish(FMATERIALIZE)
 	return
     game.quad[ix][iy]=game.ship
-    #textcolor("green")
     prout(_("succeeds."))
-    #textcolor(None)
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
@@ -4217,7 +4169,7 @@ def abandon():
     "Abandon ship."
     scanner.chew()
     if game.condition=="docked":
-	if game.ship!=IHE:
+	if game.ship!='E':
 	    prout(_("You cannot abandon Ye Faerie Queene."))
 	    return
     else:
@@ -4275,11 +4227,11 @@ def abandon():
 	    newqad()
 	while True:
 	    # position next to base by trial and error 
-	    game.quad[game.sector.i][game.sector.j] = IHDOT
+	    game.quad[game.sector.i][game.sector.j] = '.'
 	    for l in range(QUADSIZE):
 		game.sector = game.base.scatter()
 		if game.sector.valid_sector() and \
-                       game.quad[game.sector.i][game.sector.j] == IHDOT:
+                       game.quad[game.sector.i][game.sector.j] == '.':
                     break
 	    if l < QUADSIZE+1:
 		break # found a spot 
@@ -4287,7 +4239,7 @@ def abandon():
 	    game.sector.j=QUADSIZE/2
 	    newqad()
     # Get new commission 
-    game.quad[game.sector.i][game.sector.j] = game.ship = IHF
+    game.quad[game.sector.i][game.sector.j] = game.ship = 'F'
     game.state.crew = FULLCREW
     prout(_("Starfleet puts you in command of another ship,"))
     prout(_("the Faerie Queene, which is antiquated but,"))
@@ -4670,7 +4622,7 @@ def deathray():
     game.ididit = False
     skip(1)
     scanner.chew()
-    if game.ship != IHE:
+    if game.ship != 'E':
 	prout(_("Ye Faerie Queene has no death ray."))
 	return
     if len(game.enemies)==0:
@@ -4754,8 +4706,8 @@ def deathray():
 	prout(_(" Mr. Sulu."))
 	for i in range(QUADSIZE):
 	    for j in range(QUADSIZE):
-		if game.quad[i][j] == IHDOT:
-		    game.quad[i][j] = IHQUEST
+		if game.quad[i][j] == '.':
+		    game.quad[i][j] = '?'
 	prout(_("  Captain, our quadrant is now infested with"))
 	prouts(_(" - - - - - -  *THINGS*."))
 	skip(1)
@@ -4829,7 +4781,7 @@ def report():
 	prout(_("%d casualt%s suffered so far.") % (game.casual, ("y", "ies")[game.casual!=1]))
     if game.nhelp:
 	prout(_("There were %d call%s for help.") % (game.nhelp,  ("" , _("s"))[game.nhelp!=1]))
-    if game.ship == IHE:
+    if game.ship == 'E':
 	proutn(_("You have "))
 	if game.nprobes:
 	    proutn("%d" % (game.nprobes))
@@ -4956,16 +4908,7 @@ def chart():
 def sectscan(goodScan, i, j):
     "Light up an individual dot in a sector."
     if goodScan or (abs(i-game.sector.i)<= 1 and abs(j-game.sector.j) <= 1):
-	if (game.quad[i][j]==IHMATER0) or (game.quad[i][j]==IHMATER1) or (game.quad[i][j]==IHMATER2) or (game.quad[i][j]==IHE) or (game.quad[i][j]==IHF):
-	    #if game.condition   == "red": textcolor("red")
-	    #elif game.condition == "green": textcolor("green")
-	    #elif game.condition == "yellow": textcolor("yellow")
-	    #elif game.condition == "docked": textcolor("cyan")
-	    #elif game.condition == "dead": textcolor("brown")
-	    if game.quad[i][j] != game.ship: 
-		highvideo()
 	proutn("%c " % game.quad[i][j])
-	#textcolor(None)
     else:
 	proutn("- ")
 
@@ -5317,7 +5260,7 @@ def setup():
 	return # frozen game
     # Prepare the Enterprise
     game.alldone = game.gamewon = game.shldchg = game.shldup = False
-    game.ship = IHE
+    game.ship = 'E'
     game.state.crew = FULLCREW
     game.energy = game.inenrg = 5000.0
     game.shield = game.inshld = 2500.0
@@ -5614,7 +5557,7 @@ def dropin(iquad=None):
     "Drop a feature on a random dot in the current quadrant."
     while True:
         w = randplace(QUADSIZE)
-        if game.quad[w.i][w.j] == IHDOT:
+        if game.quad[w.i][w.j] == '.':
             break
     if iquad is not None:
         game.quad[w.i][w.j] = iquad
@@ -5632,7 +5575,7 @@ def newcnd():
 
 def newkling():
     "Drop new Klingon into current quadrant."
-    return enemy(IHK, loc=dropin(), power=randreal(300,450)+25.0*game.skill)
+    return enemy('K', loc=dropin(), power=randreal(300,450)+25.0*game.skill)
 
 def newqad():
     "Set up a new state of quadrant, for when we enter or re-enter it."
@@ -5641,7 +5584,7 @@ def newqad():
     game.neutz = game.inorbit = game.landed = False
     game.ientesc = game.iseenit = False
     # Create a blank quadrant
-    game.quad = fill2d(QUADSIZE, lambda i, j: IHDOT)
+    game.quad = fill2d(QUADSIZE, lambda i, j: '.')
     if game.iscate:
 	# Attempt to escape Super-commander, so tbeam back!
 	game.iscate = False
@@ -5663,28 +5606,28 @@ def newqad():
         for cmdr in game.state.kcmdr:
 	    if cmdr == game.quadrant:
                 e = game.enemies[game.klhere-1]
-                game.quad[e.kloc.i][e.kloc.j] = IHC
+                game.quad[e.kloc.i][e.kloc.j] = 'C'
                 e.kpower = randreal(950,1350) + 50.0*game.skill
 		break	
 	# If we need a super-commander, promote a Klingon
 	if game.quadrant == game.state.kscmdr:
             e = game.enemies[0]
-	    game.quad[e.kloc.i][e.kloc.j] = IHS
+	    game.quad[e.kloc.i][e.kloc.j] = 'S'
 	    e.kpower = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
     # Put in Romulans if needed
     for i in range(q.romulans):
-        enemy(IHR, loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
+        enemy('R', loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
     # If quadrant needs a starbase, put it in
     if q.starbase:
-	game.base = dropin(IHB)
+	game.base = dropin('B')
     # If quadrant needs a planet, put it in
     if q.planet:
 	game.iplnet = q.planet
 	if not q.planet.inhabited:
-	    game.plnet = dropin(IHP)
+	    game.plnet = dropin('P')
 	else:
-	    game.plnet = dropin(IHW)
+	    game.plnet = dropin('@')
     # Check for condition
     newcnd()
     # Check for RNZ
@@ -5699,7 +5642,7 @@ def newqad():
 	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
     # Put in THING if needed
     if thing == game.quadrant:
-        enemy(type=IHQUEST, loc=dropin(),
+        enemy(type='?', loc=dropin(),
                   power=randreal(6000,6500.0)+250.0*game.skill)
         if not damaged(DSRSENS):
             skip(1)
@@ -5714,37 +5657,37 @@ def newqad():
             while True:
 		w.i = withprob(0.5) * (QUADSIZE-1)
 		w.j = withprob(0.5) * (QUADSIZE-1)
-                if game.quad[w.i][w.j] == IHDOT:
+                if game.quad[w.i][w.j] == '.':
                     break
-            game.tholian = enemy(type=IHT, loc=w,
+            game.tholian = enemy(type='T', loc=w,
                                  power=randrange(100, 500) + 25.0*game.skill)
 	    # Reserve unoccupied corners 
-	    if game.quad[0][0]==IHDOT:
+	    if game.quad[0][0]=='.':
 		game.quad[0][0] = 'X'
-	    if game.quad[0][QUADSIZE-1]==IHDOT:
+	    if game.quad[0][QUADSIZE-1]=='.':
 		game.quad[0][QUADSIZE-1] = 'X'
-	    if game.quad[QUADSIZE-1][0]==IHDOT:
+	    if game.quad[QUADSIZE-1][0]=='.':
 		game.quad[QUADSIZE-1][0] = 'X'
-	    if game.quad[QUADSIZE-1][QUADSIZE-1]==IHDOT:
+	    if game.quad[QUADSIZE-1][QUADSIZE-1]=='.':
 		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
     game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     # And finally the stars
     for i in range(q.stars):
-	dropin(IHSTAR)
+	dropin('*')
     # Put in a few black holes
     for i in range(1, 3+1):
 	if withprob(0.5): 
-	    dropin(IHBLANK)
+	    dropin(' ')
     # Take out X's in corners if Tholian present
     if game.tholian:
 	if game.quad[0][0]=='X':
-	    game.quad[0][0] = IHDOT
+	    game.quad[0][0] = '.'
 	if game.quad[0][QUADSIZE-1]=='X':
-	    game.quad[0][QUADSIZE-1] = IHDOT
+	    game.quad[0][QUADSIZE-1] = '.'
 	if game.quad[QUADSIZE-1][0]=='X':
-	    game.quad[QUADSIZE-1][0] = IHDOT
+	    game.quad[QUADSIZE-1][0] = '.'
 	if game.quad[QUADSIZE-1][QUADSIZE-1]=='X':
-	    game.quad[QUADSIZE-1][QUADSIZE-1] = IHDOT
+	    game.quad[QUADSIZE-1][QUADSIZE-1] = '.'
 
 def setpassword():
     "Set the self-destruct password."
@@ -6031,18 +5974,18 @@ def makemoves():
 
 def cramen(type):
     "Emit the name of an enemy or feature." 
-    if   type == IHR: s = _("Romulan")
-    elif type == IHK: s = _("Klingon")
-    elif type == IHC: s = _("Commander")
-    elif type == IHS: s = _("Super-commander")
-    elif type == IHSTAR: s = _("Star")
-    elif type == IHP: s = _("Planet")
-    elif type == IHB: s = _("Starbase")
-    elif type == IHBLANK: s = _("Black hole")
-    elif type == IHT: s = _("Tholian")
-    elif type == IHWEB: s = _("Tholian web")
-    elif type == IHQUEST: s = _("Stranger")
-    elif type == IHW: s = _("Inhabited World")
+    if   type == 'R': s = _("Romulan")
+    elif type == 'K': s = _("Klingon")
+    elif type == 'C': s = _("Commander")
+    elif type == 'S': s = _("Super-commander")
+    elif type == '*': s = _("Star")
+    elif type == 'P': s = _("Planet")
+    elif type == 'B': s = _("Starbase")
+    elif type == ' ': s = _("Black hole")
+    elif type == 'T': s = _("Tholian")
+    elif type == '#': s = _("Tholian web")
+    elif type == '?': s = _("Stranger")
+    elif type == '@': s = _("Inhabited World")
     else: s = "Unknown??"
     return s
 
@@ -6060,7 +6003,7 @@ def crmena(stars, enemy, loctype, w):
 
 def crmshp():
     "Emit our ship name." 
-    return{IHE:_("Enterprise"),IHF:_("Faerie Queene")}.get(game.ship,"Ship???")
+    return{'E':_("Enterprise"),'F':_("Faerie Queene")}.get(game.ship,"Ship???")
 
 def stars():
     "Emit a line of stars" 
