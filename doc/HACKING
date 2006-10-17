@@ -245,3 +245,25 @@ FORTRAN all the vector representation was done with parallel arrays;
 in C, I introduced a struct; in Python, the class has a complete
 repertoire of vector-algebra operations.
 
+There's one weird archeological detail about the nav code that
+deserves a remark.  This program originally required input in terms of
+a (clock) direction and distance -- essentially, directions were real
+numbers modulo 12 with zero being north.  Somewhere in history, it was
+changed to Cartesian coordinates.  But the bearing method still computes
+polar coordinates in clockface units -- that's the reason for the
+wacky constant 1.90985, inherited straight from the ancestral FORTRAN.
+Elsewhere, there were a bunch of computations, now centralized in the
+course object, that looked like (15.0 - bearing)*0.5235988; this is a 
+conversion from clockface units to radians with zero on the X axis.
+
+As a previous maintainer, probably Tom Almy, observed: Probably
+"manual" input should still be done this way -- it's a real pain if
+the computer isn't working! Manual mode is still confusing because it
+involves giving x and y motions, yet the coordinates are always
+displayed y - x, where +y is downward!
+
+Because I think he's arguably right, I haven't ripped out all the
+clockface-to-radian conversions.  For this reason, and others, the 
+trig code is still a bit wacky and obscure.  Modify with caution
+and test thoroughly.
+

@@ -3530,14 +3530,6 @@ def dock(verbose):
 	prout(_("Lt. Uhura- \"Captain, an important message from the starbase:\""))
 	attackreport(False)
 	game.iseenit = True
- 
-# This program originally required input in terms of a (clock)
-# direction and distance. Somewhere in history, it was changed to
-# cartesian coordinates. So we need to convert.  Probably
-# "manual" input should still be done this way -- it's a real
-# pain if the computer isn't working! Manual mode is still confusing
-# because it involves giving x and y motions, yet the coordinates
-# are always displayed y - x, where +y is downward!
 
 def cartesian(loc1=None, loc2=None):
     if loc1 is None:
