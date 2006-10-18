@@ -229,39 +229,37 @@ FENSLV	= 10	# Inhabited word is enslaved */
 FREPRO	= 11	# Klingons build a ship in an enslaved system
 NEVENTS	= 12
 
-#
-# abstract out the event handling -- underlying data structures will change
-# when we implement stateful events
-# 
+# Abstract out the event handling -- underlying data structures will change
+# when we implement stateful events 
 def findevent(evtype):	return game.future[evtype]
 
 class enemy:
     def __init__(self, type=None, loc=None, power=None):
         self.type = type
-        self.kloc = coord()
+        self.location = coord()
         if loc:
             self.move(loc)
-        self.kpower = power	# enemy energy level
+        self.power = power	# enemy energy level
         game.enemies.append(self)
     def move(self, loc):
-        motion = (loc != self.kloc)
-        if self.kloc.i is not None and self.kloc.j is not None:
+        motion = (loc != self.location)
+        if self.location.i is not None and self.location.j is not None:
             if motion:
                 if self.type == 'T':
-                    game.quad[self.kloc.i][self.kloc.j] = '#'
+                    game.quad[self.location.i][self.location.j] = '#'
                 else:
-                    game.quad[self.kloc.i][self.kloc.j] = '.'
+                    game.quad[self.location.i][self.location.j] = '.'
         if loc:
-            self.kloc = copy.copy(loc)
-            game.quad[self.kloc.i][self.kloc.j] = self.type
+            self.location = copy.copy(loc)
+            game.quad[self.location.i][self.location.j] = self.type
             self.kdist = self.kavgd = (game.sector - loc).distance()
         else:
-            self.kloc = coord()
+            self.location = coord()
             self.kdist = self.kavgd = None
             game.enemies.remove(self)
         return motion
     def __repr__(self):
-        return "<%s,%s.%f>" % (self.type, self.kloc, self.kpower)	# For debugging
+        return "<%s,%s.%f>" % (self.type, self.location, self.power)	# For debugging
 
 class gamestate:
     def __init__(self):
@@ -419,13 +417,13 @@ def tryexit(enemy, look, irun):
 	    if game.battle == game.quadrant:
 		return False
 	# don't leave if over 1000 units of energy 
-	if enemy.kpower > 1000.0:
+	if enemy.power > 1000.0:
 	    return False
     # emit escape message and move out of quadrant.
     # we know this if either short or long range sensors are working
     if not damaged(DSRSENS) or not damaged(DLRSENS) or \
 	game.condition == "docked":
-	prout(crmena(True, enemy.type, "sector", enemy.kloc) + \
+	prout(crmena(True, enemy.type, "sector", enemy.location) + \
               (_(" escapes to Quadrant %s (and regains strength).") % q))
     # handle local matters related to escape
     enemy.move(None)
@@ -500,12 +498,12 @@ def movebaddy(enemy):
     mdist = int(dist1 + 0.5); # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
     if enemy.type=='S' and \
-	(enemy.kpower <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
+	(enemy.power <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
 	irun = True
 	motion = -QUADSIZE
     else:
 	# decide whether to advance, retreat, or hold position 
-	forces = enemy.kpower+100.0*len(game.enemies)+400*(nbaddys-1)
+	forces = enemy.power+100.0*len(game.enemies)+400*(nbaddys-1)
 	if not game.shldup:
 	    forces += 1000; # Good for enemy if shield is down! 
 	if not damaged(DPHASER) or not damaged(DPHOTON):
@@ -550,13 +548,13 @@ def movebaddy(enemy):
     if idebug:
 	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
-    m = game.sector - enemy.kloc
+    m = game.sector - enemy.location
     if 2.0 * abs(m.i) < abs(m.j):
 	m.i = 0
-    if 2.0 * abs(m.j) < abs(game.sector.i-enemy.kloc.i):
+    if 2.0 * abs(m.j) < abs(game.sector.i-enemy.location.i):
 	m.j = 0
     m = (motion * m).sgn()
-    next = enemy.kloc
+    next = enemy.location
     # main move loop 
     for ll in range(nsteps):
 	if idebug:
@@ -615,7 +613,7 @@ def movebaddy(enemy):
 	skip(1)
     if enemy.move(next):
 	if not damaged(DSRSENS) or game.condition == "docked":
-	    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.kloc))
+	    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.location))
 	    if enemy.kdist < dist1:
 		proutn(_(" advances to "))
 	    else:
@@ -810,13 +808,13 @@ def movetholian():
     if not game.tholian or game.justin:
 	return
     id = coord()
-    if game.tholian.kloc.i == 0 and game.tholian.kloc.j == 0:
+    if game.tholian.location.i == 0 and game.tholian.location.j == 0:
 	id.i = 0; id.j = QUADSIZE-1
-    elif game.tholian.kloc.i == 0 and game.tholian.kloc.j == QUADSIZE-1:
+    elif game.tholian.location.i == 0 and game.tholian.location.j == QUADSIZE-1:
 	id.i = QUADSIZE-1; id.j = QUADSIZE-1
-    elif game.tholian.kloc.i == QUADSIZE-1 and game.tholian.kloc.j == QUADSIZE-1:
+    elif game.tholian.location.i == QUADSIZE-1 and game.tholian.location.j == QUADSIZE-1:
 	id.i = QUADSIZE-1; id.j = 0
-    elif game.tholian.kloc.i == QUADSIZE-1 and game.tholian.kloc.j == 0:
+    elif game.tholian.location.i == QUADSIZE-1 and game.tholian.location.j == 0:
 	id.i = 0; id.j = 0
     else:
 	# something is wrong! 
@@ -826,8 +824,8 @@ def movetholian():
     # do nothing if we are blocked 
     if game.quad[id.i][id.j] not in ('.', '#'):
 	return
-    here = copy.copy(game.tholian.kloc)
-    delta = (id - game.tholian.kloc).sgn()
+    here = copy.copy(game.tholian.location)
+    delta = (id - game.tholian.location).sgn()
     # move in x axis 
     while here.i != id.i:
         here.i += delta.i
@@ -849,7 +847,7 @@ def movetholian():
 	if game.quad[i][QUADSIZE-1]!='#' and game.quad[i][QUADSIZE-1]!='T':
 	    return
     # All plugged up -- Tholian splits 
-    game.quad[game.tholian.kloc.i][game.tholian.kloc.j]='#'
+    game.quad[game.tholian.location.i][game.tholian.location.j]='#'
     dropin(' ')
     prout(crmena(True, 'T', "sector", game.tholian) + _(" completes web."))
     game.tholian.move(None)
@@ -1026,11 +1024,11 @@ def collision(rammed, enemy):
         proutn(_(" rammed by "))
     else:
         proutn(_(" rams "))
-    proutn(crmena(False, enemy.type, "sector", enemy.kloc))
+    proutn(crmena(False, enemy.type, "sector", enemy.location))
     if rammed:
 	proutn(_(" (original position)"))
     skip(1)
-    deadkl(enemy.kloc, enemy.type, game.sector)
+    deadkl(enemy.location, enemy.type, game.sector)
     proutn("***" + crmship() + " heavily damaged.")
     icas = randrange(10, 30)
     prout(_("***Sickbay reports %d casualties"), icas)
@@ -1107,7 +1105,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             game.quad[bumpto.i][bumpto.j]=iquad
             prout(_(" displaced by blast to Sector %s ") % bumpto)
             for enemy in game.enemies:
-                enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
+                enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
             game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             return None
 	elif iquad in ('C', 'S', 'R', 'K'): # Hit a regular enemy 
@@ -1117,19 +1115,19 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		prout(_("   torpedo neutralized."))
 		return None
             for enemy in game.enemies:
-		if w == enemy.kloc:
+		if w == enemy.location:
 		    break
-	    kp = math.fabs(enemy.kpower)
+	    kp = math.fabs(enemy.power)
 	    h1 = 700.0 + randrange(100) - \
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
 	    h1 = math.fabs(h1)
 	    if kp < h1:
 		h1 = kp
-            if enemy.kpower < 0:
-                enemy.kpower -= -h1
+            if enemy.power < 0:
+                enemy.power -= -h1
             else:
-                enemy.kpower -= h1
-	    if enemy.kpower == 0:
+                enemy.power -= h1
+	    if enemy.power == 0:
 		deadkl(w, iquad, w)
 		return None
 	    proutn(crmena(True, iquad, "sector", w))
@@ -1146,11 +1144,11 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		prout(_(" damaged but not destroyed."))
             else:
                 prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
-                enemy.kloc = bumpto
+                enemy.location = bumpto
                 game.quad[w.i][w.j]='.'
                 game.quad[bumpto.i][bumpto.j]=iquad
                 for enemy in game.enemies:
-                    enemy.kdist = enemy.kavgd = (game.sector-enemy.kloc).distance()
+                    enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
                 game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
             return None
 	elif iquad == 'B': # Hit a base 
@@ -1314,14 +1312,14 @@ def attack(torps_ok):
     if game.skill <= SKILL_FAIR:
 	where = "sector"
     for enemy in game.enemies:
-	if enemy.kpower < 0:
+	if enemy.power < 0:
 	    continue;	# too weak to attack 
 	# compute hit strength and diminish shield power 
 	r = randreal()
 	# Increase chance of photon torpedos if docked or enemy energy is low 
 	if game.condition == "docked":
 	    r *= 0.25
-	if enemy.kpower < 500:
+	if enemy.power < 500:
 	    r *= 0.25; 
 	if enemy.type=='T' or (enemy.type=='?' and not thing.angry):
 	    continue
@@ -1337,20 +1335,20 @@ def attack(torps_ok):
 		continue; # Don't waste the effort! 
 	    attempt = True; # Attempt to attack 
 	    dustfac = randreal(0.8, 0.85)
-	    hit = enemy.kpower*math.pow(dustfac,enemy.kavgd)
-	    enemy.kpower *= 0.75
+	    hit = enemy.power*math.pow(dustfac,enemy.kavgd)
+	    enemy.power *= 0.75
 	else: # Enemy uses photon torpedo 
 	    # We should be able to make the bearing() method work here
-	    course = 1.90985*math.atan2(game.sector.j-enemy.kloc.j, enemy.kloc.i-game.sector.i)
+	    course = 1.90985*math.atan2(game.sector.j-enemy.location.j, enemy.location.i-game.sector.i)
 	    hit = 0
 	    proutn(_("***TORPEDO INCOMING"))
 	    if not damaged(DSRSENS):
-		proutn(_(" From ") + crmena(False, enemy.type, where, enemy.kloc))
+		proutn(_(" From ") + crmena(False, enemy.type, where, enemy.location))
 	    attempt = True
 	    prout("  ")
 	    dispersion = (randreal()+randreal())*0.5 - 0.5
-	    dispersion += 0.002*enemy.kpower*dispersion
-	    hit = torpedo(enemy.kloc, course, dispersion, number=1, nburst=1)
+	    dispersion += 0.002*enemy.power*dispersion
+	    hit = torpedo(enemy.location, course, dispersion, number=1, nburst=1)
 	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
 		finish(FWON); # Klingons did themselves in! 
 	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova or game.alldone:
@@ -1383,7 +1381,7 @@ def attack(torps_ok):
 	if (damaged(DSRSENS) and usephasers) or game.skill<=SKILL_FAIR:
 	    proutn(_(" on the ") + crmshp())
 	if not damaged(DSRSENS) and usephasers:
-	    prout(_(" from ") + crmena(False, enemy.type, where, enemy.kloc))
+	    prout(_(" from ") + crmena(False, enemy.type, where, enemy.location))
 	skip(1)
 	# Decide if hit is critical 
 	if hit > hitmax:
@@ -1471,7 +1469,7 @@ def deadkl(w, type, mv):
     game.recompute()
     # Remove enemy ship from arrays describing local conditions
     for e in game.enemies:
-	if e.kloc == w:
+	if e.location == w:
             e.move(None)
 	    break
     return
@@ -1644,16 +1642,16 @@ def hittem(hits):
 	    continue
 	dustfac = randreal(0.9, 1.0)
 	hit = wham*math.pow(dustfac,game.enemies[kk].kdist)
-	kpini = game.enemies[kk].kpower
+	kpini = game.enemies[kk].power
 	kp = math.fabs(kpini)
 	if PHASEFAC*hit < kp:
 	    kp = PHASEFAC*hit
-        if game.enemies[kk].kpower < 0:
-            game.enemies[kk].kpower -= -kp
+        if game.enemies[kk].power < 0:
+            game.enemies[kk].power -= -kp
         else:
-            game.enemies[kk].kpower -= kp
-	kpow = game.enemies[kk].kpower
-	w = game.enemies[kk].kloc
+            game.enemies[kk].power -= kp
+	kpow = game.enemies[kk].power
+	w = game.enemies[kk].location
 	if hit > 0.005:
 	    if not damaged(DSRSENS):
 		boom(w)
@@ -1677,7 +1675,7 @@ def hittem(hits):
 	    if kpow>0 and withprob(0.9) and kpow <= randreal(0.4, 0.8)*kpini:
 		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s")%w)
 		prout(_("   has just lost its firepower.\""))
-		game.enemies[kk].kpower = -kpow
+		game.enemies[kk].power = -kpow
         kk += 1
     return
 
@@ -1770,7 +1768,7 @@ def phasers():
 	    scanner.chew()
 	    if not kz:
 		for i in range(len(game.enemies)):
-		    irec += math.fabs(game.enemies[i].kpower)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))*randreal(1.01, 1.06) + 1.0
+		    irec += math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))*randreal(1.01, 1.06) + 1.0
 	    kz=1
 	    proutn(_("%d units required. ") % irec)
 	    scanner.chew()
@@ -1806,7 +1804,7 @@ def phasers():
 		hits.append(0.0)
 		if powrem <= 0:
 		    continue
-		hits[i] = math.fabs(game.enemies[i].kpower)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))
+		hits[i] = math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))
 		over = randreal(1.01, 1.06) * hits[i]
 		temp = powrem
 		powrem -= hits[i] + over
@@ -1843,7 +1841,7 @@ def phasers():
     elif automode == "MANUAL":
 	rpow = 0.0
         for k in range(len(game.enemies)):
-	    aim = game.enemies[k].kloc
+	    aim = game.enemies[k].location
 	    ienm = game.quad[aim.i][aim.j]
 	    if msgflag:
 		proutn(_("Energy available= %.2f") % (avail-0.006))
@@ -1861,7 +1859,7 @@ def phasers():
 	    if key == "IHEOL":
 		scanner.chew()
 		if itarg and k > kz:
-		    irec=(abs(game.enemies[k].kpower)/(PHASEFAC*math.pow(0.9,game.enemies[k].kdist))) *	randreal(1.01, 1.06) + 1.0
+		    irec=(abs(game.enemies[k].power)/(PHASEFAC*math.pow(0.9,game.enemies[k].kdist))) *	randreal(1.01, 1.06) + 1.0
 		kz = k
 		proutn("(")
 		if not damaged(DCOMPTR):
@@ -2499,10 +2497,10 @@ def nova(nov):
                     deadkl(neighbor, iquad, neighbor)
                 elif iquad in ('C','S','R'): # Damage/destroy big enemies 
                     for ll in range(len(game.enemies)):
-                        if game.enemies[ll].kloc == neighbor:
+                        if game.enemies[ll].location == neighbor:
                             break
-                    game.enemies[ll].kpower -= 800.0 # If firepower is lost, die 
-                    if game.enemies[ll].kpower <= 0.0:
+                    game.enemies[ll].power -= 800.0 # If firepower is lost, die 
+                    if game.enemies[ll].power <= 0.0:
                         deadkl(neighbor, iquad, neighbor)
                         break
                     newc = neighbor + neighbor - hits[mm]
@@ -2695,8 +2693,8 @@ def kaboom():
 	whammo = 25.0 * game.energy
 	l=1
 	while l <= len(game.enemies):
-	    if game.enemies[l].kpower*game.enemies[l].kdist <= whammo: 
-		deadkl(game.enemies[l].kloc, game.quad[game.enemies[l].kloc.i][game.enemies[l].kloc.j], game.enemies[l].kloc)
+	    if game.enemies[l].power*game.enemies[l].kdist <= whammo: 
+		deadkl(game.enemies[l].location, game.quad[game.enemies[l].location.i][game.enemies[l].location.j], game.enemies[l].location)
 	    l += 1
     finish(FDILITHIUM)
 				
@@ -3365,7 +3363,7 @@ def imove(course=None, noattack=False):
         if len(game.enemies) != 0 and not noattack:
             newcnd()
             for enemy in game.enemies:
-                finald = (w - enemy.kloc).distance()
+                finald = (w - enemy.location).distance()
                 enemy.kavgd = 0.5 * (finald + enemy.kdist)
             # Stas Sergeev added the condition
             # that attacks only happen if Klingons
@@ -3423,7 +3421,7 @@ def imove(course=None, noattack=False):
             stopegy = 50.0*course.distance/game.optime
             if iquad in ('T', 'K', 'C', 'S', 'R', '?'):
                 for enemy in game.enemies:
-                    if enemy.kloc == game.sector:
+                    if enemy.location == game.sector:
                         break
                 collision(rammed=False, enemy=enemy)
                 return True
@@ -3489,7 +3487,7 @@ def imove(course=None, noattack=False):
     game.quad[game.sector.i][game.sector.j] = game.ship
     if game.enemies:
         for enemy in game.enemies:
-            finald = (w-enemy.kloc).distance()
+            finald = (w-enemy.location).distance()
             enemy.kavgd = 0.5 * (finald + enemy.kdist)
             enemy.kdist = finald
         game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
@@ -4650,7 +4648,7 @@ def deathray():
 	prouts(_("Sulu- \"Captain!  It's working!\""))
 	skip(2)
 	while len(game.enemies) > 0:
-	    deadkl(game.enemies[1].kloc, game.quad[game.enemies[1].kloc.i][game.enemies[1].kloc.j],game.enemies[1].kloc)
+	    deadkl(game.enemies[1].location, game.quad[game.enemies[1].location.i][game.enemies[1].location.j],game.enemies[1].location)
 	prout(_("Ensign Chekov-  \"Congratulations, Captain!\""))
 	if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) == 0:
 	    finish(FWON)    
@@ -5598,14 +5596,14 @@ def newqad():
         for cmdr in game.state.kcmdr:
 	    if cmdr == game.quadrant:
                 e = game.enemies[game.klhere-1]
-                game.quad[e.kloc.i][e.kloc.j] = 'C'
-                e.kpower = randreal(950,1350) + 50.0*game.skill
+                game.quad[e.location.i][e.location.j] = 'C'
+                e.power = randreal(950,1350) + 50.0*game.skill
 		break	
 	# If we need a super-commander, promote a Klingon
 	if game.quadrant == game.state.kscmdr:
             e = game.enemies[0]
-	    game.quad[e.kloc.i][e.kloc.j] = 'S'
-	    e.kpower = randreal(1175.0,  1575.0) + 125.0*game.skill
+	    game.quad[e.location.i][e.location.j] = 'S'
+	    e.power = randreal(1175.0,  1575.0) + 125.0*game.skill
 	    game.iscate = (game.state.remkl > 1)
     # Put in Romulans if needed
     for i in range(q.romulans):
