@@ -373,22 +373,17 @@ FHOLE = 20
 FCREW = 21
 
 def withprob(p):
-    v = random.random()
-    #logfp.write("# withprob(%s) -> %f (%s) at %s\n" % (p, v, v<p, traceback.extract_stack()[-2][1:]))
-    return v < p
+    return random.random() < p
 
 def randrange(*args):
-    v = random.randrange(*args)
-    #logfp.write("# randrange%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
-    return v
+    return random.randrange(*args)
 
 def randreal(*args):
     v = random.random()
     if len(args) == 1:
-        v *= args[0] 		# returns from [0, args[0])
+        v *= args[0] 		# from [0, args[0])
     elif len(args) == 2:
-        v = args[0] + v*(args[1]-args[0])	# returns from [args[0], args[1])
-    #logfp.write("# randreal%s -> %s at %s\n" % (args, v, traceback.extract_stack()[-2][1:]))
+        v = args[0] + v*(args[1]-args[0])	# from [args[0], args[1])
     return v
 
 # Code from ai.c begins here
