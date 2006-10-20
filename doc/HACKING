@@ -178,13 +178,33 @@ worlds enabled, they must have one in the quadrant to beam down
 to; otherwise they die in space and this counts heavily against
 your score.  Docking at a starbase replenishes your crew.
 
-8. Still more BSD-Trek: we now have a weighted damage table.
+8. Still more BSD-Trek: we now have a weighted damage table.  Quoth
+Eric Allman in the code of BSD-Trek: "Under certain conditions you can
+get a critical hit.  This sort of hit damages devices.  The
+probability that a given device is damaged depends on the device.
+Well protected devices (such as the computer, which is in the core of
+the ship and has considerable redundancy) almost never get damaged,
+whereas devices which are exposed (such as the warp engines) or which
+are particularly delicate (such as the transporter) have a much higher
+probability of being damaged."
+
+This is one place where OPTION_PLAIN does not restore the original
+behavior, which was equiprobable damage across all devices.  If we
+wanted that, we'd return randrange(NDEVICES) and have done with it.
+Also, in the original game, DNAVYS and DCOMPTR were the same device.
+
+Instead, we use a table of weights similar to the one from BSD Trek.
+BSD doesn't have the shuttle, shield controller, death ray, or probes.
+We don't have a cloaking device.  The shuttle got the allocation for
+the cloaking device, then we shaved a half-percent off everything to
+have some weight to give DSHCTRL/DDRAY/DDSP.
+
 Also, the nav subsystem (enabling automatic course
 setting) can be damaged separately from the main computer (which
 handles weapons targeting, ETA calculation, and self-destruct).
 
-After these features were added, I translated this into Python and added
-more:
+After these features were added, I translated this program into Python
+and added more:
 
 9. A long-range scan is done silently whenever you call CHART; thus
 the LRSCAN command is no longer needed.  (Controlled by OPTION_AUTOSCAN

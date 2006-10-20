@@ -958,34 +958,12 @@ def doshield(shraise):
 
 def randdevice():
     "Choose a device to damage, at random."
-    # Quoth Eric Allman in the code of BSD-Trek:
-    # "Under certain conditions you can get a critical hit.  This
-    # sort of hit damages devices.  The probability that a given
-    # device is damaged depends on the device.  Well protected
-    # devices (such as the computer, which is in the core of the
-    # ship and has considerable redundancy) almost never get
-    # damaged, whereas devices which are exposed (such as the
-    # warp engines) or which are particularly delicate (such as
-    # the transporter) have a much higher probability of being
-    # damaged."
-    # 
-    # This is one place where OPTION_PLAIN does not restore the
-    # original behavior, which was equiprobable damage across
-    # all devices.  If we wanted that, we'd return randrange(NDEVICES)
-    # and have done with it.  Also, in the original game, DNAVYS
-    # and DCOMPTR were the same device. 
-    # 
-    # Instead, we use a table of weights similar to the one from BSD Trek.
-    # BSD doesn't have the shuttle, shield controller, death ray, or probes. 
-    # We don't have a cloaking device.  The shuttle got the allocation
-    # for the cloaking device, then we shaved a half-percent off
-    # everything to have some weight to give DSHCTRL/DDRAY/DDSP.
     weights = (
 	105,	# DSRSENS: short range scanners	10.5% 
 	105,	# DLRSENS: long range scanners		10.5% 
 	120,	# DPHASER: phasers			12.0% 
 	120,	# DPHOTON: photon torpedoes		12.0% 
-	25,	# DLIFSUP: life support		 2.5% 
+	25,	# DLIFSUP: life support			 2.5% 
 	65,	# DWARPEN: warp drive			 6.5% 
 	70,	# DIMPULS: impulse engines		 6.5% 
 	145,	# DSHIELD: deflector shields		14.5% 
