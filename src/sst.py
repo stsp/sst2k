@@ -11,7 +11,7 @@ Stas Sergeev, and Eric S. Raymond.
 See the doc/HACKING file in the distribution for designers notes and advice
 ion how to modify (and how not to modify!) this code.
 """
-import os, sys, math, curses, time, readline, cPickle, random, copy, gettext
+import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
 SSTDOC  	= "/usr/share/doc/sst/sst.doc"
 DOC_NAME	= "sst.doc"
@@ -4015,7 +4015,7 @@ def timwrp():
 	# Likewise, if in the original time the Galileo was abandoned, but
 	# was on ship earlier, it would have vanished -- let's restore it.
 	if game.iscraft == "offship" and not gotit and game.damage[DSHUTTL] >= 0.0:
-	    prout(_("Checkov-  \"Security reports the Galileo has reappeared in the dock!\""))
+	    prout(_("Chekov-  \"Security reports the Galileo has reappeared in the dock!\""))
 	    game.iscraft = "onship"
         # There used to be code to do the actual reconstrction here,
         # but the starchart is now part of the snapshotted galaxy state.
@@ -6240,7 +6240,7 @@ if __name__ == '__main__':
             logfp.write("# seed %s\n" % seed)
             logfp.write("# options %s\n" % " ".join(arguments))
             logfp.write("# recorded by %s@%s on %s\n" % \
-                    (os.getenv("LOGNAME"),socket.gethostname(),time.ctime()))
+                    (getpass.getuser(),socket.gethostname(),time.ctime()))
         random.seed(seed)
         scanner = sstscanner()
         map(scanner.append, arguments)
