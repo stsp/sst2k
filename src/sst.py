@@ -3995,7 +3995,7 @@ def timwrp():
 	prout(_("Spock has reconstructed a correct star chart from memory"))
     else:
 	# Go forward in time 
-	game.optime = -0.5*game.intime*math.log(randreal())
+	game.optime = expran(0.5*game.intime)
 	prout(_("You are traveling forward in time %d stardates.") % int(game.optime))
 	# cheat to make sure no tractor beams occur during time warp 
 	postpone(FTBEAM, game.optime)
@@ -5412,12 +5412,10 @@ def setup():
 
 def choose():
     "Choose your game type."
-    global thing
     while True:
-	game.tourn = 0
+	game.tourn = game.length = 0
 	game.thawed = False
 	game.skill = SKILL_NONE
-	game.length = 0
 	if not scanner.inqueue: # Can start with command line options 
 	    proutn(_("Would you like a regular, tournament, or saved game? "))
         scanner.next()
@@ -5785,8 +5783,7 @@ def makemoves():
 	drawmaps(1)
         while True:	# get a command 
 	    hitme = False
-	    game.justin = False
-	    game.optime = 0.0
+	    game.optime = game.justin = False
 	    scanner.chew()
 	    setwnd(prompt_window)
 	    clrscr()
