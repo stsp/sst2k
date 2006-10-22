@@ -18,20 +18,20 @@ DOC_NAME	= "sst.doc"
 
 def _(str): return gettext.gettext(str)
 
-PHASEFAC	= 2.0
-GALSIZE 	= 8
-NINHAB  	= (GALSIZE * GALSIZE / 2)
-MAXUNINHAB	= 10
-PLNETMAX	= (NINHAB + MAXUNINHAB)
-QUADSIZE	= 10
-BASEMIN		= 2
-BASEMAX 	= (GALSIZE * GALSIZE / 12)
-MAXKLGAME	= 127
-MAXKLQUAD	= 9
-FULLCREW	= 428	# BSD Trek was 387, that's wrong 
-FOREVER 	= 1e30
-MAXBURST	= 3
-MINCMDR 	= 10
+GALSIZE 	= 8		# Galaxy size in quadrants
+NINHAB  	= (GALSIZE * GALSIZE / 2)	# Number of inhabited worlds
+MAXUNINHAB	= 10		# Maximum uninhabited worlds
+QUADSIZE	= 10		# Quadrant size in sectors
+BASEMIN		= 2				# Minimum starbases
+BASEMAX 	= (GALSIZE * GALSIZE / 12)	# Maximum starbases
+MAXKLGAME	= 127		# Maximum Klingons per game
+MAXKLQUAD	= 9		# Maximum Klingons per quadrant
+FULLCREW	= 428		# Crew size. BSD Trek was 387, that's wrong 
+FOREVER 	= 1e30		# Time for the indefinite future
+MAXBURST	= 3		# Max # of torps you can launch in one turn
+MINCMDR 	= 10		# Minimum number of Klingon commanders
+DOCKFAC		= 0.25		# Repair faster when docked
+PHASEFAC	= 2.0		# Unclear what this is, it was in the C version
 
 class TrekError:
     pass
@@ -331,10 +331,8 @@ class gamestate:
         self.energy = 0.0	# energy level
         self.shield = 0.0	# shield level
         self.warpfac = 0.0	# warp speed
-        self.wfacsq = 0.0	# squared warp factor
         self.lsupres = 0.0	# life support reserves
         self.optime = 0.0	# time taken by current operation
-        self.docfac = 0.0	# repair factor when docking (constant?)
         self.damfac = 0.0	# damage factor
         self.lastchart = 0.0	# time star chart was last updated
         self.cryprob = 0.0	# probability that crystal will work
@@ -2079,7 +2077,7 @@ def events():
 	# Fix devices 
 	repair = xtime
 	if game.condition == "docked":
-	    repair /= game.docfac
+	    repair /= DOCKFAC
 	# Don't fix Deathray here 
 	for l in range(NDEVICES):
 	    if game.damage[l] > 0.0 and l != DDRAY:
@@ -4816,7 +4814,7 @@ def damagereport():
 		jdam = True
 	    prout("  %-26s\t%8.2f\t\t%8.2f" % (device[i],
                                                game.damage[i]+0.05,
-                                               game.docfac*game.damage[i]+0.005))
+                                               DOCKFAC*game.damage[i]+0.005))
     if not jdam:
 	prout(_("All devices functional."))
 
@@ -5246,7 +5244,6 @@ def setup():
     game.iscraft = "onship"
     game.landed = False
     game.alive = True
-    game.docfac = 0.25
     # Starchart is functional but we've never seen it
     game.lastchart = FOREVER
     # Put stars in the galaxy
