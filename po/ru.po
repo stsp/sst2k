@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sst 2.0\n"
 "Report-Msgid-Bugs-To: stsp\n"
-"POT-Creation-Date: 2006-10-02 23:04+0400\n"
+"POT-Creation-Date: 2006-10-23 21:47+0400\n"
 "PO-Revision-Date: 2006-09-15 11:01+0400\n"
 "Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -21,1272 +21,1259 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: src/ai.c:36
-#, c-format
-msgid " escapes to %s (and regains strength)."
-msgstr " удирает в %s (и восстанавливает энергию)"
+#: src/sst.py:420
+#, python-format
+msgid " escapes to Quadrant %s (and regains strength)."
+msgstr " удирает в Квадрант %s (и восстанавливает энергию)"
 
-#: src/ai.c:266
-#, c-format
-msgid " from %s"
-msgstr " из %s"
+#: src/sst.py:609
+#, python-format
+msgid "*** %s from Sector %s"
+msgstr "*** %s из Сектора %s"
 
-#: src/ai.c:268
+#: src/sst.py:611
 msgid " advances to "
 msgstr " наступает к "
 
-#: src/ai.c:270
+#: src/sst.py:613
 msgid " retreats to "
 msgstr " отступает к "
 
-#: src/ai.c:367 src/ai.c:554
+#: src/sst.py:674 src/sst.py:795
 msgid "Lt. Uhura-  \"Captain, Starfleet Intelligence reports"
 msgstr "Лт. Ухура- \"Капитан, разведка звёздного флота докладывает"
 
-#: src/ai.c:368
-msgid "   a planet in "
-msgstr "   планета в "
+#: src/sst.py:675
+#, python-format
+msgid "   a planet in Quadrant %s has been destroyed"
+msgstr "   планета в Квадранте %s была уничтожена"
 
-#: src/ai.c:370
-msgid " has been destroyed"
-msgstr " уничтожена"
-
-#: src/ai.c:371
+#: src/sst.py:676
 msgid "   by the Super-commander.\""
 msgstr "   Глав-комом."
 
-#: src/ai.c:529 src/events.c:300
-msgid "Lt. Uhura-  \"Captain, the starbase in "
-msgstr "Лт. Ухура- \"Капитан, база в "
+#: src/sst.py:775 src/sst.py:2170
+#, python-format
+msgid "Lt. Uhura-  \"Captain, the starbase in Quadrant %s"
+msgstr "Лт. Ухура- \"Капитан, база в Квадранте %s"
 
-#: src/ai.c:532
+#: src/sst.py:777
 msgid "   reports that it is under attack from the Klingon Super-commander."
 msgstr "   сообщает, что она атакована Глав-комом Клингонов."
 
-#: src/ai.c:533
-#, c-format
+#: src/sst.py:778
+#, python-format
 msgid "   It can survive until stardate %d.\""
 msgstr "   Она сможет продержаться до даты %d.\""
 
-#: src/ai.c:537 src/events.c:49
+#: src/sst.py:782 src/sst.py:1931
 msgid "Mr. Spock-  \"Captain, shall we cancel the rest period?\""
 msgstr "Мистер Спок- \"Капитан, нам прервать отдых?\""
 
-#: src/ai.c:555
-msgid "   the Super-commander is in "
-msgstr "   Глав-ком находится в "
+#: src/sst.py:796
+#, python-format
+msgid "   the Super-commander is in Quadrant %s,"
+msgstr "   Глав-ком находится в Квадранте %s,"
 
-#: src/ai.c:627
+#: src/sst.py:845
 msgid " completes web."
 msgstr " доделал сеть."
 
-#: src/battle.c:21 src/battle.c:37
+#: src/sst.py:864 src/sst.py:876
 msgid "Shields damaged and down."
 msgstr "Защита сломана и снята."
 
-#: src/battle.c:31
+#: src/sst.py:871
 msgid "Do you wish to change shield energy? "
 msgstr "Вы хотите изменить энергию защиты? "
 
-#: src/battle.c:33 src/battle.c:92
+#: src/sst.py:873 src/sst.py:920
 msgid "Energy to transfer to shields- "
 msgstr "Энергия для защитного поля- "
 
-#: src/battle.c:41
+#: src/sst.py:879
 msgid "Shields are up. Do you want them down? "
 msgstr "Защита поднята. Вы хотите её снять? "
 
-#: src/battle.c:50
+#: src/sst.py:886
 msgid "Shields are down. Do you want them up? "
 msgstr "Защита снята. Вы хотите её поднять? "
 
-#: src/battle.c:63
+#: src/sst.py:894
 msgid "Shields already up."
 msgstr "Защита и так уже поднята."
 
-#: src/battle.c:70 src/battle.c:1328
+#: src/sst.py:900 src/sst.py:1893
 msgid "Shields raised."
 msgstr "Защита поднята."
 
-#: src/battle.c:73
+#: src/sst.py:903
 msgid "Shields raising uses up last of energy."
 msgstr "Поднятие защиты расходует весь остаток энергии."
 
-#: src/battle.c:81
+#: src/sst.py:910
 msgid "Shields already down."
 msgstr "Защита и так уже снята."
 
-#: src/battle.c:86 src/battle.c:995
+#: src/sst.py:914 src/sst.py:1574
 msgid "Shields lowered."
 msgstr "Защита снята."
 
-#: src/battle.c:98
+#: src/sst.py:925
 msgid "Insufficient ship energy."
 msgstr "Энергии корабля недостаточно."
 
-#: src/battle.c:103
+#: src/sst.py:929
 msgid "Shield energy maximized."
 msgstr "Энергия защиты достигла максимума."
 
-#: src/battle.c:105
+#: src/sst.py:931
 msgid "Excess energy requested returned to ship energy"
 msgstr "Лишняя энергия вернулась кораблю"
 
-#: src/battle.c:114 src/moving.c:538 src/moving.c:639 src/planets.c:149
-#: src/planets.c:154
+#: src/sst.py:938 src/sst.py:3764 src/sst.py:3833 src/sst.py:4351
+#: src/sst.py:4355
 msgid "Engineering to bridge--"
 msgstr "Инженерный отсек мостику--"
 
-#: src/battle.c:115
+#: src/sst.py:939
 msgid "  Scott here. Power circuit problem, Captain."
 msgstr "  Это Скотт. Тут проблемы с энергетическим контуром, Капитан."
 
-#: src/battle.c:116
+#: src/sst.py:940
 msgid "  I can't drain the shields."
 msgstr "  Я не могу откачать энергию из защитных полей."
 
-#: src/battle.c:121
+#: src/sst.py:944
 msgid "All shield energy transferred to ship."
 msgstr "Вся энергия защиты переправлена на корабль."
 
-#: src/battle.c:126
+#: src/sst.py:948
 msgid "Scotty- \""
 msgstr "Скотти- \""
 
-#: src/battle.c:128
+#: src/sst.py:950
 msgid "Transferring energy to shields.\""
 msgstr "Перевожу энергию на защиту.\""
 
-#: src/battle.c:130
+#: src/sst.py:952
 msgid "Draining energy from shields.\""
 msgstr "Забираю энергию из защиты.\""
 
-#: src/battle.c:199 src/battle.c:999 src/events.c:875 src/moving.c:144
-#: src/moving.c:750 src/planets.c:492
+#: src/sst.py:987 src/sst.py:1577 src/sst.py:2557 src/sst.py:3401
+#: src/sst.py:3916 src/sst.py:4638
 msgid "***RED ALERT!  RED ALERT!"
 msgstr "***ТРЕВОГА!  ТРЕВОГА!"
 
-#: src/battle.c:201
+#: src/sst.py:989
 msgid "***COLLISION IMMINENT."
 msgstr "***ОПАСНОСТЬ СТОЛКНОВЕНИЯ."
 
-#: src/battle.c:213
+#: src/sst.py:995
 msgid " rammed by "
 msgstr " протаранен "
 
-#: src/battle.c:213
+#: src/sst.py:997
 msgid " rams "
 msgstr " таранит "
 
-#: src/battle.c:216
+#: src/sst.py:1000
 msgid " (original position)"
 msgstr " (исходное положение)"
 
-#: src/battle.c:221
-msgid " heavily damaged."
-msgstr " серьёзно повреждён."
-
-#: src/battle.c:223
-#, c-format
+#: src/sst.py:1005
+#, python-format
 msgid "***Sickbay reports %d casualties"
 msgstr "***Из лазарета докладывают о %d пострадавших"
 
-#: src/battle.c:241
+#: src/sst.py:1020
 msgid "***Shields are down."
 msgstr "***Защита снята."
 
-#: src/battle.c:294
-msgid "Torpedo hits "
-msgstr "Торпеда попала в цель: "
+#: src/sst.py:1054
+#, python-format
+msgid "Torpedo hits %s."
+msgstr "Торпеда ударила в %s."
 
-#: src/battle.c:331
+#: src/sst.py:1077
+#, python-format
+msgid " displaced by blast to Sector %s "
+msgstr " перемещён взрывом в Сектор %s "
+
+#: src/sst.py:1085
 msgid " uses anti-photon device;"
 msgstr " использует противофотонную установку;"
 
-#: src/battle.c:332
+#: src/sst.py:1086
 msgid "   torpedo neutralized."
 msgstr "   торпеда нейтрализована."
 
-#: src/battle.c:363 src/battle.c:373
+#: src/sst.py:1109 src/sst.py:1115
 msgid " damaged but not destroyed."
 msgstr " повреждён, но не уничтожен."
 
-#: src/battle.c:367
+#: src/sst.py:1112
 msgid " buffeted into black hole."
 msgstr " отлетел в чёрную дыру."
 
-#: src/battle.c:376
-msgid " damaged--"
-msgstr " повреждён--"
+#: src/sst.py:1117
+#, python-format
+msgid " damaged-- displaced by blast to Sector %s "
+msgstr " повреждён-- перемещён взрывом в Сектор %s "
 
-#: src/battle.c:382
+#: src/sst.py:1127
 msgid "***STARBASE DESTROYED.."
 msgstr "***БАЗА УНИЧТОЖЕНА.."
 
-#: src/battle.c:399 src/battle.c:413 src/battle.c:790 src/events.c:690
-#: src/events.c:711
+#: src/sst.py:1137 src/sst.py:1149 src/sst.py:1437 src/sst.py:2432
+#: src/sst.py:2446
 msgid " destroyed."
 msgstr " уничтожен."
 
-#: src/battle.c:424
-msgid "You have just destroyed an inhabited planet."
-msgstr "Вы только что уничтожили обитаемую планету."
+#: src/sst.py:1159
+msgid "The torpedo destroyed an inhabited planet."
+msgstr "Торпеда уничтожила обитаемую планету."
 
-#: src/battle.c:425
-msgid "Celebratory rallies are being held on the Klingon homeworld."
-msgstr "На планете Клингонов прошли праздничные митинги."
-
-#: src/battle.c:433
+#: src/sst.py:1165
 msgid " unaffected by photon blast."
 msgstr " не повреждён фотонным зарядом."
 
-#: src/battle.c:438
+#: src/sst.py:1170
 msgid "AAAAIIIIEEEEEEEEAAAAAAAAUUUUUGGGGGHHHHHHHHHHHH!!!"
 msgstr "ВВВВППППЕЕЕЕРРРЁЁЁЁДДДЗЗЗЗААААРРРРООООДДДДИИИННННУУУУ!!!"
 
-#: src/battle.c:440
+#: src/sst.py:1172
 msgid "    HACK!     HACK!    HACK!        *CHOKE!*  "
 msgstr ""
 
-#: src/battle.c:442
+#: src/sst.py:1174
 msgid "Mr. Spock-"
 msgstr "Мистер Спок-"
 
-#: src/battle.c:443
+#: src/sst.py:1175
 msgid "  \"Fascinating!\""
 msgstr "  \"Грандиозно!\""
 
-#: src/battle.c:459
+#: src/sst.py:1187
 msgid " swallows torpedo."
 msgstr " поглотила торпеду."
 
-#: src/battle.c:463
+#: src/sst.py:1191
 msgid "***Torpedo absorbed by Tholian web."
 msgstr "***Толианская сеть поглотила торпеду."
 
-#: src/battle.c:478
+#: src/sst.py:1205
 msgid " survives photon blast."
 msgstr " выдержал фотонный взрыв."
 
-#: src/battle.c:481
+#: src/sst.py:1207
 msgid " disappears."
 msgstr " исчез."
 
-#: src/battle.c:503
-#, c-format
-msgid " displaced by blast to %s "
-msgstr " перемещён взрывом в %s "
-
-#: src/battle.c:510
+#: src/sst.py:1220
 msgid "Torpedo missed."
 msgstr "Торпеда промазала."
 
-#: src/battle.c:525
+#: src/sst.py:1228
 msgid "***CRITICAL HIT--"
 msgstr "***КРИТИЧЕСКИЙ УДАР--"
 
-#: src/battle.c:543
+#: src/sst.py:1247
 msgid " and "
 msgstr " и "
 
-#: src/battle.c:547
+#: src/sst.py:1248
 msgid " damaged."
 msgstr " поврежден."
 
-#: src/battle.c:549
+#: src/sst.py:1250
 msgid "***Shields knocked down."
 msgstr "***Защита сбита."
 
-#: src/battle.c:632
+#: src/sst.py:1315
 msgid "***TORPEDO INCOMING"
 msgstr "***ТОРПЕДА ПРИБЛИЖАЕТСЯ"
 
-#: src/battle.c:634
+#: src/sst.py:1317
 msgid " From "
 msgstr " От "
 
-#: src/battle.c:670
-#, c-format
+#: src/sst.py:1351
+#, python-format
 msgid "%d unit hit"
 msgstr "удар на %d единиц"
 
-#: src/battle.c:672
+#: src/sst.py:1353
 msgid " on the "
 msgstr " по "
 
-#: src/battle.c:676
+#: src/sst.py:1355
 msgid " from "
 msgstr " от "
 
-#: src/battle.c:693
+#: src/sst.py:1368
 msgid "***Enemies decide against attacking your ship."
 msgstr "***Враги решили не атаковать ваш корабль."
 
-#: src/battle.c:699
+#: src/sst.py:1372
 msgid "Enemy attack reduces shield strength to "
 msgstr "Вражеская атака уменьшает силу защиты до "
 
-#: src/battle.c:704
-#, c-format
+#: src/sst.py:1376
+#, python-format
 msgid "Energy left %2d    shields "
 msgstr "Остаток энергии: %2d    защита "
 
-#: src/battle.c:706
+#: src/sst.py:1378
 msgid "up "
 msgstr "поднята "
 
-#: src/battle.c:708
+#: src/sst.py:1380
 msgid "down "
 msgstr "снята "
 
-#: src/battle.c:710
+#: src/sst.py:1382
 msgid "damaged, "
 msgstr "сломана, "
 
-#: src/battle.c:712
-#, c-format
+#: src/sst.py:1383
+#, python-format
 msgid "%d%%,   torpedoes left %d"
 msgstr "%d%%,   осталось %d торпед"
 
-#: src/battle.c:718
-#, c-format
+#: src/sst.py:1389
+#, python-format
 msgid "Mc Coy-  \"Sickbay to bridge.  We suffered %d casualties"
 msgstr "МакКой- \"Лазарет мостику.  К нам поступили %d пострадавших"
 
-#: src/battle.c:719
+#: src/sst.py:1390
 msgid "   in that last attack.\""
 msgstr "   от последней атаки.\""
 
-#: src/battle.c:831
+#: src/sst.py:1459
 msgid "Spock-  \"Bridge to sickbay.  Dr. McCoy,"
 msgstr "Спок- \"Мостик лазарету.  Доктор МакКой,"
 
-#: src/battle.c:832
+#: src/sst.py:1460
 msgid "  I recommend an immediate review of"
 msgstr "  рекомендую немедленно проверить"
 
-#: src/battle.c:833
+#: src/sst.py:1461
 msgid "  the Captain's psychological profile.\""
 msgstr "  психологическое состояние Капитана.\""
 
-#: src/battle.c:851
+#: src/sst.py:1471
 msgid "Photon tubes damaged."
 msgstr "Фотонные трубы сломаны."
 
-#: src/battle.c:856
+#: src/sst.py:1475
 msgid "No torpedoes left."
 msgstr "Торпед совсем не осталось."
 
-#: src/battle.c:867
-#, c-format
+#: src/sst.py:1485
+#, python-format
 msgid "%d torpedoes left."
 msgstr "Осталось %d торпед."
 
-#: src/battle.c:868
+#: src/sst.py:1487
 msgid "Number of torpedoes to fire- "
 msgstr "Число торпед на отстрел- "
 
-#: src/battle.c:879
-msgid "Maximum of 3 torpedoes per burst."
-msgstr "Максимум 3 торпеды за залп."
+#: src/sst.py:1496
+#, python-format
+msgid "Maximum of %d torpedoes per burst."
+msgstr "Максимум %d торпеды за залп."
 
-#: src/battle.c:922
-#, c-format
+#: src/sst.py:1526
+#, python-format
 msgid "Target sector for torpedo number %d- "
 msgstr "Сектор назначения для торпеды номер %d- "
 
-#: src/battle.c:950
-#, c-format
+#: src/sst.py:1544
+#, python-format
 msgid "***TORPEDO NUMBER %d MISFIRES"
 msgstr "***ТОРПЕДА НОМЕР %d НЕ СОШЛА"
 
-#: src/battle.c:953
+#: src/sst.py:1546
 msgid "***TORPEDO MISFIRES."
 msgstr "***ТОРПЕДА НЕ СОШЛА."
 
-#: src/battle.c:956
+#: src/sst.py:1549
 msgid "  Remainder of burst aborted."
 msgstr "  Остаток залпа отменён."
 
-#: src/battle.c:958
+#: src/sst.py:1551
 msgid "***Photon tubes damaged by misfire."
 msgstr "***Фотонные трубы сломались при осечке."
 
-#: src/battle.c:981
+#: src/sst.py:1567
 msgid "Weapons officer Sulu-  \"Phasers overheated, sir.\""
 msgstr "Наводчик Сулу- \"Фазеры перегорели, сэр.\""
 
-#: src/battle.c:1005
+#: src/sst.py:1583
 msgid "Sulu-  \"Captain! Shield malf***********************\""
 msgstr "Сулу- \"Капитан! Защита не сраб*********************\""
 
-#: src/battle.c:1011
+#: src/sst.py:1588
 msgid "Sulu-  \"Captain! Shield malfunction! Phaser fire contained!\""
 msgstr ""
 "Сулу- \"Капитан! Защита не сработала! Энергия фазеров скопилась внутри!\""
 
-#: src/battle.c:1013
+#: src/sst.py:1590
 msgid "Lt. Uhura-  \"Sir, all decks reporting damage.\""
 msgstr "Лт. Ухура- \"Сэр, все палубы сообщают о повреждении.\""
 
-#: src/battle.c:1019
+#: src/sst.py:1596
 msgid "McCoy to bridge- \"Severe radiation burns, Jim."
 msgstr "МакКой мостику- \"Сильнейшие радиационные ожоги, Джим."
 
-#: src/battle.c:1020
-#, c-format
+#: src/sst.py:1597
+#, python-format
 msgid "  %d casualties so far.\""
 msgstr "  пока-что %d пострадавших.\""
 
-#: src/battle.c:1025
+#: src/sst.py:1601
 msgid "Phaser energy dispersed by shields."
 msgstr "Энергия фазеров рассеяна защитным полем."
 
-#: src/battle.c:1026
+#: src/sst.py:1602
 msgid "Enemy unaffected."
 msgstr "Враг не пострадал."
 
-#: src/battle.c:1046
-msgid "Phasers can't be fired through base shields."
-msgstr "Фазеры не могут стрелять через защиту базы."
-
-#: src/battle.c:1051
-msgid "Phaser control damaged."
-msgstr "Управление фазерами не работает."
-
-#: src/battle.c:1057
-msgid "High speed shield control damaged."
-msgstr "Высокоскоростное управление защитой не работает."
-
-#: src/battle.c:1062
-msgid "Insufficient energy to activate high-speed shield control."
-msgstr "Недостаточно энергии для высокоскоростного управления защитой."
-
-#: src/battle.c:1066
-msgid "Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""
-msgstr "Наводчик Сулу- \"Высокоскоростное управление защитой включено, сэр.\""
-
-#: src/battle.c:1076
-msgid "There is no enemy present to select."
-msgstr "Здесь нет врагов."
-
-#: src/battle.c:1092 src/battle.c:1107 src/battle.c:1118
-msgid "Energy will be expended into space."
-msgstr "Энергия уйдёт в пустоту."
-
-#: src/battle.c:1124
-msgid "Manual or automatic? "
-msgstr "Ручной или автоматический? "
-
-#: src/battle.c:1135
-#, c-format
-msgid "Phasers locked on target. Energy available: %.2f"
-msgstr "Фазеры наведены на цель. Доступная энергия: %.2f"
-
-#: src/battle.c:1146
-#, c-format
-msgid "%d units required. "
-msgstr "Необходимо %d единиц. "
-
-#: src/battle.c:1148
-msgid "Units to fire= "
-msgstr "Энергия на выстрел= "
-
-#: src/battle.c:1154 src/battle.c:1231
-#, c-format
-msgid "Energy available= %.2f"
-msgstr "Доступная энергия= %.2f"
-
-#: src/battle.c:1200
-msgid "*** Tholian web absorbs "
-msgstr "*** Толианская сеть поглощает "
-
-#: src/battle.c:1202
-msgid "excess "
-msgstr "избыточную "
-
-#: src/battle.c:1203
-msgid "phaser energy."
-msgstr "энергию фазеров."
-
-#: src/battle.c:1206
-#, c-format
-msgid "%d expended on empty space."
-msgstr "%d ушло в пустоту."
-
-#: src/battle.c:1215
-msgid "Battle computer damaged, manual fire only."
-msgstr "Бортовой компьютер сломан, используйте ручное наведение."
-
-#: src/battle.c:1218 src/finish.c:14
-msgid "---WORKING---"
-msgstr "---РАБОТА---"
-
-#: src/battle.c:1220
-msgid "Short-range-sensors-damaged"
-msgstr "Сенсоры-ближнего-обзора-сломаны"
-
-#: src/battle.c:1221
-msgid "Insufficient-data-for-automatic-phaser-fire"
-msgstr "Недостаточно-данных-для-автоматического-наведения-фазеров"
-
-#: src/battle.c:1222
-msgid "Manual-fire-must-be-used"
-msgstr "Используйте-ручное-наведение"
-
-#: src/battle.c:1240
-msgid " can't be located without short range scan."
-msgstr " не может быть обнаружен без ближнего сканирования."
-
-#: src/battle.c:1259
-msgid "units to fire at "
-msgstr "энергии на выстрел по "
-
-#: src/battle.c:1289
-msgid "Available energy exceeded -- try again."
-msgstr "Имеющейся энергии не хватает -- попробуйте снова."
-
-#: src/battle.c:1322
-msgid "Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."
-msgstr "Сулу- \"Сэр, высокоскоростное управление защитой не сработало . . ."
-
-#: src/battle.c:1323
-msgid "         CLICK   CLICK   POP  . . ."
-msgstr "         ЩЁЛК   ЩЁЛК   ЧЁРТ  . . ."
-
-#: src/battle.c:1324
-msgid " No response, sir!"
-msgstr " Без реакции, сэр!"
-
-#: src/battle.c:1360
-#, c-format
+#: src/sst.py:1629
+#, python-format
 msgid "%d unit hit on "
 msgstr "%d единиц энергии ударили по "
 
-#: src/battle.c:1363
+#: src/sst.py:1631
 msgid "Very small hit on "
 msgstr "Очень слабый удар по "
 
-#: src/battle.c:1380
-#, c-format
-msgid "***Mr. Spock-  \"Captain, the vessel at %s"
-msgstr "***Мистер Спок- \"Капитан, посудина в %s "
+#: src/sst.py:1647
+#, python-format
+msgid "***Mr. Spock-  \"Captain, the vessel at Sector %s"
+msgstr "***Мистер Спок- \"Капитан, посудина в Секторе %s"
 
-#: src/battle.c:1382
+#: src/sst.py:1648
 msgid "   has just lost its firepower.\""
 msgstr "   потеряла боеспособность.\""
 
-#: src/events.c:144
-msgid "Lt. Uhura- \"Captain, the sub-space radio is working and"
-msgstr "Лт. Ухура- \"Капитан, космическая рация работает и"
+#: src/sst.py:1665
+msgid "Phasers can't be fired through base shields."
+msgstr "Фазеры не могут стрелять через защиту базы."
 
-#: src/events.c:145
-msgid "   surveillance reports are coming in."
-msgstr "   принимает информацию из центра наблюдения."
+#: src/sst.py:1669
+msgid "Phaser control damaged."
+msgstr "Управление фазерами не работает."
 
-#: src/events.c:152
-msgid "   The star chart is now up to date.\""
-msgstr "   Звёздная карта обновлена."
+#: src/sst.py:1674
+msgid "High speed shield control damaged."
+msgstr "Высокоскоростное управление защитой не работает."
 
-#: src/events.c:205
+#: src/sst.py:1678
+msgid "Insufficient energy to activate high-speed shield control."
+msgstr "Недостаточно энергии для высокоскоростного управления защитой."
+
+#: src/sst.py:1681
+msgid "Weapons Officer Sulu-  \"High-speed shield control enabled, sir.\""
+msgstr "Наводчик Сулу- \"Высокоскоростное управление защитой включено, сэр.\""
+
+#: src/sst.py:1690
+msgid "There is no enemy present to select."
+msgstr "Здесь нет врагов."
+
+#: src/sst.py:1702 src/sst.py:1712 src/sst.py:1721
+msgid "Energy will be expended into space."
+msgstr "Энергия уйдёт в пустоту."
+
+#: src/sst.py:1726
+msgid "Manual or automatic? "
+msgstr "Ручной или автоматический? "
+
+#: src/sst.py:1736
+#, python-format
+msgid "Phasers locked on target. Energy available: %.2f"
+msgstr "Фазеры наведены на цель. Доступная энергия: %.2f"
+
+#: src/sst.py:1744
+#, python-format
+msgid "%d units required. "
+msgstr "Необходимо %d единиц. "
+
+#: src/sst.py:1746
+msgid "Units to fire= "
+msgstr "Энергия на выстрел= "
+
+#: src/sst.py:1752 src/sst.py:1818
+#, python-format
+msgid "Energy available= %.2f"
+msgstr "Доступная энергия= %.2f"
+
+#: src/sst.py:1793
+msgid "*** Tholian web absorbs "
+msgstr "*** Толианская сеть поглощает "
+
+#: src/sst.py:1795
+msgid "excess "
+msgstr "избыточную "
+
+#: src/sst.py:1796
+msgid "phaser energy."
+msgstr "энергию фазеров."
+
+#: src/sst.py:1798
+#, python-format
+msgid "%d expended on empty space."
+msgstr "%d ушло в пустоту."
+
+#: src/sst.py:1803
+msgid "Battle computer damaged, manual fire only."
+msgstr "Бортовой компьютер сломан, используйте ручное наведение."
+
+#: src/sst.py:1806 src/sst.py:2622
+msgid "---WORKING---"
+msgstr "---РАБОТА---"
+
+#: src/sst.py:1808
+msgid "Short-range-sensors-damaged"
+msgstr "Сенсоры-ближнего-обзора-сломаны"
+
+#: src/sst.py:1809
+msgid "Insufficient-data-for-automatic-phaser-fire"
+msgstr "Недостаточно-данных-для-автоматического-наведения-фазеров"
+
+#: src/sst.py:1810
+msgid "Manual-fire-must-be-used"
+msgstr "Используйте-ручное-наведение"
+
+#: src/sst.py:1824
+msgid " can't be located without short range scan."
+msgstr " не может быть обнаружен без ближнего сканирования."
+
+#: src/sst.py:1841
+#, python-format
+msgid "units to fire at %s-  "
+msgstr "энергии на выстрел в %s-  "
+
+#: src/sst.py:1862
+msgid "Available energy exceeded -- try again."
+msgstr "Имеющейся энергии не хватает -- попробуйте снова."
+
+#: src/sst.py:1888
+msgid "Sulu-  \"Sir, the high-speed shield control has malfunctioned . . ."
+msgstr "Сулу- \"Сэр, высокоскоростное управление защитой не сработало . . ."
+
+#: src/sst.py:1889
+msgid "         CLICK   CLICK   POP  . . ."
+msgstr "         ЩЁЛК   ЩЁЛК   ЧЁРТ  . . ."
+
+#: src/sst.py:1890
+msgid " No response, sir!"
+msgstr " Без реакции, сэр!"
+
+#: src/sst.py:1951
 msgid " caught in long range tractor beam--"
 msgstr " пойман дальнобойным буксирным лучём--"
 
-#: src/events.c:218
+#: src/sst.py:1963
 msgid "Galileo, left on the planet surface, is captured"
 msgstr "Галилей, оставшийся на планете, схвачен"
 
-#: src/events.c:219
+#: src/sst.py:1964
 msgid "by aliens and made into a flying McDonald's."
 msgstr "инопланетянами и превращён в летательный МакДональдс."
 
-#: src/events.c:224
+#: src/sst.py:1968
 msgid "Galileo, left on the planet surface, is well hidden."
 msgstr "Галилей, оставшийся на планете, хорошо спрятан."
 
-#: src/events.c:233
-msgid " is pulled to "
-msgstr " затянут в "
+#: src/sst.py:1974
+#, python-format
+msgid " is pulled to Quadrant %s, Sector %s"
+msgstr ""
 
-#: src/events.c:238
+#: src/sst.py:1977
 msgid "(Remainder of rest/repair period cancelled.)"
 msgstr "(Остаток периода отдыха/ремонта отменён.)"
 
-#: src/events.c:247
+#: src/sst.py:1984
 msgid "(Shields not currently useable.)"
 msgstr "(Защита в нерабочем состоянии.)"
 
-#: src/events.c:302
-msgid "   reports that it is under attack and that it can"
-msgstr "   сообщает, что она атакована и сможет"
-
-#: src/events.c:303
-#, c-format
-msgid "   hold out only until stardate %d"
-msgstr "   продержаться до даты %d.\""
-
-#: src/events.c:340
+#: src/sst.py:2004
 msgid "Spock-  \"Captain, I believe the starbase has been destroyed.\""
 msgstr "Спок- \"Капитан, я чувствую, что база уничтожена.\""
 
-#: src/events.c:347
+#: src/sst.py:2009
 msgid "Lt. Uhura-  \"Captain, Starfleet Command reports that"
 msgstr "Лт. Ухура- \"Капитан, штаб звёздного флота сообщает"
 
-#: src/events.c:348
-msgid "   the starbase in "
-msgstr "   база в "
+#: src/sst.py:2010
+#, python-format
+msgid "   the starbase in Quadrant %s has been destroyed by"
+msgstr "   база в Квадранте %s уничтожена"
 
-#: src/events.c:350
-msgid " has been destroyed by"
-msgstr " уничтожена"
-
-#: src/events.c:352
+#: src/sst.py:2012
 msgid "the Klingon Super-Commander"
 msgstr "Глав-комом Клингонов"
 
-#: src/events.c:354
+#: src/sst.py:2014
 msgid "a Klingon Commander"
 msgstr "Командиром Клингонов"
 
-#: src/events.c:392
+#: src/sst.py:2090
+msgid "Lt. Uhura- \"Captain, the sub-space radio is working and"
+msgstr "Лт. Ухура- \"Капитан, космическая рация работает и"
+
+#: src/sst.py:2091
+msgid "   surveillance reports are coming in."
+msgstr "   принимает информацию из центра наблюдения."
+
+#: src/sst.py:2097
+msgid "   The star chart is now up to date.\""
+msgstr "   Звёздная карта обновлена."
+
+#: src/sst.py:2171
+msgid "   reports that it is under attack and that it can"
+msgstr "   сообщает, что она атакована и сможет"
+
+#: src/sst.py:2172
+#, python-format
+msgid "   hold out only until stardate %d.\""
+msgstr "   продержаться только до даты %d.\""
+
+#: src/sst.py:2212
 msgid "Lt. Uhura-  \"The deep space probe "
 msgstr "Лт. Ухура- \"Дальнобойная космическая ракета "
 
-#: src/events.c:394
-msgid "has left the galaxy"
-msgstr "покинула галактику"
+#: src/sst.py:2214
+msgid "has left the galaxy.\""
+msgstr "покинула галактику.\""
 
-#: src/events.c:396
-msgid "is no longer transmitting"
-msgstr "больше не передаёт"
+#: src/sst.py:2216
+msgid "is no longer transmitting.\""
+msgstr "больше не передаёт.\""
 
-#: src/events.c:405
-msgid "Lt. Uhura-  \"The deep space probe is now in "
-msgstr "Лт. Ухура- \"Дальнобойная космическая ракета сейчас в "
+#: src/sst.py:2222
+#, python-format
+msgid "Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\""
+msgstr "Лт. Ухура- \"Дальнобойная космическая ракета сейчас в Квадранте %s.\""
 
-#: src/events.c:460
-#, c-format
-msgid "Uhura- Captain, %s in %s reports it is under attack"
-msgstr "Ухура- Капитан, %s на %s сообщает, что они подверглись атаке"
+#: src/sst.py:2261
+#, python-format
+msgid "Uhura- Captain, %s in Quadrant %s reports it is under attack"
+msgstr "Ухура- Капитан, %s в Квадранте %s сообщают, что они подверглись атаке"
 
-#: src/events.c:462
+#: src/sst.py:2263
 msgid "by a Klingon invasion fleet."
 msgstr "захватнического флота Клингонов."
 
-#: src/events.c:484
-#, c-format
+#: src/sst.py:2281
+#, python-format
 msgid "Uhura- We've lost contact with starsystem %s"
 msgstr "Ухура- Мы потеряли контакт с системой %s"
 
-#: src/events.c:486 src/events.c:542
-#, c-format
-msgid "in %s.\n"
-msgstr "в %s.\n"
+#: src/sst.py:2283
+#, python-format
+msgid "in Quadrant %s.\n"
+msgstr "в Квадранте %s.\n"
 
-#: src/events.c:536
+#: src/sst.py:2324
 msgid "Spock- sensors indicate the Klingons have"
 msgstr "Спок- судя по показаниям сенсоров, Клингоны"
 
-#: src/events.c:537
-#, c-format
+#: src/sst.py:2325
+#, python-format
 msgid "launched a warship from %s."
 msgstr "запустили военный корабль с %s."
 
-#: src/events.c:539
+#: src/sst.py:2327
 msgid "Uhura- Starfleet reports increased Klingon activity"
 msgstr "Ухура- Звёздный Флот сообщает об усилившейся активности Клингонов"
 
-#: src/events.c:541
-#, c-format
+#: src/sst.py:2329
+#, python-format
 msgid "near %s"
 msgstr "около %s."
 
-#: src/events.c:562
+#: src/sst.py:2330
+#, python-format
+msgid "in Quadrant %s."
+msgstr "в Квадранте %s."
+
+#: src/sst.py:2339
 msgid "How long? "
 msgstr "Какой срок? "
 
-#: src/events.c:573
+#: src/sst.py:2348
 msgid "Are you sure? "
 msgstr "Вы уверены? "
 
-#: src/events.c:585
-#, c-format
+#: src/sst.py:2357
+#, python-format
 msgid "%d stardates left."
 msgstr "Осталось %d дней."
 
-#: src/events.c:642 src/events.c:683
+#: src/sst.py:2393 src/sst.py:2423
 msgid " novas."
 msgstr " взорвалась."
 
-#: src/events.c:716
+#: src/sst.py:2449
 msgid "***Starship buffeted by nova."
 msgstr "***Звездолёт отбросило взрывом звезды."
 
-#: src/events.c:725
+#: src/sst.py:2458
 msgid "***Shields knocked out."
 msgstr "***Защита разбита."
 
-#: src/events.c:757
+#: src/sst.py:2478
 msgid " damaged"
 msgstr " повреждён"
 
-#: src/events.c:765
+#: src/sst.py:2485
 msgid ", blasted into "
 msgstr ", долбанулся в "
 
-#: src/events.c:776
-msgid ", buffeted to "
-msgstr " отлетел в "
+#: src/sst.py:2493
+#, python-format
+msgid ", buffeted to Sector %s"
+msgstr ", отлетел в Сектор %s"
 
-#: src/events.c:807
+#: src/sst.py:2507
 msgid "Force of nova displaces starship."
 msgstr "Взрыв звезды смещает звездолёт."
 
-#: src/events.c:853
-#, c-format
+#: src/sst.py:2542
+#, python-format
 msgid "Message from Starfleet Command       Stardate %.2f"
 msgstr "Сообщение от штаба Звёздного Флота       Дата %.2f"
 
-#: src/events.c:854
-#, c-format
-msgid "     Supernova in %s; caution advised."
-msgstr "     Взрыв сверхновой в %s; соблюдайте осторожность."
+#: src/sst.py:2543
+#, python-format
+msgid "     Supernova in Quadrant %s; caution advised."
+msgstr "     Взрыв сверхновой в Квадранте %s; соблюдайте осторожность."
 
-#: src/events.c:877
-#, c-format
-msgid "***Incipient supernova detected at %s"
-msgstr "***Зарегистрирован взрыв сверхновой в %s"
+#: src/sst.py:2559
+#, python-format
+msgid "***Incipient supernova detected at Sector %s"
+msgstr "***Зарегистрирован взрыв сверхновой в Секторе %s"
 
-#: src/events.c:879
+#: src/sst.py:2561
 msgid "Emergency override attempts t"
 msgstr "Автопилот пытается в"
 
-#: src/events.c:947
+#: src/sst.py:2605
 msgid "Lucky you!"
 msgstr "Повезло!"
 
-#: src/events.c:948
-#, c-format
+#: src/sst.py:2606
+#, python-format
 msgid "A supernova in %s has just destroyed the last Klingons."
 msgstr "Сверхновая в %s как раз уничтожила последних Клингонов."
 
-#: src/finish.c:11
+#: src/sst.py:2620
 msgid "Computer damaged; cannot execute destruct sequence."
 msgstr "Компьютер сломан; невозможно запустить программу самоуничтожения."
 
-#: src/finish.c:15
+#: src/sst.py:2623
 msgid "SELF-DESTRUCT-SEQUENCE-ACTIVATED"
 msgstr "ПРОГРАММА-САМОУНИЧТОЖЕНИЯ-ЗАПУЩЕНА"
 
-#: src/finish.c:22
+#: src/sst.py:2630
 msgid "ENTER-CORRECT-PASSWORD-TO-CONTINUE-"
 msgstr "ВВЕДИТЕ-ПАРОЛЬ-ДЛЯ-ПРОДОЛЖЕНИЯ-"
 
-#: src/finish.c:24
+#: src/sst.py:2632
 msgid "SELF-DESTRUCT-SEQUENCE-OTHERWISE-"
 msgstr "САМОУНИЧТОЖЕНИЯ-А-ИНАЧЕ-"
 
-#: src/finish.c:26
+#: src/sst.py:2634
 msgid "SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"
 msgstr "САМОУНИЧТОЖЕНИЕ-БУДЕТ-ПРЕРВАНО"
 
-#: src/finish.c:31
+#: src/sst.py:2639
 msgid "PASSWORD-REJECTED;"
 msgstr "ПАРОЛЬ-НЕ-ПРИНЯТ"
 
-#: src/finish.c:33
+#: src/sst.py:2641
 msgid "CONTINUITY-EFFECTED"
 msgstr "ПРОДОЛЖАЕМ-ЖИТЬ"
 
-#: src/finish.c:37
+#: src/sst.py:2644
 msgid "PASSWORD-ACCEPTED"
 msgstr "ПАРОЛЬ-ПРИНЯТ"
 
-#: src/finish.c:44
+#: src/sst.py:2651
 msgid "GOODBYE-CRUEL-WORLD"
 msgstr "ПРОЩАЙ-ЖЕСТОКИЙ-МИР"
 
-#: src/finish.c:55
-msgid "********* Entropy of "
-msgstr "********* Ентропия корабля "
+#: src/sst.py:2659
+#, python-format
+msgid "********* Entropy of %s maximized *********"
+msgstr "********* Ентропия корабля %s достигла критического уровня *********"
 
-#: src/finish.c:57
-msgid " maximized *********"
-msgstr " возрасла *********"
-
-#: src/finish.c:80
-#, c-format
+#: src/sst.py:2702
+#, python-format
 msgid "It is stardate %.1f."
 msgstr "Сегодня %.1f число."
 
-#: src/finish.c:85
-#, c-format
+#: src/sst.py:2706
+#, python-format
 msgid "The remaining %d Romulans surrender to Starfleet Command."
 msgstr "Оставшиеся %d Ромулан сдались Звёздному Флоту."
 
-#: src/finish.c:88
+#: src/sst.py:2709
 msgid "You have smashed the Klingon invasion fleet and saved"
 msgstr "Вы сокрушили флот Клингоновских захватчиков и спасли"
 
-#: src/finish.c:89
+#: src/sst.py:2710
 msgid "the Federation."
 msgstr "Федерацию."
 
-#: src/finish.c:106
+#: src/sst.py:2720
 msgid "In fact, you have done so well that Starfleet Command"
 msgstr "По правде говоря, вы действовали так умело, что штаб Звёздного Флота"
 
-#: src/finish.c:111
+#: src/sst.py:2722
 msgid "promotes you one step in rank from \"Novice\" to \"Fair\"."
 msgstr "повышает ваш ранг от Новичка до Среднего."
 
-#: src/finish.c:114
+#: src/sst.py:2724
 msgid "promotes you one step in rank from \"Fair\" to \"Good\"."
 msgstr "повышает ваш ранг от Среднего до Умелого."
 
-#: src/finish.c:117
+#: src/sst.py:2726
 msgid "promotes you one step in rank from \"Good\" to \"Expert\"."
 msgstr "повышает ваш ранг от Умелого до Специалиста."
 
-#: src/finish.c:120
+#: src/sst.py:2728
 msgid "promotes you to Commodore Emeritus."
 msgstr "возводит вас на должность Отставного Капитана."
 
-#: src/finish.c:122
+#: src/sst.py:2730
 msgid "Now that you think you're really good, try playing"
 msgstr "Теперь, когда вы считаете себя хорошим игроком, попытайтесь сыграть"
 
-#: src/finish.c:123
+#: src/sst.py:2731
 msgid "the \"Emeritus\" game. It will splatter your ego."
 msgstr "за \"Emeritus\". Это охладит ваш пыл."
 
-#: src/finish.c:127
+#: src/sst.py:2734
 msgid "Computer-  "
 msgstr "Компьютер-  "
 
-#: src/finish.c:128
+#: src/sst.py:2735
 msgid "ERROR-ERROR-ERROR-ERROR"
 msgstr "СБОЙ-СБОЙ-СБОЙ-ОШИБКА"
 
-#: src/finish.c:130
+#: src/sst.py:2737
 msgid "  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM"
 msgstr "  ВАШЕ-МАСТЕРСТВО-НЕПОДВЛАСТНО-ЭТОЙ-ПРОГРАММЕ"
 
-#: src/finish.c:132 src/finish.c:134 src/finish.c:136
+#: src/sst.py:2739 src/sst.py:2741 src/sst.py:2743
 msgid "  THIS-PROGRAM-MUST-SURVIVE"
 msgstr ""
 
-#: src/finish.c:138
+#: src/sst.py:2745
 msgid "  THIS-PROGRAM-MUST?- MUST ? - SUR? ? -?  VI"
 msgstr ""
 
-#: src/finish.c:140
+#: src/sst.py:2747
 msgid "Now you can retire and write your own Star Trek game!"
 msgstr "Теперь вы можете уйти на пенсию и написать свою игру Star Trek!"
 
-#: src/finish.c:146
+#: src/sst.py:2751
 msgid "You cannot get a citation, so..."
 msgstr "Вам не положена грамота, так что..."
 
-#: src/finish.c:148
+#: src/sst.py:2753
 msgid "Do you want your Commodore Emeritus Citation printed? "
 msgstr "Хотите распечатать вашу грамоту Отставного Капитана? "
 
-#: src/finish.c:158 src/finish.c:172
+#: src/sst.py:2759 src/sst.py:2772
 msgid "LIVE LONG AND PROSPER."
 msgstr "ЖИВИТЕ ДОЛГО И СЧАСТЛИВО."
 
-#: src/finish.c:165
+#: src/sst.py:2765
 msgid "Your time has run out and the Federation has been"
 msgstr "Ваше время истекло и Федерация была"
 
-#: src/finish.c:166
+#: src/sst.py:2766
 msgid "conquered.  Your starship is now Klingon property,"
 msgstr "захвачена.  Ваш звездолёт стал собственностью Клингонов,"
 
-#: src/finish.c:167
+#: src/sst.py:2767
 msgid "and you are put on trial as a war criminal.  On the"
 msgstr "а вы попали на скамью подсудимых как военный преступник.  Рассмотрев"
 
-#: src/finish.c:168
+#: src/sst.py:2768
 msgid "basis of your record, you are "
 msgstr "содеянное вами, вас "
 
-#: src/finish.c:170
+#: src/sst.py:2770
 msgid "acquitted."
 msgstr "освободили."
 
-#: src/finish.c:175
+#: src/sst.py:2774
 msgid "found guilty and"
 msgstr "признали виновным и"
 
-#: src/finish.c:176
+#: src/sst.py:2775
 msgid "sentenced to death by slow torture."
 msgstr "приговорили к смерти на медленном огне."
 
-#: src/finish.c:182
+#: src/sst.py:2780
 msgid "Your life support reserves have run out, and"
 msgstr "Резервы жизнеобеспечения иссякли и"
 
-#: src/finish.c:183
+#: src/sst.py:2781
 msgid "you die of thirst, starvation, and asphyxiation."
 msgstr "вы погибли от жажды, голода и удушья."
 
-#: src/finish.c:184 src/finish.c:189 src/finish.c:284
+#: src/sst.py:2782 src/sst.py:2786 src/sst.py:2857
 msgid "Your starship is a derelict in space."
 msgstr "Ваш звездолёт стал космическим мусором."
 
-#: src/finish.c:187
+#: src/sst.py:2784
 msgid "Your energy supply is exhausted."
 msgstr "Источники энергии иссякли."
 
-#: src/finish.c:192 src/finish.c:211 src/finish.c:230 src/moving.c:752
-msgid "The "
-msgstr " "
+#: src/sst.py:2788
+#, python-format
+msgid "The %s has been destroyed in battle."
+msgstr "%s был уничтожен в бою."
 
-#: src/finish.c:194
-msgid "has been destroyed in battle."
-msgstr " был уничтожен в бою."
-
-#: src/finish.c:196
+#: src/sst.py:2790
 msgid "Dulce et decorum est pro patria mori."
 msgstr ""
 
-#: src/finish.c:199
+#: src/sst.py:2792
 msgid "You have made three attempts to cross the negative energy"
 msgstr "Вы три раза пытались пересечь негативный энергетический"
 
-#: src/finish.c:200
+#: src/sst.py:2793
 msgid "barrier which surrounds the galaxy."
 msgstr "барьер, окружающий галактику."
 
-#: src/finish.c:202
+#: src/sst.py:2795
 msgid "Your navigation is abominable."
 msgstr "Вы не умеете управлять кораблём."
 
-#: src/finish.c:206
+#: src/sst.py:2798
 msgid "Your starship has been destroyed by a nova."
 msgstr "Ваш звездолёт уничтожен взрывом звезды."
 
-#: src/finish.c:207 src/finish.c:251
+#: src/sst.py:2799 src/sst.py:2829
 msgid "That was a great shot."
 msgstr "Это был отличный выстрел."
 
-#: src/finish.c:213
-msgid " has been fried by a supernova."
-msgstr " был поджарен взрывом сверхновой."
+#: src/sst.py:2802
+#, python-format
+msgid "The %s has been fried by a supernova."
+msgstr "%s был поджарен взрывом сверхновой."
 
-#: src/finish.c:214
+#: src/sst.py:2803
 msgid "...Not even cinders remain..."
 msgstr "...И угольков-то не осталось..."
 
-#: src/finish.c:217
+#: src/sst.py:2805
 msgid "You have been captured by the Klingons. If you still"
 msgstr "Вас захватили Клингоны. Будь у вас"
 
-#: src/finish.c:218
+#: src/sst.py:2806
 msgid "had a starbase to be returned to, you would have been"
 msgstr "хотя бы база, вас бы могли"
 
-#: src/finish.c:219
+#: src/sst.py:2807
 msgid "repatriated and given another chance. Since you have"
 msgstr "спасти и дать ещё шанс. А так -"
 
-#: src/finish.c:220
+#: src/sst.py:2808
 msgid "no starbases, you will be mercilessly tortured to death."
 msgstr "вас безжалостно замучают и казнят."
 
-#: src/finish.c:223
+#: src/sst.py:2810
 msgid "Your starship is now an expanding cloud of subatomic particles"
 msgstr "Ваш звездолёт стал облаком субатомных частиц"
 
-#: src/finish.c:226
+#: src/sst.py:2812
 msgid "Starbase was unable to re-materialize your starship."
 msgstr "База не смогла материализовать ваш звездолёт."
 
-#: src/finish.c:227
+#: src/sst.py:2813
 msgid "Sic transit gloria mundi"
 msgstr ""
 
-#: src/finish.c:232
-msgid " has been cremated by its own phasers."
-msgstr " сожжён собственными фазерами."
+#: src/sst.py:2815
+#, python-format
+msgid "The %s has been cremated by its own phasers."
+msgstr "%s сожжён собственными фазерами."
 
-#: src/finish.c:235
+#: src/sst.py:2817
 msgid "You and your landing party have been"
 msgstr "Вы и ваш отряд"
 
-#: src/finish.c:236
+#: src/sst.py:2818
 msgid "converted to energy, disipating through space."
 msgstr "превратились в энергию, рассеевшуюся в пространстве."
 
-#: src/finish.c:239
+#: src/sst.py:2820
 msgid "You are left with your landing party on"
 msgstr "Вы с отрядом остались на"
 
-#: src/finish.c:240
+#: src/sst.py:2821
 msgid "a wild jungle planet inhabited by primitive cannibals."
 msgstr "планете диких джунглей, населённых примитивными людоедами."
 
-#: src/finish.c:242
+#: src/sst.py:2823
 msgid "They are very fond of \"Captain Kirk\" soup."
 msgstr "Им очень понравился \"Капитанский\" суп."
 
-#: src/finish.c:244 src/finish.c:270
-msgid "Without your leadership, the "
-msgstr "Без вашего руководства, "
+#: src/sst.py:2825 src/sst.py:2847
+#, python-format
+msgid "Without your leadership, the %s is destroyed."
+msgstr "Без вашего руководства %s погиб."
 
-#: src/finish.c:246 src/finish.c:272
-msgid " is destroyed."
-msgstr " уничтожен."
-
-#: src/finish.c:249
+#: src/sst.py:2827
 msgid "You and your mining party perish."
 msgstr "Вы и ваш отряд умерли."
 
-#: src/finish.c:255
+#: src/sst.py:2832
 msgid "The Galileo is instantly annihilated by the supernova."
 msgstr "Галилей мгновенно испарился от взрыва сверхновой."
 
-#: src/finish.c:258
+#: src/sst.py:2833 src/sst.py:2838
 msgid "You and your mining party are atomized."
 msgstr "Вы с вашим отрядом распались на атомы."
 
-#: src/finish.c:260
-msgid "Mr. Spock takes command of the "
-msgstr "Мистер Спок принимает командование "
+#: src/sst.py:2835 src/sst.py:2840
+#, python-format
+msgid "Mr. Spock takes command of the %s and"
+msgstr "Мистер Спок принимает командование кораблём %s и"
 
-#: src/finish.c:262
-msgid " and"
-msgstr " и "
-
-#: src/finish.c:263
-msgid "joins the Romulans, reigning terror on the Federation."
+#: src/sst.py:2836 src/sst.py:2841
+msgid "joins the Romulans, wreaking terror on the Federation."
 msgstr "присоединяется к Ромуланам, усиливая террор Федерации."
 
-#: src/finish.c:266
+#: src/sst.py:2843
 msgid "The shuttle craft Galileo is also caught,"
 msgstr "Челнок Галилей тоже попался"
 
-#: src/finish.c:267
+#: src/sst.py:2844
 msgid "and breaks up under the strain."
 msgstr "и разломался от давления."
 
-#: src/finish.c:269
+#: src/sst.py:2846
 msgid "Your debris is scattered for millions of miles."
 msgstr "Ваши кости разлетелись на миллионы миль."
 
-#: src/finish.c:275
+#: src/sst.py:2849
 msgid "The mutants attack and kill Spock."
 msgstr "Мутанты напали первыми и убили Спока."
 
-#: src/finish.c:276
+#: src/sst.py:2850
 msgid "Your ship is captured by Klingons, and"
 msgstr "Ваш звездолёт пойман клингонами и"
 
-#: src/finish.c:277
+#: src/sst.py:2851
 msgid "your crew is put on display in a Klingon zoo."
 msgstr "ваш экипаж выставлен на показ в зоопарке."
 
-#: src/finish.c:280
+#: src/sst.py:2853
 msgid "Tribbles consume all remaining water,"
 msgstr "Червяки извели всю оставшуюся воду,"
 
-#: src/finish.c:281
+#: src/sst.py:2854
 msgid "food, and oxygen on your ship."
 msgstr "пищу и кислород на корабле."
 
-#: src/finish.c:283
+#: src/sst.py:2856
 msgid "You die of thirst, starvation, and asphyxiation."
 msgstr "Вы умерли от жажды, голода и удушья."
 
-#: src/finish.c:287
+#: src/sst.py:2859
 msgid "Your ship is drawn to the center of the black hole."
 msgstr "Ваш корабль занесло прямо в центр чёрной дыры."
 
-#: src/finish.c:288
+#: src/sst.py:2860
 msgid "You are crushed into extremely dense matter."
 msgstr "Вас расплющило до состояния сверхтвёрдого вещества."
 
-#: src/finish.c:291
+#: src/sst.py:2862
 msgid "Your last crew member has died."
 msgstr "Последний член вашей команды погиб."
 
-#: src/finish.c:303
+#: src/sst.py:2872
 msgid "As a result of your actions, a treaty with the Klingon"
 msgstr "В результате ваших действий, с империей Клингонов"
 
-#: src/finish.c:304
+#: src/sst.py:2873
 msgid "Empire has been signed. The terms of the treaty are"
 msgstr "удалось подписать договор. Условия этого договора"
 
-#: src/finish.c:306
+#: src/sst.py:2875
 msgid "favorable to the Federation."
 msgstr "выгодны для Федерации."
 
-#: src/finish.c:308
+#: src/sst.py:2877
 msgid "Congratulations!"
 msgstr "Поздравляем!"
 
-#: src/finish.c:311
+#: src/sst.py:2879
 msgid "highly unfavorable to the Federation."
 msgstr "крайне не выгодны для Федерации."
 
-#: src/finish.c:314
+#: src/sst.py:2881
 msgid "The Federation will be destroyed."
 msgstr "Федерация погибнет."
 
-#: src/finish.c:317
+#: src/sst.py:2883
 msgid "Since you took the last Klingon with you, you are a"
 msgstr "Поскольку вы забрали на тот свет последнего Клингона, вы теперь"
 
-#: src/finish.c:318
+#: src/sst.py:2884
 msgid "martyr and a hero. Someday maybe they'll erect a"
 msgstr "мученик и герой. Возможно однажды даже поставят"
 
-#: src/finish.c:319
+#: src/sst.py:2885
 msgid "statue in your memory. Rest in peace, and try not"
 msgstr "статую в вашу честь. Покойтесь с миром и постарайтесь не"
 
-#: src/finish.c:320
+#: src/sst.py:2886
 msgid "to think about pigeons."
 msgstr "думать о голубях."
 
-#: src/finish.c:354
+#: src/sst.py:2919
 msgid "Your score --"
 msgstr "Ваш счёт --"
 
-#: src/finish.c:356
-#, c-format
+#: src/sst.py:2921
+#, python-format
 msgid "%6d Romulans destroyed                 %5d"
 msgstr "%6d Ромулан уничтожено                 %5d"
 
-#: src/finish.c:359
-#, c-format
+#: src/sst.py:2924
+#, python-format
 msgid "%6d Romulans captured                  %5d"
 msgstr "%6d Ромулан захвачено                  %5d"
 
-#: src/finish.c:362
-#, c-format
+#: src/sst.py:2927
+#, python-format
 msgid "%6d ordinary Klingons destroyed        %5d"
 msgstr "%6d рядовых Клингонов уничтожено        %5d"
 
-#: src/finish.c:365
-#, c-format
+#: src/sst.py:2930
+#, python-format
 msgid "%6d Klingon commanders destroyed       %5d"
 msgstr "%6d Клингоновских командиров уничтожено       %5d"
 
-#: src/finish.c:368
-#, c-format
+#: src/sst.py:2933
+#, python-format
 msgid "%6d Super-Commander destroyed          %5d"
 msgstr "%6d Глав-комов уничтожено          %5d"
 
-#: src/finish.c:371
-#, c-format
+#: src/sst.py:2936
+#, python-format
 msgid "%6.2f Klingons per stardate              %5d"
 msgstr "%6.2f Клингонов в день              %5d"
 
-#: src/finish.c:374
-#, c-format
+#: src/sst.py:2939
+#, python-format
 msgid "%6d stars destroyed by your action     %5d"
 msgstr "%6d звёзд уничтожено     %5d"
 
-#: src/finish.c:377
-#, c-format
+#: src/sst.py:2942
+#, python-format
 msgid "%6d planets destroyed by your action   %5d"
 msgstr "%6d планет уничтожено   %5d"
 
-#: src/finish.c:380
-#, c-format
+#: src/sst.py:2945
+#, python-format
 msgid "%6d inhabited planets destroyed by your action   %5d"
 msgstr "%6d обитаемых планет уничтожено   %5d"
 
-#: src/finish.c:383
-#, c-format
+#: src/sst.py:2948
+#, python-format
 msgid "%6d bases destroyed by your action     %5d"
 msgstr "%6d баз уничтожено     %5d"
 
-#: src/finish.c:386
-#, c-format
+#: src/sst.py:2951
+#, python-format
 msgid "%6d calls for help from starbase       %5d"
 msgstr "%6d обращений за помощью к базе       %5d"
 
-#: src/finish.c:389
-#, c-format
+#: src/sst.py:2954
+#, python-format
 msgid "%6d casualties incurred                %5d"
 msgstr "%6d человек пострадали                %5d"
 
-#: src/finish.c:392
-#, c-format
+#: src/sst.py:2957
+#, python-format
 msgid "%6d crew abandoned in space            %5d"
 msgstr "%6d человек остались в космосе        %5d"
 
-#: src/finish.c:395
-#, c-format
+#: src/sst.py:2960
+#, python-format
 msgid "%6d ship(s) lost or destroyed          %5d"
 msgstr "%6d корабль(ей) потеряно          %5d"
 
-#: src/finish.c:398
+#: src/sst.py:2963
 msgid "Penalty for getting yourself killed        -200"
 msgstr "Расплата за собственную гибель        -200"
 
-#: src/finish.c:400
+#: src/sst.py:2965
 msgid "Bonus for winning "
 msgstr "Награда за победу в "
 
-#: src/finish.c:403
+#: src/sst.py:2966
 msgid "Novice game  "
 msgstr "игре Новичка  "
 
-#: src/finish.c:404
+#: src/sst.py:2967
 msgid "Fair game    "
 msgstr "игре Среднего    "
 
-#: src/finish.c:405
+#: src/sst.py:2968
 msgid "Good game    "
 msgstr "игре Умелого    "
 
-#: src/finish.c:406
+#: src/sst.py:2969
 msgid "Expert game  "
 msgstr "игре Специалиста  "
 
-#: src/finish.c:407
+#: src/sst.py:2970
 msgid "Emeritus game"
 msgstr "игре Отставного Капитана"
 
-#: src/finish.c:412
-#, c-format
+#: src/sst.py:2973
+#, python-format
 msgid "TOTAL SCORE                               %5d"
 msgstr "ОБЩИЙ СЧЁТ                               %5d"
 
-#: src/finish.c:426
+#: src/sst.py:2979
 msgid "File or device name for your plaque: "
 msgstr "Имя файла или устройства для грамоты: "
 
-#: src/finish.c:430
+#: src/sst.py:2985
 msgid "Invalid name."
 msgstr "Неправельное имя."
 
-#: src/finish.c:434
+#: src/sst.py:2987
 msgid "Enter name to go on plaque (up to 30 characters): "
 msgstr "Введите своё имя для грамоты (до 30 знаков): "
 
-#: src/finish.c:458
-#, c-format
+#: src/sst.py:3010
 msgid ""
 "                                                       U. S. S. ENTERPRISE\n"
 msgstr "                                                       ЭНТЕРПРАЙЗ\n"
 
-#: src/finish.c:460
-#, c-format
+#: src/sst.py:3012
 msgid ""
 "                                  For demonstrating outstanding ability as a "
 "starship captain\n"
 msgstr "                                  За проявленный героизм\n"
 
-#: src/finish.c:462
-#, c-format
+#: src/sst.py:3014
 msgid ""
 "                                                Starfleet Command bestows to "
 "you\n"
@@ -1294,8 +1281,7 @@ msgstr ""
 "                                                Штаб Звёздного Флота "
 "присваивает вам\n"
 
-#: src/finish.c:465
-#, c-format
+#: src/sst.py:3017
 msgid ""
 "                                                           the rank of\n"
 "\n"
@@ -1303,8 +1289,7 @@ msgstr ""
 "                                                           звание\n"
 "\n"
 
-#: src/finish.c:466
-#, c-format
+#: src/sst.py:3018
 msgid ""
 "                                                       \"Commodore Emeritus"
 "\"\n"
@@ -1314,8 +1299,7 @@ msgstr ""
 "\"\n"
 "\n"
 
-#: src/finish.c:469
-#, c-format
+#: src/sst.py:3021
 msgid ""
 " Expert level\n"
 "\n"
@@ -1323,8 +1307,7 @@ msgstr ""
 " Уровень Специалиста\n"
 "\n"
 
-#: src/finish.c:470
-#, c-format
+#: src/sst.py:3023
 msgid ""
 "Emeritus level\n"
 "\n"
@@ -1332,8 +1315,7 @@ msgstr ""
 "Уровень Отставника\n"
 "\n"
 
-#: src/finish.c:471
-#, c-format
+#: src/sst.py:3025
 msgid ""
 " Cheat level\n"
 "\n"
@@ -1341,8 +1323,8 @@ msgstr ""
 " Уровень Мошенника\n"
 "\n"
 
-#: src/finish.c:475
-#, c-format
+#: src/sst.py:3027
+#, python-format
 msgid ""
 "                                                 This day of %.6s %.4s, "
 "%.8s\n"
@@ -1352,8 +1334,8 @@ msgstr ""
 "%.8s\n"
 "\n"
 
-#: src/finish.c:477
-#, c-format
+#: src/sst.py:3029
+#, python-format
 msgid ""
 "                                                        Your score:  %d\n"
 "\n"
@@ -1361,1997 +1343,2020 @@ msgstr ""
 "                                                        Ваш счёт:  %d\n"
 "\n"
 
-#: src/finish.c:478
-#, c-format
+#: src/sst.py:3030
+#, python-format
 msgid ""
 "                                                    Klingons per stardate:  "
 "%.2f\n"
 msgstr ""
 "                                                    Клингонов в день:  %.2f\n"
 
-#: src/io.c:96
-msgid "[ANOUNCEMENT ARRIVING...]"
+#: src/sst.py:3090
+msgid "[ANNOUNCEMENT ARRIVING...]"
 msgstr "[ПОСТУПИЛО СООБЩЕНИЕ...]"
 
-#: src/io.c:98
-msgid "[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]"
-msgstr "[ПОСТУПИЛО ВАЖНОЕ СООБЩЕНИЕ -- НАЖМИТЕ ВВОД ДЛЯ ПРОДОЛЖЕНИЯ]"
-
-#: src/io.c:107
+#: src/sst.py:3095
 msgid "[CONTINUE?]"
 msgstr "[ПРОДОЛЖИТЬ?]"
 
-#: src/io.c:109
+#: src/sst.py:3097
 msgid "[PRESS ENTER TO CONTINUE]"
 msgstr "[НАЖМИТЕ ВВОД ДЛЯ ПРОДОЛЖЕНИЯ]"
 
-#: src/io.c:400
-#, c-format
+#: src/sst.py:3273
+#, python-format
 msgid "Track for torpedo number %d-  "
-msgstr "Трасса торпеды номер %d- "
+msgstr "Трасса торпеды номер %d-  "
 
-#: src/io.c:404
+#: src/sst.py:3276
 msgid "Torpedo track- "
 msgstr "Трасса торпеды- "
 
-#: src/moving.c:19
-msgid "Helmsman Sulu- \"Leaving standard orbit.\""
-msgstr "Кормчий Сулу- \"Уходим с орбиты.\""
-
-#: src/moving.c:107
+#: src/sst.py:3373
 msgid "YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER"
 msgstr "ВЫ ПЫТАЕТЕСЬ ПЕРЕСЕЧЬ ОТРИЦАТЕЛЬНЫЙ ЭНЕРГЕТИЧЕСКИЙ БАРЬЕР"
 
-#: src/moving.c:108
+#: src/sst.py:3374
 msgid "AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,"
 msgstr "НА ГРАНИЦЕ ГАЛАКТИКИ.  ЕЩЁ ПАРУ РАЗ ТАК СДЕЛАЕТЕ,"
 
-#: src/moving.c:109
+#: src/sst.py:3375
 msgid "YOU WILL BE DESTROYED."
 msgstr "И ПЕНЯЙТЕ НА СЕБЯ."
 
-#: src/moving.c:119
-#, c-format
-msgid "Entering %s."
-msgstr "Входим в %s."
+#: src/sst.py:3382
+#, python-format
+msgid "Entering Quadrant %s."
+msgstr "Входим в Квадрант %s."
 
-#: src/moving.c:148
-msgid " pulled into black hole at "
-msgstr " затянут в чёрную дыру в "
+#: src/sst.py:3404
+#, python-format
+msgid " pulled into black hole at Sector %s"
+msgstr " затянут в чёрную дыру в Секторе %s"
 
-#: src/moving.c:170
-msgid " encounters Tholian web at "
-msgstr " обнаружил Толианскую сеть в "
+#: src/sst.py:3423
+#, python-format
+msgid " encounters Tholian web at %s;"
+msgstr " обнаружил Толианскую сеть в %s;"
 
-#: src/moving.c:172
-msgid " blocked by object at "
-msgstr " остановлен объектом в "
+#: src/sst.py:3425
+#, python-format
+msgid " blocked by object at %s;"
+msgstr " остановлен объектом в %s;"
 
-#: src/moving.c:175
+#: src/sst.py:3426
 msgid "Emergency stop required "
 msgstr "Экстренная остановка потребовала "
 
-#: src/moving.c:176
-#, c-format
+#: src/sst.py:3427
+#, python-format
 msgid "%2d units of energy."
 msgstr "%2d единиц энергии."
 
-#: src/moving.c:220
+#: src/sst.py:3436
+msgid "Helmsman Sulu- \"Leaving standard orbit.\""
+msgstr "Кормчий Сулу- \"Уходим с орбиты.\""
+
+#: src/sst.py:3478
 msgid "Already docked."
 msgstr "И так уже пришвартован."
 
-#: src/moving.c:224
+#: src/sst.py:3481
 msgid "You must first leave standard orbit."
 msgstr "Сначала вы должны уйти с орбиты."
 
-#: src/moving.c:229
+#: src/sst.py:3484
 msgid " not adjacent to base."
 msgstr " вне досягаемости базы."
 
-#: src/moving.c:234
+#: src/sst.py:3488
 msgid "Docked."
 msgstr "Пришвартован."
 
-#: src/moving.c:245
+#: src/sst.py:3499
 msgid "Lt. Uhura- \"Captain, an important message from the starbase:\""
 msgstr "Лт. Ухура- \"Капитан, тут важное сообщение с базы:\""
 
-#: src/moving.c:277
+#: src/sst.py:3520
 msgid "Dummy! You can't leave standard orbit until you"
 msgstr "Дятел! Ты не можешь уйти с орбиты пока ты не"
 
-#: src/moving.c:278
+#: src/sst.py:3521
 msgid "are back aboard the ship."
 msgstr "вернёшься на борт корабля."
 
-#: src/moving.c:285
+#: src/sst.py:3527
 msgid "Computer damaged; manual navigation only"
 msgstr "Компьютер сломан; только ручное управление работает"
 
-#: src/moving.c:287
+#: src/sst.py:3529
 msgid "Computer damaged; manual movement only"
 msgstr "Компьютер сломан; задавайте перемещение вручную"
 
-#: src/moving.c:302
+#: src/sst.py:3536
 msgid "Manual or automatic- "
 msgstr "Ручной или автоматический- "
 
-#: src/moving.c:325
+#: src/sst.py:3554
 msgid "(Manual navigation assumed.)"
 msgstr "(Используется ручное управление.)"
 
-#: src/moving.c:327
+#: src/sst.py:3556
 msgid "(Manual movement assumed.)"
 msgstr "(Используется ручная навигация.)"
 
-#: src/moving.c:336
+#: src/sst.py:3563
 msgid "Target quadrant or quadrant&sector- "
 msgstr "Квадрант назначения или квадрант&сектор- "
 
-#: src/moving.c:338
+#: src/sst.py:3565
 msgid "Destination sector or quadrant&sector- "
 msgstr "Сектор назначения или квадрант&сектор- "
 
-#: src/moving.c:392
-#, c-format
-msgid "Helmsman Sulu- \"Course locked in for %s.\""
-msgstr "Кормчий Сулу- \"Курс взят на %s.\""
+#: src/sst.py:3610
+#, python-format
+msgid "Helmsman Sulu- \"Course locked in for Sector %s.\""
+msgstr "Кормчий Сулу- \"Курс взят на Сектор %s.\""
 
-#: src/moving.c:397
+#: src/sst.py:3612
 msgid "Ensign Chekov- \"Course laid in, Captain.\""
 msgstr "Прапорщик Чехов- \"Курс взят, Капитан.\""
 
-#: src/moving.c:404
+#: src/sst.py:3618
 msgid "X and Y displacements- "
 msgstr "Расстояния по X и Y- "
 
-#: src/moving.c:429
+#: src/sst.py:3638
 msgid "Helmsman Sulu- \"Aye, Sir.\""
 msgstr "Кормчий Сулу- \"Ага, Сэр.\""
 
-#: src/moving.c:450 src/moving.c:514
+#: src/sst.py:3692
 msgid "Engineer Scott- \"The impulse engines are damaged, Sir.\""
 msgstr "Инженер Скотт- \"Импульсные двигатели повреждены, Сэр.\""
 
-#: src/moving.c:466
+#: src/sst.py:3705
 msgid "First Officer Spock- \"Captain, the impulse engines"
 msgstr "Первый Офицер Спок- \"Капитан, импульсные двигатели"
 
-#: src/moving.c:467
+#: src/sst.py:3706
 msgid "require 20.0 units to engage, plus 100.0 units per"
 msgstr "требуют 20.0 единиц энергии для запуска, плюс 100.0 единиц на"
 
-#: src/moving.c:469
-#, c-format
+#: src/sst.py:3708
+#, python-format
 msgid "quadrant.  We can go, therefore, a maximum of %d"
 msgstr "квадрант.  Следовательно, мы пролетим максимум %d"
 
-#: src/moving.c:471
+#: src/sst.py:3710
 msgid " quadrants.\""
 msgstr " квадрантов.\""
 
-#: src/moving.c:474
+#: src/sst.py:3712
 msgid "quadrant.  They are, therefore, useless.\""
 msgstr "квадрант.  Таким образом они бесполезны.\""
 
-#: src/moving.c:482
+#: src/sst.py:3718
 msgid "First Officer Spock- \"Captain, our speed under impulse"
 msgstr "Первый Офицер Спок- \"Капитан, наша скорость на импульсной"
 
-#: src/moving.c:483
+#: src/sst.py:3719
 msgid "power is only 0.95 sectors per stardate. Are you sure"
 msgstr "тяге всего 0.95 секторов в день. Вы уверены,"
 
-#: src/moving.c:484
+#: src/sst.py:3720
 msgid "we dare spend the time?\" "
 msgstr "что мы можем тратить столько времени?\" "
 
-#: src/moving.c:520
+#: src/sst.py:3743
+msgid "Engineer Scott- \"The warp engines are damaged, Sir.\""
+msgstr "Инженер Скотт- \"Импульсные двигатели повреждены, Сэр.\""
+
+#: src/sst.py:3748
 msgid "Engineer Scott- \"Sorry, Captain. Until this damage"
 msgstr "Инженер Скотт- \"Извините, Капитан. Пока эта неисправность не"
 
-#: src/moving.c:521
+#: src/sst.py:3749
 msgid "  is repaired, I can only give you warp 4.\""
 msgstr "  устранена, я могу только предложить вам скорость 4.\""
 
-#: src/moving.c:542
+#: src/sst.py:3768
 msgid "We can't do it, Captain. We don't have enough energy."
 msgstr "Не выйдет, Капитан. У нас не хватит энергии."
 
-#: src/moving.c:545
-#, c-format
+#: src/sst.py:3770
+#, python-format
 msgid "We don't have enough energy, but we could do it at warp %d"
 msgstr "У нас не достаточно энергии, но её могло бы хватить бы при скорости %d"
 
-#: src/moving.c:548
+#: src/sst.py:3773
 msgid "if you'll lower the shields."
 msgstr ", если только вы опустите защиту."
 
-#: src/moving.c:555
+#: src/sst.py:3777
 msgid "We haven't the energy to go that far with the shields up."
 msgstr "У нас нет энергии чтобы лететь так далеко с поднятой защитой."
 
-#: src/moving.c:563
+#: src/sst.py:3783
 msgid "First Officer Spock- \"Captain, I compute that such"
 msgstr "Первый Офицер Спок- \"Капитан, я считаю что такой"
 
-#: src/moving.c:564
-#, c-format
+#: src/sst.py:3784
+#, python-format
 msgid "  a trip would require approximately %2.0f"
 msgstr "  полёт потребует примерно %2.0f"
 
-#: src/moving.c:566
+#: src/sst.py:3786
 msgid " percent of our"
 msgstr " процентов"
 
-#: src/moving.c:567
+#: src/sst.py:3787
 msgid "  remaining time.  Are you sure this is wise?\" "
 msgstr " оставшегося времени.  Вы уверены что это разумно?\" "
 
-#: src/moving.c:640
+#: src/sst.py:3834
 msgid "  Scott here.  The warp engines are damaged."
 msgstr "  Скотт на связи.  Межпространственные двигатели сломаны."
 
-#: src/moving.c:641
+#: src/sst.py:3835
 msgid "  We'll have to reduce speed to warp 4."
 msgstr "  Придётся сбавить скорость до 4."
 
-#: src/moving.c:657
+#: src/sst.py:3846
 msgid "Warp factor- "
 msgstr "Скорость- "
 
-#: src/moving.c:665
+#: src/sst.py:3852
 msgid "Warp engines inoperative."
 msgstr "Межпространственные двигатели не работают."
 
-#: src/moving.c:669
+#: src/sst.py:3855
 msgid "Engineer Scott- \"I'm doing my best, Captain,"
 msgstr "Инженер Скотт- \"Я делаю всё что могу, Капитан,"
 
-#: src/moving.c:670
+#: src/sst.py:3856
 msgid "  but right now we can only go warp 4.\""
 msgstr "  но сейчас мы можем дать только скорость 4.\""
 
-#: src/moving.c:674
+#: src/sst.py:3859
 msgid "Helmsman Sulu- \"Our top speed is warp 10, Captain.\""
 msgstr "Прапорщик Сулу- \"Наша максимальная скорость - 10, Капитан.\""
 
-#: src/moving.c:678
+#: src/sst.py:3862
 msgid "Helmsman Sulu- \"We can't go below warp 1, Captain.\""
 msgstr "Прапорщик Сулу- \"Мы не можем установить скорость ниже 1, Капитан.\""
 
-#: src/moving.c:685
-#, c-format
+#: src/sst.py:3867
+#, python-format
 msgid "Helmsman Sulu- \"Warp factor %d, Captain.\""
 msgstr "Прапорщик Сулу- \"Скорость %d, Капитан.\""
 
-#: src/moving.c:690
+#: src/sst.py:3871
 msgid "Engineer Scott- \"Aye, but our maximum safe speed is warp 6.\""
 msgstr "Инженер Скотт- \"Ага, хотя наибольшая безопасная скорость - 6.\""
 
-#: src/moving.c:694
+#: src/sst.py:3874
 msgid "Engineer Scott- \"Aye, Captain, we'll try it.\""
 msgstr "Инженер Скотт- \"Ага Капитан, попробуем.\""
 
-#: src/moving.c:697
+#: src/sst.py:3876
 msgid "Engineer Scott- \"Aye, Captain, but our engines may not take it.\""
 msgstr "Инженер Скотт- \"Ага Капитан, но наши движки могут не справиться.\""
 
-#: src/moving.c:713
+#: src/sst.py:3887
 msgid "Scotty rushes to the transporter controls."
 msgstr "Скотти бросается к управлению транспортёром."
 
-#: src/moving.c:715
+#: src/sst.py:3889
 msgid "But with the shields up it's hopeless."
 msgstr "Но с поднятой защитой это безнадёжно."
 
-#: src/moving.c:718
+#: src/sst.py:3891
 msgid "His desperate attempt to rescue you . . ."
 msgstr "Его отчаянная попытка спасти вас . . ."
 
-#: src/moving.c:720 src/moving.c:1047
+#: src/sst.py:3893 src/sst.py:4114
 msgid "fails."
 msgstr "провалилась."
 
-#: src/moving.c:724
+#: src/sst.py:3896
 msgid "SUCCEEDS!"
 msgstr "УВЕНЧАЛАСЬ УСПЕХОМ!"
 
-#: src/moving.c:727
+#: src/sst.py:3899
 msgid "The crystals mined were "
 msgstr "Собранные кристаллы "
 
-#: src/moving.c:729
+#: src/sst.py:3901
 msgid "lost."
 msgstr "пропали."
 
-#: src/moving.c:732
+#: src/sst.py:3903
 msgid "saved."
 msgstr "уцелели."
 
-#: src/moving.c:754
-msgid " has stopped in a quadrant containing"
-msgstr " остановился в квадранте со"
+#: src/sst.py:3918
+#, python-format
+msgid "The %s has stopped in a quadrant containing"
+msgstr "%s остановился в квадранте со"
 
-#: src/moving.c:755
+#: src/sst.py:3919
 msgid "   a supernova."
 msgstr "   сверхновой."
 
-#: src/moving.c:758
+#: src/sst.py:3921
 msgid "***Emergency automatic override attempts to hurl "
 msgstr "***Автопилот пытается вырвать "
 
-#: src/moving.c:761
+#: src/sst.py:3922
 msgid "safely out of quadrant."
 msgstr "из квадранта."
 
-#: src/moving.c:767
+#: src/sst.py:3928
 msgid "Warp engines damaged."
 msgstr "Межпространственные двигатели повреждёны."
 
-#: src/moving.c:773
-#, c-format
+#: src/sst.py:3932
+#, python-format
 msgid "Warp factor set to %d"
 msgstr "Скорость установлена на %d"
 
-#: src/moving.c:789
+#: src/sst.py:3946
 msgid "Insufficient energy to leave quadrant."
 msgstr "Недостаточно энергии чтобы покинуть квадрант."
 
-#: src/moving.c:805
+#: src/sst.py:3957
 msgid "***TIME WARP ENTERED."
 msgstr "***ИСКРИВЛЕНИЕ ВРЕМЕННОГО КОНТИНУУМА."
 
-#: src/moving.c:808
-#, c-format
+#: src/sst.py:3960
+#, python-format
 msgid "You are traveling backwards in time %d stardates."
 msgstr "Вы путешествуете назад во времени на %d дней."
 
-#: src/moving.c:834
-msgid "Checkov-  \"Security reports the Galileo has disappeared, Sir!"
+#: src/sst.py:3984
+msgid "Chekov-  \"Security reports the Galileo has disappeared, Sir!"
 msgstr "Чехов- \"Охрана докладывает о пропаже Галилея, Сэр!"
 
-#: src/moving.c:842
-msgid "Checkov-  \"Security reports the Galileo has reappeared in the dock!\""
+#: src/sst.py:3989
+msgid "Chekov-  \"Security reports the Galileo has reappeared in the dock!\""
 msgstr "Чехов- \"Охрана докладыват о появлении Галилея в доке!\""
 
-#: src/moving.c:849
+#: src/sst.py:3993
 msgid "Spock has reconstructed a correct star chart from memory"
 msgstr "Спок восстановил звёздную карту по памяти"
 
-#: src/moving.c:854
-#, c-format
+#: src/sst.py:3997
+#, python-format
 msgid "You are traveling forward in time %d stardates."
 msgstr "Вы путешествуете вперёд во времени на %d дней."
 
-#: src/moving.c:873
+#: src/sst.py:4011
 msgid "Engineer Scott- \"We have no more deep space probes, Sir.\""
 msgstr ""
 "Инженер Скотт- \"У нас больше нет дальнобойных космических ракет, Сэр.\""
 
-#: src/moving.c:875
+#: src/sst.py:4013
 msgid "Ye Faerie Queene has no deep space probes."
 msgstr "На Волшебной Королеве нет дальнобойных космических ракет."
 
-#: src/moving.c:881
+#: src/sst.py:4018
 msgid "Engineer Scott- \"The probe launcher is damaged, Sir.\""
 msgstr "Инженер Скотт- \"Пусковой аппарат сломан, Сэр.\""
 
-#: src/moving.c:888
+#: src/sst.py:4024
 msgid "Spock-  \"Records show the previous probe has not yet"
 msgstr "Скотт- \"Сигналы с предыдущей ракеты говорят о том, что она ещё не"
 
-#: src/moving.c:889
+#: src/sst.py:4025
 msgid "   reached its destination.\""
 msgstr "   достигла пункта назначения.\""
 
-#: src/moving.c:892
+#: src/sst.py:4027
 msgid "Uhura- \"The previous probe is still reporting data, Sir.\""
 msgstr "Ухура- \"Предыдущая ракета всё ещё посылает сигналы, Сэр.\""
 
-#: src/moving.c:899
-#, c-format
-msgid "%d probe left."
-msgstr "Осталось %d ракета."
+#: src/sst.py:4032
+msgid "1 probe left."
+msgstr "Осталась 1 ракета."
 
-#: src/moving.c:899
-#, c-format
-msgid "%d probes left."
-msgstr "Осталось %d ракет."
+#: src/sst.py:4034
+#, python-format
+msgid "%d probes left"
+msgstr "Осталось %d ракет"
 
-#: src/moving.c:900
+#: src/sst.py:4035
 msgid "Are you sure you want to fire a probe? "
 msgstr "Вы уверены, что хотите запустить ракету? "
 
-#: src/moving.c:911
+#: src/sst.py:4043
 msgid "Arm NOVAMAX warhead? "
 msgstr "Снарядить атомной боеголовкой? "
 
-#: src/moving.c:933
+#: src/sst.py:4053
 msgid "Ensign Chekov-  \"The deep space probe is launched, Captain.\""
 msgstr ""
 "Прапорщик Чехов- \"Дальнобойная космическая ракета выпущена, Капитан.\""
 
-#: src/moving.c:968
+#: src/sst.py:4063
 msgid "Lt. Uhura-  \"But Captain, we're already docked.\""
 msgstr "Лт. Ухура- \"Но Капитан, мы ведь уже пришвартовались.\""
 
-#: src/moving.c:972
+#: src/sst.py:4066
 msgid "Subspace radio damaged."
 msgstr "Межпространственная рация повреждена."
 
-#: src/moving.c:976
+#: src/sst.py:4069
 msgid "Lt. Uhura-  \"Captain, I'm not getting any response from Starbase.\""
 msgstr "Лт. Ухура- \"Капитан, я не получаю никаких сигналов от базы.\""
 
-#: src/moving.c:980
-msgid "You must be aboard the "
-msgstr "Вы должны быть на борту карабля "
+#: src/sst.py:4072
+#, python-format
+msgid "You must be aboard the %s."
+msgstr "Вы должны быть на борту карабля %s."
 
-#: src/moving.c:1006
-#, c-format
-msgid "Starbase in %s responds--"
-msgstr "База из %s откликнулась--"
+#: src/sst.py:4090
+#, python-format
+msgid "Starbase in Quadrant %s responds--%s dematerializes"
+msgstr "База из Квадранта %s откликнулась--%s дематериализован"
 
-#: src/moving.c:1008
-msgid " dematerializes."
-msgstr " дематериализовался."
-
-#: src/moving.c:1021
+#: src/sst.py:4100
 msgid "You have been lost in space..."
 msgstr "Вы пропали в космической пустоте..."
 
-#: src/moving.c:1029
+#: src/sst.py:4106
 msgid "1st"
 msgstr "1-ая"
 
-#: src/moving.c:1030
+#: src/sst.py:4107
 msgid "2nd"
 msgstr "2-ая"
 
-#: src/moving.c:1031
+#: src/sst.py:4108
 msgid "3rd"
 msgstr "3-я"
 
-#: src/moving.c:1033
+#: src/sst.py:4109
 msgid " attempt to re-materialize "
 msgstr " попытка материализации "
 
-#: src/moving.c:1061
+#: src/sst.py:4124
 msgid "succeeds."
 msgstr "увенчалась успехом."
 
-#: src/moving.c:1065
+#: src/sst.py:4127
 msgid "Lt. Uhura-  \"Captain, we made it!\""
 msgstr "Лт. Ухура- \"Капитан, получлось!\""
 
-#: src/moving.c:1098
+#: src/sst.py:4134
 msgid "You cannot abandon Ye Faerie Queene."
 msgstr "Вы не можете оставить Волшебную Королеву."
 
-#: src/moving.c:1105
+#: src/sst.py:4139
 msgid "Ye Faerie Queene has no shuttle craft."
 msgstr "На Волшебной Королеве нет челнока."
 
-#: src/moving.c:1109
+#: src/sst.py:4142
 msgid "Shuttle craft now serving Big Macs."
 msgstr "Челнок приспособили для хранения Биг Маков."
 
-#: src/moving.c:1113
+#: src/sst.py:4145
 msgid "Shuttle craft damaged."
 msgstr "Челнок повреждён."
 
-#: src/moving.c:1117
+#: src/sst.py:4148
 msgid "You must be aboard the ship."
 msgstr "Вы должны быть на борту карабля."
 
-#: src/moving.c:1121 src/planets.c:330
+#: src/sst.py:4151 src/sst.py:4500
 msgid "Shuttle craft not currently available."
 msgstr "Челнок сейчас недоступен."
 
-#: src/moving.c:1126
+#: src/sst.py:4155
 msgid "***ABANDON SHIP!  ABANDON SHIP!"
 msgstr "***ПОКИНУТЬ КОРАБЛЬ!  ПОКИНУТЬ КОРАБЛЬ!"
 
-#: src/moving.c:1128
+#: src/sst.py:4157
 msgid "***ALL HANDS ABANDON SHIP!"
 msgstr "***ВСЕМУ ПЕРСОНАЛУ ПОКИНУТЬ КОРАБЛЬ!"
 
-#: src/moving.c:1130
+#: src/sst.py:4159
 msgid "Captain and crew escape in shuttle craft."
 msgstr "Капитан с экипажем удрали на челноке."
 
-#: src/moving.c:1139
+#: src/sst.py:4167
 msgid "Remainder of ship's complement beam down"
 msgstr "Остатки экипажа телепортировались"
 
-#: src/moving.c:1140
+#: src/sst.py:4168
 msgid "to nearest habitable planet."
 msgstr "на ближайшую пригодную для жизни планету."
 
-#: src/moving.c:1142
-#, c-format
+#: src/sst.py:4170
+#, python-format
 msgid "Remainder of ship's complement beam down to %s."
 msgstr "Остатки экипажа телепортировались на %s."
 
-#: src/moving.c:1145
-#, c-format
+#: src/sst.py:4173
+#, python-format
 msgid "Entire crew of %d left to die in outer space."
 msgstr "Весь экипаж в составе %d человек остался погибать в открытом космосе."
 
-#: src/moving.c:1155
+#: src/sst.py:4181
 msgid "You are captured by Klingons and released to"
 msgstr "Клингоны поймали вас и передали"
 
-#: src/moving.c:1156
+#: src/sst.py:4182
 msgid "the Federation in a prisoner-of-war exchange."
 msgstr "Федерации при обмене военнопленными."
 
-#: src/moving.c:1183
+#: src/sst.py:4205
 msgid "Starfleet puts you in command of another ship,"
 msgstr "Звёздный Флот доверил вам командование ещё одним кораблём,"
 
-#: src/moving.c:1184
+#: src/sst.py:4206
 msgid "the Faerie Queene, which is antiquated but,"
 msgstr "Волшебная Королева, который немного устарел, но"
 
-#: src/moving.c:1185
+#: src/sst.py:4207
 msgid "still useable."
 msgstr "всё ещё работает."
 
-#: src/moving.c:1187
+#: src/sst.py:4209
 msgid "The dilithium crystals have been moved."
 msgstr "Кристаллы дилития взяты с собой."
 
-#: src/planets.c:22
+#: src/sst.py:4240
 msgid "Spock-  \"Planet report follows, Captain.\""
 msgstr "Спок- \"Вот информация о планете, Капитан.\""
 
-#: src/planets.c:34
+#: src/sst.py:4251
+#, python-format
+msgid "Quadrant %s"
+msgstr "Квадрант %s"
+
+#: src/sst.py:4252
 msgid "   class "
 msgstr "   класс "
 
-#: src/planets.c:38
+#: src/sst.py:4256
 msgid "no "
 msgstr "отсутствуют "
 
-#: src/planets.c:39
+#: src/sst.py:4257
 msgid "dilithium crystals present."
 msgstr "признаки кристаллов дилития."
 
-#: src/planets.c:41
+#: src/sst.py:4259
 msgid "    Shuttle Craft Galileo on surface."
 msgstr "    Челнок Галилей на поверхности."
 
-#: src/planets.c:45
+#: src/sst.py:4261
 msgid "No information available."
 msgstr "Нет информации."
 
-#: src/planets.c:54
+#: src/sst.py:4268
 msgid "Already in standard orbit."
 msgstr "И так уже на орбите."
 
-#: src/planets.c:58
+#: src/sst.py:4271
 msgid "Both warp and impulse engines damaged."
 msgstr "Межпространственные двигатели сломаны, равно как и импульсные."
 
-#: src/planets.c:63
+#: src/sst.py:4277
 msgid " not adjacent to planet."
 msgstr " слишком далеко от планеты."
 
-#: src/planets.c:68
+#: src/sst.py:4281
 msgid "Helmsman Sulu-  \"Entering standard orbit, Sir.\""
 msgstr "Кормчий Сулу- \"Выходим на орбиту, Сэр.\""
 
-#: src/planets.c:73
-#, c-format
+#: src/sst.py:4286
+#, python-format
 msgid "Sulu-  \"Entered orbit at altitude %.2f kilometers.\""
 msgstr "Сулу- \"Зашли на орбиту на высоте %.2f километров.\""
 
-#: src/planets.c:82
+#: src/sst.py:4294
 msgid "Short range sensors damaged."
 msgstr "Сенсоры ближнего обзора сломаны."
 
-#: src/planets.c:86
+#: src/sst.py:4298
 msgid "Spock- \"No planet in this quadrant, Captain.\""
 msgstr "Спок- \"В этом квадранте нет планет, Капитан.\""
 
-#: src/planets.c:90
-#, c-format
-msgid "Spock-  \"Sensor scan for %s-"
-msgstr "Спок- \"Сканирование %s-"
+#: src/sst.py:4301
+#, python-format
+msgid "Spock-  \"Sensor scan for Quadrant %s-"
+msgstr "Спок- \"Сканирование Квадранта %s-"
 
-#: src/planets.c:92
-#, c-format
-msgid "         Planet at %s is of class %s."
-msgstr "         Планета на %s класса %s."
+#: src/sst.py:4303
+#, python-format
+msgid "         Planet at Sector %s is of class %s."
+msgstr "         Планета в Секторе %s класса %s."
 
-#: src/planets.c:96
+#: src/sst.py:4306
 msgid "         Sensors show Galileo still on surface."
 msgstr "         Сенсоры показывают, что Галилей всё ещё на поверхности."
 
-#: src/planets.c:97
+#: src/sst.py:4307
 msgid "         Readings indicate"
 msgstr "         Сканирование"
 
-#: src/planets.c:99
+#: src/sst.py:4309
 msgid " no"
 msgstr " не"
 
-#: src/planets.c:100
+#: src/sst.py:4310
 msgid " dilithium crystals present.\""
 msgstr " показывает признаки кристаллов дилития."
 
-#: src/planets.c:113
+#: src/sst.py:4314
+#, python-format
+msgid "Spock-  \"The inhabited planet %s "
+msgstr ""
+
+#: src/sst.py:4315
+#, python-format
+msgid "        is located at Sector %s, Captain.\""
+msgstr ""
+
+#: src/sst.py:4323
 msgid "Transporter damaged."
 msgstr "Транспортёр не работает."
 
-#: src/planets.c:116
+#: src/sst.py:4326
 msgid "Spock-  \"May I suggest the shuttle craft, Sir?\" "
 msgstr "Спок- \"Могу я посоветовать челнок, Сэр?\""
 
-#: src/planets.c:124 src/planets.c:326
+#: src/sst.py:4331 src/sst.py:4497
 msgid " not in standard orbit."
 msgstr " не на орбите."
 
-#: src/planets.c:128
+#: src/sst.py:4334
 msgid "Impossible to transport through shields."
 msgstr "Невозможно транспортировать через защитные поля."
 
-#: src/planets.c:132 src/planets.c:342
+#: src/sst.py:4337 src/sst.py:4509
 msgid "Spock-  \"Captain, we have no information on this planet"
 msgstr "Спок- \"Капитан, у нас нет информации об этой планете"
 
-#: src/planets.c:133 src/planets.c:343
+#: src/sst.py:4338 src/sst.py:4510
 msgid "  and Starfleet Regulations clearly state that in this situation"
 msgstr " и инструкции Звёздного Флота чётко предписывают в такой ситуации"
 
-#: src/planets.c:134
+#: src/sst.py:4339
 msgid "  you may not go down.\""
 msgstr " не спускаться на поверхность.\""
 
-#: src/planets.c:138
+#: src/sst.py:4342
 msgid "Spock-  \"Captain, I fail to see the logic in"
 msgstr "Спок- \"Капитан, я не вижу смысла"
 
-#: src/planets.c:139
+#: src/sst.py:4343
 msgid "  exploring a planet with no dilithium crystals."
 msgstr "  исследовать планету, на которой нет кристаллов дилития."
 
-#: src/planets.c:140 src/planets.c:159 src/planets.c:272
+#: src/sst.py:4344 src/sst.py:4360 src/sst.py:4450
 msgid "  Are you sure this is wise?\" "
 msgstr "  Вы уверены что это разумно?\" "
 
-#: src/planets.c:150
+#: src/sst.py:4352
 msgid "  Captain, we don't have enough energy for transportation."
 msgstr "  Капитан, для транспортировки недостаточно энергии."
 
-#: src/planets.c:155
+#: src/sst.py:4356
 msgid "  Captain, we have enough energy only to transport you down to"
 msgstr "  Капитан, у нас хватит энергии только для транспортировки на"
 
-#: src/planets.c:156
+#: src/sst.py:4357
 msgid "  the planet, but there wouldn't be an energy for the trip back."
 msgstr "  планету, но на обратный путь энегии не останется."
 
-#: src/planets.c:158
+#: src/sst.py:4359
 msgid "  Although the Galileo shuttle craft may still be on a surface."
 msgstr "  Хотя челнок Галилей может быть всё ещё на поверхности."
 
-#: src/planets.c:169
+#: src/sst.py:4367
 msgid "Spock-  \"Wouldn't you rather take the Galileo?\" "
 msgstr "Спок- \"Может вы всё же используете Галилей?\""
 
-#: src/planets.c:174
+#: src/sst.py:4371
 msgid "Your crew hides the Galileo to prevent capture by aliens."
 msgstr "Ваша команда прячет Галилей, чтобы он не достался инопланетянам."
 
-#: src/planets.c:176
+#: src/sst.py:4372
 msgid "Landing party assembled, ready to beam up."
 msgstr "Дисантный отряд собран, готовы к телепортации."
 
-#: src/planets.c:178
+#: src/sst.py:4374
 msgid "Kirk whips out communicator..."
 msgstr "Кирк достаёт коммуникатор..."
 
-#: src/planets.c:179
+#: src/sst.py:4375
 msgid "BEEP  BEEP  BEEP"
 msgstr "БИП  БИП  БИП"
 
-#: src/planets.c:181
+#: src/sst.py:4377
 msgid "\"Kirk to enterprise-  Lock on coordinates...energize.\""
 msgstr "\"Кирк энтерпрайзу- Установите координаты...поехали.\""
 
-#: src/planets.c:185
+#: src/sst.py:4380
 msgid "Scotty-  \"Transporter room ready, Sir.\""
 msgstr "Скотти- \"Транспортёр готов, Сэр.\""
 
-#: src/planets.c:187
+#: src/sst.py:4382
 msgid "Kirk and landing party prepare to beam down to planet surface."
 msgstr "Кирк и дисантный отряд готовятся к телепортации на планету."
 
-#: src/planets.c:189
+#: src/sst.py:4384
 msgid "Kirk-  \"Energize.\""
 msgstr "Кирк- \"Поехали.\""
 
-#: src/planets.c:198
+#: src/sst.py:4392
 msgid "Scotty-  \"Oh my God!  I've lost them.\""
 msgstr "Скотти- \"О нет!  Я их потерял.\""
 
-#: src/planets.c:206
+#: src/sst.py:4399
 msgid "Transport complete."
 msgstr "Транспортировка завершена."
 
-#: src/planets.c:208
+#: src/sst.py:4401
 msgid "The shuttle craft Galileo is here!"
 msgstr "Здесь челнок Галилей!"
 
-#: src/planets.c:224
+#: src/sst.py:4413
 msgid "Mining party not on planet."
 msgstr "Добытчиков на планете нет."
 
-#: src/planets.c:228
+#: src/sst.py:4416
 msgid "This planet has already been strip-mined for dilithium."
 msgstr "Эта планета уже обобрана до нитки; дилития там больше нет."
 
-#: src/planets.c:232
+#: src/sst.py:4419
 msgid "No dilithium crystals on this planet."
 msgstr "На этой планете дилития нет."
 
-#: src/planets.c:236
+#: src/sst.py:4422
 msgid "You've already mined enough crystals for this trip."
 msgstr "Вы набрали уже достаточно кристаллов за эту поездку."
 
-#: src/planets.c:240
+#: src/sst.py:4425
 msgid "With all those fresh crystals aboard the "
 msgstr "У нас так много кристаллов на борту, что"
 
-#: src/planets.c:243
+#: src/sst.py:4426
 msgid "there's no reason to mine more at this time."
 msgstr "нет смысла собирать ещё."
 
-#: src/planets.c:249
+#: src/sst.py:4431
 msgid "Mining operation complete."
 msgstr "Сборка кристаллов завершена."
 
-#: src/planets.c:261
+#: src/sst.py:4441
 msgid "No dilithium crystals available."
 msgstr "Нет кристаллов дилития."
 
-#: src/planets.c:265
+#: src/sst.py:4444
 msgid "Spock-  \"Captain, Starfleet Regulations prohibit such an operation"
 msgstr "Спок- \"Капитан, инструкции Звёздного Флота запрещают эти действия,"
 
-#: src/planets.c:266
+#: src/sst.py:4445
 msgid "  except when Condition Yellow exists."
 msgstr " кроме случаев Жёлтого состояния."
 
-#: src/planets.c:269
+#: src/sst.py:4447
 msgid "Spock- \"Captain, I must warn you that loading"
 msgstr "Спок- \"Капитан, я должен предупредить вас, что пихать"
 
-#: src/planets.c:270
+#: src/sst.py:4448
 msgid "  raw dilithium crystals into the ship's power"
 msgstr " необработанные кристаллы дилития в энергетическую"
 
-#: src/planets.c:271
+#: src/sst.py:4449
 msgid "  system may risk a severe explosion."
 msgstr " систему корабля опасно, и может привести к большому взрыву."
 
-#: src/planets.c:278
+#: src/sst.py:4455
 msgid "Engineering Officer Scott-  \"(GULP) Aye Sir."
 msgstr "Инженер-механик Скотт- \"(глотая воздух) Ага Сэр."
 
-#: src/planets.c:279
+#: src/sst.py:4456
 msgid "  Mr. Spock and I will try it.\""
 msgstr "  Мы с Мистером Споком попробуем.\""
 
-#: src/planets.c:281
+#: src/sst.py:4458
 msgid "Spock-  \"Crystals in place, Sir."
 msgstr "Спок- \"Кристаллы на месте, Сэр."
 
-#: src/planets.c:282
+#: src/sst.py:4459
 msgid "  Ready to activate circuit.\""
 msgstr "  Готов замкнуть цепь.\""
 
-#: src/planets.c:284
+#: src/sst.py:4461
 msgid "Scotty-  \"Keep your fingers crossed, Sir!\""
 msgstr "Скотти-  \"Скрестите пальцы, Сэр!\""
 
-#: src/planets.c:287
+#: src/sst.py:4464
 msgid "  \"Activating now! - - No good!  It's***"
 msgstr "  \"Уже запускаю! - - Плохо!  Он***"
 
-#: src/planets.c:289 src/planets.c:496
+#: src/sst.py:4466 src/sst.py:4642
 msgid "***RED ALERT!  RED A*L********************************"
 msgstr "***ТРЕВОГА! ТРЕ*ВО***********************************"
 
-#: src/planets.c:292 src/planets.c:499
+#: src/sst.py:4469 src/sst.py:4645
 msgid "******************   KA-BOOM!!!!   *******************"
 msgstr "******************   БА-БАХ!!!!    ********************"
 
-#: src/planets.c:298
+#: src/sst.py:4474
 msgid "  \"Activating now! - - "
 msgstr "  \"Уже запускаю! - - "
 
-#: src/planets.c:299
+#: src/sst.py:4475
 msgid "The instruments"
 msgstr "Аппараты"
 
-#: src/planets.c:300
+#: src/sst.py:4476
 msgid "   are going crazy, but I think it's"
 msgstr "   сошли с ума, но я думаю, что это"
 
-#: src/planets.c:301
+#: src/sst.py:4477
 msgid "   going to work!!  Congratulations, Sir!\""
 msgstr "   должно работать!!  Поздравляю, Сэр!\""
 
-#: src/planets.c:314
+#: src/sst.py:4488
 msgid "Ye Faerie Queene has no shuttle craft bay to dock it at."
 msgstr "На Волшебной Королеве нет отсека для стыковки с челноком."
 
-#: src/planets.c:316
+#: src/sst.py:4490
 msgid "Ye Faerie Queene had no shuttle craft."
 msgstr "На Волшебной Королеве нет челнока."
 
-#: src/planets.c:319
+#: src/sst.py:4492
 msgid "The Galileo is damaged."
 msgstr "Галилей повреждён."
 
-#: src/planets.c:321
+#: src/sst.py:4494
 msgid "Shuttle craft is now serving Big Macs."
 msgstr "Челнок приспособили для хранения Биг Маков."
 
-#: src/planets.c:334
+#: src/sst.py:4503
 msgid "You will have to beam down to retrieve the shuttle craft."
 msgstr "Вам придётся спуститься на поверхность чтобы забрать челнок."
 
-#: src/planets.c:338
+#: src/sst.py:4506
 msgid "Shuttle craft cannot pass through shields."
 msgstr "Челнок не может пролететь через защиту."
 
-#: src/planets.c:344
+#: src/sst.py:4511
 msgid "  you may not fly down.\""
 msgstr " вам не удастся слетать вниз.\""
 
-#: src/planets.c:349
+#: src/sst.py:4515
 msgid "First Officer Spock-  \"Captain, I compute that such"
 msgstr "Первый Офицер Спок- \"Капитан, я считаю что такой"
 
-#: src/planets.c:350
-#, c-format
+#: src/sst.py:4516
+#, python-format
 msgid "  a maneuver would require approximately %2d%% of our"
 msgstr "  манёвр потребует примерно %2d%%"
 
-#: src/planets.c:352
+#: src/sst.py:4518
 msgid "remaining time."
 msgstr "оставшегося времени."
 
-#: src/planets.c:353
+#: src/sst.py:4519
 msgid "Are you sure this is wise?\" "
 msgstr "Вы уверены что это разумно?\" "
 
-#: src/planets.c:364
+#: src/sst.py:4528
 msgid "Spock-  \"Would you rather use the transporter?\" "
 msgstr "Спок- \"Не лучше ли вам воспользоваться транспортёром?\" "
 
-#: src/planets.c:369
+#: src/sst.py:4532
 msgid "Shuttle crew"
 msgstr "Экипаж челнока"
 
-#: src/planets.c:372
+#: src/sst.py:4534
 msgid "Rescue party"
 msgstr "Спасательная команда"
 
-#: src/planets.c:373
+#: src/sst.py:4535
 msgid " boards Galileo and swoops toward planet surface."
 msgstr " садится в Галилей и устремляется к поверхности планеты."
 
-#: src/planets.c:379 src/planets.c:402 src/planets.c:421
+#: src/sst.py:4541 src/sst.py:4562 src/sst.py:4578
 msgid "Trip complete."
 msgstr "Полёт окончен."
 
-#: src/planets.c:384
+#: src/sst.py:4545
 msgid "You and your mining party board the"
 msgstr "Вы и ваш отряд залезли в"
 
-#: src/planets.c:385
+#: src/sst.py:4546
 msgid "shuttle craft for the trip back to the Enterprise."
 msgstr "челнок чтобы лететь на Энтерпрайз."
 
-#: src/planets.c:387
+#: src/sst.py:4548
 msgid "The short hop begins . . ."
 msgstr "Начался недолгий перелёт . . ."
 
-#: src/planets.c:409
+#: src/sst.py:4566
 msgid "Mining party assembles in the hangar deck,"
 msgstr "Группа добытчиков собралась в ангаре,"
 
-#: src/planets.c:410
+#: src/sst.py:4567
 msgid "ready to board the shuttle craft \"Galileo\"."
 msgstr "все готовы залезть в челнок \"Галилей\"."
 
-#: src/planets.c:412
+#: src/sst.py:4569
 msgid "The hangar doors open; the trip begins."
 msgstr "Двери ангара открыты; полёт начался."
 
-#: src/planets.c:435
+#: src/sst.py:4587
 msgid "Ye Faerie Queene has no death ray."
 msgstr "На Волшебной Королеве нет луча смерти."
 
-#: src/planets.c:439
+#: src/sst.py:4590
 msgid "Sulu-  \"But Sir, there are no enemies in this quadrant.\""
 msgstr "Сулу- \"Но Сэр, в этом квадранте нет врагов.\""
 
-#: src/planets.c:443
+#: src/sst.py:4593
 msgid "Death Ray is damaged."
 msgstr "Луч Смерти повреждён."
 
-#: src/planets.c:446
+#: src/sst.py:4595
 msgid "Spock-  \"Captain, the 'Experimental Death Ray'"
 msgstr "Спок- \"Капитан, 'Экспериментальный Луч Смерти'"
 
-#: src/planets.c:447
+#: src/sst.py:4596
 msgid "  is highly unpredictible.  Considering the alternatives,"
 msgstr "  довольно непредсказуем.  Обдумав все альтернативы,"
 
-#: src/planets.c:448
+#: src/sst.py:4597
 msgid "  are you sure this is wise?\" "
 msgstr " вы уверены что это разумно?\" "
 
-#: src/planets.c:451
+#: src/sst.py:4600
 msgid "Spock-  \"Acknowledged.\""
 msgstr "Спок- \"Вас понял.\""
 
-#: src/planets.c:454
+#: src/sst.py:4603
 msgid "WHOOEE ... WHOOEE ... WHOOEE ... WHOOEE"
 msgstr ""
 
-#: src/planets.c:456
+#: src/sst.py:4605
 msgid "Crew scrambles in emergency preparation."
 msgstr "Команда засуетилась, начались срочные приготовления."
 
-#: src/planets.c:457
+#: src/sst.py:4606
 msgid "Spock and Scotty ready the death ray and"
 msgstr "Спок и Скотти наладили луч смерти и"
 
-#: src/planets.c:458
+#: src/sst.py:4607
 msgid "prepare to channel all ship's power to the device."
 msgstr "готовы к подаче всей энергии корабля на установку."
 
-#: src/planets.c:460
+#: src/sst.py:4609
 msgid "Spock-  \"Preparations complete, sir.\""
 msgstr "Спок- \"Преготовления окончены, сэр.\""
 
-#: src/planets.c:461
+#: src/sst.py:4610
 msgid "Kirk-  \"Engage!\""
 msgstr "Кирк- \"Пли!\""
 
-#: src/planets.c:463
+#: src/sst.py:4612
 msgid "WHIRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 msgstr ""
 
-#: src/planets.c:469 src/planets.c:490
+#: src/sst.py:4619 src/sst.py:4636
 msgid "Sulu- \"Captain!  It's working!\""
 msgstr "Сулу- \"Капитан!  Он работает!\""
 
-#: src/planets.c:473
+#: src/sst.py:4623
 msgid "Ensign Chekov-  \"Congratulations, Captain!\""
 msgstr "Прапорщик Чехов- \"Поздравляю, Капитан.\""
 
-#: src/planets.c:477
+#: src/sst.py:4627
 msgid "Spock-  \"Captain, I believe the `Experimental Death Ray'"
 msgstr "Спок- \"Капитан, я чувствую, что 'Эксперементальный Луч Смерти'"
 
-#: src/planets.c:479
+#: src/sst.py:4629
 msgid "   is still operational.\""
 msgstr "   всё ещё исправен.\""
 
-#: src/planets.c:482
+#: src/sst.py:4631
 msgid "   has been rendered nonfunctional.\""
 msgstr "   пришёл в негодность.\""
 
-#: src/planets.c:494
+#: src/sst.py:4640
 msgid "***MATTER-ANTIMATTER IMPLOSION IMMINENT!"
 msgstr "***НАЧАЛОСЬ СЛИЯНИЕ МАТЕРИИ С АНТИМАТЕРИЕЙ!"
 
-#: src/planets.c:505
+#: src/sst.py:4650
 msgid "Sulu- \"Captain!  Yagabandaghangrapl, brachriigringlanbla!\""
 msgstr "Сулу- \"Капитан!  Кабабонга, Абырвалг, Киргуду-Бамбарбия!\""
 
-#: src/planets.c:507
+#: src/sst.py:4652
 msgid "Lt. Uhura-  \"Graaeek!  Graaeek!\""
 msgstr "Лт. Ухура- \"Горячё!  Горю!\""
 
-#: src/planets.c:509
+#: src/sst.py:4654
 msgid "Spock-  \"Fascinating!  . . . All humans aboard"
 msgstr "Спок- \"Грандиозно!  . . . Все люди на борту"
 
-#: src/planets.c:510
+#: src/sst.py:4655
 msgid "  have apparently been transformed into strange mutations."
 msgstr "  явно подверглись какой-то странной мутации."
 
-#: src/planets.c:511
+#: src/sst.py:4656
 msgid "  Vulcans do not seem to be affected."
 msgstr "  Вулканиты, однако, похоже не пострадали."
 
-#: src/planets.c:513
+#: src/sst.py:4658
 msgid "Kirk-  \"Raauch!  Raauch!\""
 msgstr "Кирк- \"Гав! Гав! Ррр-ав!"
 
-#: src/planets.c:519
+#: src/sst.py:4663
 msgid "Sulu- \"Captain!  It's   --WHAT?!?!\""
 msgstr "Сулу- \"Капитан!  Он   --ЧТО???!\""
 
-#: src/planets.c:521
+#: src/sst.py:4665
 msgid "Spock-  \"I believe the word is"
 msgstr "Спок- \"Похоже, слово"
 
-#: src/planets.c:522
+#: src/sst.py:4666
 msgid " *ASTONISHING*"
 msgstr " *УДИВИТЕЛЬНО*"
 
-#: src/planets.c:523
+#: src/sst.py:4667
 msgid " Mr. Sulu."
 msgstr " Мистер Сулу."
 
-#: src/planets.c:528
+#: src/sst.py:4672
 msgid "  Captain, our quadrant is now infested with"
 msgstr "  Капитан, наш квадрант теперь весь набит"
 
-#: src/planets.c:529
+#: src/sst.py:4673
 msgid " - - - - - -  *THINGS*."
 msgstr " - - - - - -  *ФИГНЁЙ*."
 
-#: src/planets.c:531
+#: src/sst.py:4675
 msgid "  I have no logical explanation.\""
 msgstr "  У меня нет логичного объяснения.\""
 
-#: src/planets.c:534
+#: src/sst.py:4677
 msgid "Sulu- \"Captain!  The Death Ray is creating tribbles!\""
 msgstr "Сулу- \"Капитан!   Луч Смерти зачем-то создаёт червяков!\""
 
-#: src/planets.c:536
+#: src/sst.py:4679
 msgid "Scotty-  \"There are so many tribbles down here"
 msgstr "Скотти-  \"Тут столько этих червяков бегает"
 
-#: src/planets.c:537
+#: src/sst.py:4680
 msgid "  in Engineering, we can't move for 'em, Captain.\""
 msgstr "  в техническом отсеке, что мы не можем к нему подобраться, Капитан.\""
 
-#: src/reports.c:11
-#, c-format
-msgid "Starbase in %s is currently under Commander attack."
-msgstr "База в %s атакована Командиром Клингонов."
+#: src/sst.py:4690
+#, python-format
+msgid "Starbase in Quadrant %s is currently under Commander attack."
+msgstr "База в Квадранте %s атакована Командиром Клингонов."
 
-#: src/reports.c:13 src/reports.c:19
-#, c-format
+#: src/sst.py:4691 src/sst.py:4694
+#, python-format
 msgid "It can hold out until Stardate %d."
 msgstr "Она сможет продержаться до даты %d.\""
 
-#: src/reports.c:17
-#, c-format
-msgid "Starbase in %s is under Super-commander attack."
-msgstr "База в %s атакована Глав-комом Клингонов."
+#: src/sst.py:4693
+#, python-format
+msgid "Starbase in Quadrant %s is under Super-commander attack."
+msgstr "База в Квадранте %s атакована Глав-комом Клингонов."
 
-#: src/reports.c:22
+#: src/sst.py:4696
 msgid "No Starbase is currently under attack."
 msgstr "Базы сейчас не атакованы."
 
-#: src/reports.c:26
-#, c-format
-msgid "Base in %i - %i attacked by C. Alive until %.1f"
-msgstr "База в %i - %i атакована C. Доживёт до %.1f"
+#: src/sst.py:4699
+#, python-format
+msgid "Base in %s attacked by C. Alive until %.1f"
+msgstr "База в %s атакована C. Доживёт до %.1f"
 
-#: src/reports.c:28
-#, c-format
-msgid "Base in %i - %i attacked by S. Alive until %.1f"
-msgstr "База в %i - %i атакована S. Доживёт до %.1f"
+#: src/sst.py:4701
+#, python-format
+msgid "Base in %s attacked by S. Alive until %.1f"
+msgstr "База в %s атакована S. Доживёт до %.1f"
 
-#: src/reports.c:40
+#: src/sst.py:4707
 msgid "thawed "
 msgstr "сохранённую "
 
-#: src/reports.c:42
-msgid "short"
-msgstr "короткую"
-
-#: src/reports.c:43
-msgid "medium"
-msgstr "сруднюю"
-
-#: src/reports.c:44
-msgid "long"
-msgstr "длинную"
-
-#: src/reports.c:45
-msgid "unknown length"
-msgstr ""
-
-#: src/reports.c:48
+#: src/sst.py:4709
 msgid "novice"
 msgstr "новичёк"
 
-#: src/reports.c:49
+#: src/sst.py:4709
 msgid "fair"
 msgstr "средний"
 
-#: src/reports.c:50
+#: src/sst.py:4710
 msgid "good"
 msgstr "умелый"
 
-#: src/reports.c:51
+#: src/sst.py:4710
 msgid "expert"
 msgstr "специалист"
 
-#: src/reports.c:52
+#: src/sst.py:4710
 msgid "emeritus"
 msgstr "отставной капитан"
 
-#: src/reports.c:53
-msgid "skilled"
-msgstr ""
-
-#: src/reports.c:56
-#, c-format
+#: src/sst.py:4711
+#, python-format
 msgid "You %s a %s%s %s game."
 msgstr "Вы %s игру %s%s %s."
 
-#: src/reports.c:57
+#: src/sst.py:4711
 msgid "were playing"
 msgstr "сыграли"
 
-#: src/reports.c:57
+#: src/sst.py:4711
 msgid "are playing"
 msgstr "играете"
 
-#: src/reports.c:59
+#: src/sst.py:4713
 msgid "No plaque is allowed."
 msgstr "Грамоты не будет."
 
-#: src/reports.c:61
-#, c-format
+#: src/sst.py:4715
+#, python-format
 msgid "This is tournament game %d."
 msgstr "Это турнирная игра номер %d."
 
-#: src/reports.c:62
-#, c-format
+#: src/sst.py:4716
+#, python-format
 msgid "Your secret password is \"%s\""
 msgstr "Ваш пароль \"%s\""
 
-#: src/reports.c:63
-#, c-format
+#: src/sst.py:4717
+#, python-format
 msgid "%d of %d Klingons have been killed"
 msgstr "%d из %d Клингонов убиты"
 
-#: src/reports.c:67
-#, c-format
+#: src/sst.py:4720
+#, python-format
 msgid ", including %d Commander%s."
 msgstr ", включая %d Командира%s."
 
-#: src/reports.c:67 src/reports.c:97 src/reports.c:106 src/reports.c:129
+#: src/sst.py:4720 src/sst.py:4744 src/sst.py:4753 src/sst.py:4771
 msgid "s"
 msgstr "(ов)"
 
-#: src/reports.c:69
+#: src/sst.py:4722
 msgid ", but no Commanders."
 msgstr ", но без Командиров."
 
-#: src/reports.c:73
-#, c-format
+#: src/sst.py:4726
+#, python-format
 msgid "The Super Commander has %sbeen destroyed."
 msgstr "Глав-ком %sбыл уничтожен."
 
-#: src/reports.c:74
+#: src/sst.py:4726
 msgid "not "
 msgstr "не "
 
-#: src/reports.c:76
+#: src/sst.py:4728
 msgid "There "
 msgstr " "
 
-#: src/reports.c:78
+#: src/sst.py:4730
 msgid "has been 1 base"
 msgstr "1 баз"
 
-#: src/reports.c:80
-#, c-format
+#: src/sst.py:4732
+#, python-format
 msgid "have been %d bases"
 msgstr "%d баз"
 
-#: src/reports.c:82
-#, c-format
+#: src/sst.py:4733
+#, python-format
 msgid " destroyed, %d remaining."
 msgstr " уничтожено, %d осталось."
 
-#: src/reports.c:85
-#, c-format
+#: src/sst.py:4735
+#, python-format
 msgid "There are %d bases."
 msgstr "Осталось %d баз."
 
-#: src/reports.c:93
-#, c-format
+#: src/sst.py:4742
+#, python-format
 msgid "%d casualt%s suffered so far."
 msgstr "%d пострадавших%s уже умерли.\""
 
-#: src/reports.c:96
-#, c-format
+#: src/sst.py:4744
+#, python-format
 msgid "There were %d call%s for help."
 msgstr "Вы сделали %d вызов%s базы."
 
-#: src/reports.c:99
+#: src/sst.py:4746
 msgid "You have "
 msgstr "У вас "
 
-#: src/reports.c:103
+#: src/sst.py:4750
 msgid "no"
 msgstr "отсутствуют"
 
-#: src/reports.c:104
+#: src/sst.py:4751
 msgid " deep space probe"
 msgstr " дальнобойные космические ракеты"
 
-#: src/reports.c:112
+#: src/sst.py:4757
 msgid "An armed deep space probe is in "
 msgstr "Дальнобойная космическая ракета с атомным зарядом сейчас в "
 
-#: src/reports.c:114
+#: src/sst.py:4759
 msgid "A deep space probe is in "
 msgstr "Дальнобойная космическая ракета сейчас в "
 
-#: src/reports.c:120
+#: src/sst.py:4763
 msgid "Dilithium crystals aboard ship... not yet used."
 msgstr "Кристаллы дилития на борту... пока не использовались."
 
-#: src/reports.c:128
-#, c-format
+#: src/sst.py:4770
+#, python-format
 msgid "Dilithium crystals have been used %d time%s."
 msgstr "Кристаллы дилития использовались %d раз%s."
 
-#: src/reports.c:142
+#: src/sst.py:4780
 msgid "LONG-RANGE SENSORS DAMAGED."
 msgstr "СЕНСОРЫ ДАЛЬНЕГО ОБЗОРА СЛОМАНЫ."
 
-#: src/reports.c:145
+#: src/sst.py:4783
 msgid "Starbase's long-range scan"
 msgstr "Дальний обзор с базы"
 
-#: src/reports.c:148
+#: src/sst.py:4785
 msgid "Long-range scan"
 msgstr "Дальний обзор"
 
-#: src/reports.c:181
+#: src/sst.py:4812
 msgid "\tDEVICE\t\t\t-REPAIR TIMES-"
 msgstr "\tУСТРОЙСТВО\t\t-ВРЕМЯ РЕМОНТА-"
 
-#: src/reports.c:182
+#: src/sst.py:4813
 msgid "\t\t\tIN FLIGHT\t\tDOCKED"
 msgstr "\t\t\tВ ПОЛЁТЕ\t\tВ ДОКАХ"
 
-#: src/reports.c:192
+#: src/sst.py:4819
 msgid "All devices functional."
 msgstr "Все устройства в порядке."
 
-#: src/reports.c:219
+#: src/sst.py:4839
 msgid "Spock-  \"I revised the Star Chart from the starbase's records.\""
 msgstr "Спок- \"Я обновил звёздную карту по записям с базы.\""
 
-#: src/reports.c:223
+#: src/sst.py:4841
 msgid "       STAR CHART FOR THE KNOWN GALAXY"
 msgstr "     ЗВЁЗДНАЯ КАРТА ИССЛЕДОВАННЫХ УЧАСТКОВ"
 
-#: src/reports.c:225
-#, c-format
+#: src/sst.py:4843
+#, python-format
 msgid "(Last surveillance update %d stardates ago)."
 msgstr "(Последнее обновление было %d дней назад)."
 
-#: src/reports.c:286
+#: src/sst.py:4879
 msgid "Stardate"
 msgstr "Число"
 
-#: src/reports.c:286
-#, c-format
+#: src/sst.py:4879
+#, python-format
 msgid "%.1f, Time Left %.2f"
 msgstr "%.1f, Осталось %.2f"
 
-#: src/reports.c:293
-msgid "RED"
-msgstr "КРАСНЫЙ"
-
-#: src/reports.c:294
-msgid "GREEN"
-msgstr "ЗЕЛЁНЫЙ"
-
-#: src/reports.c:295
-msgid "YELLOW"
-msgstr "ЖЁЛТЫЙ"
-
-#: src/reports.c:296
-msgid "DOCKED"
-msgstr "ПРИШВАРТ"
-
-#: src/reports.c:297
-msgid "DEAD"
-msgstr "ПОГИБ"
-
-#: src/reports.c:302
+#: src/sst.py:4884
 msgid "Condition"
 msgstr "Состояние"
 
-#: src/reports.c:302
-#, c-format
+#: src/sst.py:4884
+#, python-format
 msgid "%s, %i DAMAGES"
 msgstr "%s, %i ПОВРЕЖДЕНИЙ"
 
-#: src/reports.c:306
+#: src/sst.py:4887
 msgid "Position"
 msgstr "Положение"
 
-#: src/reports.c:313
-#, c-format
+#: src/sst.py:4891
 msgid "DAMAGED, Base provides"
 msgstr "СЛОМАНО, База поддерживает"
 
-#: src/reports.c:315
-#, c-format
+#: src/sst.py:4893
+#, python-format
 msgid "DAMAGED, reserves=%4.2f"
 msgstr "СЛОМАНО, осталось=%4.2f"
 
-#: src/reports.c:318
-#, c-format
+#: src/sst.py:4895
 msgid "ACTIVE"
 msgstr "РАБОТАЕТ"
 
-#: src/reports.c:319 src/setup.c:159
+#: src/sst.py:4896 src/sst.py:5202
 msgid "Life Support"
 msgstr "Жизнеобесп"
 
-#: src/reports.c:323
+#: src/sst.py:4898
 msgid "Warp Factor"
 msgstr "Скорость"
 
-#: src/reports.c:327
-msgid "Energy"
-msgstr "Энергия"
-
-#: src/reports.c:329
+#: src/sst.py:4902
 msgid " (have crystals)"
 msgstr " (есть кристаллы)"
 
-#: src/reports.c:333
+#: src/sst.py:4903
+msgid "Energy"
+msgstr "Энергия"
+
+#: src/sst.py:4905
 msgid "Torpedoes"
 msgstr "Торпеды"
 
-#: src/reports.c:338
+#: src/sst.py:4908
 msgid "DAMAGED,"
 msgstr "СЛОМАНА,"
 
-#: src/reports.c:340
+#: src/sst.py:4910
 msgid "UP,"
 msgstr "ПОДНЯТА,"
 
-#: src/reports.c:342
+#: src/sst.py:4912
 msgid "DOWN,"
 msgstr "СНЯТА,"
 
-#: src/reports.c:343
-#, c-format
+#: src/sst.py:4913
+#, python-format
 msgid " %d%% %.1f units"
 msgstr " %d%% %.1f единиц"
 
-#: src/reports.c:345 src/setup.c:162
+#: src/sst.py:4915 src/sst.py:5205
 msgid "Shields"
 msgstr "Защита"
 
-#: src/reports.c:349
+#: src/sst.py:4917
 msgid "Klingons Left"
 msgstr "Клингонов"
 
-#: src/reports.c:356
+#: src/sst.py:4923
 msgid "Major system"
 msgstr "Основная сист"
 
-#: src/reports.c:358
+#: src/sst.py:4925
 msgid "Sector is uninhabited"
 msgstr "Сектор необитаем"
 
-#: src/reports.c:376
+#: src/sst.py:4933
 msgid "Information desired? "
 msgstr "Какую информацию желаете? "
 
-#: src/reports.c:382
+#: src/sst.py:4938
 msgid "UNRECOGNIZED REQUEST. Legal requests are:"
 msgstr "ЗАПРОС НЕ ЯСЕН. Возможные запросы:"
 
-#: src/reports.c:398
+#: src/sst.py:4948
 msgid "   S.R. SENSORS DAMAGED!"
 msgstr "   СЕНСОРЫ Б.О. СЛОМАНЫ!"
 
-#: src/reports.c:402
+#: src/sst.py:4951
 msgid "  [Using Base's sensors]"
 msgstr "  [Используются сенсоры Базы]"
 
-#: src/reports.c:405
+#: src/sst.py:4953
 msgid "     Short-range scan"
 msgstr "       Ближний обзор"
 
-#: src/reports.c:432
+#: src/sst.py:4973
 msgid "COMPUTER DAMAGED, USE A POCKET CALCULATOR."
 msgstr "КОМПЬЮТЕР СЛОМАН, ВОСПОЛЬЗУЙТЕСЬ КАЛЬКУЛЯТОРОМ."
 
-#: src/reports.c:439
+#: src/sst.py:4979
 msgid "Destination quadrant and/or sector? "
 msgstr "Квадрант назначения и/или сектор? "
 
-#: src/reports.c:479
+#: src/sst.py:5010
 msgid "Answer \"no\" if you don't know the value:"
 msgstr "Отвечайте \"no\" если не знаете:"
 
-#: src/reports.c:482
+#: src/sst.py:5013
 msgid "Time or arrival date? "
 msgstr "Время прибытия? "
 
-#: src/reports.c:489
+#: src/sst.py:5020
 msgid "We'll never make it, sir."
 msgstr "Никак не получится, сэр."
 
-#: src/reports.c:498
+#: src/sst.py:5027
 msgid "Warp factor? "
 msgstr "Скорость? "
 
-#: src/reports.c:508
+#: src/sst.py:5035
 msgid "Captain, certainly you can give me one of these."
 msgstr "Капитан, вы точно могли указать одно из значений."
 
-#: src/reports.c:515
+#: src/sst.py:5041
 msgid "Insufficient energy, sir."
 msgstr "Не хватает энергии, сэр."
 
-#: src/reports.c:519 src/reports.c:561
+#: src/sst.py:5045 src/sst.py:5078
 msgid "New warp factor to try? "
 msgstr "Попробовать другую скорость? "
 
-#: src/reports.c:535
+#: src/sst.py:5057
 msgid "But if you lower your shields,"
 msgstr "Но если вы снимите защиту,"
 
-#: src/reports.c:536
+#: src/sst.py:5058
 msgid "remaining"
 msgstr "остаток"
 
-#: src/reports.c:540
+#: src/sst.py:5061
 msgid "Remaining"
 msgstr "Остаток"
 
-#: src/reports.c:541
-#, c-format
+#: src/sst.py:5062
+#, python-format
 msgid " energy will be %.2f."
 msgstr " энергии будет %.2f."
 
-#: src/reports.c:543
-#, c-format
+#: src/sst.py:5064
+#, python-format
 msgid "And we will arrive at stardate %.2f."
 msgstr "А мы прибудем %.2f числа."
 
-#: src/reports.c:547
+#: src/sst.py:5066
 msgid "Any warp speed is adequate."
 msgstr "На любой скорости успеем."
 
-#: src/reports.c:549
-#, c-format
+#: src/sst.py:5068
+#, python-format
 msgid "Minimum warp needed is %.2f,"
 msgstr "Минимальная необходимая скорость - %.2f,"
 
-#: src/reports.c:550
-#, c-format
+#: src/sst.py:5069
+#, python-format
 msgid "and we will arrive at stardate %.2f."
 msgstr "а мы прибудем %.2f числа."
 
-#: src/reports.c:554
+#: src/sst.py:5071
 msgid "Unfortunately, the Federation will be destroyed by then."
 msgstr "К сожалению, Федерация к тому времени будет уже уничтожена."
 
-#: src/reports.c:556
+#: src/sst.py:5073
 msgid "You'll be taking risks at that speed, Captain"
 msgstr "На такой скорости летать рисковано, Капитан"
 
-#: src/reports.c:560
+#: src/sst.py:5077
 msgid "The starbase there will be destroyed by then."
 msgstr "База к тому моменту уже будет уничтожена."
 
-#: src/reports.c:612
-msgid "Direction? "
-msgstr "Направление? "
-
-#: src/setup.c:15
+#: src/sst.py:5095
 msgid "-SUPER- STAR TREK"
 msgstr "-СУПЕР- ЗВЁЗДНЫЙ ПУТЬ"
 
-#: src/setup.c:18
-msgid "Latest update-21 Sept 78"
-msgstr "Последнее обновление - 21 Сен 78"
-
-#: src/setup.c:33 src/setup.c:66
+#: src/sst.py:5107 src/sst.py:5128
 msgid "File name: "
 msgstr "Имя файла: "
 
-#: src/setup.c:46
-msgid "Can't freeze game as file "
-msgstr "Не могу сохранить игру в "
+#: src/sst.py:5118
+#, python-format
+msgid "Can't freeze game as file %s"
+msgstr "Не могу сохранить игру в файл %s"
 
-#: src/setup.c:78
-msgid "Can't find game file "
-msgstr "Не могу найти файл "
+#: src/sst.py:5139
+#, python-format
+msgid "Can't thaw game in %s"
+msgstr "Не могу загрузить игру из файла %s"
 
-#: src/setup.c:85
-msgid "Game file format is bad, should begin with "
-msgstr "ФАйл с игрой испорчен, он должен был начинаться с "
-
-#: src/setup.c:108
+#: src/sst.py:5153
 msgid "Andoria (Fesoan)"
 msgstr ""
 
-#: src/setup.c:109
+#: src/sst.py:5154
 msgid "Tellar Prime (Miracht)"
 msgstr ""
 
-#: src/setup.c:110
+#: src/sst.py:5155
 msgid "Vulcan (T'Khasi)"
 msgstr ""
 
-#: src/setup.c:111
+#: src/sst.py:5156
 msgid "Medusa"
 msgstr "Медуза"
 
-#: src/setup.c:112
+#: src/sst.py:5157
 msgid "Argelius II (Nelphia)"
 msgstr ""
 
-#: src/setup.c:113
+#: src/sst.py:5158
 msgid "Ardana"
 msgstr "Ардана"
 
-#: src/setup.c:114
+#: src/sst.py:5159
 msgid "Catulla (Cendo-Prae)"
 msgstr ""
 
-#: src/setup.c:115
+#: src/sst.py:5160
 msgid "Gideon"
 msgstr "Гидеон"
 
-#: src/setup.c:116
+#: src/sst.py:5161
 msgid "Aldebaran III"
 msgstr "Альдебаран 3"
 
-#: src/setup.c:117
+#: src/sst.py:5162
 msgid "Alpha Majoris I"
 msgstr ""
 
-#: src/setup.c:118
+#: src/sst.py:5163
 msgid "Altair IV"
 msgstr "Альтаир 4"
 
-#: src/setup.c:119
+#: src/sst.py:5164
 msgid "Ariannus"
 msgstr ""
 
-#: src/setup.c:120
+#: src/sst.py:5165
 msgid "Benecia"
 msgstr ""
 
-#: src/setup.c:121
+#: src/sst.py:5166
 msgid "Beta Niobe I (Sarpeidon)"
 msgstr ""
 
-#: src/setup.c:122
+#: src/sst.py:5167
 msgid "Alpha Carinae II"
 msgstr ""
 
-#: src/setup.c:123
+#: src/sst.py:5168
 msgid "Capella IV (Kohath)"
 msgstr ""
 
-#: src/setup.c:124
+#: src/sst.py:5169
 msgid "Daran V"
 msgstr ""
 
-#: src/setup.c:125
+#: src/sst.py:5170
 msgid "Deneb II"
 msgstr ""
 
-#: src/setup.c:126
+#: src/sst.py:5171
 msgid "Eminiar VII"
 msgstr ""
 
-#: src/setup.c:127
+#: src/sst.py:5172
 msgid "Gamma Canaris IV"
 msgstr ""
 
-#: src/setup.c:128
+#: src/sst.py:5173
 msgid "Gamma Tranguli VI (Vaalel)"
 msgstr ""
 
-#: src/setup.c:129
+#: src/sst.py:5174
 msgid "Ingraham B"
 msgstr ""
 
-#: src/setup.c:130
+#: src/sst.py:5175
 msgid "Janus IV"
 msgstr ""
 
-#: src/setup.c:131
+#: src/sst.py:5176
 msgid "Makus III"
 msgstr ""
 
-#: src/setup.c:132
+#: src/sst.py:5177
 msgid "Marcos XII"
 msgstr ""
 
-#: src/setup.c:133
+#: src/sst.py:5178
 msgid "Omega IV"
 msgstr "Омега 4"
 
-#: src/setup.c:134
+#: src/sst.py:5179
 msgid "Regulus V"
 msgstr ""
 
-#: src/setup.c:135
+#: src/sst.py:5180
 msgid "Deneva"
 msgstr ""
 
-#: src/setup.c:137
+#: src/sst.py:5182
 msgid "Rigel II"
 msgstr ""
 
-#: src/setup.c:138
+#: src/sst.py:5183
 msgid "Beta III"
 msgstr "Бэта 3"
 
-#: src/setup.c:139
+#: src/sst.py:5184
 msgid "Triacus"
 msgstr ""
 
-#: src/setup.c:140
+#: src/sst.py:5185
 msgid "Exo III"
 msgstr ""
 
-#: src/setup.c:143
-msgid "Hansen's Planet"
-msgstr ""
-
-#: src/setup.c:144
-msgid "Taurus IV"
-msgstr ""
-
-#: src/setup.c:145
-msgid "Antos IV (Doraphane)"
-msgstr ""
-
-#: src/setup.c:146
-msgid "Izar"
-msgstr ""
-
-#: src/setup.c:147
-msgid "Tiburon"
-msgstr ""
-
-#: src/setup.c:148
-msgid "Merak II"
-msgstr ""
-
-#: src/setup.c:149
-msgid "Coridan (Desotriana)"
-msgstr ""
-
-#: src/setup.c:150
-msgid "Iotia"
-msgstr "Лоция"
-
-#: src/setup.c:155
+#: src/sst.py:5198
 msgid "S. R. Sensors"
 msgstr "Сенсоры Б. О."
 
-#: src/setup.c:156
+#: src/sst.py:5199
 msgid "L. R. Sensors"
 msgstr "Сенсоры Д. О."
 
-#: src/setup.c:157
+#: src/sst.py:5200
 msgid "Phasers"
 msgstr "Фазеры"
 
-#: src/setup.c:158
+#: src/sst.py:5201
 msgid "Photon Tubes"
 msgstr "Фотонные Трубы"
 
-#: src/setup.c:160
+#: src/sst.py:5203
 msgid "Warp Engines"
 msgstr "Межпростр Двиг"
 
-#: src/setup.c:161
+#: src/sst.py:5204
 msgid "Impulse Engines"
 msgstr "Импульсные Двиг"
 
-#: src/setup.c:163
+#: src/sst.py:5206
 msgid "Subspace Radio"
 msgstr "Межпростр Рация"
 
-#: src/setup.c:164
+#: src/sst.py:5207
 msgid "Shuttle Craft"
 msgstr "Челнок"
 
-#: src/setup.c:165
+#: src/sst.py:5208
 msgid "Computer"
 msgstr "Компьютер"
 
-#: src/setup.c:166
+#: src/sst.py:5209
 msgid "Navigation System"
 msgstr "Сист Навигации"
 
-#: src/setup.c:167
+#: src/sst.py:5210
 msgid "Transporter"
 msgstr "Транспортёр"
 
-#: src/setup.c:168
+#: src/sst.py:5211
 msgid "Shield Control"
 msgstr "Управл Защитой"
 
-#: src/setup.c:169
+#: src/sst.py:5212
 msgid "Death Ray"
 msgstr "Луч Смерти"
 
-#: src/setup.c:170
+#: src/sst.py:5213
 msgid "D. S. Probe"
 msgstr "Д. К. Ракета"
 
-#: src/setup.c:375
-#, c-format
+#: src/sst.py:5375
+#, python-format
 msgid "It is stardate %d. The Federation is being attacked by"
 msgstr "Сегодня %d число. Федерация атакована"
 
-#: src/setup.c:377
+#: src/sst.py:5376
 msgid "a deadly Klingon invasion force. As captain of the United"
 msgstr "беспощадными захватчиками Клингонами. Как капитан"
 
-#: src/setup.c:378
+#: src/sst.py:5377
 msgid "Starship U.S.S. Enterprise, it is your mission to seek out"
 msgstr "звездолёта Энтерпрайз, вы должны найти"
 
-#: src/setup.c:379
-#, c-format
+#: src/sst.py:5378
+#, python-format
 msgid "and destroy this invasion force of %d battle cruisers."
 msgstr "и уничтожить все вторгшиеся войска в составе %d боевых крейсеров."
 
-#: src/setup.c:381
-#, c-format
+#: src/sst.py:5379
+#, python-format
 msgid "You have an initial allotment of %d stardates to complete"
 msgstr "У вас есть %d дней чтобы завершить"
 
-#: src/setup.c:382
+#: src/sst.py:5380
 msgid "your mission.  As you proceed you may be given more time."
 msgstr "эту миссию.  По ходу дела вам могут дать ещё времени."
 
-#: src/setup.c:384
-#, c-format
+#: src/sst.py:5382
+#, python-format
 msgid "You will have %d supporting starbases."
 msgstr "У вас будет %d баз."
 
-#: src/setup.c:385
+#: src/sst.py:5383
 msgid "Starbase locations-  "
 msgstr "Координаты Баз-  "
 
-#: src/setup.c:388
-#, c-format
+#: src/sst.py:5385
+#, python-format
 msgid "Stardate %d."
 msgstr "Число %d."
 
-#: src/setup.c:390
-#, c-format
+#: src/sst.py:5387
+#, python-format
 msgid "%d Klingons."
 msgstr "%d Клингонов."
 
-#: src/setup.c:391
+#: src/sst.py:5388
 msgid "An unknown number of Romulans."
 msgstr "Множество Ромулан."
 
-#: src/setup.c:393
+#: src/sst.py:5390
 msgid "And one (GULP) Super-Commander."
 msgstr "И один (ик!) Глав-ком Клингонов."
 
-#: src/setup.c:394
-#, c-format
+#: src/sst.py:5391
+#, python-format
 msgid "%d stardates."
 msgstr "%d дней."
 
-#: src/setup.c:395
-#, c-format
+#: src/sst.py:5392
+#, python-format
 msgid "%d starbases in "
 msgstr "%d баз в "
 
-#: src/setup.c:402
-msgid "The Enterprise is currently in "
-msgstr "Энтерпрайз сейчас в "
+#: src/sst.py:5397
+#, python-format
+msgid "The Enterprise is currently in Quadrant %s"
+msgstr "Энтерпрайз сейчас в Квадранте %s"
 
-#: src/setup.c:407
+#: src/sst.py:5398
+#, python-format
+msgid " Sector %s"
+msgstr " Сектор %s"
+
+#: src/sst.py:5400
 msgid "Good Luck!"
 msgstr "Удачи!"
 
-#: src/setup.c:409
+#: src/sst.py:5402
 msgid "  YOU'LL NEED IT."
 msgstr "  ОНА ВАМ ПОНАДОБИТСЯ."
 
-#: src/setup.c:427
+#: src/sst.py:5417
 msgid "Would you like a regular, tournament, or saved game? "
 msgstr "Хотите обычную (r), турнирную (t), или сохранённую (s) игру? "
 
-#: src/setup.c:433
+#: src/sst.py:5421
 msgid "Type in tournament number-"
 msgstr "Введите номер турнира-"
 
-#: src/setup.c:458 src/setup.c:482 src/setup.c:514
+#: src/sst.py:5443 src/sst.py:5489
+#, python-format
+msgid "What is \"%s\"?"
+msgstr "Что за \"%s\"?"
+
+#: src/sst.py:5464
 msgid "What is \""
 msgstr "Что за \""
 
-#: src/setup.c:490
+#: src/sst.py:5470
 msgid "Would you like a Short, Medium, or Long game? "
 msgstr "Хотите короткую (s), среднюю (m), или длинную (l) игру? "
 
-#: src/setup.c:492
+#: src/sst.py:5472
 msgid "Are you a Novice, Fair, Good, Expert, or Emeritus player? "
 msgstr ""
 "Вы новичёк (n), средний (f), умелый (g), специалист (e), или Отставной (em)? "
 
-#: src/setup.c:498
+#: src/sst.py:5476
 msgid "Choose your game style (or just press enter): "
 msgstr "Выберите стить игры (или нажмите ввод): "
 
-#: src/setup.c:679
+#: src/sst.py:5596
 msgid "LT. Uhura- \"Captain, an urgent message."
 msgstr "Лт. Ухура- \"Капитан, срочное сообщение."
 
-#: src/setup.c:680
+#: src/sst.py:5597
 msgid "  I'll put it on audio.\"  CLICK"
 msgstr "  Я выведу его на громкоговоритель.\"  ЩЁЛК"
 
-#: src/setup.c:682
+#: src/sst.py:5599
 msgid "INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE."
 msgstr "ЧУЖАК! ТЫ ПЕРЕСЁК ГРАНИЦУ ТЕРРИТОРИИ РОМУЛАН."
 
-#: src/setup.c:683
+#: src/sst.py:5600
 msgid "LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"
 msgstr "УЛЕТАЙ НЕМЕДЛЕННО, ИЛИ БУДЕШЬ УНИЧТОЖЕН!"
 
-#: src/setup.c:700
+#: src/sst.py:5607
 msgid "Mr. Spock- \"Captain, this is most unusual."
 msgstr "Мистер Спок- \"Капитан, тут что-то очень необычное."
 
-#: src/setup.c:701
+#: src/sst.py:5608
 msgid "    Please examine your short-range scan.\""
 msgstr "    Пожалуйста посмотрите результаты ближнего сканирования.\""
 
-#: src/setup.c:797
+#: src/sst.py:5655
 msgid "Please type in a secret password- "
 msgstr "Пожалуйста наберите пароль- "
 
-#: src/sst.c:292
+#: src/sst.py:5711
 msgid "LEGAL COMMANDS ARE:"
 msgstr "ВОЗМОЖНЫЕ КОМАНДЫ:"
 
-#: src/sst.c:317
+#: src/sst.py:5727
 msgid "Help on what command? "
 msgstr "Справка на какую команду? "
 
-#: src/sst.c:349
+#: src/sst.py:5746
 msgid "Spock-  \"Captain, that information is missing from the"
 msgstr "Спок- \"Капитан, такой информации нет в"
 
-#: src/sst.c:350
+#: src/sst.py:5747
 msgid "   computer. You need to find "
 msgstr "   компьютере. Вам надо найти "
 
-#: src/sst.c:352
+#: src/sst.py:5749
 msgid " and put it in the"
 msgstr "и поместить его в"
 
-#: src/sst.c:353
+#: src/sst.py:5750
 msgid "   current directory or to "
 msgstr "   текущий каталог или в "
 
-#: src/sst.c:364
+#: src/sst.py:5759
 msgid "Spock- \"Captain, there is no information on that command.\""
 msgstr "Спок- \"Капитан, на эту команду нет информации.\""
 
-#: src/sst.c:378
+#: src/sst.py:5767
 msgid "Spock- \"Captain, I've found the following information:\""
 msgstr "Спок- \"Капитан, я нашёл кое-какую информацию:\""
 
-#: src/sst.c:552
+#: src/sst.py:5893
 msgid "WARNING--Saved games produce no plaques!"
 msgstr "ПРЕДУПРЕЖДЕНИЕ--Сохранённые игры не дают грамоты!"
 
-#: src/sst.c:684
-msgid "Do you want your score recorded?"
-msgstr "Хотите записать свой счёт? "
-
-#: src/sst.c:690
-msgid "Do you want to play again? "
-msgstr "Хотите сыграть снова? "
-
-#: src/sst.c:695
-msgid "May the Great Bird of the Galaxy roost upon your home planet."
-msgstr "И пусть Великая Птица Галактики нагадит на твою планету."
-
-#: src/sst.c:707
+#: src/sst.py:5934
 msgid "Romulan"
 msgstr "Ромулан"
 
-#: src/sst.c:708
+#: src/sst.py:5935
 msgid "Klingon"
 msgstr "Клингон"
 
-#: src/sst.c:709
+#: src/sst.py:5936
 msgid "Commander"
 msgstr "Командир"
 
-#: src/sst.c:710
+#: src/sst.py:5937
 msgid "Super-commander"
 msgstr "Глав-ком"
 
-#: src/sst.c:711
+#: src/sst.py:5938
 msgid "Star"
 msgstr "Звезда"
 
-#: src/sst.c:712
+#: src/sst.py:5939
 msgid "Planet"
 msgstr "Планета"
 
-#: src/sst.c:713
+#: src/sst.py:5940
 msgid "Starbase"
 msgstr "База"
 
-#: src/sst.c:714
+#: src/sst.py:5941
 msgid "Black hole"
 msgstr "Чёрная дыра"
 
-#: src/sst.c:715
+#: src/sst.py:5942
 msgid "Tholian"
 msgstr "Толиан"
 
-#: src/sst.c:716
+#: src/sst.py:5943
 msgid "Tholian web"
 msgstr "Толианская сеть"
 
-#: src/sst.c:717
+#: src/sst.py:5944
 msgid "Stranger"
 msgstr "Странник"
 
-#: src/sst.c:718
+#: src/sst.py:5945
 msgid "Inhabited World"
 msgstr "Обитаемый Мир"
 
-#: src/sst.c:730
-msgid "Quadrant "
-msgstr "Квадрант "
-
-#: src/sst.c:732
-msgid "Sector "
-msgstr "Сектор "
-
-#: src/sst.c:743
+#: src/sst.py:5954
 msgid " at "
 msgstr " в "
 
-#: src/sst.c:752
+#: src/sst.py:5956
+msgid "Quadrant "
+msgstr "Квадрант "
+
+#: src/sst.py:5958
+msgid "Sector "
+msgstr "Сектор "
+
+#: src/sst.py:5963
 msgid "Enterprise"
 msgstr "Энтерпрайз"
 
-#: src/sst.c:753
+#: src/sst.py:5963
 msgid "Faerie Queene"
 msgstr "Волшебная Королева"
 
-#: src/sst.c:858
+#: src/sst.py:6061
 msgid "Please answer with \"y\" or \"n\": "
 msgstr "Пожалуйста отвечайте Да (\"y\") или Нет (\"n\"): "
 
-#: src/sst.c:867
+#: src/sst.py:6067
 msgid "Beg your pardon, Captain?"
 msgstr "Прошу прощения, Капитан?"
+
+#: src/sst.py:6230
+msgid "Do you want your score recorded?"
+msgstr "Хотите записать свой счёт? "
+
+#: src/sst.py:6236
+msgid "Do you want to play again? "
+msgstr "Хотите сыграть снова? "
+
+#: src/sst.py:6240
+msgid "May the Great Bird of the Galaxy roost upon your home planet."
+msgstr "И пусть Великая Птица Галактики нагадит на твою планету."
+
+#~ msgid " heavily damaged."
+#~ msgstr " серьёзно повреждён."
+
+#~ msgid " damaged--"
+#~ msgstr " повреждён--"
+
+#~ msgid "Celebratory rallies are being held on the Klingon homeworld."
+#~ msgstr "На планете Клингонов прошли праздничные митинги."
+
+#~ msgid " maximized *********"
+#~ msgstr " возрасла *********"
+
+#~ msgid "The "
+#~ msgstr " "
+
+#~ msgid " is destroyed."
+#~ msgstr " уничтожен."
+
+#~ msgid " and"
+#~ msgstr " и "
+
+#~ msgid " dematerializes."
+#~ msgstr " дематериализовался."
+
+#~ msgid "   a planet in "
+#~ msgstr "   планета в "
+
+#~ msgid " has been destroyed"
+#~ msgstr " уничтожена"
+
+#~ msgid " is pulled to "
+#~ msgstr " затянут в "
+
+#~ msgid "   the starbase in "
+#~ msgstr "   база в "
+
+#~ msgid " has been destroyed by"
+#~ msgstr " уничтожена"
+
+#~ msgid "in %s.\n"
+#~ msgstr "в %s.\n"
+
+#~ msgid "[IMPORTANT ANNOUNCEMENT ARRIVING -- PRESS ENTER TO CONTINUE]"
+#~ msgstr "[ПОСТУПИЛО ВАЖНОЕ СООБЩЕНИЕ -- НАЖМИТЕ ВВОД ДЛЯ ПРОДОЛЖЕНИЯ]"
+
+#~ msgid "short"
+#~ msgstr "короткую"
+
+#~ msgid "medium"
+#~ msgstr "сруднюю"
+
+#~ msgid "long"
+#~ msgstr "длинную"
+
+#~ msgid "RED"
+#~ msgstr "КРАСНЫЙ"
+
+#~ msgid "GREEN"
+#~ msgstr "ЗЕЛЁНЫЙ"
+
+#~ msgid "YELLOW"
+#~ msgstr "ЖЁЛТЫЙ"
+
+#~ msgid "DOCKED"
+#~ msgstr "ПРИШВАРТ"
+
+#~ msgid "DEAD"
+#~ msgstr "ПОГИБ"
+
+#~ msgid "Direction? "
+#~ msgstr "Направление? "
+
+#~ msgid "Latest update-21 Sept 78"
+#~ msgstr "Последнее обновление - 21 Сен 78"
+
+#~ msgid "Game file format is bad, should begin with "
+#~ msgstr "ФАйл с игрой испорчен, он должен был начинаться с "
+
+#~ msgid "Iotia"
+#~ msgstr "Лоция"

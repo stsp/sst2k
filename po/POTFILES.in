@@ -1,11 +1,2 @@
 # List of source files which contain translatable strings.
-src/ai.c
-src/battle.c
-src/events.c
-src/finish.c
-src/io.c
-src/moving.c
-src/planets.c
-src/reports.c
-src/setup.c
-src/sst.c
+src/sst.py
