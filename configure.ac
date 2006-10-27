@@ -27,7 +27,7 @@ fi
 # Checks for libraries.
 AC_CHECK_LIB(m, floor, [],
     AC_MSG_ERROR([math library is missing on your system.]))
-AC_CHECK_LIB(ncurses, newwin, [],
+AC_CHECK_LIB(ncursesw, newwin, [],
     AC_MSG_ERROR([ncurses library is missing on your system.]))
 
 # Checks for header files.
