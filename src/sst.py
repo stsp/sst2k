@@ -6200,9 +6200,10 @@ if __name__ == '__main__':
                 raise SystemExit, 1
         # where to save the input in case of bugs
         try:
-            logfp = open("/usr/tmp/sst-input.log", "w")
+            logfp = open("/tmp/sst-input.log", "w")
         except IOError:
             sys.stderr.write("sst: warning, can't open logfile\n")
+            sys.exit(1)
         if logfp:
             logfp.write("# seed %s\n" % seed)
             logfp.write("# options %s\n" % " ".join(arguments))
