@@ -870,7 +870,6 @@ def doshield(shraise):
 	if action=="NONE":
 	    proutn(_("Do you wish to change shield energy? "))
 	    if ja() == True:
-		proutn(_("Energy to transfer to shields- "))
 		action = "NRG"
 	    elif damaged(DSHIELD):
 		prout(_("Shields damaged and down."))
@@ -918,21 +917,22 @@ def doshield(shraise):
 	while scanner.next() != "IHREAL":
 	    scanner.chew()
 	    proutn(_("Energy to transfer to shields- "))
+        nrg = scanner.real
 	scanner.chew()
-	if scanner.real == 0:
+	if nrg == 0:
 	    return
-	if scanner.real > game.energy:
+	if nrg > game.energy:
 	    prout(_("Insufficient ship energy."))
 	    return
 	game.ididit = True
-	if game.shield+scanner.real >= game.inshld:
+	if game.shield+nrg >= game.inshld:
 	    prout(_("Shield energy maximized."))
-	    if game.shield+scanner.real > game.inshld:
+	    if game.shield+nrg > game.inshld:
 		prout(_("Excess energy requested returned to ship energy"))
 	    game.energy -= game.inshld-game.shield
 	    game.shield = game.inshld
 	    return
-	if scanner.real < 0.0 and game.energy-scanner.real > game.inenrg:
+	if nrg < 0.0 and game.energy-nrg > game.inenrg:
 	    # Prevent shield drain loophole 
 	    skip(1)
 	    prout(_("Engineering to bridge--"))
@@ -940,18 +940,18 @@ def doshield(shraise):
 	    prout(_("  I can't drain the shields."))
 	    game.ididit = False
 	    return
-	if game.shield+scanner.real < 0:
+	if game.shield+nrg < 0:
 	    prout(_("All shield energy transferred to ship."))
 	    game.energy += game.shield
 	    game.shield = 0.0
 	    return
 	proutn(_("Scotty- \""))
-	if scanner.real > 0:
+	if nrg > 0:
 	    prout(_("Transferring energy to shields.\""))
 	else:
 	    prout(_("Draining energy from shields.\""))
-	game.shield += scanner.real
-	game.energy -= scanner.real
+	game.shield += nrg
+	game.energy -= nrg
 	return
 
 def randdevice():
