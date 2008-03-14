@@ -328,17 +328,37 @@ void finish(FINTYPE ifin)
     score();
 }
 
+static void score_item(const char *str, int num, int score)
+{
+    if (num) {
+	prout(str, num, score);
+	iscore += score;
+    }
+}
+
+static void score_item1(const char *str, int score)
+{
+    prout(str, score);
+    iscore += score;
+}
+
+static void score_itemf(const char *str, float num, int score)
+{
+    if (num > 0) {
+	prout(str, num, score);
+	iscore += score;
+    }
+}
+
 void score(void) 
 /* compute player's score */
 {
     double timused = game.state.date - game.indate;
-    int ithperd, iwon, klship;
+    int iwon, klship, num;
 
     iskill = game.skill;
     if ((timused == 0 || (game.state.remkl + game.state.remcom + game.state.nscrem) != 0) && timused < 5.0)
 	timused = 5.0;
-    perdate = ((game.inkling + game.incom + game.inscom) - (game.state.remkl + game.state.remcom + game.state.nscrem))/timused;
-    ithperd = 500*perdate + 0.5;
     iwon = 0;
     if (game.gamewon)
 	iwon = 100*game.skill;
@@ -348,59 +368,43 @@ void score(void)
 	klship = 1;
     else
 	klship = 2;
-    if (!game.gamewon)
-	game.state.nromrem = 0; // None captured if no win
-    iscore = 10*(game.inkling - game.state.remkl) + 50*(game.incom - game.state.remcom) + ithperd + iwon
-	- 100*game.state.basekl - 100*klship - 45*game.nhelp -5*game.state.starkl - game.casual
-	+ 20*(game.inrom - game.state.nromrem) + 200*(game.inscom - game.state.nscrem) - 10*game.state.nplankl - 300*game.state.nworldkl + game.state.nromrem;
-    if (!game.alive)
-	iscore -= 200;
+    iscore = 0;
     skip(2);
     prout(_("Your score --"));
-    if (game.inrom - game.state.nromrem)
-	prout(_("%6d Romulans destroyed                 %5d"),
-	      game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem));
-    if (game.state.nromrem)
-	prout(_("%6d Romulans captured                  %5d"),
+    num = game.inrom - game.state.nromrem;
+    score_item(_("%6d Romulans destroyed                 %5d"), num, 20 * num);
+    if (game.gamewon)
+	score_item(_("%6d Romulans captured                  %5d"),
 	      game.state.nromrem, game.state.nromrem);
-    if (game.inkling - game.state.remkl)
-	prout(_("%6d ordinary Klingons destroyed        %5d"),
-	      game.inkling - game.state.remkl, 10*(game.inkling - game.state.remkl));
-    if (game.incom - game.state.remcom)
-	prout(_("%6d Klingon commanders destroyed       %5d"),
-	      game.incom - game.state.remcom, 50*(game.incom - game.state.remcom));
-    if (game.inscom - game.state.nscrem)
-	prout(_("%6d Super-Commander destroyed          %5d"),
-	      game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem));
-    if (ithperd)
-	prout(_("%6.2f Klingons per stardate              %5d"),
-	      perdate, ithperd);
-    if (game.state.starkl)
-	prout(_("%6d stars destroyed by your action     %5d"),
-	      game.state.starkl, -5*game.state.starkl);
-    if (game.state.nplankl)
-	prout(_("%6d planets destroyed by your action   %5d"),
-	      game.state.nplankl, -10*game.state.nplankl);
-    if ((game.options & OPTION_WORLDS) && game.state.nworldkl)
-	prout(_("%6d inhabited planets destroyed by your action   %5d"),
-	      game.state.nplankl, -300*game.state.nworldkl);
-    if (game.state.basekl)
-	prout(_("%6d bases destroyed by your action     %5d"),
-	      game.state.basekl, -100*game.state.basekl);
-    if (game.nhelp)
-	prout(_("%6d calls for help from starbase       %5d"),
-	      game.nhelp, -45*game.nhelp);
-    if (game.casual)
-	prout(_("%6d casualties incurred                %5d"),
-	      game.casual, -game.casual);
-    if (game.abandoned)
-	prout(_("%6d crew abandoned in space            %5d"),
-	      game.abandoned, -3*game.abandoned);
-    if (klship)
-	prout(_("%6d ship(s) lost or destroyed          %5d"),
-	      klship, -100*klship);
+    num = game.inkling - game.state.remkl;
+    score_item(_("%6d ordinary Klingons destroyed        %5d"), num, 10 * num);
+    num = game.incom - game.state.remcom;
+    score_item(_("%6d Klingon commanders destroyed       %5d"), num, 50 * num);
+    num = game.inscom - game.state.nscrem;
+    score_item(_("%6d Super-Commander destroyed          %5d"), num, 200 * num);
+    perdate = ((game.inkling + game.incom + game.inscom) -
+	    (game.state.remkl + game.state.remcom + game.state.nscrem))/timused;
+    score_itemf(_("%6.2f Klingons per stardate              %5d"), perdate,
+	    500 * perdate + 0.5);
+    score_item(_("%6d stars destroyed by your action     %5d"),
+	    game.state.starkl, -5*game.state.starkl);
+    score_item(_("%6d planets destroyed by your action   %5d"),
+	    game.state.nplankl, -10*game.state.nplankl);
+    if (game.options & OPTION_WORLDS)
+	score_item(_("%6d inhabited planets destroyed by your action   %5d"),
+		game.state.nworldkl, -300*game.state.nworldkl);
+    score_item(_("%6d bases destroyed by your action     %5d"),
+	    game.state.basekl, -100*game.state.basekl);
+    score_item(_("%6d calls for help from starbase       %5d"),
+	    game.nhelp, -45*game.nhelp);
+    score_item(_("%6d casualties incurred                %5d"),
+	    game.casual, -game.casual);
+    score_item(_("%6d crew abandoned in space            %5d"),
+	    game.abandoned, -3*game.abandoned);
+    score_item(_("%6d ship(s) lost or destroyed          %5d"),
+	    klship, -100*klship);
     if (!game.alive)
-	prout(_("Penalty for getting yourself killed        -200"));
+	score_item1(_("Penalty for getting yourself killed        %5d"), -200);
     if (game.gamewon) {
 	proutn(_("Bonus for winning "));
 	switch (game.skill) {

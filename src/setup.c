@@ -495,7 +495,7 @@ bool choose(bool needprompt)
     // Choose game options -- added by ESR for SST2K
     if (scan() != IHALPHA) {
 	chew();
-	proutn(_("Choose your game style (or just press enter): "));
+	proutn(_("Choose your game style (plain, almy, fancy or just press enter): "));
 	scan();
     }
     if (isit("plain")) {

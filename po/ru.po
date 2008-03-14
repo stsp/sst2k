@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sst 2.0\n"
 "Report-Msgid-Bugs-To: stsp\n"
-"POT-Creation-Date: 2006-10-23 21:47+0400\n"
+"POT-Creation-Date: 2008-03-13 10:49+0300\n"
 "PO-Revision-Date: 2006-09-15 11:01+0400\n"
 "Last-Translator: Stas Sergeev <stsp@aknet.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -590,7 +590,7 @@ msgstr "Галилей, оставшийся на планете, хорошо �
 #: src/sst.py:1974
 #, python-format
 msgid " is pulled to Quadrant %s, Sector %s"
-msgstr ""
+msgstr " затянут в Квадрант %s, Сектор %s"
 
 #: src/sst.py:1977
 msgid "(Remainder of rest/repair period cancelled.)"
@@ -868,7 +868,7 @@ msgstr "СБОЙ-СБОЙ-СБОЙ-ОШИБКА"
 
 #: src/sst.py:2737
 msgid "  YOUR-SKILL-HAS-EXCEEDED-THE-CAPACITY-OF-THIS-PROGRAM"
-msgstr "  ВАШЕ-МАСТЕРСТВО-НЕПОДВЛАСТНО-ЭТОЙ-ПРОГРАММЕ"
+msgstr "  ВАШЕ-МАСТЕРСТВО-ВЫШЛО-ЗА-РАМКИ-ВОЗМОЖНОСТЕЙ-ПРОГРАММЫ"
 
 #: src/sst.py:2739 src/sst.py:2741 src/sst.py:2743
 msgid "  THIS-PROGRAM-MUST-SURVIVE"
@@ -3037,11 +3037,11 @@ msgstr "и уничтожить все вторгшиеся войска в со
 #: src/sst.py:5379
 #, python-format
 msgid "You have an initial allotment of %d stardates to complete"
-msgstr "У вас есть %d дней чтобы завершить"
+msgstr "У вас есть %d дней чтобы выполнить"
 
 #: src/sst.py:5380
 msgid "your mission.  As you proceed you may be given more time."
-msgstr "эту миссию.  По ходу дела вам могут дать ещё времени."
+msgstr "эту миссию.  По ходу дела вам могут дать ещё время."
 
 #: src/sst.py:5382
 #, python-format
@@ -3125,8 +3125,8 @@ msgstr ""
 "Вы новичёк (n), средний (f), умелый (g), специалист (e), или Отставной (em)? "
 
 #: src/sst.py:5476
-msgid "Choose your game style (or just press enter): "
-msgstr "Выберите стить игры (или нажмите ввод): "
+msgid "Choose your game style (plain, almy, fancy or just press enter): "
+msgstr "Выберите стиль игры (plain, almy, fancy или нажмите ввод): "
 
 #: src/sst.py:5596
 msgid "LT. Uhura- \"Captain, an urgent message."
@@ -3174,7 +3174,7 @@ msgstr "   компьютере. Вам надо найти "
 
 #: src/sst.py:5749
 msgid " and put it in the"
-msgstr "и поместить его в"
+msgstr " и поместить его в"
 
 #: src/sst.py:5750
 msgid "   current directory or to "

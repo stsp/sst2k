@@ -2904,8 +2904,6 @@ def score():
 	klship = 1
     else:
 	klship = 2
-    if not game.gamewon:
-	game.state.nromrem = 0 # None captured if no win
     iscore = 10*(game.inkling - game.state.remkl) \
              + 50*(game.incom - len(game.state.kcmdr)) \
              + ithperd + iwon \
@@ -2920,7 +2918,7 @@ def score():
     if game.inrom - game.state.nromrem:
 	prout(_("%6d Romulans destroyed                 %5d") %
 	      (game.inrom - game.state.nromrem, 20*(game.inrom - game.state.nromrem)))
-    if game.state.nromrem:
+    if game.state.nromrem and game.gamewon:
 	prout(_("%6d Romulans captured                  %5d") %
 	      (game.state.nromrem, game.state.nromrem))
     if game.inkling - game.state.remkl:
@@ -2943,7 +2941,7 @@ def score():
 	      (game.state.nplankl, -10*game.state.nplankl))
     if (game.options & OPTION_WORLDS) and game.state.nworldkl:
 	prout(_("%6d inhabited planets destroyed by your action   %5d") %
-	      (game.state.nplankl, -300*game.state.nworldkl))
+	      (game.state.nworldkl, -300*game.state.nworldkl))
     if game.state.basekl:
 	prout(_("%6d bases destroyed by your action     %5d") %
 	      (game.state.basekl, -100*game.state.basekl))
@@ -5473,7 +5471,7 @@ def choose():
     # Choose game options -- added by ESR for SST2K
     if scanner.next() != "IHALPHA":
 	scanner.chew()
-	proutn(_("Choose your game style (or just press enter): "))
+	proutn(_("Choose your game style (plain, almy, fancy or just press enter): "))
 	scanner.next()
     if scanner.sees("plain"):
 	# Approximates the UT FORTRAN version.
