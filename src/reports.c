@@ -154,9 +154,7 @@ void lrscan(void)
 		proutn("  -1");
 	    else {
 		game.state.galaxy[x][y].charted = true;
-		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
-		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
-		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
+		rechart();
 		if (game.state.galaxy[x][y].supernova) 
 		    proutn(" ***");
 		else
