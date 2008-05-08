@@ -2326,7 +2326,7 @@ def events():
 		else:
 		    prout(_("Uhura- Starfleet reports increased Klingon activity"))
 		    if q.planet != None:
-			proutn(_("near %s") % q.planet)
+			proutn(_("near %s ") % q.planet)
 		    prout(_("in Quadrant %s.") % w)
 				
 def wait():

@@ -759,8 +759,7 @@ void atover(bool igrab)
 	crmshp();
 	skip(1);
 	prout(_("safely out of quadrant."));
-	if (!damaged(DRADIO))
-	    game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
+	game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
 	/* Try to use warp engines */
 	if (damaged(DWARPEN)) {
 	    skip(1);

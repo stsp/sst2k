@@ -153,8 +153,7 @@ void lrscan(void)
 	    if (!VALID_QUADRANT(x, y))
 		proutn("  -1");
 	    else {
-		if (!damaged(DRADIO))
-		    game.state.galaxy[x][y].charted = true;
+		game.state.galaxy[x][y].charted = true;
 		game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
 		game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
 		game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
@@ -192,18 +191,57 @@ void damagereport(void)
 	prout(_("All devices functional."));
 }
 
-void rechart(void)
+static void rechart_quad(int x, int y)
+{
+    if (game.state.galaxy[x][y].charted) {
+	game.state.chart[x][y].klingons = game.state.galaxy[x][y].klingons;
+	game.state.chart[x][y].starbase = game.state.galaxy[x][y].starbase;
+	game.state.chart[x][y].stars = game.state.galaxy[x][y].stars;
+    }
+}
+
+static void rechart_dsradio(void)
 /* update the chart in the Enterprise's computer from galaxy data */
 {
     int i, j;
     game.lastchart = game.state.date;
     for (i = 1; i <= GALSIZE; i++)
 	for (j = 1; j <= GALSIZE; j++)
-	    if (game.state.galaxy[i][j].charted) {
-		game.state.chart[i][j].klingons = game.state.galaxy[i][j].klingons;
-		game.state.chart[i][j].starbase = game.state.galaxy[i][j].starbase;
-		game.state.chart[i][j].stars = game.state.galaxy[i][j].stars;
-	    }
+	    rechart_quad(i, j);
+}
+
+static void rechart_lr(void)
+/* update the chart in the Enterprise's computer from galaxy data */
+{
+    int i, j;
+    for (i = game.quadrant.x-1; i <= game.quadrant.x+1; i++) {
+	for (j = game.quadrant.y-1; j <= game.quadrant.y+1; j++) {
+	    if (i == game.quadrant.x && j == game.quadrant.y)
+		continue;
+	    rechart_quad(i, j);
+	}
+    }
+}
+
+static void rechart_sr(void)
+/* update the chart in the Enterprise's computer from galaxy data */
+{
+    rechart_quad(game.quadrant.x, game.quadrant.y);
+}
+
+void rechart(void)
+{
+    if (!damaged(DRADIO) || game.condition == docked) {
+	if (game.lastchart < game.state.date && game.condition == docked)
+	    prout(_("Spock-  \"I revised the Star Chart from the "
+		    "starbase's records.\""));
+	rechart_dsradio();
+    } else {
+	if (!damaged(DLRSENS))
+	    rechart_lr();
+	if (!damaged(DSRSENS))
+	    rechart_sr();
+    }
 }
 
 void chart(void)
@@ -212,13 +250,7 @@ void chart(void)
     int i,j;
     chew();
 
-    if (!damaged(DRADIO))
-	rechart();
-
-    if (game.lastchart < game.state.date && game.condition == docked) {
-	prout(_("Spock-  \"I revised the Star Chart from the starbase's records.\""));
-	rechart();
-    }
+    rechart();
 
     prout(_("       STAR CHART FOR THE KNOWN GALAXY"));
     if (game.state.date > game.lastchart)
@@ -403,11 +435,9 @@ void srscan(void)
     }
     else
 	prout(_("     Short-range scan"));
-    if (goodScan && !damaged(DRADIO)) { 
-	game.state.chart[game.quadrant.x][game.quadrant.y].klingons = game.state.galaxy[game.quadrant.x][game.quadrant.y].klingons;
-	game.state.chart[game.quadrant.x][game.quadrant.y].starbase = game.state.galaxy[game.quadrant.x][game.quadrant.y].starbase;
-	game.state.chart[game.quadrant.x][game.quadrant.y].stars = game.state.galaxy[game.quadrant.x][game.quadrant.y].stars;
+    if (goodScan) {
 	game.state.galaxy[game.quadrant.x][game.quadrant.y].charted = true;
+	rechart();
     }
     prout("    1 2 3 4 5 6 7 8 9 10");
     if (game.condition != docked)

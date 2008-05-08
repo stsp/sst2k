@@ -62,10 +62,11 @@ void events(void)
 {
     int evcode, i=0, j, k, l;
     double fintim = game.state.date + game.optime, datemin, xtime, repair, yank=0;
-    bool radio_was_broken, ictbeam = false, istract = false;
+    bool ictbeam = false, istract = false;
     struct quadrant *pdest, *q;
     coord w, hold;
     event *ev, *ev2;
+    bool fixed_dev[NDEVICES];
 
     if (idebug) {
 	prout("=== EVENTS from %.2f to %.2f:", game.state.date, fintim);
@@ -90,8 +91,6 @@ void events(void)
 
 	}
     }
-
-    radio_was_broken = damaged(DRADIO);
 
     hold.x = hold.y = 0;
     for (;;) {
@@ -137,11 +136,18 @@ void events(void)
 	if (game.condition == docked)
 	    repair /= game.docfac;
 	/* Don't fix Deathray here */
-	for (l=0; l<NDEVICES; l++)
-	    if (game.damage[l] > 0.0 && l != DDRAY)
-		game.damage[l] -= (game.damage[l]-repair > 0.0 ? repair : game.damage[l]);
+	for (l=0; l<NDEVICES; l++) {
+	    fixed_dev[l] = false;
+	    if (game.damage[l] > 0.0 && l != DDRAY) {
+		double reminder = (game.damage[l] > repair ?
+			game.damage[l] - repair : .0);
+		game.damage[l] = reminder;
+		if (!(reminder > 0))
+		    fixed_dev[l] = true;
+	    }
+	}
 	/* If radio repaired, update star chart and attack reports */
-	if (radio_was_broken && !damaged(DRADIO)) {
+	if (fixed_dev[DRADIO]) {
 	    prout(_("Lt. Uhura- \"Captain, the sub-space radio is working and"));
 	    prout(_("   surveillance reports are coming in."));
 	    skip(1);
@@ -149,10 +155,11 @@ void events(void)
 		attackreport(false);
 		game.iseenit = true;
 	    }
-	    rechart();
 	    prout(_("   The star chart is now up to date.\""));
 	    skip(1);
 	}
+	if (fixed_dev[DRADIO] || fixed_dev[DLRSENS] || fixed_dev[DSRSENS])
+	    rechart();
 	/* Cause extraneous event EVCODE to occur */
 	game.optime -= xtime;
 	switch (evcode) {
@@ -541,7 +548,7 @@ void events(void)
 		} else {
 		    prout(_("Uhura- Starfleet reports increased Klingon activity"));
 		    if (q->planet != NOPLANET)
-			proutn(_("near %s"), systnames[q->planet]);
+			proutn(_("near %s "), systnames[q->planet]);
 		    prout(_("in %s.\n"), cramlc(quadrant, w));
 		}
 	    }
@@ -895,7 +902,11 @@ void supernova(bool induced, coord *w)
 	game.state.nscrem = game.state.kscmdr.x = game.state.kscmdr.y = game.isatb =  0;
 	game.iscate = false;
 	unschedule(FSCMOVE);
+    }
+    if (same(nq, game.battle)) {
 	unschedule(FSCDBAS);
+	unschedule(FCDBAS);
+	invalidate(game.battle);
     }
     if (game.state.remcom) {
 	int maxloop = game.state.remcom, l;

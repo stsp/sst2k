@@ -82,7 +82,7 @@ force is -1000. Having shields down subtracts an additional 1000.
 346*K + 400*R + 500*(C+S) - 400 for expert and emeritus.
 
 Attacker Initial energy levels (nominal):
-Klingon   Romulan   Commander   Super-Commander
+        Klingon    Romulan    Commander   Super-Commander
 Novice    400        700        1200        
 Fair      425        750        1250
 Good      450        800        1300        1750
