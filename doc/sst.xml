@@ -66,19 +66,20 @@ mode (all features enabled).</para>
 <refsect1 id='files'><title>FILES</title>
 <variablelist>
 <varlistentry>
-<term>/usr/share/doc/sst/sst.doc</term>
+<term><filename>/usr/share/doc/sst/sst.doc</filename></term>
 <listitem>
 <para>Documentation file.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>/usr/tmp/sst-input.log</term>
+<term><filename>$TMPDIR/sst-input.log</filename></term>
 <listitem>
-<para>Where user input is saved to (send this with your bug reports).</para>
+<para>Where user input is saved to (send this with your bug reports).
+If TMPDIR is not set is defaults to <filename>/tmp</filename>.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>emsave.trk</term>
+<term><filename>emsave.trk</filename></term>
 <listitem>
 <para>Save file produced by EMEXIT command.</para>
 </listitem>

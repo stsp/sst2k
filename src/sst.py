@@ -6197,8 +6197,12 @@ if __name__ == '__main__':
                 sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
                 raise SystemExit, 1
         # where to save the input in case of bugs
+        if "TMPDIR" in os.environ:
+            tmpdir = os.environ['TMPDIR']
+        else:
+            tmpdir = "/tmp"
         try:
-            logfp = open("/tmp/sst-input.log", "w")
+            logfp = open(os.path.join(tmpdir, "sst-input.log"), "w")
         except IOError:
             sys.stderr.write("sst: warning, can't open logfile\n")
             sys.exit(1)
