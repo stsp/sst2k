@@ -240,8 +240,8 @@ separate project).  I then hand-tuned and refactored the result.
 
 The LOC count dropped by almost exactly 20% during this process, from
 a bit over 8100 lines to a bit over 6500 lines.  If the code is still
-shorter than that when you read thism, it's because this file comtains
-nost of what used to be a huge header comment.  
+shorter than that when you read this, it's because this file contains
+most of what used to be a huge header comment.  
 
 SST is not a data-structure- intensive program, so it compresses less
 under translation to Python than the 50% drop in LOC I've found to be
