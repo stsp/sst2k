@@ -649,7 +649,7 @@ def movescom(iq, avoid):
     game.state.kscmdr = iq
     game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons += 1
     if game.state.kscmdr==game.quadrant:
-	# SC has scooted, Remove him from current quadrant 
+	# SC has scooted, remove him from current quadrant 
 	game.iscate=False
 	game.isatb=0
 	game.ientesc = False
@@ -4458,7 +4458,7 @@ def usecrystals():
     skip(1)
     prouts(_("Scotty-  \"Keep your fingers crossed, Sir!\""))
     skip(1)
-    if with(game.cryprob):
+    if random.random() > game.cryprob:
 	prouts(_("  \"Activating now! - - No good!  It's***"))
 	skip(2)
 	prouts(_("***RED ALERT!  RED A*L********************************"))
