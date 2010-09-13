@@ -11,10 +11,6 @@ Short-term items:
 
 Long-term items:
 
-* Python's random module supports the von Mises distribution (circular
-  equivalent of the Gaussian).  Tweak the code that handles dispersion
-  in torpedos and explosion displacements to use it.
-
 * Wrap a GUI around it.
 
 * Wandering planet-killer as in "The Doomsday Machine";
