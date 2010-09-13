@@ -4459,7 +4459,7 @@ def usecrystals():
     skip(1)
     prouts(_("Scotty-  \"Keep your fingers crossed, Sir!\""))
     skip(1)
-    if random.random() > game.cryprob:
+    if withprob(game.cryprob):
 	prouts(_("  \"Activating now! - - No good!  It's***"))
 	skip(2)
 	prouts(_("***RED ALERT!  RED A*L********************************"))
