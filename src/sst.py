@@ -970,11 +970,12 @@ def randdevice():
 	15,	# DCOMPTR: computer			 1.5% 
 	20,	# NAVCOMP: navigation system		 2.0% 
 	75,	# DTRANSP: transporter			 7.5% 
-	20,	# DSHCTRL: high-speed shield controller 2.0% 
+	20,	# DSHCTRL: high-speed shield controller  2.0% 
 	10,	# DDRAY: death ray			 1.0% 
 	30,	# DDSP: deep-space probes		 3.0% 
     )
-    idx = randrange(1000)	# weights must sum to 1000 
+    assert(sum(weights) == 1000)
+    idx = randrange(1000)
     sum = 0
     for (i, w) in enumerate(weights):
 	sum += w
