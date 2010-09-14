@@ -33,6 +33,24 @@ MINCMDR 	= 10		# Minimum number of Klingon commanders
 DOCKFAC		= 0.25		# Repair faster when docked
 PHASEFAC	= 2.0		# Unclear what this is, it was in the C version
 
+DEFAULT      = -1
+BLACK        = 0
+BLUE         = 1
+GREEN        = 2
+CYAN         = 3
+RED          = 4
+MAGENTA      = 5
+BROWN        = 6
+LIGHTGRAY    = 7
+DARKGRAY     = 8
+LIGHTBLUE    = 9
+LIGHTGREEN   = 10
+LIGHTCYAN    = 11
+LIGHTRED     = 12
+LIGHTMAGENTA = 13
+YELLOW       = 14
+WHITE        = 15
+
 class TrekError:
     pass
 
@@ -183,6 +201,7 @@ OPTION_WORLDS	= 0x00000800	# logic for inhabited worlds (ESR, 2006)
 OPTION_AUTOSCAN	= 0x00001000	# automatic LRSCAN before CHART (ESR, 2006)
 OPTION_PLAIN	= 0x01000000	# user chose plain game 
 OPTION_ALMY	= 0x02000000	# user chose Almy variant 
+OPTION_COLOR    = 0x04000000	# enable color display (experimental, ESR, 2010)
 
 # Define devices 
 DSRSENS	= 0
@@ -3058,6 +3077,17 @@ def iostart():
 	stdscr.keypad(True)
 	curses.nonl()
 	curses.cbreak()
+        if game.options & OPTION_COLOR:
+            curses.start_color();
+            curses.use_default_colors()
+            curses.init_pair(curses.COLOR_BLACK,   curses.COLOR_BLACK, -1);
+            curses.init_pair(curses.COLOR_GREEN,   curses.COLOR_GREEN, -1);
+            curses.init_pair(curses.COLOR_RED,     curses.COLOR_RED, -1);
+            curses.init_pair(curses.COLOR_CYAN,    curses.COLOR_CYAN, -1);
+            curses.init_pair(curses.COLOR_WHITE,   curses.COLOR_WHITE, -1);
+            curses.init_pair(curses.COLOR_MAGENTA, curses.COLOR_MAGENTA, -1);
+            curses.init_pair(curses.COLOR_BLUE,    curses.COLOR_BLUE, -1);
+            curses.init_pair(curses.COLOR_YELLOW,  curses.COLOR_YELLOW, -1);
         global fullscreen_window, srscan_window, report_window, status_window
         global lrscan_window, message_window, prompt_window
         (rows, columns)   = stdscr.getmaxyx()
@@ -3204,7 +3234,48 @@ def clrscr():
        curwnd.move(0, 0)
        curwnd.refresh()
     linecount = 0
-    
+
+def textcolor(color=DEFAULT):
+    if game.options & OPTION_COLOR:
+	if color == DEFAULT: 
+	    curwnd.attrset(0);
+	elif color ==  BLACK: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK));
+	elif color ==  BLUE: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE));
+	elif color ==  GREEN: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN));
+	elif color ==  CYAN: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN));
+	elif color ==  RED: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_RED));
+	elif color ==  MAGENTA: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA));
+	elif color ==  BROWN: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW));
+	elif color ==  LIGHTGRAY: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE));
+	elif color ==  DARKGRAY: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK) | curses.A_BOLD);
+	elif color ==  LIGHTBLUE: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE) | curses.A_BOLD);
+	elif color ==  LIGHTGREEN: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN) | curses.A_BOLD);
+	elif color ==  LIGHTCYAN: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN) | curses.A_BOLD);
+	elif color ==  LIGHTRED: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_RED) | curses.A_BOLD);
+	elif color ==  LIGHTMAGENTA: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA) | curses.A_BOLD);
+	elif color ==  YELLOW: 
+	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW) | curses.A_BOLD);
+	elif color ==  WHITE:
+	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE) | curses.A_BOLD);
+
+def highvideo():
+    if game.options & OPTION_COLOR:
+        curwnd.attron(curses.A_REVERSE)
+
 #
 # Things past this point have policy implications.
 # 
@@ -4107,10 +4178,12 @@ def mayday():
 	elif m == 3: proutn(_("3rd"))
 	proutn(_(" attempt to re-materialize ") + crmshp())
 	game.quad[ix][iy]=('-','o','O')[m-1]
+        textcolor(RED)
 	warble()
 	if randreal() > probf:
 	    break
 	prout(_("fails."))
+        textcolor(DEFAULT)
 	curses.delay_output(500)
     if m > 3:
 	game.quad[ix][iy]='?'
@@ -4120,7 +4193,9 @@ def mayday():
 	finish(FMATERIALIZE)
 	return
     game.quad[ix][iy]=game.ship
+    textcolor(GREEN);
     prout(_("succeeds."))
+    textcolor(DEFAULT);
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
@@ -4868,7 +4943,15 @@ def chart():
 def sectscan(goodScan, i, j):
     "Light up an individual dot in a sector."
     if goodScan or (abs(i-game.sector.i)<= 1 and abs(j-game.sector.j) <= 1):
+        textcolor({"green":GREEN,
+                   "yellow":YELLOW,
+                   "red":RED,
+                   "docked":CYAN,
+                   "dead":BROWN}[game.condition]) 
+        if game.quad[i][j] != game.ship: 
+            highvideo();
 	proutn("%c " % game.quad[i][j])
+        textcolor(DEFAULT)
     else:
 	proutn("- ")
 
@@ -5486,6 +5569,7 @@ def choose():
 	pass
     elif len(scanner.token):
         proutn(_("What is \"%s\"?") % scanner.token)
+    game.options &=~ OPTION_COLOR
     setpassword()
     if game.passwd == "debug":
 	idebug = True
