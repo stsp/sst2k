@@ -13,8 +13,7 @@ ion how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
-SSTDOC  	= "/usr/share/doc/sst/sst.doc"
-DOC_NAME	= "sst.doc"
+docpath  	= (".", "../doc", "/usr/share/doc/sst")
 
 def _(str): return gettext.gettext(str)
 
@@ -5812,7 +5811,7 @@ def helpme():
 	setwnd(message_window)
 	if key == "IHEOL":
 	    return
-        if scanner.token in commands or scanner.token == "ABBREV":
+        if scanner.token.upper() in commands or scanner.token == "ABBREV":
 	    break
 	skip(1)
 	listCommands()
@@ -5820,22 +5819,20 @@ def helpme():
 	scanner.chew()
 	skip(1)
     cmd = scanner.token.upper()
-    try:
-        fp = open(SSTDOC, "r")
-    except IOError:
+    for directory in docpath:
         try:
-            fp = open(DOC_NAME, "r")
+            fp = open(os.path.join(directory, "sst.doc"), "r")
+            break
         except IOError:
-            prout(_("Spock-  \"Captain, that information is missing from the"))
-            proutn(_("   computer. You need to find "))
-            proutn(DOC_NAME)
-            prout(_(" and put it in the"))
-            proutn(_("   current directory or to "))
-            proutn(SSTDOC)
-            prout(".\"")
-            # This used to continue: "You need to find SST.DOC and put 
-            # it in the current directory."
-            return
+            pass
+    else:
+        prout(_("Spock-  \"Captain, that information is missing from the"))
+        prout(_("   computer. You need to find sst.doc and put it somewhere"))
+        proutn(_("   in these directories: %s") % ":".join(docpath))
+        prout(".\"")
+        # This used to continue: "You need to find SST.DOC and put 
+        # it in the current directory."
+        return
     while True:
         linebuf = fp.readline()
 	if linebuf == '':
@@ -5844,12 +5841,13 @@ def helpme():
 	    return
 	if linebuf[0] == '%' and linebuf[1] == '%' and linebuf[2] == ' ':
             linebuf = linebuf[3:].strip()
-            if cmd == linebuf:
+            if cmd.upper() == linebuf:
 		break
     skip(1)
     prout(_("Spock- \"Captain, I've found the following information:\""))
     skip(1)
-    while linebuf in fp:
+    while True:
+        linebuf = fp.readline()
         if "******" in linebuf:
 	    break
 	proutn(linebuf)
