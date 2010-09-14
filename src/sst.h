@@ -270,7 +270,7 @@ struct game {
 	inplan,		// initial planets
 	nenhere,	// number of enemies in quadrant
 	irhere,		// Romulans in quadrant
-	isatb,		// =1 if super commander is attacking base
+	isatb,		// =2 if super commander is attacking base
 	tourn,		// tournament number
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available

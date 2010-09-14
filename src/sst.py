@@ -319,7 +319,7 @@ class gamestate:
         self.iplnet = None	# planet # in quadrant
         self.inplan = 0		# initial planets
         self.irhere = 0		# Romulans in quadrant
-        self.isatb = 0		# =1 if super commander is attacking base
+        self.isatb = 0		# =2 if super commander is attacking base
         self.tourn = None	# tournament number
         self.nprobes = 0	# number of probes available
         self.inresor = 0.0	# initial resources
