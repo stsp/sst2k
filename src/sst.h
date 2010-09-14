@@ -306,7 +306,7 @@ extern char *systnames[NINHAB];
 extern int iscore, iskill; // Common PLAQ
 extern double perdate;
 extern double aaitem;
-extern char citem[10];
+extern char citem[12];
 extern int seed;
 extern bool idebug;
 extern FILE *logfp, *replayfp;

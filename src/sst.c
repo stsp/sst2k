@@ -184,7 +184,7 @@ bool iqhere, iqengry;
 int iscore, iskill;	// Common PLAQ
 double aaitem;
 double perdate;
-char citem[10];
+char citem[12];
 int seed;		// the random-number seed
 bool idebug;		// debug mode
 FILE *logfp, *replayfp;

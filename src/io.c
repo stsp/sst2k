@@ -209,12 +209,12 @@ void cgetline(char *line, int max)
 	wrefresh(curwnd);
     } else {
 	if (replayfp && !feof(replayfp))
-	    fgets(line, max, replayfp);
+	    (void)fgets(line, max, replayfp);
 	else
-	    fgets(line, max, stdin);
+	    (void)fgets(line, max, stdin);
     }
     if (logfp)
-	fputs(line, logfp);
+	(void)fputs(line, logfp);
     line[strlen(line)-1] = '\0';
 }
 
@@ -390,7 +390,7 @@ void warble(void)
 void tracktorpedo(coord w, int l, int i, int n, int iquad)
 /* torpedo-track animation */
 {
-    if (!game.options & OPTION_CURSES) {
+    if (!(game.options & OPTION_CURSES)) {
 	if (l == 1) {
 	    if (n != 1) {
 		skip(1);
