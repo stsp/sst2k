@@ -839,8 +839,8 @@ static bool targetcheck(double x, double y, double *course)
     return false;
 }
 
-void photon(void) 
-/* launch photon torpedo */
+void torps(void) 
+/* launch photon torpedo salvo */
 {
     double targ[4][3], course[4];
     double r, dummy;

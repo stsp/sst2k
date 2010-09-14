@@ -1482,8 +1482,8 @@ def targetcheck(w):
 	return None
     return delta.bearing()
 
-def photon():
-    "Launch photon torpedo."
+def torps():
+    "Launch photon torpedo salvo."
     course = []
     game.ididit = False
     if damaged(DPHOTON):
@@ -5898,8 +5898,8 @@ def makemoves():
 	    phasers()
 	    if game.ididit:
 		hitme = True
-	elif cmd == "TORPEDO":		# photon torpedos
-	    photon()
+	elif cmd in ("TORPEDO", "PHOTONS"):	# photon torpedos
+	    torps()
 	    if game.ididit:
 		hitme = True
 	elif cmd == "MOVE":		# move under warp

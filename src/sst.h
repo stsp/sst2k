@@ -335,7 +335,7 @@ extern void atover(bool);
 extern void srscan(void);
 extern void lrscan(void);
 extern void phasers(void);
-extern void photon(void);
+extern void torps(void);
 extern void warp(bool);
 extern void doshield(bool);
 extern void dock(bool);

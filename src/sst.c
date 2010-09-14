@@ -451,8 +451,8 @@ static void makemoves(void)
 	    if (game.ididit)
 		hitme = true;
 	    break;
-	case TORPEDO:			// photons
-	    photon();
+	case TORPEDO:			// photon torpedoes
+	    torps();
 	    if (game.ididit)
 		hitme = true;
 	    break;
