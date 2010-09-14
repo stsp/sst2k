@@ -961,9 +961,9 @@ calculate travel times and energy usage.</para>
 <sect1><title>Photon Torpedoes</title>
 
 <literallayout>
-Mnemonic:  PHOTONS
-Shortest abbreviation:  PHO
-Full commands:  PHOTONS &lt;NUMBER&gt; &lt;TARG1&gt; &lt;TARG2&gt; &lt;TARG3&gt;
+Mnemonic:  TORPEDO
+Shortest abbreviation:  TO
+Full commands:  TORPEDO &lt;NUMBER&gt; &lt;TARG1&gt; &lt;TARG2&gt; &lt;TARG3&gt;
 </literallayout>
 
 <para>Photon torpedoes are projectile weapons&mdash;you either hit what you aim
@@ -1584,7 +1584,7 @@ orientation</quote>.</para>
  P         PHASERS &lt;TOTAL AMOUNT&gt;                 phasers and computer
            PHASERS AUTOMATIC &lt;TOTAL AMOUNT&gt;       phasers, computer, sr sensors
            PHASERS MANUAL &lt;AMT1&gt; &lt;AMT2&gt; ...       phasers
- PHO       PHOTONS &lt;NUMBER&gt; &lt;TARGETS&gt;             torpedo tubes 
+ TOR       TORPEDO &lt;NUMBER&gt; &lt;TARGETS&gt;             torpedo tubes 
  PL        PLANETS                                (none)
  PR        PROBE &lt;ARMED&gt; &lt;MANUAL&gt; &lt;DISPLACEMENT&gt;  probe launcher, radio 
            PROBE &lt;ARMED&gt; AUTOMATIC &lt;DESTINATION&gt;  launcher, radio, computer
