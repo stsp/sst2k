@@ -3919,7 +3919,6 @@ def setwarp():
             break
 	scanner.chew()
 	proutn(_("Warp factor- "))
-    scanner.chew()
     if key != "IHREAL":
 	huh()
 	return
