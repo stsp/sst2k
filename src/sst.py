@@ -3154,7 +3154,7 @@ def skip(i):
 	if game.options & OPTION_CURSES:
             (y, x) = curwnd.getyx()
             (my, mx) = curwnd.getmaxyx()
-	    if curwnd == message_window and y >= my - 3:
+	    if curwnd == message_window and y >= my - 2:
 		pause_game()
 		clrscr()
 	    else:
@@ -4879,7 +4879,8 @@ def lrscan(silent):
 		    proutn(" ***")
 		elif not silent:
 		    proutn(" %3d" % (game.state.chart[x][y].klingons*100 + game.state.chart[x][y].starbase * 10 + game.state.chart[x][y].stars))
-	prout(" ")
+	if not silent:
+	    prout(" ")
 
 def damagereport():
     "Damage report."
