@@ -4785,7 +4785,7 @@ def report():
     scanner.chew()
     s1 = "" and game.thawed and _("thawed ")
     s2 = {1:"short", 2:"medium", 4:"long"}[game.length]
-    s3 = (None, _("novice"). _("fair"),
+    s3 = (None, _("novice"), _("fair"),
           _("good"), _("expert"), _("emeritus"))[game.skill]
     prout(_("You %s a %s%s %s game.") % ((_("were playing"), _("are playing"))[game.alldone], s1, s2, s3))
     if game.skill>SKILL_GOOD and game.thawed and not game.alldone:
