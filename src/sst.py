@@ -5748,7 +5748,7 @@ def setpassword():
 		break
     else:
         game.passwd = ""
-        for i in range(8):
+        for i in range(3):
 	    game.passwd += chr(ord('a')+randrange(26))
 
 # Code from sst.c begins here
