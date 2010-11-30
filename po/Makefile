@@ -1,4 +1,4 @@
-# Note: msgfmt.py is copiere from the Python source distribution
+# Note: msgfmt.py is copied from the Python source distributionls
 
 .SUFFIXES: .po .mo
 
