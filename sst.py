@@ -5230,7 +5230,7 @@ def thaw():
     return False
 
 # I used <http://www.memory-alpha.org> to find planets
-# with references in ST:TOS.  Eath and the Alpha Centauri
+# with references in ST:TOS.  Earth and the Alpha Centauri
 # Colony have been omitted.
 # 
 # Some planets marked Class G and P here will be displayed as class M
