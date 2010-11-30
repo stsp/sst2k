@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = po src doc
+SUBDIRS = src
 
 EXTRA_DIST = config.rpath po m4 \
 	autogen.sh sst.spec ChangeLog.old

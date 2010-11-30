@@ -1,0 +1,5 @@
+This is an archive of the last C version of SST.  The game was moved to
+Python in 2006.
+
+The NEWS, ChangeLog, and COPYING files in this directory are stubs to appease
+the cruel gods of autoconf.

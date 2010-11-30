@@ -46,7 +46,11 @@ AC_CHECK_FUNCS([pow sqrt floor strcasecmp strncasecmp strchr strstr atexit], [],
 AC_CONFIG_FILES([
     Makefile
     src/Makefile
-    po/Makefile.in
-    doc/Makefile
 ])
+
+# These used to be in AC_CONFIG_FILES before the C version became obsolete.
+# Now the build machinery in them is separate/
+#    po/Makefile.in
+#    doc/Makefile
+
 AC_OUTPUT
