@@ -18,6 +18,7 @@
       <arg choice='opt'>-r <replaceable>filename</replaceable></arg> 
       <arg choice='opt'>-t </arg> 
       <arg choice='opt'>-x </arg> 
+      <arg choice='opt'>-V </arg> 
       <arg rep='repeat' ><replaceable>command</replaceable></arg>  
 </cmdsynopsis>
 
@@ -50,6 +51,8 @@ from stdin as normal.  The -r option forces -t mode.</para>
 
 <para>The option -x enables some debugging features of interest
 probably only to sst2k developers.</para>
+
+<para>With -V, the program emits its version and exits.</para>
 
 <para>Input tokens for the setup prompts will be read from the
 remainder of the command line before standard input.  Thus, for

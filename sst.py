@@ -13,6 +13,8 @@ on how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
+version="2.0"
+
 docpath  	= (".", "../doc", "/usr/share/doc/sst")
 
 def _(str): return gettext.gettext(str)
@@ -6255,7 +6257,7 @@ if __name__ == '__main__':
         else:
             game.options |= OPTION_TTY
         seed = int(time.time())
-        (options, arguments) = getopt.getopt(sys.argv[1:], "r:s:tx")
+        (options, arguments) = getopt.getopt(sys.argv[1:], "r:s:txV")
         for (switch, val) in options:
             if switch == '-r':
                 try:
@@ -6282,6 +6284,9 @@ if __name__ == '__main__':
                 game.options &=~ OPTION_CURSES
             elif switch == '-x':
                 idebug = True
+            elif switch == '-V':
+                print "SST2K", version
+                raise SystemExit, 0 
             else:
                 sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
                 raise SystemExit, 1
