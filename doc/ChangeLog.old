@@ -1,0 +1,42 @@
+Stas Sergeev story:
+
+Found Tom Almy's C sources - yeah! Hmm, not too playable - I've got
+used to that nice text-based GUI I've seen on an IBM S/370 port, and the
+command-line control gets me quite annoyed. But that's a good starting
+point for some improvements - the sources are finally here! I was about
+to start writing an S/370 emulator to get it a go, and now here are
+the sources - what a great finding.
+
+[a bit later]
+
+Added a text-based interface which makes the game much more playable.
+Initially I made it for DOS using conio.h. Later I decided to make a
+linux port, and I ported it using a linux-conio package. I had to patch
+linux-conio a lot, so you have to use my version. The colors are still
+wrong though.
+I also fixed an uncountable amount of bugs and added some features, I
+can't remember now which ones.
+
+[3 years later]
+
+I dusted off the game and finally got around to move it to autoconf.
+For building with Borland C under DOS, use the build_bc.bat file.
+
+It turned out Tom Almy also did a linux port and made some bug-fixing
+work, although to the much smaller extent than I did. I contacted him
+and notified about my port, but he expressed no interest. :(
+
+[a year later]
+
+I've found out that Eric S Raymond (ESR) took over the development
+of the Tom Almy's sources. He could use mine instead as they are
+much more advanced, but oh well... Now I have to find out the way
+to incorporate my mods into his version and hope that he can do
+the better work on that game than I could (which is most likely
+the case).
+.....
+OK, the changes were incorporated, however Eric removed the conio
+port and therefore the game can no longer be compiled with bcc/DOS.
+The DJGPP port might still be possible in the future.
+
+  -- Stas Sergeev <stsp@users.sourceforge.net>
