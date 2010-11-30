@@ -6,7 +6,7 @@ MANDIR=/usr/share/man/man1
 BINDIR=/usr/bin
 
 DOCS    = README COPYING NEWS doc/HACKING doc/sst-doc.xml doc/sst-layer.xsl doc/sst.xml
-SOURCES = sst.py Makefile replay doc/makehelp.py $(DOCS)
+SOURCES = sst.py Makefile replay doc/makehelp.py control $(DOCS)
 
 all: sst-$(VERS).tar.gz
 
