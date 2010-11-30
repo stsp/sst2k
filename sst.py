@@ -3066,7 +3066,7 @@ def iostart():
     "for some recent versions of python2, the following enables UTF8"
     "for the older ones we probably need to set C locale, and the python3"
     "has no problems at all"
-    if sys.version_info.major < 3:
+    if sys.version_info[0] < 3:
 	import locale
 	locale.setlocale(locale.LC_ALL, "")
     gettext.bindtextdomain("sst", "/usr/local/share/locale")
