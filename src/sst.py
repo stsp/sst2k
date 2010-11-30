@@ -9,7 +9,7 @@ and Paul Reynolds, with modifications by Don Smith, Tom Almy,
 Stas Sergeev, and Eric S. Raymond.
 
 See the doc/HACKING file in the distribution for designers notes and advice
-ion how to modify (and how not to modify!) this code.
+on how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
