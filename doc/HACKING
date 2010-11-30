@@ -1,7 +1,7 @@
 This is the hackers' guide to SST2K.  Read it before messing with the code.
 
 It consists of an introduction, a history, suggestions for regression testing,
-some notes on the Python translation.  For a to-do list, see TODO in the
+and some notes on the Python translation.  For a to-do list, see TODO in the
 top-level directory.
 
 INTRODUCTION:
