@@ -2,6 +2,7 @@
 # It's project metadata for the shipper tool
 
 Package: sst
+XBS-Freshmeat-Name: strek
 
 Destinations: ~,berlios,freshmeat
 
