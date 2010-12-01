@@ -1633,10 +1633,8 @@ Impulse engines require 20 units to warm up, plus 100 units per
 <para>The original Star Trek seems to have been written by Mike
 Mayfield at the beginning of the 1970s.  His first version was in
 BASIC for a Sigma 7 in 1971; in 1972 he rewrote it in Hewlett Packard
-BASIC. The source is <ulink
-url="&sst-site;www/historic/mayfield.basic">available</ulink> on the
-SST2K website. In January 1975 it became part of the DECUS library
-under the name <ulink
+BASIC. The source is inckuded in the SST2K repository.  In January
+1975 it became part of the DECUS library under the name <ulink
 url='http://www.trailing-edge.com/~shoppa/decus/110174.html'>SPACWR</ulink>.</para>
 
 <para>While some people claim to have recollections of playing Trek
@@ -1662,9 +1660,8 @@ Hicks dated 5 April 1973. This does not appear to have been derived
 from Ahl's SPACWR. The header says "GENERAL IDEA STOLEN FROM
 PENN. U.", and the game has several features not present in SPACEWR:
 notably, the Death Ray, ramming, and the Klingon summons to surrender.
-And, of course, it predates Ahl's book.  The source is <ulink
-url="&sst-site;www/historic/UT-Trek.basic">available</ulink> on the
-SST2K website.</para>
+And, of course, it predates Ahl's book.  The source is included in the
+SST2K repository.</para>
 
 <para>Dave Matuszek, Paul Reynolds et. al. at UT Austin played the
 Hicks version on a CDC6600, but disliked the long load time and
