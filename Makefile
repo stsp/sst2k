@@ -31,7 +31,7 @@ dist: sst-$(VERS).tar.gz
 
 clean:
 	rm -f sst.6 sst.html
-	rm -f *.1 MANIFEST index.html SHIPPER.*
+	rm -f *.6 MANIFEST index.html SHIPPER.*
 
 release: sst-$(VERS).tar.gz sst.html
 	shipper -u -m -t; make clean

@@ -3,12 +3,14 @@
 
 Package: sst
 
-Destinations: ~,sourceforge,freshmeat
+Destinations: ~,berlios,freshmeat
 
 Description: Super Star Trek, a timeless classic of computer games
  Save the Federation from the invading Klingons!  Visit exotic planets and
  strip-mine them for dilithium!  Encounter mysterious space thingies!
  This is the classic Super Star Trek game from the days of slow teletypes, 
  reloaded.
+
+XBS-Logo: www/trek.png
 
 XBS-Project-Tag-List: games, retro
