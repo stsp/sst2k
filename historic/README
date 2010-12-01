@@ -1,0 +1,13 @@
+This directory contains historic versions of this game.
+
+The c-version directory contains a buildable, runnable version from judt before
+the game was translated to Python by ESR in 2006; it's ESR's translatoion of 
+the UT FORTRAN version.
+
+The mayfield.basic file is Mayfield's 1972 version for HP basic, the first
+rewrite of his original 1971 game and probably the oldest version still
+in existence.
+
+The UT-Trek.basic file the Grady Hicks version, from 1973.  This code,
+or much like it, was what the authors of UT Trek wanted to replace.
+
