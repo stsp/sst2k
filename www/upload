@@ -2,5 +2,5 @@
 #
 # Upload gpsd docs
 #
-xmlto xhtml-nochunks ../sst-doc.xml
-scp ../TODO ../CHANGES *.html *.jpg esr@shell.berlios.de:/home/groups/sst/htdocs
+xmlto xhtml-nochunks ../doc/sst-doc.xml
+scp ../TODO vv*.html *.jpg esr@shell.berlios.de:/home/groups/sst/htdocs
