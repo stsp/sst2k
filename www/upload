@@ -3,4 +3,4 @@
 # Upload gpsd docs
 #
 xmlto xhtml-nochunks ../doc/sst-doc.xml
-scp ../TODO vv*.html *.jpg esr@shell.berlios.de:/home/groups/sst/htdocs
+scp ../TODO *.html *.png *.jpg esr@shell.berlios.de:/home/groups/sst/htdocs
