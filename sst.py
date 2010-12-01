@@ -1577,7 +1577,7 @@ def torps():
 	torpedo(game.sector, course[i], dispersion, number=i, nburst=n)
 	if game.alldone or game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 	    return
-    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
+    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)<=0:
 	finish(FWON);
 
 def overheat(rpow):
