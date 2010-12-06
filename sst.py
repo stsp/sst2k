@@ -291,8 +291,10 @@ class gamestate:
         self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
         self.quad = None	# contents of our quadrant
         self.damage = [0.0] * NDEVICES	# damage encountered
-        self.future = []		# future events
-        for i_unused in range(NEVENTS):
+        self.future = []	# future events
+        i = NEVENTS
+        while i > 0:
+            i -= 1
             self.future.append(event())
         self.passwd  = None;		# Self Destruct password
         self.enemies = []
@@ -804,7 +806,7 @@ def supercommander():
 		if not game.resting:
 		    return
 		prout(_("Mr. Spock-  \"Captain, shall we cancel the rest period?\""))
-		if ja() == False:
+		if not ja():
 		    return
 		game.resting = False
 		game.optime = 0.0; # actually finished 
@@ -2528,7 +2530,7 @@ def nova(nov):
     if dist == 0.0:
 	return
     scourse = course(bearing=direc, distance=dist)
-    game.optime = course.time(warp=4)
+    game.optime = scourse.time(warp=4)
     skip(1)
     prout(_("Force of nova displaces starship."))
     imove(scourse, noattack=True)
@@ -3151,8 +3153,7 @@ def pause_game():
         sys.stdout.write('\n')
         proutn(prompt)
         raw_input()
-        for j_unused in range(rows):
-            sys.stdout.write('\n')
+        sys.stdout.write('\n' * rows)
         linecount = 0
 
 def skip(i):
@@ -3406,7 +3407,7 @@ def prstat(txt, data):
 
 # Code from moving.c begins here
 
-def imove(course=None, noattack=False):
+def imove(icourse=None, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
     w = coord()
 
@@ -3429,17 +3430,17 @@ def imove(course=None, noattack=False):
         kinks = 0
         while True:
             kink = False
-            if course.final.i < 0:
-                course.final.i = -course.final.i
+            if icourse.final.i < 0:
+                icourse.final.i = -icourse.final.i
                 kink = True
-            if course.final.j < 0:
-                course.final.j = -course.final.j
+            if icourse.final.j < 0:
+                icourse.final.j = -icourse.final.j
                 kink = True
-            if course.final.i >= GALSIZE*QUADSIZE:
-                course.final.i = (GALSIZE*QUADSIZE*2) - course.final.i
+            if icourse.final.i >= GALSIZE*QUADSIZE:
+                icourse.final.i = (GALSIZE*QUADSIZE*2) - icourse.final.i
                 kink = True
-            if course.final.j >= GALSIZE*QUADSIZE:
-                course.final.j = (GALSIZE*QUADSIZE*2) - course.final.j
+            if icourse.final.j >= GALSIZE*QUADSIZE:
+                icourse.final.j = (GALSIZE*QUADSIZE*2) - icourse.final.j
                 kink = True
             if kink:
                 kinks += 1
@@ -3458,8 +3459,8 @@ def imove(course=None, noattack=False):
         # Compute final position in new quadrant 
         if trbeam: # Don't bother if we are to be beamed 
             return
-        game.quadrant = course.final.quadrant()
-        game.sector = course.final.sector()
+        game.quadrant = icourse.final.quadrant()
+        game.sector = icourse.final.sector()
         skip(1)
         prout(_("Entering Quadrant %s.") % game.quadrant)
         game.quad[game.sector.i][game.sector.j] = game.ship
@@ -3471,7 +3472,7 @@ def imove(course=None, noattack=False):
         iquad = game.quad[h.i][h.j]
         if iquad != '.':
             # object encountered in flight path 
-            stopegy = 50.0*course.distance/game.optime
+            stopegy = 50.0*icourse.distance/game.optime
             if iquad in ('T', 'K', 'C', 'S', 'R', '?'):
                 for enemy in game.enemies:
                     if enemy.location == game.sector:
@@ -3521,17 +3522,17 @@ def imove(course=None, noattack=False):
     if game.state.date+game.optime >= scheduled(FTBEAM):
 	trbeam = True
 	game.condition = "red"
-	course.distance = course.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
+	icourse.distance = icourse.distance*(scheduled(FTBEAM)-game.state.date)/game.optime + 0.1
 	game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move out
     game.quad[game.sector.i][game.sector.j] = '.'
-    for m in range(course.moves):
-        course.next()
-        w = course.sector()
-        if course.origin.quadrant() != course.location.quadrant():
+    for m in range(icourse.moves):
+        icourse.next()
+        w = icourse.sector()
+        if icourse.origin.quadrant() != icourse.location.quadrant():
             newquadrant(noattack)
             break
-        elif check_collision(w):
+        elif check_collision(icourse, w):
             print "Collision detected"
             break
         else:
@@ -3814,7 +3815,7 @@ def impulse():
 	finish(FNRG)
     return
 
-def warp(course, involuntary):
+def warp(wcourse, involuntary):
     "ove under warp drive."
     blooey = False; twarp = False
     if not involuntary: # Not WARPX entry 
@@ -3831,21 +3832,21 @@ def warp(course, involuntary):
 	    prout(_("  is repaired, I can only give you warp 4.\""))
 	    return
        	# Read in course and distance
-        if course==None:
+        if wcourse==None:
             try:
-                course = getcourse(isprobe=False)
+                wcourse = getcourse(isprobe=False)
             except TrekError:
                 return
 	# Make sure starship has enough energy for the trip
         # Note: this formula is slightly different from the C version,
         # and lets you skate a bit closer to the edge.
-	if course.power(game.warpfac) >= game.energy:
+	if wcourse.power(game.warpfac) >= game.energy:
 	    # Insufficient power for trip 
 	    game.ididit = False
 	    skip(1)
 	    prout(_("Engineering to bridge--"))
-	    if not game.shldup or 0.5*course.power(game.warpfac) > game.energy:
-		iwarp = (game.energy/(course.dist+0.05)) ** 0.333333333
+	    if not game.shldup or 0.5*wcourse.power(game.warpfac) > game.energy:
+		iwarp = (game.energy/(wcourse.dist+0.05)) ** 0.333333333
 		if iwarp <= 0:
 		    prout(_("We can't do it, Captain. We don't have enough energy."))
 		else:
@@ -3859,7 +3860,7 @@ def warp(course, involuntary):
 		prout(_("We haven't the energy to go that far with the shields up."))
 	    return				
 	# Make sure enough time is left for the trip 
-	game.optime = course.time(game.warpfac)
+	game.optime = wcourse.time(game.warpfac)
 	if game.optime >= 0.8*game.state.remtime:
 	    skip(1)
 	    prout(_("First Officer Spock- \"Captain, I compute that such"))
@@ -3875,12 +3876,12 @@ def warp(course, involuntary):
     if game.warpfac > 6.0:
 	# Decide if engine damage will occur
         # ESR: Seems wrong. Probability of damage goes *down* with distance? 
-	prob = course.distance*(6.0-game.warpfac)**2/66.666666666
+	prob = wcourse.distance*(6.0-game.warpfac)**2/66.666666666
 	if prob > randreal():
 	    blooey = True
-	    course.distance = randreal(course.distance)
+	    wcourse.distance = randreal(wcourse.distance)
 	# Decide if time warp will occur 
-	if 0.5*course.distance*math.pow(7.0,game.warpfac-10.0) > randreal():
+	if 0.5*wcourse.distance*math.pow(7.0,game.warpfac-10.0) > randreal():
 	    twarp = True
 	if game.idebug and game.warpfac==10 and not twarp:
 	    blooey = False
@@ -3890,23 +3891,23 @@ def warp(course, involuntary):
 	if blooey or twarp:
 	    # If time warp or engine damage, check path 
 	    # If it is obstructed, don't do warp or damage 
-            for m_unused in range(course.moves):
-                course.next()
-                w = course.sector()
+            for m_unused in range(wcourse.moves):
+                wcourse.next()
+                w = wcourse.sector()
                 if not w.valid_sector():
                     break
 		if game.quad[w.i][w.j] != '.':
 		    blooey = False
 		    twarp = False
-            course.reset()
+            wcourse.reset()
     # Activate Warp Engines and pay the cost 
     imove(course, noattack=False)
     if game.alldone:
 	return
-    game.energy -= course.power(game.warpfac)
+    game.energy -= wcourse.power(game.warpfac)
     if game.energy <= 0:
 	finish(FNRG)
-    game.optime = course.time(game.warpfac)
+    game.optime = wcourse.time(game.warpfac)
     if twarp:
 	timwrp()
     if blooey:
@@ -5753,8 +5754,9 @@ def setpassword():
 		break
     else:
         game.passwd = ""
-        for i_unused in range(3):
-	    game.passwd += chr(ord('a')+randrange(26))
+        game.passwd += chr(ord('a')+randrange(26))
+        game.passwd += chr(ord('a')+randrange(26))
+        game.passwd += chr(ord('a')+randrange(26))
 
 # Code from sst.c begins here
 
@@ -5915,7 +5917,7 @@ def makemoves():
 	    if game.ididit:
 		hitme = True
 	elif cmd == "MOVE":		# move under warp
-	    warp(course=None, involuntary=False)
+	    warp(wcourse=None, involuntary=False)
 	elif cmd == "SHIELDS":		# shields
 	    doshield(shraise=False)
 	    if game.ididit:
