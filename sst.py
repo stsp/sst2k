@@ -56,9 +56,9 @@ class TrekError(Exception):
     pass
 
 class JumpOut(Exception):
-    pass
+    pass 
 
-class coord:
+class Coord:
     def __init__(self, x=None, y=None):
         self.i = x
         self.j = y
@@ -75,28 +75,28 @@ class coord:
     def __ne__(self, other):
         return other == None or self.i != other.i or self.j != other.j
     def __add__(self, other):
-        return coord(self.i+other.i, self.j+other.j)
+        return Coord(self.i+other.i, self.j+other.j)
     def __sub__(self, other):
-        return coord(self.i-other.i, self.j-other.j)
+        return Coord(self.i-other.i, self.j-other.j)
     def __mul__(self, other):
-        return coord(self.i*other, self.j*other)
+        return Coord(self.i*other, self.j*other)
     def __rmul__(self, other):
-        return coord(self.i*other, self.j*other)
+        return Coord(self.i*other, self.j*other)
     def __div__(self, other):
-        return coord(self.i/other, self.j/other)
+        return Coord(self.i/other, self.j/other)
     def __mod__(self, other):
-        return coord(self.i % other, self.j % other)
+        return Coord(self.i % other, self.j % other)
     def __rdiv__(self, other):
-        return coord(self.i/other, self.j/other)
+        return Coord(self.i/other, self.j/other)
     def roundtogrid(self):
-        return coord(int(round(self.i)), int(round(self.j)))
+        return Coord(int(round(self.i)), int(round(self.j)))
     def distance(self, other=None):
-        if not other: other = coord(0, 0)
+        if not other: other = Coord(0, 0)
         return math.sqrt((self.i - other.i)**2 + (self.j - other.j)**2)
     def bearing(self):
         return 1.90985*math.atan2(self.j, self.i)
     def sgn(self):
-        s = coord()
+        s = Coord()
         if self.i == 0:
             s.i = 0
         else:
@@ -112,7 +112,7 @@ class coord:
     def sector(self):
         return self.roundtogrid() % QUADSIZE
     def scatter(self):
-        s = coord()
+        s = Coord()
         s.i = self.i + randrange(-1, 2)
         s.j = self.j + randrange(-1, 2)
         return s
@@ -122,10 +122,10 @@ class coord:
         return "%s - %s" % (self.i+1, self.j+1)
     __repr__ = __str__
 
-class planet:
+class Planet:
     def __init__(self):
         self.name = None	# string-valued if inhabited
-        self.quadrant = coord()	# quadrant located
+        self.quadrant = Coord()	# quadrant located
         self.pclass = None	# could be ""M", "N", "O", or "destroyed"
         self.crystals = "absent"# could be "mined", "present", "absent"
         self.known = "unknown"	# could be "unknown", "known", "shuttle_down"
@@ -133,7 +133,7 @@ class planet:
     def __str__(self):
         return self.name
 
-class quadrant:
+class Quadrant:
     def __init__(self):
         self.stars = 0
         self.planet = None
@@ -144,7 +144,7 @@ class quadrant:
 	self.charted = False
         self.status = "secure"	# Could be "secure", "distressed", "enslaved"
 
-class page:
+class Page:
     def __init__(self):
 	self.stars = None
 	self.starbase = None
@@ -159,7 +159,7 @@ def fill2d(size, fillfun):
             lst[i].append(fillfun(i, j))
     return lst
 
-class snapshot:
+class Snapshot:
     def __init__(self):
         self.snap = False	# snapshot taken
         self.crew = 0   	# crew complement
@@ -176,13 +176,13 @@ class snapshot:
 	self.remtime = 0	# remaining time
         self.baseq = [] 	# Base quadrant coordinates
         self.kcmdr = [] 	# Commander quadrant coordinates
-	self.kscmdr = coord()	# Supercommander quadrant coordinates
+	self.kscmdr = Coord()	# Supercommander quadrant coordinates
         # the galaxy
-        self.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: quadrant())
+        self.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
         # the starchart
-    	self.chart = fill2d(GALSIZE, lambda i_unused, j_unused: page())
+    	self.chart = fill2d(GALSIZE, lambda i_unused, j_unused: Page())
 
-class event:
+class Event:
     def __init__(self):
         self.date = None	# A real number
         self.quadrant = None	# A coord structure
@@ -256,10 +256,10 @@ NEVENTS	= 12
 # when we implement stateful events 
 def findevent(evtype):	return game.future[evtype]
 
-class enemy:
+class Enemy:
     def __init__(self, type=None, loc=None, power=None):
         self.type = type
-        self.location = coord()
+        self.location = Coord()
         if loc:
             self.move(loc)
         self.power = power	# enemy energy level
@@ -277,25 +277,25 @@ class enemy:
             game.quad[self.location.i][self.location.j] = self.type
             self.kdist = self.kavgd = (game.sector - loc).distance()
         else:
-            self.location = coord()
+            self.location = Coord()
             self.kdist = self.kavgd = None
             game.enemies.remove(self)
         return motion
     def __repr__(self):
         return "<%s,%s.%f>" % (self.type, self.location, self.power)	# For debugging
 
-class gamestate:
+class Gamestate:
     def __init__(self):
         self.options = None	# Game options
-        self.state = snapshot()	# A snapshot structure
-        self.snapsht = snapshot()	# Last snapshot taken for time-travel purposes
+        self.state = Snapshot()	# A snapshot structure
+        self.snapsht = Snapshot()	# Last snapshot taken for time-travel purposes
         self.quad = None	# contents of our quadrant
         self.damage = [0.0] * NDEVICES	# damage encountered
         self.future = []	# future events
         i = NEVENTS
         while i > 0:
             i -= 1
-            self.future.append(event())
+            self.future.append(Event())
         self.passwd  = None;		# Self Destruct password
         self.enemies = []
         self.quadrant = None	# where we are in the large
@@ -414,13 +414,13 @@ def randreal(*args):
 
 def welcoming(iq):
     "Would this quadrant welcome another Klingon?"
-    return iq.valid_quadrant() and \
+    return iq.valid_Quadrant() and \
 	not game.state.galaxy[iq.i][iq.j].supernova and \
 	game.state.galaxy[iq.i][iq.j].klingons < MAXKLQUAD
 
 def tryexit(enemy, look, irun):
     "A bad guy attempts to bug out."
-    iq = coord()
+    iq = Coord()
     iq.i = game.quadrant.i+(look.i+(QUADSIZE-1))/QUADSIZE - 1
     iq.j = game.quadrant.j+(look.j+(QUADSIZE-1))/QUADSIZE - 1
     if not welcoming(iq):
@@ -506,7 +506,7 @@ def tryexit(enemy, look, irun):
 
 def movebaddy(enemy):
     "Tactical movement for the bad guys."
-    goto = coord(); look = coord()
+    goto = Coord(); look = Coord()
     irun = False
     # This should probably be just (game.quadrant in game.state.kcmdr) + (game.state.kscmdr==game.quadrant) 
     if game.skill >= SKILL_EXPERT:
@@ -705,7 +705,7 @@ def movescom(iq, avoid):
 			
 def supercommander():
     "Move the Super Commander." 
-    iq = coord(); sc = coord(); ibq = coord(); idelta = coord()
+    iq = Coord(); sc = Coord(); ibq = Coord(); idelta = Coord()
     basetbl = []
     if game.idebug:
 	prout("== SUPERCOMMANDER")
@@ -826,7 +826,7 @@ def movetholian():
     "Move the Tholian."
     if not game.tholian or game.justin:
 	return
-    tid = coord()
+    tid = Coord()
     if game.tholian.location.i == 0 and game.tholian.location.j == 0:
 	tid.i = 0; tid.j = QUADSIZE-1
     elif game.tholian.location.i == 0 and game.tholian.location.j == QUADSIZE-1:
@@ -1062,7 +1062,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     ac = bearing + 0.25*dispersion	# dispersion is a random variable
     bullseye = (15.0 - bearing)*0.5235988
     track = course(bearing=ac, distance=QUADSIZE, origin=cartesian(origin)) 
-    bumpto = coord(0, 0)
+    bumpto = Coord(0, 0)
     # Loop to move a single torpedo 
     setwnd(message_window)
     for step in range(1, QUADSIZE*2):
@@ -1478,11 +1478,11 @@ def targetcheck(w):
     if not w.valid_sector():
 	huh()
 	return None
-    delta = coord()
+    delta = Coord()
     # FIXME: C code this was translated from is wacky -- why the sign reversal?
     delta.j = (w.j - game.sector.j);
     delta.i = (game.sector.i - w.i);
-    if delta == coord(0, 0):
+    if delta == Coord(0, 0):
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
 	prout(_("  I recommend an immediate review of"))
@@ -1634,7 +1634,7 @@ def checkshctrl(rpow):
 def hittem(hits):
     "Register a phaser hit on Klingons and Romulans."
     kk = 0
-    w = coord()
+    w = Coord()
     skip(1)
     for (k, wham) in enumerate(hits):
 	if wham==0:
@@ -1968,8 +1968,8 @@ def events():
     i=0
     fintim = game.state.date + game.optime; yank=0
     ictbeam = False; istract = False
-    w = coord(); hold = coord()
-    ev = event(); ev2 = event()
+    w = Coord(); hold = Coord()
+    ev = Event(); ev2 = Event()
 
     def tractorbeam(yank):
         "Tractor-beaming cases merge here." 
@@ -2181,7 +2181,7 @@ def events():
                     schedule(FBATTAK, expran(0.3*game.intime))
                     unschedule(FCDBAS)
                     continue
-            except coord:
+            except Coord:
                 pass
 	    # commander + starbase combination found -- launch attack 
 	    game.battle = ibq
@@ -2322,7 +2322,7 @@ def events():
 		continue		# full right now 
 	    # reproduce one Klingon 
 	    w = ev.quadrant
-            m = coord()
+            m = Coord()
 	    if game.klhere >= MAXKLQUAD:
                 try:
                     # this quadrant not ok, pick an adjacent one 
@@ -2411,7 +2411,7 @@ def wait():
 def nova(nov):
     "Star goes nova." 
     ncourse = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
-    newc = coord(); neighbor = coord(); bump = coord(0, 0)
+    newc = Coord(); neighbor = Coord(); bump = Coord(0, 0)
     if withprob(0.05):
 	# Wow! We've supernova'ed 
 	supernova(game.quadrant)
@@ -2425,7 +2425,7 @@ def nova(nov):
     hits = [nov]
     kount = 0
     while hits:
-        offset = coord()
+        offset = Coord()
         start = hits.pop()
         for offset.i in range(-1, 1+1):
             for offset.j in range(-1, 1+1):
@@ -2545,7 +2545,7 @@ def supernova(w):
     else:
 	# Scheduled supernova -- select star at random. 
 	stars = 0
-        nq = coord()
+        nq = Coord()
 	for nq.i in range(GALSIZE):
 	    for nq.j in range(GALSIZE):
 		stars += game.state.galaxy[nq.i][nq.j].stars
@@ -2570,7 +2570,7 @@ def supernova(w):
 	    prout(_("Message from Starfleet Command       Stardate %.2f") % game.state.date)
 	    prout(_("     Supernova in Quadrant %s; caution advised.") % nq)
     else:
-	ns = coord()
+	ns = Coord()
 	# we are in the quadrant! 
 	num = randrange(game.state.galaxy[nq.i][nq.j].stars) + 1
 	for ns.i in range(QUADSIZE):
@@ -3409,7 +3409,7 @@ def prstat(txt, data):
 
 def imove(icourse=None, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
-    w = coord()
+    w = Coord()
 
     def newquadrant(noattack):
         # Leaving quadrant -- allow final enemy attack 
@@ -3597,7 +3597,7 @@ def getcourse(isprobe):
     dquad = copy.copy(game.quadrant)
     navmode = "unspecified"
     itemp = "curt"
-    dsect = coord()
+    dsect = Coord()
     iprompt = False
     if game.landed and not isprobe:
 	prout(_("Dummy! You can't leave standard orbit until you"))
@@ -3639,7 +3639,7 @@ def getcourse(isprobe):
 		prout(_("(Manual movement assumed.)"))
 	    navmode = "manual"
 	    break
-    delta = coord()
+    delta = Coord()
     if navmode == "automatic":
 	while key == "IHEOL":
 	    if isprobe:
@@ -3739,7 +3739,7 @@ class course:
             self.origin = cartesian(game.quadrant, game.sector)
         else:
             self.origin = cartesian(game.quadrant, origin)
-        self.increment = coord(-math.sin(self.angle), math.cos(self.angle))
+        self.increment = Coord(-math.sin(self.angle), math.cos(self.angle))
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
         self.moves = int(round(10*self.distance*bigger))
@@ -4872,7 +4872,7 @@ def lrscan(silent):
         if not silent:
             proutn(" ")
         for y in range(game.quadrant.j-1, game.quadrant.j+2):
-	    if not coord(x, y).valid_quadrant():
+	    if not Coord(x, y).valid_quadrant():
                 if not silent:
                     proutn("  -1")
 	    else:
@@ -5061,7 +5061,7 @@ def srscan():
 		
 def eta():
     "Use computer to get estimated time of arrival for a warp jump."
-    w1 = coord(); w2 = coord()
+    w1 = Coord(); w2 = Coord()
     prompt = False
     if damaged(DCOMPTR):
 	prout(_("COMPUTER DAMAGED, USE A POCKET CALCULATOR."))
@@ -5309,7 +5309,7 @@ device = (
 
 def setup():
     "Prepare to play, set up cosmos."
-    w = coord()
+    w = Coord()
     #  Decide how many of everything
     if choose():
 	return # frozen game
@@ -5329,7 +5329,7 @@ def setup():
     for i in range(NDEVICES): 
 	game.damage[i] = 0.0
     # Set up assorted game parameters
-    game.battle = coord()
+    game.battle = Coord()
     game.state.date = game.indate = 100.0 * randreal(20, 51)
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0
     game.iscate = game.resting = game.imine = game.icrystl = game.icraft = False
@@ -5407,7 +5407,7 @@ def setup():
             w = randplace(GALSIZE) 
             if game.state.galaxy[w.i][w.j].planet == None:
                 break
-        new = planet()
+        new = Planet()
 	new.quadrant = w
         new.crystals = "absent"
 	if (game.options & OPTION_WORLDS) and i < NINHAB:
@@ -5628,7 +5628,7 @@ def newcnd():
 
 def newkling():
     "Drop new Klingon into current quadrant."
-    return enemy('K', loc=dropin(), power=randreal(300,450)+25.0*game.skill)
+    return Enemy('K', loc=dropin(), power=randreal(300,450)+25.0*game.skill)
 
 def newqad():
     "Set up a new state of quadrant, for when we enter or re-enter it."
@@ -5670,7 +5670,7 @@ def newqad():
 	    game.iscate = (game.state.remkl > 1)
     # Put in Romulans if needed
     for i in range(q.romulans):
-        enemy('R', loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
+        Enemy('R', loc=dropin(), power=randreal(400.0,850.0)+50.0*game.skill)
     # If quadrant needs a starbase, put it in
     if q.starbase:
 	game.base = dropin('B')
@@ -5695,7 +5695,7 @@ def newqad():
 	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
     # Put in THING if needed
     if thing == game.quadrant:
-        enemy(type='?', loc=dropin(),
+        Enemy(type='?', loc=dropin(),
                   power=randreal(6000,6500.0)+250.0*game.skill)
         if not damaged(DSRSENS):
             skip(1)
@@ -5706,13 +5706,13 @@ def newqad():
 	if (game.skill < SKILL_GOOD and withprob(0.02)) or \
 	    (game.skill == SKILL_GOOD and withprob(0.05)) or \
             (game.skill > SKILL_GOOD and withprob(0.08)):
-            w = coord()
+            w = Coord()
             while True:
 		w.i = withprob(0.5) * (QUADSIZE-1)
 		w.j = withprob(0.5) * (QUADSIZE-1)
                 if game.quad[w.i][w.j] == '.':
                     break
-            game.tholian = enemy(type='T', loc=w,
+            game.tholian = Enemy(type='T', loc=w,
                                  power=randrange(100, 500) + 25.0*game.skill)
 	    # Reserve unoccupied corners 
 	    if game.quad[0][0]=='.':
@@ -6067,7 +6067,7 @@ def expran(avrage):
 
 def randplace(size):
     "Choose a random location."
-    w = coord()
+    w = Coord()
     w.i = randrange(size) 
     w.j = randrange(size)
     return w
@@ -6128,7 +6128,7 @@ class sstscanner:
         # Round token value to nearest integer
         return int(round(scanner.real))
     def getcoord(self):
-        s = coord()
+        s = Coord()
         scanner.next()
     	if scanner.type != "IHREAL":
 	    huh()
@@ -6192,8 +6192,8 @@ def debugme():
 		game.damage[i] = 10.0
     proutn("Examine/change events? ")
     if ja():
-	ev = event()
-	w = coord()
+	ev = Event()
+	w = Coord()
         legends = {
             FSNOVA:  "Supernova       ",
             FTBEAM:  "T Beam          ",
@@ -6253,9 +6253,9 @@ if __name__ == '__main__':
     try:
         global line, thing, game
         game = None
-        thing = coord()
+        thing = Coord()
         thing.angry = False
-        game = gamestate()
+        game = Gamestate()
         game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_PLAIN | OPTION_ALMY)
         if os.getenv("TERM"):
             game.options |= OPTION_CURSES
