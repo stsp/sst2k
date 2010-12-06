@@ -29,6 +29,9 @@ sst-$(VERS).tar.gz: $(SOURCES) sst.6
 
 dist: sst-$(VERS).tar.gz
 
+pychecker:
+	@-pychecker --only --limit 50 sst.py
+
 clean:
 	rm -f sst.6 sst.html
 	rm -f *.6 MANIFEST index.html SHIPPER.*
