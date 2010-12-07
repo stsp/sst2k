@@ -5727,6 +5727,7 @@ def newqad():
 		game.quad[QUADSIZE-1][0] = 'X'
 	    if game.quad[QUADSIZE-1][QUADSIZE-1]=='.':
 		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
+    # Sort enemies by distance so 'nearest' is meaningful
     game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
     # And finally the stars
     for i in range(q.stars):
