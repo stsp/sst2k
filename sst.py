@@ -663,7 +663,7 @@ def moveklings():
         for enemy in game.enemies:
             if enemy.type in ('K', 'R'):
 		movebaddy(enemy)
-    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+    sortenemies()
 
 def movescom(iq, avoid):
     "Commander movement helper." 
@@ -689,7 +689,7 @@ def movescom(iq, avoid):
 	game.klhere -= 1
 	if game.condition != "docked":
 	    newcnd()
-        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+        sortenemies()
     # check for a helpful planet 
     for i in range(game.inplan):
 	if game.state.planets[i].quadrant == game.state.kscmdr and \
@@ -1107,7 +1107,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             prout(_(" displaced by blast to Sector %s ") % bumpto)
             for enemy in game.enemies:
                 enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
-            game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+            sortenemies()
             return None
 	elif iquad in ('C', 'S', 'R', 'K'): # Hit a regular enemy 
 	    # find the enemy 
@@ -1150,7 +1150,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
                 game.quad[bumpto.i][bumpto.j]=iquad
                 for enemy in game.enemies:
                     enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
-                game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+                sortenemies()
             return None
 	elif iquad == 'B': # Hit a base 
 	    skip(1)
@@ -1423,7 +1423,7 @@ def attack(torps_ok):
     # After attack, reset average distance to enemies 
     for enemy in game.enemies:
 	enemy.kavgd = enemy.kdist
-    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+    sortenemies()
     return
 		
 def deadkl(w, type, mv):
@@ -3545,7 +3545,7 @@ def imove(icourse=None, noattack=False):
             finald = (w-enemy.location).distance()
             enemy.kavgd = 0.5 * (finald + enemy.kdist)
             enemy.kdist = finald
-        game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+        sortenemies()
         if not game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
             attack(torps_ok=False)
         for enemy in game.enemies:
@@ -5634,6 +5634,10 @@ def newkling():
     "Drop new Klingon into current quadrant."
     return Enemy('K', loc=dropin(), power=randreal(300,450)+25.0*game.skill)
 
+def sortenemies():
+    "Sort enemies by distance so 'nearest' is meaningful."
+    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+
 def newqad():
     "Set up a new state of quadrant, for when we enter or re-enter it."
     game.justin = True
@@ -5727,8 +5731,7 @@ def newqad():
 		game.quad[QUADSIZE-1][0] = 'X'
 	    if game.quad[QUADSIZE-1][QUADSIZE-1]=='.':
 		game.quad[QUADSIZE-1][QUADSIZE-1] = 'X'
-    # Sort enemies by distance so 'nearest' is meaningful
-    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+    sortenemies()
     # And finally the stars
     for i in range(q.stars):
 	dropin('*')
