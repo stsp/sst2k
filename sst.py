@@ -363,6 +363,8 @@ class Gamestate:
         self.cryprob = 0.0	# probability that crystal will work
         self.probe = None	# object holding probe course info
         self.height = 0.0	# height of orbit around planet
+        self.score = 0.0	# overall score
+        self.perdate = 0.0	# rate of kills
         self.idebug = False	# Debugging instrumentation enabled?
     def recompute(self):
         # Stas thinks this should be (C expression): 
@@ -726,7 +728,7 @@ def supercommander():
 	    unschedule(FSCMOVE)
 	    return
 	sc = game.state.kscmdr
-        for base in game.state.baseq:
+        for (i, base) in enumerate(game.state.baseq):
 	    basetbl.append((i, (base - sc).distance()))
 	if game.state.baseq > 1:
             basetbl.sort(lambda x, y: cmp(x[1], y[1]))
@@ -1071,7 +1073,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	if not w.valid_sector():
 	    break
 	iquad=game.quad[w.i][w.j]
-	tracktorpedo(origin, w, step, number, nburst, iquad)
+	tracktorpedo(w, step, number, nburst, iquad)
 	if iquad=='.':
 	    continue
 	# hit something 
@@ -1219,7 +1221,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    return None
 	elif iquad == 'T':  # Hit a Tholian 
 	    h1 = 700.0 + randrange(100) - \
-		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-angle))
+		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
 	    h1 = math.fabs(h1)
 	    if h1 >= 600:
 		game.quad[w.i][w.j] = '.'
@@ -2175,13 +2177,13 @@ def events():
                 for ibq in game.state.baseq:
                    for cmdr in game.state.kcmdr: 
                        if ibq == cmdr and ibq != game.quadrant and ibq != game.state.kscmdr:
-                           raise ibq
+                           raise JumpOut
                 else:
                     # no match found -- try later 
                     schedule(FBATTAK, expran(0.3*game.intime))
                     unschedule(FCDBAS)
                     continue
-            except Coord:
+            except JumpOut:
                 pass
 	    # commander + starbase combination found -- launch attack 
 	    game.battle = ibq
@@ -2491,7 +2493,7 @@ def nova(nov):
                         finish(FNOVA)
                         return
                     # add in course nova contributes to kicking starship
-                    bump += (game.sector-hits[mm]).sgn()
+                    bump += (game.sector-hits[-1]).sgn()
                 elif iquad == 'K': # kill klingon 
                     deadkl(neighbor, iquad, neighbor)
                 elif iquad in ('C','S','R'): # Damage/destroy big enemies 
@@ -2502,7 +2504,7 @@ def nova(nov):
                     if game.enemies[ll].power <= 0.0:
                         deadkl(neighbor, iquad, neighbor)
                         break
-                    newc = neighbor + neighbor - hits[mm]
+                    newc = neighbor + neighbor - hits[-1]
                     proutn(crmena(True, iquad, "sector", neighbor) + _(" damaged"))
                     if not newc.valid_sector():
                         # can't leave quadrant 
@@ -2918,11 +2920,10 @@ def finish(ifin):
 def score():
     "Compute player's score."
     timused = game.state.date - game.indate
-    iskill = game.skill
     if (timused == 0 or (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) != 0) and timused < 5.0:
 	timused = 5.0
-    perdate = killrate()
-    ithperd = 500*perdate + 0.5
+    game.perdate = killrate()
+    ithperd = 500*game.perdate + 0.5
     iwon = 0
     if game.gamewon:
 	iwon = 100*game.skill
@@ -2932,7 +2933,7 @@ def score():
 	klship = 1
     else:
 	klship = 2
-    iscore = 10*(game.inkling - game.state.remkl) \
+    game.score = 10*(game.inkling - game.state.remkl) \
              + 50*(game.incom - len(game.state.kcmdr)) \
              + ithperd + iwon \
              + 20*(game.inrom - game.state.nromrem) \
@@ -2940,7 +2941,7 @@ def score():
     	     - game.state.nromrem \
              - badpoints()
     if not game.alive:
-	iscore -= 200
+	game.score -= 200
     skip(2)
     prout(_("Your score --"))
     if game.inrom - game.state.nromrem:
@@ -2960,7 +2961,7 @@ def score():
 	      (game.inscom - game.state.nscrem, 200*(game.inscom - game.state.nscrem)))
     if ithperd:
 	prout(_("%6.2f Klingons per stardate              %5d") %
-	      (perdate, ithperd))
+	      (game.perdate, ithperd))
     if game.state.starkl:
 	prout(_("%6d stars destroyed by your action     %5d") %
 	      (game.state.starkl, -5*game.state.starkl))
@@ -2996,7 +2997,7 @@ def score():
 	elif game.skill ==  SKILL_EMERITUS:	proutn(_("Emeritus game"))
 	prout("           %5d" % iwon)
     skip(1)
-    prout(_("TOTAL SCORE                               %5d") % iscore)
+    prout(_("TOTAL SCORE                               %5d") % game.score)
 
 def plaque():
     "Emit winner's commemmorative plaque." 
@@ -3052,8 +3053,8 @@ def plaque():
     timestring = time.ctime()
     fp.write(_("                                                 This day of %.6s %.4s, %.8s\n\n") %
                     (timestring+4, timestring+20, timestring+11))
-    fp.write(_("                                                        Your score:  %d\n\n") % iscore)
-    fp.write(_("                                                    Klingons per stardate:  %.2f\n") % perdate)
+    fp.write(_("                                                        Your score:  %d\n\n") % game.score)
+    fp.write(_("                                                    Klingons per stardate:  %.2f\n") % game.perdate)
     fp.close()
 
 # Code from io.c begins here
@@ -3347,7 +3348,7 @@ def warble():
 	#nosound()
         pass
 
-def tracktorpedo(origin, w, step, i, n, iquad):
+def tracktorpedo(w, step, i, n, iquad):
     "Torpedo-track animation." 
     if not game.options & OPTION_CURSES:
 	if step == 1:
@@ -3890,8 +3891,10 @@ def warp(wcourse, involuntary):
 		twarp = True
 	if blooey or twarp:
 	    # If time warp or engine damage, check path 
-	    # If it is obstructed, don't do warp or damage 
-            for m_unused in range(wcourse.moves):
+	    # If it is obstructed, don't do warp or damage
+            look = wcourse.moves
+            while look > 0:
+                look -= 1
                 wcourse.next()
                 w = wcourse.sector()
                 if not w.valid_sector():
@@ -4189,7 +4192,7 @@ def mayday():
 	elif m == 2: proutn(_("2nd"))
 	elif m == 3: proutn(_("3rd"))
 	proutn(_(" attempt to re-materialize ") + crmshp())
-	game.quad[ix][iy]=('-','o','O')[m-1]
+	game.quad[game.sector.i][game.sector.j]=('-','o','O')[m-1]
         textcolor(RED)
 	warble()
 	if randreal() > probf:
@@ -4198,13 +4201,13 @@ def mayday():
         textcolor(DEFAULT)
 	curses.delay_output(500)
     if m > 3:
-	game.quad[ix][iy]='?'
+	game.quad[game.sector.i][game.sector.j]='?'
 	game.alive = False
 	drawmaps(1)
 	setwnd(message_window)
 	finish(FMATERIALIZE)
 	return
-    game.quad[ix][iy]=game.ship
+    game.quad[game.sector.i][game.sector.j]=game.ship
     textcolor(GREEN);
     prout(_("succeeds."))
     textcolor(DEFAULT);
@@ -4789,7 +4792,7 @@ def attackreport(curt):
 def report():
     # report on general game status 
     scanner.chew()
-    s1 = "" and game.thawed and _("thawed ")
+    s1 = (game.thawed and _("thawed ")) or ""
     s2 = {1:"short", 2:"medium", 4:"long"}[game.length]
     s3 = (None, _("novice"), _("fair"),
           _("good"), _("expert"), _("emeritus"))[game.skill]
@@ -5216,6 +5219,7 @@ def freeze(boss):
 
 def thaw():
     "Retrieve saved game."
+    global game
     game.passwd[0] = '\0'
     key = scanner.next()
     if key == "IHEOL":
