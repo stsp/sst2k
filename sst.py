@@ -2692,11 +2692,9 @@ def kaboom():
     skip(1)
     if len(game.enemies) != 0:
 	whammo = 25.0 * game.energy
-	l=1
-	while l <= len(game.enemies):
+	for l in range(len(game.enemies)):
 	    if game.enemies[l].power*game.enemies[l].kdist <= whammo: 
 		deadkl(game.enemies[l].location, game.quad[game.enemies[l].location.i][game.enemies[l].location.j], game.enemies[l].location)
-	    l += 1
     finish(FDILITHIUM)
 				
 def killrate():
