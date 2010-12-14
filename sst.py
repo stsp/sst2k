@@ -915,7 +915,7 @@ def doshield(shraise):
 		    action = "SHUP"
 		else:
 		    scanner.chew()
-		    return    
+		    return
     if action == "SHUP": # raise shields 
 	if game.shldup:
 	    prout(_("Shields already up."))
@@ -2664,7 +2664,6 @@ def selfdestruct():
     prout(_("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"))
     skip(1)
     scanner.next()
-    scanner.chew()
     if game.passwd != scanner.token:
 	prouts(_("PASSWORD-REJECTED;"))
 	skip(1)
