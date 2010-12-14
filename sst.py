@@ -5496,6 +5496,8 @@ def setup():
     if game.state.nscrem:
 	prout(_("  YOU'LL NEED IT."))
     waitfor()
+    clrscr()
+    setwnd(message_window)
     newqad()
     if len(game.enemies) - (thing == game.quadrant) - (game.tholian != None):
 	game.shldup = True
@@ -5875,8 +5877,6 @@ def helpme():
 
 def makemoves():
     "Command-interpretation loop."
-    clrscr()
-    setwnd(message_window)
     while True: 	# command loop 
 	drawmaps(1)
         while True:	# get a command 
