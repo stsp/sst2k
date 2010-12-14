@@ -3161,16 +3161,11 @@ def skip(i):
     "Skip i lines.  Pause game if this would cause a scrolling event."
     for dummy in range(i):
 	if game.options & OPTION_CURSES:
-            (y, x) = curwnd.getyx()
-            (my, mx) = curwnd.getmaxyx()
-	    if curwnd == message_window and y >= my - 2:
-		pause_game()
-		clrscr()
-	    else:
-                try:
-                    curwnd.move(y+1, 0)
-                except curses.error:
-                    pass
+	    (y, x) = curwnd.getyx()
+	    try:
+		curwnd.move(y+1, 0)
+	    except curses.error:
+		pass
 	else:
             global linecount
 	    linecount += 1
@@ -3182,6 +3177,11 @@ def skip(i):
 def proutn(line):
     "Utter a line with no following line feed."
     if game.options & OPTION_CURSES:
+	(y, x) = curwnd.getyx()
+	(my, mx) = curwnd.getmaxyx()
+	if curwnd == message_window and y >= my - 2:
+	    pause_game()
+	    clrscr()
 	curwnd.addstr(line)
 	curwnd.refresh()
     else:
