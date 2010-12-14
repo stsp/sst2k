@@ -416,7 +416,7 @@ def randreal(*args):
 
 def welcoming(iq):
     "Would this quadrant welcome another Klingon?"
-    return iq.valid_Quadrant() and \
+    return iq.valid_quadrant() and \
 	not game.state.galaxy[iq.i][iq.j].supernova and \
 	game.state.galaxy[iq.i][iq.j].klingons < MAXKLQUAD
 
