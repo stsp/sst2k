@@ -5508,8 +5508,9 @@ def choose():
 	game.tourn = game.length = 0
 	game.thawed = False
 	game.skill = SKILL_NONE
-	if not scanner.inqueue: # Can start with command line options 
-	    proutn(_("Would you like a regular, tournament, or saved game? "))
+	scanner.chew()
+#	if not scanner.inqueue: # Can start with command line options 
+	proutn(_("Would you like a regular, tournament, or saved game? "))
         scanner.next()
         if scanner.sees("tournament"):
 	    while scanner.next() == "IHEOL":
