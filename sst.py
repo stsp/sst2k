@@ -5898,8 +5898,13 @@ def makemoves():
 	    clrscr()
 	    setwnd(message_window)
 	    clrscr()
+	    abandon_passed = False
 	    for (cmd, opt) in commands:
-		if cmd.startswith(scanner.token.upper()):
+		# commands after ABANDON cannot be abbreviated
+		if cmd == "ABANDON":
+		    abandon_passed = True
+		if cmd == scanner.token.upper() or (not abandon_passed \
+			and cmd.startswith(scanner.token.upper())):
 		    break;
 	    if cmd == "":
                 listCommands()
