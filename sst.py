@@ -5768,54 +5768,55 @@ def setpassword():
 
 # Code from sst.c begins here
 
-commands = {
-    "SRSCAN":   	OPTION_TTY,
-    "STATUS":   	OPTION_TTY,
-    "REQUEST":  	OPTION_TTY,
-    "LRSCAN":   	OPTION_TTY,
-    "PHASERS":  	0,
-    "TORPEDO":  	0,
-    "PHOTONS":  	0,
-    "MOVE":     	0,
-    "SHIELDS":   	0,
-    "DOCK":     	0,
-    "DAMAGES":   	0,
-    "CHART":    	0,
-    "IMPULSE":  	0,
-    "REST":     	0,
-    "WARP":     	0,
-    "SCORE":    	0,
-    "SENSORS":  	OPTION_PLANETS,
-    "ORBIT":		OPTION_PLANETS,
-    "TRANSPORT":	OPTION_PLANETS,
-    "MINE":		OPTION_PLANETS,
-    "CRYSTALS":  	OPTION_PLANETS,
-    "SHUTTLE":  	OPTION_PLANETS,
-    "PLANETS":  	OPTION_PLANETS,
-    "REPORT":   	0,
-    "COMPUTER": 	0,
-    "COMMANDS": 	0,
-    "EMEXIT":		0,
-    "PROBE":		OPTION_PROBE,
-    "SAVE":		0,
-    "FREEZE":		0,	# Synonym for SAVE
-    "ABANDON":  	0,
-    "DESTRUCT": 	0,
-    "DEATHRAY": 	0,
-    "DEBUG":    	0,
-    "MAYDAY":		0,
-    "SOS":		0,	# Synonym for MAYDAY
-    "CALL":		0,	# Synonym for MAYDAY
-    "QUIT":		0,
-    "HELP":		0,
-}
+commands = [
+    ("SRSCAN",   	OPTION_TTY),
+    ("STATUS",   	OPTION_TTY),
+    ("REQUEST",  	OPTION_TTY),
+    ("LRSCAN",   	OPTION_TTY),
+    ("PHASERS",  	0),
+    ("TORPEDO",  	0),
+    ("PHOTONS",  	0),
+    ("MOVE",     	0),
+    ("SHIELDS",   	0),
+    ("DOCK",     	0),
+    ("DAMAGES",   	0),
+    ("CHART",    	0),
+    ("IMPULSE",  	0),
+    ("REST",     	0),
+    ("WARP",     	0),
+    ("SCORE",    	0),
+    ("SENSORS",  	OPTION_PLANETS),
+    ("ORBIT",		OPTION_PLANETS),
+    ("TRANSPORT",	OPTION_PLANETS),
+    ("MINE",		OPTION_PLANETS),
+    ("CRYSTALS",  	OPTION_PLANETS),
+    ("SHUTTLE",  	OPTION_PLANETS),
+    ("PLANETS",  	OPTION_PLANETS),
+    ("REPORT",   	0),
+    ("COMPUTER", 	0),
+    ("COMMANDS", 	0),
+    ("EMEXIT",		0),
+    ("PROBE",		OPTION_PROBE),
+    ("SAVE",		0),
+    ("FREEZE",		0),	# Synonym for SAVE
+    ("ABANDON",  	0),
+    ("DESTRUCT", 	0),
+    ("DEATHRAY", 	0),
+    ("DEBUG",    	0),
+    ("MAYDAY",		0),
+    ("SOS",		0),	# Synonym for MAYDAY
+    ("CALL",		0),	# Synonym for MAYDAY
+    ("QUIT",		0),
+    ("HELP",		0),
+    ("",		0),
+]
 
 def listCommands():
     "Generate a list of legal commands."
     prout(_("LEGAL COMMANDS ARE:"))
     emitted = 0
-    for key in commands:
-	if not commands[key] or (commands[key] & game.options):
+    for (key, opt) in commands:
+	if not opt or (opt & game.options):
             proutn("%-12s " % key)
             emitted += 1
             if emitted % 5 == 4:
@@ -5833,7 +5834,8 @@ def helpme():
 	setwnd(message_window)
 	if key == "IHEOL":
 	    return
-        if scanner.token.upper() in commands or scanner.token == "ABBREV":
+	cmds = map(lambda x: x[0], commands)
+	if scanner.token.upper() in cmds or scanner.token.upper() == "ABBREV":
 	    break
 	skip(1)
 	listCommands()
@@ -5896,16 +5898,14 @@ def makemoves():
 	    clrscr()
 	    setwnd(message_window)
 	    clrscr()
-            candidates = filter(lambda x: x.startswith(scanner.token.upper()),
-                                commands)
-            if len(candidates) == 1:
-                cmd = candidates[0]
-                break
-            elif candidates and not (game.options & OPTION_PLAIN):
-                prout("Commands with prefix '%s': %s" % (scanner.token, " ".join(candidates)))
-            else:
+	    for (cmd, opt) in commands:
+		if cmd.startswith(scanner.token.upper()):
+		    break;
+	    if cmd == "":
                 listCommands()
                 continue
+            else:
+		break;
 	if cmd == "SRSCAN":		# srscan
 	    srscan()
 	elif cmd == "STATUS":		# status
