@@ -5335,10 +5335,21 @@ def setup():
     game.nkinks = game.nhelp = game.casual = game.abandoned = 0
     game.iscate = game.resting = game.imine = game.icrystl = game.icraft = False
     game.isatb = game.state.nplankl = 0
-    game.state.starkl = game.state.basekl = 0
+    game.state.starkl = game.state.basekl = game.state.nworldkl = 0
     game.iscraft = "onship"
     game.landed = False
     game.alive = True
+
+    # the galaxy
+    game.state.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
+    # the starchart
+    game.state.chart = fill2d(GALSIZE, lambda i_unused, j_unused: Page())
+
+    game.state.planets = []      # Planet information
+    game.state.baseq = []      # Base quadrant coordinates
+    game.state.kcmdr = []      # Commander quadrant coordinates
+    game.statekscmdr = Coord() # Supercommander quadrant coordinates
+
     # Starchart is functional but we've never seen it
     game.lastchart = FOREVER
     # Put stars in the galaxy
