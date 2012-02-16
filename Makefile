@@ -37,4 +37,5 @@ clean:
 	rm -f *.6 MANIFEST index.html SHIPPER.*
 
 release: sst-$(VERS).tar.gz sst.html
-	shipper -u -m -t; make clean
+	shipper -u -t; make clean
+	cd www; upload

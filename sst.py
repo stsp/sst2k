@@ -13,7 +13,7 @@ on how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
-version="2.0"
+version="2.1"
 
 docpath  	= (".", "../doc", "/usr/share/doc/sst")
 
@@ -6355,3 +6355,5 @@ if __name__ == '__main__':
         if logfp:
             logfp.close()
         print ""
+
+# End.

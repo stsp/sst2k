@@ -1,5 +1,8 @@
 			SST2K project news.
 
+2.1 @ 2012-02-16
+    Packaging fixes, pychecker cleanup, cope with Freshmeat name changes.
+
 2.0 @ 2010-11-30
     Game code moved to Python. Many bug fixes.
 

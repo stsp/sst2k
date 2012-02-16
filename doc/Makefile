@@ -1,4 +1,4 @@
-# From this directory, distribute rge following files:
+# From this directory, distribute the following files:
 # HACKING makehelp.py sst-doc.xml sst-layer.xsl sst.xml
 
 sst.6: sst.xml
