@@ -1883,7 +1883,7 @@ command descriptions, and changed some logic in sst.c to match.
 <listitem><para>
 I've cleaned up a lot of grubby FORTRANisms in the code internals &mdash;
 used sizeof(), replaced magic numeric constants with #defines,
-that sort of thing.
+that sort of thing.  Later I translated the code from C to Python.
 </para></listitem>
 <listitem><para>
 I fixed a surprising number of typos in the code and documentation.
