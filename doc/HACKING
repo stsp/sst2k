@@ -191,7 +191,7 @@ probability of being damaged."
 This is one place where OPTION_PLAIN does not restore the original
 behavior, which was equiprobable damage across all devices.  If we
 wanted that, we'd return randrange(NDEVICES) and have done with it.
-Also, in the original game, DNAVYS and DCOMPTR were the same device.
+Also, in the original game, DNAVSYS and DCOMPTR were the same device.
 
 Instead, we use a table of weights similar to the one from BSD Trek.
 BSD doesn't have the shuttle, shield controller, death ray, or probes.
