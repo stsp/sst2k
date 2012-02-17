@@ -5203,7 +5203,6 @@ def freeze(boss):
     if key != "IHALPHA":
         huh()
         return
-    scanner.chew()
     if '.' not in scanner.token:
         scanner.token += ".trk"
     try:
@@ -5213,6 +5212,7 @@ def freeze(boss):
 	return
     cPickle.dump(game, fp)
     fp.close()
+    scanner.chew()
 
 def thaw():
     "Retrieve saved game."
