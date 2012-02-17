@@ -3530,7 +3530,7 @@ def imove(icourse=None, noattack=False):
         if icourse.origin.quadrant() != icourse.location.quadrant():
             newquadrant(noattack)
             break
-        elif check_collision(icourse, w):
+        elif check_collision(w):
             print "Collision detected"
             break
         else:
@@ -3901,7 +3901,7 @@ def warp(wcourse, involuntary):
 		    twarp = False
             wcourse.reset()
     # Activate Warp Engines and pay the cost 
-    imove(course, noattack=False)
+    imove(wcourse, noattack=False)
     if game.alldone:
 	return
     game.energy -= wcourse.power(game.warpfac)
@@ -5549,7 +5549,7 @@ def choose():
 	    return True
         if scanner.sees("regular"):
 	    break
-	proutn(_("What is \"%s\"?") % scanner.token)
+	proutn(_("What is \"%s\"? ") % scanner.token)
 	scanner.chew()
     while game.length==0 or game.skill==SKILL_NONE:
 	if scanner.next() == "IHALPHA":
