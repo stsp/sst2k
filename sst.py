@@ -5217,7 +5217,7 @@ def freeze(boss):
 def thaw():
     "Retrieve saved game."
     global game
-    game.passwd[0] = '\0'
+    game.passwd = None
     key = scanner.next()
     if key == "IHEOL":
 	proutn(_("File name: "))
@@ -5225,7 +5225,6 @@ def thaw():
     if key != "IHALPHA":
 	huh()
 	return True
-    scanner.chew()
     if '.' not in scanner.token:
         scanner.token += ".trk"
     try:
@@ -5235,6 +5234,7 @@ def thaw():
 	return
     game = cPickle.load(fp)
     fp.close()
+    scanner.chew()
     return False
 
 # I used <http://www.memory-alpha.org> to find planets
