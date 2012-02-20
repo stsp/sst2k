@@ -386,7 +386,7 @@ class Gamestate:
         # He says the existing expression is prone to divide-by-zero errors
         # after killing the last klingon when score is shown -- perhaps also
         # if the only remaining klingon is SCOM.
-        game.state.remtime = game.state.remres/(game.state.remkl + 4*len(game.state.kcmdr))
+        self.state.remtime = self.state.remres/(self.state.remkl + 4*len(self.state.kcmdr))
 
 FWON = 0
 FDEPLETE = 1
@@ -2492,7 +2492,7 @@ def nova(nov):
                     if iquad == 'P':
                         game.state.nplankl += 1
                     else:
-                        game.state.worldkl += 1
+                        game.state.nworldkl += 1
                     prout(crmena(True, 'B', "sector", neighbor) + _(" destroyed."))
                     game.iplnet.pclass = "destroyed"
                     game.iplnet = None
@@ -6327,7 +6327,7 @@ if __name__ == '__main__':
                     raise SystemExit, 1
                 try:
                     line = replayfp.readline().strip()
-                    (leader, key, seed) = line.split()
+                    (leader, _, seed) = line.split()
                     seed = eval(seed)
                     sys.stderr.write("sst2k: seed set to %s\n" % seed)
                     line = replayfp.readline().strip()
