@@ -6318,6 +6318,7 @@ if __name__ == '__main__':
             game.options |= OPTION_TTY
         seed = int(time.time())
         (options, arguments) = getopt.getopt(sys.argv[1:], "r:s:txV")
+        replay = False
         for (switch, val) in options:
             if switch == '-r':
                 try:
@@ -6332,6 +6333,7 @@ if __name__ == '__main__':
                     sys.stderr.write("sst2k: seed set to %s\n" % seed)
                     line = replayfp.readline().strip()
                     arguments += line.split()[2:]
+                    replay = True
                 except ValueError:
                     sys.stderr.write("sst: replay file %s is ill-formed\n"% val)
                     raise SystemExit(1)
@@ -6380,6 +6382,8 @@ if __name__ == '__main__':
                     game.alldone = False
                 else:
                     makemoves()
+                if replay:
+                    break
                 skip(1)
                 stars()
                 skip(1)
