@@ -1663,7 +1663,8 @@ def hittem(hits):
     "Register a phaser hit on Klingons and Romulans."
     w = Coord()
     skip(1)
-    for (kk, wham) in enumerate(hits):
+    kk = 0
+    for wham in hits:
 	if wham == 0:
 	    continue
 	dustfac = randreal(0.9, 1.0)
@@ -3185,7 +3186,8 @@ def pause_game():
         global linecount
         sys.stdout.write('\n')
         proutn(prompt)
-        raw_input()
+        if not replayfp:
+            raw_input()
         sys.stdout.write('\n' * rows)
         linecount = 0
 
@@ -3286,7 +3288,11 @@ def setwnd(wnd):
                 legend = "unknown"
             logfp.write("#curses: setwnd(%s)\n" % legend)
         curwnd = wnd
-        curses.curs_set(wnd == fullscreen_window or wnd == message_window or wnd == prompt_window)
+        # Some curses implementations get confused when you try this.
+        try:
+            curses.curs_set(wnd in (fullscreen_window, message_window, prompt_window))
+        except curses.error:
+            pass
 
 def clreol():
     "Clear to end of line -- can be a no-op in tty mode" 
