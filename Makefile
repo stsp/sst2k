@@ -1,6 +1,6 @@
 # Makefile for the SST2K project
 
-VERS=$(shell sed <sst.py -n -e '/version=\(.*\)/s//\1/p')
+VERS=$(shell sed <sst.py -n -e '/version *= *\(.*\)/s//\1/p')
 
 MANDIR=/usr/share/man/man1
 BINDIR=/usr/bin
