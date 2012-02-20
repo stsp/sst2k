@@ -521,7 +521,8 @@ def tryexit(enemy, look, irun):
 
 def movebaddy(enemy):
     "Tactical movement for the bad guys."
-    goto = Coord(); look = Coord()
+    goto = Coord()
+    look = Coord()
     irun = False
     # This should probably be just (game.quadrant in game.state.kcmdr) + (game.state.kscmdr==game.quadrant) 
     if game.skill >= SKILL_EXPERT:
@@ -531,7 +532,7 @@ def movebaddy(enemy):
     dist1 = enemy.kdist
     mdist = int(dist1 + 0.5) # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
-    if enemy.type=='S' and \
+    if enemy.type == 'S' and \
 	(enemy.power <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
 	irun = True
 	motion = -QUADSIZE
@@ -640,7 +641,7 @@ def movebaddy(enemy):
 	if success:
 	    goto = look
 	    if game.idebug:
-		proutn(`goto`)
+		proutn(repr(goto))
 	else:
 	    break # done early 
     if game.idebug:
@@ -664,7 +665,7 @@ def moveklings():
         for enemy in game.enemies:
 	    if enemy.type == 'C':
 		movebaddy(enemy)
-    if game.state.kscmdr==game.quadrant:
+    if game.state.kscmdr == game.quadrant:
         for enemy in game.enemies:
 	    if enemy.type == 'S':
 		movebaddy(enemy)
@@ -689,7 +690,7 @@ def movescom(iq, avoid):
     game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons -= 1
     game.state.kscmdr = iq
     game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons += 1
-    if game.state.kscmdr==game.quadrant:
+    if game.state.kscmdr == game.quadrant:
 	# SC has scooted, remove him from current quadrant 
 	game.iscate = False
 	game.isatb = 0
@@ -720,7 +721,10 @@ def movescom(iq, avoid):
 			
 def supercommander():
     "Move the Super Commander." 
-    iq = Coord(); sc = Coord(); ibq = Coord(); idelta = Coord()
+    iq = Coord()
+    sc = Coord()
+    ibq = Coord()
+    idelta = Coord()
     basetbl = []
     if game.idebug:
 	prout("== SUPERCOMMANDER")
@@ -876,16 +880,16 @@ def movetholian():
             game.tholian.move(here)
     # check to see if all holes plugged 
     for i in range(QUADSIZE):
-	if game.quad[0][i]!='#' and game.quad[0][i]!='T':
+	if game.quad[0][i] != '#' and game.quad[0][i] != 'T':
 	    return
-	if game.quad[QUADSIZE-1][i]!='#' and game.quad[QUADSIZE-1][i]!='T':
+	if game.quad[QUADSIZE-1][i] != '#' and game.quad[QUADSIZE-1][i] != 'T':
 	    return
-	if game.quad[i][0]!='#' and game.quad[i][0]!='T':
+	if game.quad[i][0] != '#' and game.quad[i][0] != 'T':
 	    return
-	if game.quad[i][QUADSIZE-1]!='#' and game.quad[i][QUADSIZE-1]!='T':
+	if game.quad[i][QUADSIZE-1] != '#' and game.quad[i][QUADSIZE-1] != 'T':
 	    return
     # All plugged up -- Tholian splits 
-    game.quad[game.tholian.location.i][game.tholian.location.j]='#'
+    game.quad[game.tholian.location.i][game.tholian.location.j] = '#'
     dropin(' ')
     prout(crmena(True, 'T', "sector", game.tholian) + _(" completes web."))
     game.tholian.move(None)
@@ -947,14 +951,14 @@ def doshield(shraise):
 	    prout(_("Shields raising uses up last of energy."))
 	    finish(FNRG)
 	    return
-	game.ididit=True
+	game.ididit = True
 	return
     elif action == "SHDN":
 	if not game.shldup:
 	    prout(_("Shields already down."))
 	    return
-	game.shldup=False
-	game.shldchg=True
+	game.shldup = False
+	game.shldchg = True
 	prout(_("Shields lowered."))
 	game.ididit = True
 	return
@@ -1085,11 +1089,12 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     # Loop to move a single torpedo 
     setwnd(message_window)
     for step in range(1, QUADSIZE*2):
-        if not track.next(): break
+        if not track.next():
+            break
         w = track.sector()
 	if not w.valid_sector():
 	    break
-	iquad=game.quad[w.i][w.j]
+	iquad = game.quad[w.i][w.j]
 	tracktorpedo(w, step, number, nburst, iquad)
 	if iquad == '.':
 	    continue
@@ -1114,7 +1119,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    if game.quad[bumpto.i][bumpto.j] == ' ':
 		finish(FHOLE)
 		return hit
-	    if game.quad[bumpto.i][bumpto.j]!='.':
+	    if game.quad[bumpto.i][bumpto.j] != '.':
 		# can't move into object 
 		return hit
 	    game.sector = bumpto
@@ -1163,8 +1168,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             else:
                 prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
                 enemy.location = bumpto
-                game.quad[w.i][w.j]='.'
-                game.quad[bumpto.i][bumpto.j]=iquad
+                game.quad[w.i][w.j] = '.'
+                game.quad[bumpto.i][bumpto.j] = iquad
                 for enemy in game.enemies:
                     enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
                 sortenemies()
@@ -1295,7 +1300,7 @@ def fry(hit):
     prout(_(" damaged."))
     if damaged(DSHIELD) and game.shldup:
 	prout(_("***Shields knocked down."))
-	game.shldup=False
+	game.shldup = False
 
 def attack(torps_ok):
     # bad guy attacks us 
@@ -1305,7 +1310,9 @@ def attack(torps_ok):
 	return
     attempt = False
     ihurt = False
-    hitmax=0.0; hittot=0.0; chgfac=1.0
+    hitmax = 0.0
+    hittot = 0.0
+    chgfac = 1.0
     where = "neither"
     if game.idebug:
 	prout("=== ATTACK!")
@@ -1499,7 +1506,7 @@ def targetcheck(w):
 	huh()
 	return None
     delta = Coord()
-    # FIXME: C code this was translated from is wacky -- why the sign reversal?
+    # C code this was translated from is wacky -- why the sign reversal?
     delta.j = (w.j - game.sector.j)
     delta.i = (game.sector.i - w.i)
     if delta == Coord(0, 0):
@@ -1678,7 +1685,7 @@ def hittem(hits):
 	else:
 	    proutn(_("Very small hit on "))
 	ienm = game.quad[w.i][w.j]
-	if ienm=='?':
+	if ienm == '?':
 	    thing.angry()
 	proutn(crmena(False, ienm, "sector", w))
 	skip(1)
@@ -1691,7 +1698,7 @@ def hittem(hits):
 	    kk -= 1	# don't do the increment
             continue
 	else: # decide whether or not to emasculate klingon 
-	    if kpow>0 and withprob(0.9) and kpow <= randreal(0.4, 0.8)*kpini:
+	    if kpow > 0 and withprob(0.9) and kpow <= randreal(0.4, 0.8)*kpini:
 		prout(_("***Mr. Spock-  \"Captain, the vessel at Sector %s")%w)
 		prout(_("   has just lost its firepower.\""))
 		game.enemies[kk].power = -kpow
