@@ -698,8 +698,7 @@ def movescom(iq, avoid):
 	unschedule(FSCDBAS)
 	for enemy in game.enemies:
 	    if enemy.type == 'S':
-		break
-	enemy.move(None)
+		enemy.move(None)
 	game.klhere -= 1
 	if game.condition != "docked":
 	    newcnd()
@@ -1140,40 +1139,43 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		return None
             for enemy in game.enemies:
 		if w == enemy.location:
-		    break
-	    kp = math.fabs(enemy.power)
-	    h1 = 700.0 + randrange(100) - \
-		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
-	    h1 = math.fabs(h1)
-	    if kp < h1:
-		h1 = kp
-            if enemy.power < 0:
-                enemy.power -= -h1
+                    kp = math.fabs(enemy.power)
+                    h1 = 700.0 + randrange(100) - \
+                        1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
+                    h1 = math.fabs(h1)
+                    if kp < h1:
+                        h1 = kp
+                    if enemy.power < 0:
+                        enemy.power -= -h1
+                    else:
+                        enemy.power -= h1
+                    if enemy.power == 0:
+                        deadkl(w, iquad, w)
+                        return None
+                    proutn(crmena(True, iquad, "sector", w))
+                    displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
+                    displacement.next()
+                    bumpto = displacement.sector()
+                    if not bumpto.valid_sector():
+                        prout(_(" damaged but not destroyed."))
+                        return
+                    if game.quad[bumpto.i][bumpto.j] == ' ':
+                        prout(_(" buffeted into black hole."))
+                        deadkl(w, iquad, bumpto)
+                    if game.quad[bumpto.i][bumpto.j] != '.':
+                        prout(_(" damaged but not destroyed."))
+                    else:
+                        prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
+                        enemy.location = bumpto
+                        game.quad[w.i][w.j] = '.'
+                        game.quad[bumpto.i][bumpto.j] = iquad
+                        for enemy in game.enemies:
+                            enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
+                        sortenemies()
+                    break
             else:
-                enemy.power -= h1
-	    if enemy.power == 0:
-		deadkl(w, iquad, w)
-		return None
-	    proutn(crmena(True, iquad, "sector", w))
-            displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
-            displacement.next()
-            bumpto = displacement.sector()
-            if not bumpto.valid_sector():
-		prout(_(" damaged but not destroyed."))
-		return
-	    if game.quad[bumpto.i][bumpto.j] == ' ':
-		prout(_(" buffeted into black hole."))
-		deadkl(w, iquad, bumpto)
-	    if game.quad[bumpto.i][bumpto.j] != '.':
-		prout(_(" damaged but not destroyed."))
-            else:
-                prout(_(" damaged-- displaced by blast to Sector %s ")%bumpto)
-                enemy.location = bumpto
-                game.quad[w.i][w.j] = '.'
-                game.quad[bumpto.i][bumpto.j] = iquad
-                for enemy in game.enemies:
-                    enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
-                sortenemies()
+                prout("Internal error, no enemy where expected!")
+                raise SystemExit, 1
             return None
 	elif iquad == 'B': # Hit a base 
 	    skip(1)
