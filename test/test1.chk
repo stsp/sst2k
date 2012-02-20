@@ -1,0 +1,75 @@
+sst2k: seed set to 1329758601
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # recorded by esr@snark on Mon Feb 20 12:23:21 2012
+r
+Would you like a Short, Medium, or Long game? s
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 3054. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 3 battle cruisers.
+You have an initial allotment of 7 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 5 supporting starbases.
+Starbase locations-  1 - 7  3 - 8  3 - 1  5 - 8  2 - 2  
+
+The Enterprise is currently in Quadrant 6 - 7 Sector 8 - 8
+
+Good Luck!
+COMMAND> 
+COMMAND> m 8
+(Manual movement assumed.)
+
+Beg your pardon, Captain?
+COMMAND> move 8 7 3 2
+(Manual movement assumed.)
+
+Helmsman Sulu- "Aye, Sir."
+
+YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER
+AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,
+YOU WILL BE DESTROYED.
+
+[ANNOUNCEMENT ARRIVING...]
+
+***Enterprise caught in long range tractor beam--
+Enterprise is pulled to Quadrant 4 - 4, Sector 9 - 8
+Shields raised.
+
+32 unit hit on the Enterprise from Klingon at Sector 4 - 10
+
+21 unit hit on the Enterprise from Klingon at Sector 1 - 5
+
+
+Energy left 4090    shields up 71%,   torpedoes left 10
+COMMAND> torp
+10 torpedoes left.
+Number of torpedoes to fire- 3
+Target sector for torpedo number 1- 1 5
+Target sector for torpedo number 2- 4 10
+Target sector for torpedo number 3- 7 9
+
+Track for torpedo number 1-  8 - 8   7 - 7   6 - 7   
+5 - 6   4 - 6   3 - 6   2 - 5   1 - 5   
+***Klingon at Sector 1 - 5 destroyed.
+
+Track for torpedo number 2-  8 - 8   7 - 9   
+***Commander at Sector 7 - 9 damaged-- displaced by blast to Sector 8 - 9 
+
+Track for torpedo number 3-  8 - 9   
+***Commander at Sector 8 - 9 destroyed.
+
+34 unit hit on the Enterprise from Klingon at Sector 4 - 10
+
+
+Energy left 4056    shields up 68%,   torpedoes left 7
+COMMAND> QUIT
+
+May the Great Bird of the Galaxy roost upon your home planet.
