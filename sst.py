@@ -1660,10 +1660,9 @@ def checkshctrl(rpow):
 
 def hittem(hits):
     "Register a phaser hit on Klingons and Romulans."
-    kk = 0
     w = Coord()
     skip(1)
-    for (k, wham) in enumerate(hits):
+    for (kk, wham) in enumerate(hits):
 	if wham==0:
 	    continue
 	dustfac = randreal(0.9, 1.0)
