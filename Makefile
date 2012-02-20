@@ -29,6 +29,9 @@ sst-$(VERS).tar.gz: $(SOURCES) sst.6
 
 dist: sst-$(VERS).tar.gz
 
+check: #pylint
+	cd test; make --quiet
+
 pychecker:
 	@-pychecker --quiet --only --limit 50 sst.py
 

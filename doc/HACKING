@@ -216,21 +216,8 @@ This code has been designed to be tested.  A simple shellscript
 included in the distribution, 'replay', automatically reruns the
 last game you played.
 
-Here are some interesting seeds for debugging and regression testing
-For each one, I list the seed, the options, and the last svn revision
-for which it is known to have given the described behavior.
+See the "test" directory for regression-test logs and checkfiles.
 
-1160647745 regular short good fancy	(r769)
-
-Starts you in a quadrant with the Super-Commander in it.  Slamming three
-torps at him will kill him.  You can use this to regression-test both
-torpedo tracks and the Deep Space Probe. Known bug: "probe aut 2 8"
-triggers manual navigation.
-
-1160707235 regular short good fancy	(r769)
-
-Do sr/mov aut 5 4/sr/sensors/orbit/transport; you'll get a transporter
-failure.
 
 NOTES ON THE PYTHON TRANSLATION:
 
