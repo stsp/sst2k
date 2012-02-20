@@ -124,6 +124,14 @@ class Coord:
         return "%s - %s" % (self.i+1, self.j+1)
     __repr__ = __str__
 
+class Thingy(Coord):
+    "Do not anger the Space Thingy!"
+    def __init__(self):
+        Coord.__init__(self)
+        self.angered = False
+    def angry(self):
+        self.angered = True
+
 class Planet:
     def __init__(self):
         self.name = None	# string-valued if inhabited
@@ -1218,7 +1226,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		# Stas Sergeev added the possibility that
 		# you can shove the Thingy and piss it off.
 		# It then becomes an enemy and may fire at you.
-		thing.angry = True
+		thing.angry()
 	    return None
 	elif iquad == ' ': # Black hole 
 	    skip(1)
@@ -1312,7 +1320,7 @@ def attack(torps_ok):
     if (((game.quadrant in game.state.kcmdr or game.state.kscmdr == game.quadrant) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
 	moveklings()
     # if no enemies remain after movement, we're done 
-    if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing == game.quadrant and not thing.angry):
+    if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing == game.quadrant and not thing.angered):
 	return
     # set up partial hits if attack happens during shield status change 
     pfac = 1.0/game.inshld
@@ -1332,7 +1340,7 @@ def attack(torps_ok):
 	    r *= 0.25
 	if enemy.power < 500:
 	    r *= 0.25 
-	if enemy.type == 'T' or (enemy.type == '?' and not thing.angry):
+	if enemy.type == 'T' or (enemy.type == '?' and not thing.angered):
 	    continue
 	# different enemies have different probabilities of throwing a torp 
 	usephasers = not torps_ok or \
@@ -1671,7 +1679,7 @@ def hittem(hits):
 	    proutn(_("Very small hit on "))
 	ienm = game.quad[w.i][w.j]
 	if ienm=='?':
-	    thing.angry = True
+	    thing.angry()
 	proutn(crmena(False, ienm, "sector", w))
 	skip(1)
 	if kpow == 0:
@@ -6287,8 +6295,7 @@ if __name__ == '__main__':
     try:
         global line, thing, game
         game = None
-        thing = Coord()
-        thing.angry = False
+        thing = Thingy()
         game = Gamestate()
         game.options = OPTION_ALL &~ (OPTION_IOMODES | OPTION_PLAIN | OPTION_ALMY)
         if os.getenv("TERM"):
