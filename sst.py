@@ -1099,7 +1099,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	if iquad == '.':
 	    continue
 	# hit something 
-	if not damaged(DSRSENS) or game.condition == "docked":
+        setwnd(message_window)
+        if not damaged(DSRSENS) or game.condition == "docked":
 	    skip(1)	# start new line after text track 
 	if iquad in ('E', 'F'): # Hit our ship 
 	    skip(1)
@@ -3213,6 +3214,9 @@ def proutn(line):
 	if curwnd == message_window and y >= my - 2:
 	    pause_game()
 	    clrscr()
+        # Uncomment this to debug curses problems
+        if logfp:
+            logfp.write("#curses: at %s proutn(%s)\n" % ((y, x), repr(line)))
 	curwnd.addstr(line)
 	curwnd.refresh()
     else:
@@ -3262,6 +3266,25 @@ def setwnd(wnd):
     "Change windows -- OK for this to be a no-op in tty mode."
     global curwnd
     if game.options & OPTION_CURSES:
+        # Uncomment this to debug curses problems
+        if logfp:
+            if wnd == fullscreen_window:
+                legend = "fullscreen"
+            elif wnd == srscan_window:
+                legend = "srscan"
+            elif wnd == report_window:
+                legend = "report"
+            elif wnd == status_window:
+                legend = "status"
+            elif wnd == lrscan_window:
+                legend = "lrscan"
+            elif wnd == message_window:
+                legend = "message"
+            elif wnd == prompt_window:
+                legend = "prompt"
+            else:
+                legend = "unknown"
+            logfp.write("#curses: setwnd(%s)\n" % legend)
         curwnd = wnd
         curses.curs_set(wnd == fullscreen_window or wnd == message_window or wnd == prompt_window)
 
