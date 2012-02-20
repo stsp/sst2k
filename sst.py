@@ -6327,7 +6327,7 @@ if __name__ == '__main__':
                     raise SystemExit, 1
                 try:
                     line = replayfp.readline().strip()
-                    (leader, _, seed) = line.split()
+                    (leader, __, seed) = line.split()
                     seed = eval(seed)
                     sys.stderr.write("sst2k: seed set to %s\n" % seed)
                     line = replayfp.readline().strip()
