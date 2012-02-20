@@ -1111,7 +1111,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		return hit # Cheat if on a planet 
             # In the C/FORTRAN version, dispersion was 2.5 radians, which
             # is 143 degrees, which is almost exactly 4.8 clockface units
-            displacement = course(track.bearing+randreal(-2.4,2.4), distance=2**0.5)
+            displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
             displacement.next()
             bumpto = displacement.sector()
 	    if not bumpto.valid_sector():
@@ -1154,7 +1154,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		deadkl(w, iquad, w)
 		return None
 	    proutn(crmena(True, iquad, "sector", w))
-            displacement = course(track.bearing+randreal(-2.4,2.4), distance=2**0.5)
+            displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
             displacement.next()
             bumpto = displacement.sector()
             if not bumpto.valid_sector():
@@ -1361,7 +1361,7 @@ def attack(torps_ok):
 		continue # Don't waste the effort! 
 	    attempt = True # Attempt to attack 
 	    dustfac = randreal(0.8, 0.85)
-	    hit = enemy.power*math.pow(dustfac,enemy.kavgd)
+	    hit = enemy.power*math.pow(dustfac, enemy.kavgd)
 	    enemy.power *= 0.75
 	else: # Enemy uses photon torpedo 
 	    # We should be able to make the bearing() method work here
@@ -1663,10 +1663,10 @@ def hittem(hits):
     w = Coord()
     skip(1)
     for (kk, wham) in enumerate(hits):
-	if wham==0:
+	if wham == 0:
 	    continue
 	dustfac = randreal(0.9, 1.0)
-	hit = wham*math.pow(dustfac,game.enemies[kk].kdist)
+	hit = wham*math.pow(dustfac, game.enemies[kk].kdist)
 	kpini = game.enemies[kk].power
 	kp = math.fabs(kpini)
 	if PHASEFAC*hit < kp:
@@ -1707,10 +1707,16 @@ def hittem(hits):
 def phasers():
     "Fire phasers at bad guys."
     hits = []
-    kz = 0; k = 1; irec=0 # Cheating inhibitor 
-    ifast = False; no = False; itarg = True; msgflag = True; rpow=0
+    kz = 0
+    k = 1
+    irec = 0 # Cheating inhibitor 
+    ifast = False
+    no = False
+    itarg = True
+    msgflag = True
+    rpow = 0
     automode = "NOTSET"
-    key=0
+    key = 0
     skip(1)
     # SR sensors and Computer are needed for automode 
     if damaged(DSRSENS) or damaged(DCOMPTR):
@@ -1736,15 +1742,15 @@ def phasers():
 	ifast = True
     # Original code so convoluted, I re-did it all
     # (That was Tom Almy talking about the C code, I think -- ESR)
-    while automode=="NOTSET":
-	key=scanner.next()
+    while automode == "NOTSET":
+	key = scanner.next()
 	if key == "IHALPHA":
 	    if scanner.sees("manual"):
 		if len(game.enemies)==0:
 		    prout(_("There is no enemy present to select."))
 		    scanner.chew()
 		    key = "IHEOL"
-		    automode="AUTOMATIC"
+		    automode = "AUTOMATIC"
 		else:
 		    automode = "MANUAL"
 		    key = scanner.next()
@@ -1788,18 +1794,18 @@ def phasers():
 	    key = scanner.next()
 	if key != "IHREAL" and len(game.enemies) != 0:
 	    prout(_("Phasers locked on target. Energy available: %.2f")%avail)
-	irec=0
+	irec = 0
         while True:
 	    scanner.chew()
 	    if not kz:
 		for i in range(len(game.enemies)):
-		    irec += math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))*randreal(1.01, 1.06) + 1.0
-	    kz=1
+		    irec += math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90, game.enemies[i].kdist))*randreal(1.01, 1.06) + 1.0
+	    kz = 1
 	    proutn(_("%d units required. ") % irec)
 	    scanner.chew()
 	    proutn(_("Units to fire= "))
 	    key = scanner.next()
-	    if key!="IHREAL":
+	    if key != "IHREAL":
 		return
 	    rpow = scanner.real
 	    if rpow > avail:
@@ -1808,11 +1814,11 @@ def phasers():
 		key = "IHEOL"
             if not rpow > avail:
                 break
-	if rpow<=0:
+	if rpow <= 0:
 	    # chicken out 
 	    scanner.chew()
 	    return
-        key=scanner.next()
+        key = scanner.next()
 	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	if ifast:
@@ -1829,7 +1835,7 @@ def phasers():
 		hits.append(0.0)
 		if powrem <= 0:
 		    continue
-		hits[i] = math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90,game.enemies[i].kdist))
+		hits[i] = math.fabs(game.enemies[i].power)/(PHASEFAC*math.pow(0.90, game.enemies[i].kdist))
 		over = randreal(1.01, 1.06) * hits[i]
 		temp = powrem
 		powrem -= hits[i] + over
@@ -1884,7 +1890,7 @@ def phasers():
 	    if key == "IHEOL":
 		scanner.chew()
 		if itarg and k > kz:
-		    irec=(abs(game.enemies[k].power)/(PHASEFAC*math.pow(0.9,game.enemies[k].kdist))) *	randreal(1.01, 1.06) + 1.0
+		    irec = (abs(game.enemies[k].power)/(PHASEFAC*math.pow(0.9, game.enemies[k].kdist))) *	randreal(1.01, 1.06) + 1.0
 		kz = k
 		proutn("(")
 		if not damaged(DCOMPTR):
@@ -1993,11 +1999,13 @@ def events():
     "Run through the event queue looking for things to do."
     i = 0
     fintim = game.state.date + game.optime
-    yank=0
+    yank = 0
     ictbeam = False
     istract = False
-    w = Coord(); hold = Coord()
-    ev = Event(); ev2 = Event()
+    w = Coord()
+    hold = Coord()
+    ev = Event()
+    ev2 = Event()
 
     def tractorbeam(yank):
         "Tractor-beaming cases merge here." 
@@ -2119,7 +2127,7 @@ def events():
 	    finish(FDEPLETE)
 	    return
 	# Any crew left alive? 
-	if game.state.crew <=0:
+	if game.state.crew <= 0:
 	    finish(FCREW)
 	    return
 	# Is life support adequate? 
@@ -2163,7 +2171,7 @@ def events():
 	elif evcode == FSPY: # Check with spy to see if SC should tractor beam 
 	    if game.state.nscrem == 0 or \
 		ictbeam or istract or \
-                game.condition=="docked" or game.isatb==1 or game.iscate:
+                game.condition == "docked" or game.isatb == 1 or game.iscate:
 		return
 	    if game.ientesc or \
 		(game.energy<2000 and game.torps<4 and game.shield < 1250) or \
@@ -2315,7 +2323,7 @@ def events():
 	    # tell the captain about it if we can 
 	    if communicating():
 		prout(_("Uhura- Captain, %s in Quadrant %s reports it is under attack") \
-                        % (q.planet, `w`))
+                        % (q.planet, repr(w)))
 		prout(_("by a Klingon invasion fleet."))
 		if cancelrest():
 		    return
@@ -2346,7 +2354,7 @@ def events():
 	    if q.klingons <= 0:
 		q.status = "secure"
 		continue
-	    if game.state.remkl >=MAXKLGAME:
+	    if game.state.remkl >= MAXKLGAME:
 		continue		# full right now 
 	    # reproduce one Klingon 
 	    w = ev.quadrant
@@ -2457,7 +2465,7 @@ def nova(nov):
         start = hits.pop()
         for offset.i in range(-1, 1+1):
             for offset.j in range(-1, 1+1):
-                if offset.j==0 and offset.i==0:
+                if offset.j == 0 and offset.i == 0:
                     continue
                 neighbor = start + offset
                 if not neighbor.valid_sector():

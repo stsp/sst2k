@@ -32,7 +32,7 @@ dist: sst-$(VERS).tar.gz
 pychecker:
 	@-pychecker --quiet --only --limit 50 sst.py
 
-PYLINTOPTS = --rcfile=/dev/null --reports=n --include-ids=y --disable=C0103,C0111,C0301,C0302,R0902,R0903,R0911,R0912,R0914,R0915,W0312,
+PYLINTOPTS = --rcfile=/dev/null --reports=n --include-ids=y --disable=C0103,C0111,C0301,C0302,C0321,R0902,R0903,R0911,R0912,R0914,R0915,W0312,W0603
 pylint:
 	@pylint --output-format=parseable $(PYLINTOPTS) sst.py
 
