@@ -13,11 +13,12 @@ on how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
 
-version="2.1"
+version = "2.1"
 
 docpath  	= (".", "../doc", "/usr/share/doc/sst")
 
-def _(str): return gettext.gettext(str)
+def _(st):
+    return gettext.gettext(st)
 
 GALSIZE 	= 8		# Galaxy size in quadrants
 NINHAB  	= (GALSIZE * GALSIZE / 2)	# Number of inhabited worlds
@@ -63,9 +64,9 @@ class Coord:
         self.i = x
         self.j = y
     def valid_quadrant(self):
-        return self.i>=0 and self.i<GALSIZE and self.j>=0 and self.j<GALSIZE
+        return self.i >= 0 and self.i < GALSIZE and self.j >= 0 and self.j < GALSIZE
     def valid_sector(self):
-	return self.i>=0 and self.i<QUADSIZE and self.j>=0 and self.j<QUADSIZE
+	return self.i >= 0 and self.i < QUADSIZE and self.j >= 0 and self.j < QUADSIZE
     def invalidate(self):
         self.i = self.j = None
     def is_valid(self):
@@ -91,7 +92,8 @@ class Coord:
     def roundtogrid(self):
         return Coord(int(round(self.i)), int(round(self.j)))
     def distance(self, other=None):
-        if not other: other = Coord(0, 0)
+        if not other:
+            other = Coord(0, 0)
         return math.sqrt((self.i - other.i)**2 + (self.j - other.j)**2)
     def bearing(self):
         return 1.90985*math.atan2(self.j, self.i)
@@ -208,23 +210,23 @@ OPTION_ALMY	= 0x02000000	# user chose Almy variant
 OPTION_COLOR    = 0x04000000	# enable color display (experimental, ESR, 2010)
 
 # Define devices 
-DSRSENS	= 0
-DLRSENS	= 1
-DPHASER	= 2
-DPHOTON	= 3
-DLIFSUP	= 4
-DWARPEN	= 5
-DIMPULS	= 6
-DSHIELD	= 7
-DRADIO	= 0
-DSHUTTL = 9
-DCOMPTR = 10
-DNAVSYS	= 11
-DTRANSP = 12
-DSHCTRL	= 13
-DDRAY	= 14
-DDSP	= 15
-NDEVICES= 16	# Number of devices
+DSRSENS	 = 0
+DLRSENS	 = 1
+DPHASER	 = 2
+DPHOTON	 = 3
+DLIFSUP	 = 4
+DWARPEN	 = 5
+DIMPULS	 = 6
+DSHIELD	 = 7
+DRADIO	 = 0
+DSHUTTL  = 9
+DCOMPTR  = 10
+DNAVSYS	 = 11
+DTRANSP  = 12
+DSHCTRL	 = 13
+DDRAY	 = 14
+DDSP	 = 15
+NDEVICES = 16	# Number of devices
 
 SKILL_NONE	= 0
 SKILL_NOVICE	= 1
@@ -233,8 +235,10 @@ SKILL_GOOD	= 3
 SKILL_EXPERT	= 4
 SKILL_EMERITUS	= 5
 
-def damaged(dev):	return (game.damage[dev] != 0.0)
-def communicating():	return not damaged(DRADIO) or game.condition=="docked"
+def damaged(dev):
+    return (game.damage[dev] != 0.0)
+def communicating():
+    return not damaged(DRADIO) or game.condition=="docked"
 
 # Define future events 
 FSPY	= 0	# Spy event happens always (no future[] entry)
@@ -254,11 +258,12 @@ NEVENTS	= 12
 
 # Abstract out the event handling -- underlying data structures will change
 # when we implement stateful events 
-def findevent(evtype):	return game.future[evtype]
+def findevent(evtype):
+    return game.future[evtype]
 
 class Enemy:
-    def __init__(self, type=None, loc=None, power=None):
-        self.type = type
+    def __init__(self, etype=None, loc=None, power=None):
+        self.type = etype
         self.location = Coord()
         if loc:
             self.move(loc)
@@ -296,7 +301,7 @@ class Gamestate:
         while i > 0:
             i -= 1
             self.future.append(Event())
-        self.passwd  = None;		# Self Destruct password
+        self.passwd  = None	# Self Destruct password
         self.enemies = []
         self.quadrant = None	# where we are in the large
         self.sector = None	# where we are in the small
@@ -426,9 +431,9 @@ def tryexit(enemy, look, irun):
     iq.i = game.quadrant.i+(look.i+(QUADSIZE-1))/QUADSIZE - 1
     iq.j = game.quadrant.j+(look.j+(QUADSIZE-1))/QUADSIZE - 1
     if not welcoming(iq):
-	return False;
+	return False
     if enemy.type == 'R':
-	return False; # Romulans cannot escape! 
+	return False # Romulans cannot escape! 
     if not irun:
 	# avoid intruding on another commander's territory 
 	if enemy.type == 'C':
@@ -454,19 +459,19 @@ def tryexit(enemy, look, irun):
     # Handle global matters related to escape 
     game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
     game.state.galaxy[iq.i][iq.j].klingons += 1
-    if enemy.type=='S':
+    if enemy.type == 'S':
 	game.iscate = False
 	game.ientesc = False
 	game.isatb = 0
 	schedule(FSCMOVE, 0.2777)
 	unschedule(FSCDBAS)
-	game.state.kscmdr=iq
+	game.state.kscmdr = iq
     else:
 	for cmdr in game.state.kcmdr:
 	    if cmdr == game.quadrant:
 		game.state.kcmdr.append(iq)
 		break
-    return True; # success 
+    return True # success 
 
 # The bad-guy movement algorithm:
 # 
@@ -516,7 +521,7 @@ def movebaddy(enemy):
     else:
 	nbaddys = (game.quadrant in game.state.kcmdr) + (game.state.kscmdr==game.quadrant)
     dist1 = enemy.kdist
-    mdist = int(dist1 + 0.5); # Nearest integer distance 
+    mdist = int(dist1 + 0.5) # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
     if enemy.type=='S' and \
 	(enemy.power <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
@@ -526,7 +531,7 @@ def movebaddy(enemy):
 	# decide whether to advance, retreat, or hold position 
 	forces = enemy.power+100.0*len(game.enemies)+400*(nbaddys-1)
 	if not game.shldup:
-	    forces += 1000; # Good for enemy if shield is down! 
+	    forces += 1000 # Good for enemy if shield is down! 
 	if not damaged(DPHASER) or not damaged(DPHOTON):
             if damaged(DPHASER): # phasers damaged 
 		forces += 300.0
@@ -545,12 +550,12 @@ def movebaddy(enemy):
 	else:
             if forces > 1000.0: # Very strong -- move in for kill 
 		motion = (1.0 - randreal())**2 * dist1 + 1.0
-	    if game.condition=="docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
+	    if game.condition == "docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
 		motion -= game.skill*(2.0-randreal()**2)
 	if game.idebug:
 	    proutn("=== MOTION = %d, FORCES = %1.2f, " % (motion, forces))
 	# don't move if no motion 
-	if motion==0:
+	if motion == 0:
 	    return
 	# Limit motion according to skill 
 	if abs(motion) > game.skill:
@@ -561,11 +566,11 @@ def movebaddy(enemy):
     # calculate preferred number of steps 
     nsteps = abs(int(motion))
     if motion > 0 and nsteps > mdist:
-	nsteps = mdist; # don't overshoot 
+	nsteps = mdist # don't overshoot 
     if nsteps > QUADSIZE:
-	nsteps = QUADSIZE; # This shouldn't be necessary 
+	nsteps = QUADSIZE # This shouldn't be necessary 
     if nsteps < 1:
-	nsteps = 1; # This shouldn't be necessary 
+	nsteps = 1 # This shouldn't be necessary 
     if game.idebug:
 	proutn("NSTEPS = %d:" % nsteps)
     # Compute preferred values of delta X and Y 
@@ -591,7 +596,7 @@ def movebaddy(enemy):
         else:
             krawlj = -1
 	success = False
-	attempts = 0; # Settle mysterious hang problem 
+	attempts = 0 # Settle mysterious hang problem 
 	while attempts < 20 and not success:
             attempts += 1
 	    if look.i < 0 or look.i >= QUADSIZE:
@@ -621,7 +626,7 @@ def movebaddy(enemy):
 		    look.j = goto.j + krawlj
 		    krawlj = -krawlj
 		else:
-		    break; # we have failed 
+		    break # we have failed 
 	    else:
 		success = True
 	if success:
@@ -629,7 +634,7 @@ def movebaddy(enemy):
 	    if game.idebug:
 		proutn(`goto`)
 	else:
-	    break; # done early 
+	    break # done early 
     if game.idebug:
 	skip(1)
     if enemy.move(goto):
@@ -678,8 +683,8 @@ def movescom(iq, avoid):
     game.state.galaxy[game.state.kscmdr.i][game.state.kscmdr.j].klingons += 1
     if game.state.kscmdr==game.quadrant:
 	# SC has scooted, remove him from current quadrant 
-	game.iscate=False
-	game.isatb=0
+	game.iscate = False
+	game.isatb = 0
 	game.ientesc = False
 	unschedule(FSCDBAS)
 	for enemy in game.enemies:
@@ -703,7 +708,7 @@ def movescom(iq, avoid):
 		proutn(_("   a planet in Quadrant %s has been destroyed") % game.state.kscmdr)
 		prout(_("   by the Super-commander.\""))
 	    break
-    return True; # looks good! 
+    return True # looks good! 
 			
 def supercommander():
     "Move the Super Commander." 
@@ -736,8 +741,8 @@ def supercommander():
         # without too many Klingons, and not already under attack. 
 	ifindit = iwhichb = 0
 	for (i2, base) in enumerate(game.state.baseq):
-	    i = basetbl[i2][0];	# bug in original had it not finding nearest
-	    if base==game.quadrant or base==game.battle or not welcoming(base):
+	    i = basetbl[i2][0]	# bug in original had it not finding nearest
+	    if base == game.quadrant or base == game.battle or not welcoming(base):
 		continue
 	    # if there is a commander, and no other base is appropriate,
 	    # we will take the one with the commander
@@ -750,7 +755,7 @@ def supercommander():
 		ifindit = 1
 		iwhichb = i
 		break
-	if ifindit==0:
+	if ifindit == 0:
 	    return # Nothing suitable -- wait until next time
 	ibq = game.state.baseq[iwhichb]
 	# decide how to move toward base 
@@ -763,7 +768,7 @@ def supercommander():
     iq = game.state.kscmdr + idelta
     if not movescom(iq, avoid):
 	# failed -- try some other maneuvers 
-	if idelta.i==0 or idelta.j==0:
+	if idelta.i == 0 or idelta.j == 0:
 	    # attempt angle move 
 	    if idelta.i != 0:
 		iq.j = game.state.kscmdr.j + 1
@@ -811,7 +816,7 @@ def supercommander():
 		if not ja():
 		    return
 		game.resting = False
-		game.optime = 0.0; # actually finished 
+		game.optime = 0.0 # actually finished 
 		return
     # Check for intelligence report 
     if not game.idebug and \
@@ -830,13 +835,17 @@ def movetholian():
 	return
     tid = Coord()
     if game.tholian.location.i == 0 and game.tholian.location.j == 0:
-	tid.i = 0; tid.j = QUADSIZE-1
+	tid.i = 0
+        tid.j = QUADSIZE-1
     elif game.tholian.location.i == 0 and game.tholian.location.j == QUADSIZE-1:
-	tid.i = QUADSIZE-1; tid.j = QUADSIZE-1
+	tid.i = QUADSIZE-1
+        tid.j = QUADSIZE-1
     elif game.tholian.location.i == QUADSIZE-1 and game.tholian.location.j == QUADSIZE-1:
-	tid.i = QUADSIZE-1; tid.j = 0
+	tid.i = QUADSIZE-1
+        tid.j = 0
     elif game.tholian.location.i == QUADSIZE-1 and game.tholian.location.j == 0:
-	tid.i = 0; tid.j = 0
+	tid.i = 0
+        tid.j = 0
     else:
 	# something is wrong! 
 	game.tholian.move(None)
@@ -850,12 +859,12 @@ def movetholian():
     # move in x axis 
     while here.i != tid.i:
         here.i += delta.i
-        if game.quad[here.i][here.j]=='.':
+        if game.quad[here.i][here.j] == '.':
             game.tholian.move(here)
     # move in y axis 
     while here.j != tid.j:
         here.j += delta.j
-        if game.quad[here.i][here.j]=='.':
+        if game.quad[here.i][here.j] == '.':
             game.tholian.move(here)
     # check to see if all holes plugged 
     for i in range(QUADSIZE):
@@ -895,7 +904,7 @@ def doshield(shraise):
 		    action = "SHUP"
 		elif scanner.sees("down"):
 		    action = "SHDN"
-	if action=="NONE":
+	if action == "NONE":
 	    proutn(_("Do you wish to change shield energy? "))
 	    if ja():
 		action = "NRG"
@@ -1009,7 +1018,7 @@ def randdevice():
 	wsum += w
 	if idx < wsum:
 	    return i
-    return None;	# we should never get here
+    return None	# we should never get here
 
 def collision(rammed, enemy):
     "Collision handling fot rammong events."
@@ -1057,7 +1066,7 @@ def collision(rammed, enemy):
 
 def torpedo(origin, bearing, dispersion, number, nburst):
     "Let a photon torpedo fly" 
-    if not damaged(DSRSENS) or game.condition=="docked":
+    if not damaged(DSRSENS) or game.condition == "docked":
 	setwnd(srscan_window)
     else: 
 	setwnd(message_window)
@@ -1074,18 +1083,18 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    break
 	iquad=game.quad[w.i][w.j]
 	tracktorpedo(w, step, number, nburst, iquad)
-	if iquad=='.':
+	if iquad == '.':
 	    continue
 	# hit something 
 	if not damaged(DSRSENS) or game.condition == "docked":
-	    skip(1);	# start new line after text track 
+	    skip(1)	# start new line after text track 
 	if iquad in ('E', 'F'): # Hit our ship 
 	    skip(1)
 	    prout(_("Torpedo hits %s.") % crmshp())
 	    hit = 700.0 + randreal(100) - \
 		1000.0 * (w-origin).distance() * math.fabs(math.sin(bullseye-track.angle))
-	    newcnd(); # we're blown out of dock 
-	    if game.landed or game.condition=="docked":
+	    newcnd() # we're blown out of dock 
+	    if game.landed or game.condition == "docked":
 		return hit # Cheat if on a planet 
             # In the C/FORTRAN version, dispersion was 2.5 radians, which
             # is 143 degrees, which is almost exactly 4.8 clockface units
@@ -1094,7 +1103,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             bumpto = displacement.sector()
 	    if not bumpto.valid_sector():
 		return hit
-	    if game.quad[bumpto.i][bumpto.j]==' ':
+	    if game.quad[bumpto.i][bumpto.j] == ' ':
 		finish(FHOLE)
 		return hit
 	    if game.quad[bumpto.i][bumpto.j]!='.':
@@ -1102,8 +1111,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 		return hit
 	    game.sector = bumpto
 	    proutn(crmshp())
-            game.quad[w.i][w.j]='.'
-            game.quad[bumpto.i][bumpto.j]=iquad
+            game.quad[w.i][w.j] = '.'
+            game.quad[bumpto.i][bumpto.j] = iquad
             prout(_(" displaced by blast to Sector %s ") % bumpto)
             for enemy in game.enemies:
                 enemy.kdist = enemy.kavgd = (game.sector-enemy.location).distance()
@@ -1156,7 +1165,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
             game.state.baseq = filter(lambda x: x != game.quadrant, game.state.baseq)
-	    game.quad[w.i][w.j]='.'
+	    game.quad[w.i][w.j] = '.'
 	    game.base.invalidate()
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase -= 1
 	    game.state.chart[game.quadrant.i][game.quadrant.j].starbase -= 1
@@ -1247,7 +1256,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	break
     skip(1)
     prout(_("Torpedo missed."))
-    return None;
+    return None
 
 def fry(hit):
     "Critical-hit resolution." 
@@ -1262,7 +1271,7 @@ def fry(hit):
         while True:
 	    j = randdevice()
 	    # Cheat to prevent shuttle damage unless on ship 
-            if not (game.damage[j]<0.0 or (j==DSHUTTL and game.iscraft != "onship")):
+            if not (game.damage[j]<0.0 or (j == DSHUTTL and game.iscraft != "onship")):
                 break
 	cdam.append(j)
 	extradm = (hit*game.damfac)/(ncrit*randreal(75, 100))
@@ -1286,7 +1295,8 @@ def attack(torps_ok):
     # game could be over at this point, check
     if game.alldone:
 	return
-    attempt = False; ihurt = False;
+    attempt = False
+    ihurt = False
     hitmax=0.0; hittot=0.0; chgfac=1.0
     where = "neither"
     if game.idebug:
@@ -1299,10 +1309,10 @@ def attack(torps_ok):
 	game.neutz = False
 	return
     # commanders get a chance to tac-move towards you 
-    if (((game.quadrant in game.state.kcmdr or game.state.kscmdr==game.quadrant) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
+    if (((game.quadrant in game.state.kcmdr or game.state.kscmdr == game.quadrant) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
 	moveklings()
     # if no enemies remain after movement, we're done 
-    if len(game.enemies)==0 or (len(game.enemies)==1 and thing == game.quadrant and not thing.angry):
+    if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing == game.quadrant and not thing.angry):
 	return
     # set up partial hits if attack happens during shield status change 
     pfac = 1.0/game.inshld
@@ -1314,27 +1324,27 @@ def attack(torps_ok):
 	where = "sector"
     for enemy in game.enemies:
 	if enemy.power < 0:
-	    continue;	# too weak to attack 
+	    continue	# too weak to attack 
 	# compute hit strength and diminish shield power 
 	r = randreal()
 	# Increase chance of photon torpedos if docked or enemy energy is low 
 	if game.condition == "docked":
 	    r *= 0.25
 	if enemy.power < 500:
-	    r *= 0.25; 
-	if enemy.type=='T' or (enemy.type=='?' and not thing.angry):
+	    r *= 0.25 
+	if enemy.type == 'T' or (enemy.type == '?' and not thing.angry):
 	    continue
 	# different enemies have different probabilities of throwing a torp 
 	usephasers = not torps_ok or \
 	    (enemy.type == 'K' and r > 0.0005) or \
-	    (enemy.type=='C' and r > 0.015) or \
-	    (enemy.type=='R' and r > 0.3) or \
-	    (enemy.type=='S' and r > 0.07) or \
-	    (enemy.type=='?' and r > 0.05)
+	    (enemy.type == 'C' and r > 0.015) or \
+	    (enemy.type == 'R' and r > 0.3) or \
+	    (enemy.type == 'S' and r > 0.07) or \
+	    (enemy.type == '?' and r > 0.05)
 	if usephasers:	    # Enemy uses phasers 
 	    if game.condition == "docked":
-		continue; # Don't waste the effort! 
-	    attempt = True; # Attempt to attack 
+		continue # Don't waste the effort! 
+	    attempt = True # Attempt to attack 
 	    dustfac = randreal(0.8, 0.85)
 	    hit = enemy.power*math.pow(dustfac,enemy.kavgd)
 	    enemy.power *= 0.75
@@ -1350,17 +1360,17 @@ def attack(torps_ok):
 	    dispersion = (randreal()+randreal())*0.5 - 0.5
 	    dispersion += 0.002*enemy.power*dispersion
 	    hit = torpedo(enemy.location, pcourse, dispersion, number=1, nburst=1)
-	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
-		finish(FWON); # Klingons did themselves in! 
+	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) == 0:
+		finish(FWON) # Klingons did themselves in! 
 	    if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova or game.alldone:
 		return # Supernova or finished 
 	    if hit == None:
 		continue
 	# incoming phaser or torpedo, shields may dissipate it 
-	if game.shldup or game.shldchg or game.condition=="docked":
+	if game.shldup or game.shldchg or game.condition == "docked":
 	    # shields will take hits 
 	    propor = pfac * game.shield
-            if game.condition =="docked":
+            if game.condition == "docked":
                 propor *= 2.1
 	    if propor < 0.1:
 		propor = 0.1
@@ -1426,20 +1436,20 @@ def attack(torps_ok):
     sortenemies()
     return
 		
-def deadkl(w, type, mv):
+def deadkl(w, etype, mv):
     "Kill a Klingon, Tholian, Romulan, or Thingy." 
     # Added mv to allow enemy to "move" before dying 
-    proutn(crmena(True, type, "sector", mv))
+    proutn(crmena(True, etype, "sector", mv))
     # Decide what kind of enemy it is and update appropriately 
-    if type == 'R':
+    if etype == 'R':
         # Chalk up a Romulan 
         game.state.galaxy[game.quadrant.i][game.quadrant.j].romulans -= 1
         game.irhere -= 1
         game.state.nromrem -= 1
-    elif type == 'T':
+    elif etype == 'T':
         # Killed a Tholian 
         game.tholian = None
-    elif type == '?':
+    elif etype == '?':
         # Killed a Thingy
         global thing
         thing = None
@@ -1465,7 +1475,7 @@ def deadkl(w, type, mv):
             unschedule(FSCDBAS)
     # For each kind of enemy, finish message to player 
     prout(_(" destroyed."))
-    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
+    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem) == 0:
 	return
     game.recompute()
     # Remove enemy ship from arrays describing local conditions
@@ -1482,8 +1492,8 @@ def targetcheck(w):
 	return None
     delta = Coord()
     # FIXME: C code this was translated from is wacky -- why the sign reversal?
-    delta.j = (w.j - game.sector.j);
-    delta.i = (game.sector.i - w.i);
+    delta.j = (w.j - game.sector.j)
+    delta.i = (game.sector.i - w.i)
     if delta == Coord(0, 0):
 	skip(1)
 	prout(_("Spock-  \"Bridge to sickbay.  Dr. McCoy,"))
@@ -1533,9 +1543,9 @@ def torps():
     target = []
     for i in range(n):
 	key = scanner.next()
-	if i==0 and key == "IHEOL":
-	    break;	# no coordinate waiting, we will try prompting 
-	if i==1 and key == "IHEOL":
+	if i == 0 and key == "IHEOL":
+	    break	# no coordinate waiting, we will try prompting 
+	if i == 1 and key == "IHEOL":
 	    # direct all torpedoes at one target 
 	    while i < n:
 		target.append(target[0])
@@ -1587,7 +1597,7 @@ def torps():
 	if game.alldone or game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova:
 	    return
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)<=0:
-	finish(FWON);
+	finish(FWON)
 
 def overheat(rpow):
     "Check for phasers overheating."
@@ -1631,7 +1641,7 @@ def checkshctrl(rpow):
     prout(_("Phaser energy dispersed by shields."))
     prout(_("Enemy unaffected."))
     overheat(rpow)
-    return True;
+    return True
 
 def hittem(hits):
     "Register a phaser hit on Klingons and Romulans."
@@ -1667,7 +1677,7 @@ def hittem(hits):
 	if kpow == 0:
 	    deadkl(w, ienm, w)
 	    if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0:
-		finish(FWON);		
+		finish(FWON)		
 	    if game.alldone:
 		return
 	    kk -= 1	# don't do the increment
@@ -1792,7 +1802,7 @@ def phasers():
 	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	if ifast:
-	    game.energy -= 200; # Go and do it! 
+	    game.energy -= 200 # Go and do it! 
 	    if checkshctrl(rpow):
 		return
 	scanner.chew()
@@ -1854,7 +1864,7 @@ def phasers():
 		prout(cramen(ienm) + _(" can't be located without short range scan."))
 		scanner.chew()
 		key = "IHEOL"
-		hits[k] = 0; # prevent overflow -- thanks to Alexei Voitenko 
+		hits[k] = 0 # prevent overflow -- thanks to Alexei Voitenko 
 		k += 1
 		continue
 	    if key == "IHEOL":
@@ -1878,7 +1888,7 @@ def phasers():
 		huh()
 		return
 	    if key == "IHEOL":
-		if k==1: # Let me say I'm baffled by this 
+		if k == 1: # Let me say I'm baffled by this 
 		    msgflag = True
 		continue
 	    if scanner.real < 0:
@@ -1892,7 +1902,7 @@ def phasers():
 		prout(_("Available energy exceeded -- try again."))
 		scanner.chew()
 		return
-	    key = scanner.next(); # scan for next value 
+	    key = scanner.next() # scan for next value 
 	    k += 1
 	if rpow == 0.0:
 	    # zero energy -- abort 
@@ -1923,7 +1933,7 @@ def phasers():
 		prout(_("Shields raised."))
 	else:
 	    game.shldup = False
-    overheat(rpow);
+    overheat(rpow)
 
 # Code from events,c begins here.
 
@@ -1967,9 +1977,11 @@ def cancelrest():
 
 def events():
     "Run through the event queue looking for things to do."
-    i=0
-    fintim = game.state.date + game.optime; yank=0
-    ictbeam = False; istract = False
+    i = 0
+    fintim = game.state.date + game.optime
+    yank=0
+    ictbeam = False
+    istract = False
     w = Coord(); hold = Coord()
     ev = Event(); ev2 = Event()
 
@@ -2089,7 +2101,7 @@ def events():
 	# Decrement Federation resources and recompute remaining time 
 	game.state.remres -= (game.state.remkl+4*len(game.state.kcmdr))*xtime
         game.recompute()
-	if game.state.remtime <=0:
+	if game.state.remtime <= 0:
 	    finish(FDEPLETE)
 	    return
 	# Any crew left alive? 
@@ -2175,9 +2187,9 @@ def events():
                 continue
             try:
                 for ibq in game.state.baseq:
-                   for cmdr in game.state.kcmdr: 
-                       if ibq == cmdr and ibq != game.quadrant and ibq != game.state.kscmdr:
-                           raise JumpOut
+                    for cmdr in game.state.kcmdr: 
+                        if ibq == cmdr and ibq != game.quadrant and ibq != game.state.kscmdr:
+                            raise JumpOut
                 else:
                     # no match found -- try later 
                     schedule(FBATTAK, expran(0.3*game.intime))
@@ -2211,7 +2223,7 @@ def events():
 	    game.battle = game.state.kscmdr
 	    destroybase()
 	elif evcode == FCDBAS: # Commander succeeds in destroying base 
-	    if evcode==FCDBAS:
+	    if evcode == FCDBAS:
 		unschedule(FCDBAS)
                 if not game.state.baseq() \
                        or not game.state.galaxy[game.battle.i][game.battle.j].starbase:
@@ -3090,16 +3102,16 @@ def iostart():
 	curses.nonl()
 	curses.cbreak()
         if game.options & OPTION_COLOR:
-            curses.start_color();
+            curses.start_color()
             curses.use_default_colors()
-            curses.init_pair(curses.COLOR_BLACK,   curses.COLOR_BLACK, -1);
-            curses.init_pair(curses.COLOR_GREEN,   curses.COLOR_GREEN, -1);
-            curses.init_pair(curses.COLOR_RED,     curses.COLOR_RED, -1);
-            curses.init_pair(curses.COLOR_CYAN,    curses.COLOR_CYAN, -1);
-            curses.init_pair(curses.COLOR_WHITE,   curses.COLOR_WHITE, -1);
-            curses.init_pair(curses.COLOR_MAGENTA, curses.COLOR_MAGENTA, -1);
-            curses.init_pair(curses.COLOR_BLUE,    curses.COLOR_BLUE, -1);
-            curses.init_pair(curses.COLOR_YELLOW,  curses.COLOR_YELLOW, -1);
+            curses.init_pair(curses.COLOR_BLACK,   curses.COLOR_BLACK, -1)
+            curses.init_pair(curses.COLOR_GREEN,   curses.COLOR_GREEN, -1)
+            curses.init_pair(curses.COLOR_RED,     curses.COLOR_RED, -1)
+            curses.init_pair(curses.COLOR_CYAN,    curses.COLOR_CYAN, -1)
+            curses.init_pair(curses.COLOR_WHITE,   curses.COLOR_WHITE, -1)
+            curses.init_pair(curses.COLOR_MAGENTA, curses.COLOR_MAGENTA, -1)
+            curses.init_pair(curses.COLOR_BLUE,    curses.COLOR_BLUE, -1)
+            curses.init_pair(curses.COLOR_YELLOW,  curses.COLOR_YELLOW, -1)
         global fullscreen_window, srscan_window, report_window, status_window
         global lrscan_window, message_window, prompt_window
         (rows, columns)   = stdscr.getmaxyx()
@@ -3241,47 +3253,47 @@ def clrscr():
     "Clear screen -- can be a no-op in tty mode."
     global linecount
     if game.options & OPTION_CURSES:
-       curwnd.clear()
-       curwnd.move(0, 0)
-       curwnd.refresh()
+        curwnd.clear()
+        curwnd.move(0, 0)
+        curwnd.refresh()
     linecount = 0
 
 def textcolor(color=DEFAULT):
     if game.options & OPTION_COLOR:
 	if color == DEFAULT: 
-	    curwnd.attrset(0);
+	    curwnd.attrset(0)
 	elif color ==  BLACK: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK));
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK))
 	elif color ==  BLUE: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE));
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE))
 	elif color ==  GREEN: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN));
+	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN))
 	elif color ==  CYAN: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN));
+	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN))
 	elif color ==  RED: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_RED));
+	    curwnd.attron(curses.color_pair(curses.COLOR_RED))
 	elif color ==  MAGENTA: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA));
+	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA))
 	elif color ==  BROWN: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW));
+	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW))
 	elif color ==  LIGHTGRAY: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE));
+	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE))
 	elif color ==  DARKGRAY: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLACK) | curses.A_BOLD)
 	elif color ==  LIGHTBLUE: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_BLUE) | curses.A_BOLD)
 	elif color ==  LIGHTGREEN: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_GREEN) | curses.A_BOLD)
 	elif color ==  LIGHTCYAN: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_CYAN) | curses.A_BOLD)
 	elif color ==  LIGHTRED: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_RED) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_RED) | curses.A_BOLD)
 	elif color ==  LIGHTMAGENTA: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_MAGENTA) | curses.A_BOLD)
 	elif color ==  YELLOW: 
-	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_YELLOW) | curses.A_BOLD)
 	elif color ==  WHITE:
-	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE) | curses.A_BOLD);
+	    curwnd.attron(curses.color_pair(curses.COLOR_WHITE) | curses.A_BOLD)
 
 def highvideo():
     if game.options & OPTION_COLOR:
@@ -4205,9 +4217,9 @@ def mayday():
 	finish(FMATERIALIZE)
 	return
     game.quad[game.sector.i][game.sector.j]=game.ship
-    textcolor(GREEN);
+    textcolor(GREEN)
     prout(_("succeeds."))
-    textcolor(DEFAULT);
+    textcolor(DEFAULT)
     dock(False)
     skip(1)
     prout(_("Lt. Uhura-  \"Captain, we made it!\""))
@@ -4961,7 +4973,7 @@ def sectscan(goodScan, i, j):
                    "docked":CYAN,
                    "dead":BROWN}[game.condition]) 
         if game.quad[i][j] != game.ship: 
-            highvideo();
+            highvideo()
 	proutn("%c " % game.quad[i][j])
         textcolor(DEFAULT)
     else:
@@ -5916,12 +5928,12 @@ def makemoves():
 		    abandon_passed = True
 		if cmd == scanner.token.upper() or (not abandon_passed \
 			and cmd.startswith(scanner.token.upper())):
-		    break;
+		    break
 	    if cmd == "":
                 listCommands()
                 continue
             else:
-		break;
+		break
 	if cmd == "SRSCAN":		# srscan
 	    srscan()
 	elif cmd == "STATUS":		# status
