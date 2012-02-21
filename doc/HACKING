@@ -217,7 +217,12 @@ included in the distribution, 'replay', automatically reruns the
 last game you played.
 
 See the "test" directory for regression-test logs and checkfiles.
+Please run 'make check' every time you change this game to be sure
+you haven't broken anything.  
 
+When you fix a bug, add the log of the game that triggered it (and
+a checkfile) to the regression tests. This is how we improve the code
+coverage of the suite.
 
 NOTES ON THE PYTHON TRANSLATION:
 

@@ -1,10 +1,10 @@
 This directory contains regression test pairs for SST.
 
-A regression test log is just a command capture from a game with a QUIT
-appended to tell it to exit.  The corresponding check file is just the
-output stimulated by the log.  All files with extension ".log" in this
-directory will be treated as test logs, with each corresponding checkfile
-having extension ".chk".
+A regression test log is just a command capture from a game or partial
+game, with a QUIT appended to tell it to exit a partial game.  The
+corresponding check file is just the output stimulated by the log.
+All files with extension ".log" in this directory will be treated as
+test logs, with each corresponding checkfile having extension ".chk".
 
 "make regress" checks that the output of the logfiles is stable. It
 will show context diffs when the actual output is different from the
