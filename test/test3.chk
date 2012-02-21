@@ -1,0 +1,132 @@
+sst2k: seed set to 1329859817
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # recorded by esr@snark on Tue Feb 21 16:30:17 2012
+# Ends with a torpedo miss
+r
+Would you like a Short, Medium, or Long game? s
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 2279. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 4 battle cruisers.
+You have an initial allotment of 7 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 4 supporting starbases.
+Starbase locations-  5 - 2  1 - 7  2 - 2  8 - 2  
+
+The Enterprise is currently in Quadrant 1 - 5 Sector 5 - 8
+
+Good Luck!
+COMMAND> 
+COMMAND> move aut 2 8 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 2 - 8.
+COMMAND> 
+COMMAND> move aut 4 7 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 4 - 7.
+COMMAND> 
+COMMAND> mov aut 6 1
+
+COMMAND> 
+COMMAND> move aut 5 6 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 5 - 6.
+
+130 unit hit on the Enterprise from Klingon at Sector 8 - 10
+
+
+Energy left 4178    shields down 100%,   torpedoes left 10
+COMMAND> phasers
+
+Manual or automatic? aut
+Phasers locked on target. Energy available: 4043.35
+180 units required. Units to fire= 300
+
+157 unit hit on Klingon at Sector 8 - 10
+***Klingon at Sector 8 - 10 destroyed.
+COMMAND> 
+COMMAND> move aut 6 1
+
+COMMAND> 
+COMMAND> move aut 7 7 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 7 - 7.
+COMMAND> 
+COMMAND> move aut 8 4 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 8 - 4.
+COMMAND> 
+COMMAND> move aut 7 3 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 7 - 3.
+
+162 unit hit on the Enterprise from Klingon at Sector 4 - 7
+
+177 unit hit on the Enterprise from Klingon at Sector 4 - 4
+
+
+Energy left 2731    shields down 100%,   torpedoes left 10
+COMMAND> torp 2
+Target sector for torpedo number 1- 4 4
+Target sector for torpedo number 2- 4 7
+
+Track for torpedo number 1-  4 - 4   
+***Klingon at Sector 4 - 4 destroyed.
+
+Track for torpedo number 2-  4 - 6   4 - 7   
+***Klingon at Sector 4 - 7 destroyed.
+COMMAND> 
+COMMAND> 
+COMMAND> move aut 4 4 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+[ANNOUNCEMENT ARRIVING...]
+
+***Enterprise caught in long range tractor beam--
+Enterprise is pulled to Quadrant 5 - 4, Sector 2 - 3
+Shields raised.
+
+Enemy attack reduces shield strength to 79%,   torpedoes left 8
+COMMAND> 
+COMMAND> torp
+8 torpedoes left.
+Number of torpedoes to fire- 2
+Target sector for torpedo number 1- 6 4
+Target sector for torpedo number 2- 6 4
+
+Track for torpedo number 1-  3 - 3   4 - 3   5 - 4   
+6 - 4   
+***Commander at Sector 6 - 4 damaged-- displaced by blast to Sector 3 - 2 
+
+Track for torpedo number 2-  3 - 3   4 - 3   5 - 4   
+6 - 4   7 - 4   8 - 4   9 - 5   10 - 5   
+Torpedo missed.
+
+34 unit hit on the Enterprise from Klingon at Sector 3 - 2
+
+
+Energy left 2315    shields up 75%,   torpedoes left 6
+COMMAND> quit
+
+May the Great Bird of the Galaxy roost upon your home planet.

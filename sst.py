@@ -1274,6 +1274,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
 	    return None
 	break
     skip(1)
+    setwnd(message_window)
     prout(_("Torpedo missed."))
     return None
 
