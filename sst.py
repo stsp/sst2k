@@ -273,6 +273,8 @@ class Enemy:
     def __init__(self, etype=None, loc=None, power=None):
         self.type = etype
         self.location = Coord()
+        self.kdist = None
+        self.kavgd = None
         if loc:
             self.move(loc)
         self.power = power	# enemy energy level
@@ -379,6 +381,7 @@ class Gamestate:
         self.score = 0.0	# overall score
         self.perdate = 0.0	# rate of kills
         self.idebug = False	# Debugging instrumentation enabled?
+        self.statekscmdr = None # No SuperCommander coordinates yet.
     def recompute(self):
         # Stas thinks this should be (C expression): 
         # game.state.remkl + len(game.state.kcmdr) > 0 ?
@@ -2051,8 +2054,8 @@ def events():
             else:
                 prout(_("(Shields not currently useable.)"))
         newqad()
-        # Adjust finish time to time of tractor beaming 
-        fintim = game.state.date+game.optime
+        # Adjust finish time to time of tractor beaming? 
+        # fintim = game.state.date+game.optime
         attack(torps_ok=False)
         if not game.state.kcmdr:
             unschedule(FTBEAM)
