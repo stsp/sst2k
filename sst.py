@@ -141,7 +141,7 @@ class Planet:
         self.pclass = None	# could be ""M", "N", "O", or "destroyed"
         self.crystals = "absent"# could be "mined", "present", "absent"
         self.known = "unknown"	# could be "unknown", "known", "shuttle_down"
-        self.inhabited = False	# is it inhabites?
+        self.inhabited = False	# is it inhabited?
     def __str__(self):
         return self.name
 
