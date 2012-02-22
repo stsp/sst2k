@@ -5437,7 +5437,9 @@ def setup():
     game.instar = 0
     for i in range(GALSIZE):
 	for j in range(GALSIZE):
-	    k = randrange(1, QUADSIZE**2/10)
+            # Can't have more stars per quadrant than fit in one decimal digit,
+            # if we do the chart representation will break. 
+	    k = randrange(1, min(10, QUADSIZE**2/10))
 	    game.instar += k
 	    game.state.galaxy[i][j].stars = k
     # Locate star bases in galaxy
