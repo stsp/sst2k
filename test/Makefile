@@ -22,7 +22,7 @@ regress:
 	do \
 	    if [ ! -f $${test}.tst ] ; \
 	    then \
-		(if echo "Testing $${test}" >&2; \
+		(if echo -n "$${test}: " >&2; grep 'Test' $${test}.log >&2;\
 		../sst.py -r $${test}.log >/tmp/regress 2>&1; \
 		then diff -u $${test}.chk /tmp/regress; \
 		else echo "*** Nonzero return status on $${test}!"; exit 1; fi;) \
