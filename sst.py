@@ -159,8 +159,10 @@ class Quadrant:
 class Page:
     def __init__(self):
 	self.stars = None
-	self.starbase = None
+	self.starbase = False
 	self.klingons = None
+    def __repr__(self):
+        return "<%s,%s,%s>" % (self.klingons, self.starbase, self.stars)
 
 def fill2d(size, fillfun):
     "Fill an empty list in 2D."
@@ -1179,8 +1181,8 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             game.state.baseq = filter(lambda x: x != game.quadrant, game.state.baseq)
 	    game.quad[w.i][w.j] = '.'
 	    game.base.invalidate()
-	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase -= 1
-	    game.state.chart[game.quadrant.i][game.quadrant.j].starbase -= 1
+	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase = False
+	    game.state.chart[game.quadrant.i][game.quadrant.j].starbase = False
 	    game.state.basekl += 1
 	    newcnd()
 	    return None
@@ -5435,10 +5437,12 @@ def setup():
     game.instar = 0
     for i in range(GALSIZE):
 	for j in range(GALSIZE):
-	    k = randrange(1, QUADSIZE**2/10+1)
+	    k = randrange(1, QUADSIZE**2/10)
 	    game.instar += k
 	    game.state.galaxy[i][j].stars = k
     # Locate star bases in galaxy
+    if game.idebug:
+        prout("=== Allocating %d bases" % game.inbase)
     for i in range(game.inbase):
         while True:
             while True:
@@ -5461,6 +5465,8 @@ def setup():
 			prout("=== Saving base #%d, close to #%d" % (i, j))
             if not contflag:
                 break
+        if game.idebug:
+            prout("=== Placing base #%d in quadrant %s" % (i, w))
 	game.state.baseq.append(w)
 	game.state.galaxy[w.i][w.j].starbase = game.state.chart[w.i][w.j].starbase = True
     # Position ordinary Klingon Battle Cruisers
