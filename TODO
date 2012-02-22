@@ -9,6 +9,8 @@ Short-term items:
 
 * Add the attacked inhabited planets to the status report
 
+* Status display should update after kills so Klingons Left is correct.
+
 Long-term items:
 
 * Wrap a GUI around it.
@@ -16,8 +18,6 @@ Long-term items:
 * Wandering planet-killer as in "The Doomsday Machine";
   see <http://www.ericweisstein.com/fun/startrek/TheDoomsdayMachine.html>.
  
-* Maybe make a release
-
 BSD-Trek features we haven't swiped yet:
 
 * The cloaking device.
