@@ -1028,7 +1028,7 @@ def randdevice():
     return None	# we should never get here
 
 def collision(rammed, enemy):
-    "Collision handling fot rammong events."
+    "Collision handling for rammong events."
     prouts(_("***RED ALERT!  RED ALERT!"))
     skip(1)
     prout(_("***COLLISION IMMINENT."))
