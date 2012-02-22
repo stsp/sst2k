@@ -1,0 +1,47 @@
+# seed 1329943386
+# options 
+# SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 15:43:06 2012
+# Tests loss by nova
+r
+m
+n
+
+
+move aut 1 6 5 5
+torp 2
+1 4
+7 10
+
+move aut 6 10
+
+move aut 2 7 1 1
+torp 2
+3 1
+10 5
+phasers
+aut
+220
+
+move aut 1 8 5 5
+move aut 2 4
+dock
+
+probe
+y
+n
+aut
+8 8
+
+move aut 5 6 5 5
+
+move aut 10 4
+
+move aut 5 6 5 5
+torp 2
+6 8
+6 7
+torp 1
+6 7
+
+n

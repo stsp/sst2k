@@ -1,0 +1,259 @@
+sst2k: seed set to 1329943386
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 15:43:06 2012
+# Tests loss by nova
+r
+Would you like a Short, Medium, or Long game? m
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 3530. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 10 battle cruisers.
+You have an initial allotment of 14 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 5 supporting starbases.
+Starbase locations-  1 - 8  5 - 2  1 - 1  8 - 8  1 - 5  
+
+The Enterprise is currently in Quadrant 1 - 7 Sector 4 - 8
+
+Good Luck!
+COMMAND> 
+COMMAND> move aut 1 6 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 1 - 6.
+
+212 unit hit on the Enterprise from Klingon at Sector 7 - 10
+
+160 unit hit on the Enterprise from Klingon at Sector 1 - 4
+
+
+Energy left 4626    shields down 100%,   torpedoes left 10
+
+Mc Coy-  "Sickbay to bridge.  We suffered 3 casualties
+   in that last attack."
+COMMAND> torp 2
+Target sector for torpedo number 1- 1 4
+Target sector for torpedo number 2- 7 10
+
+Track for torpedo number 1-  4 - 5   3 - 4   2 - 4   
+1 - 4   
+***Klingon at Sector 1 - 4 destroyed.
+
+Track for torpedo number 2-  5 - 6   6 - 7   6 - 8   
+6 - 9   7 - 10   
+***Klingon at Sector 7 - 10 destroyed.
+COMMAND> 
+COMMAND> move aut 6 10
+
+COMMAND> 
+COMMAND> move aut 2 7 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 2 - 7.
+
+127 unit hit on the Enterprise from Klingon at Sector 10 - 5
+
+169 unit hit on the Enterprise from Klingon at Sector 3 - 1
+
+
+Energy left 4102    shields down 100%,   torpedoes left 8
+COMMAND> torp 2
+Target sector for torpedo number 1- 3 1
+Target sector for torpedo number 2- 10 5
+
+Track for torpedo number 1-  2 - 1   3 - 1   
+***Klingon at Sector 3 - 1 destroyed.
+
+Track for torpedo number 2-  2 - 1   3 - 2   4 - 2   
+5 - 3   6 - 3   7 - 4   8 - 4   
+
+***Black hole at Sector 8 - 4 swallows torpedo.
+
+170 unit hit on the Enterprise from Klingon at Sector 10 - 5
+
+
+Energy left 3868    shields down 100%,   torpedoes left 6
+COMMAND> phasers
+
+Manual or automatic? aut
+Phasers locked on target. Energy available: 3868.22
+218 units required. Units to fire= 220
+
+158 unit hit on Klingon at Sector 10 - 5
+***Klingon at Sector 10 - 5 destroyed.
+COMMAND> 
+COMMAND> move aut 1 8 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 1 - 8.
+COMMAND> move aut 2 4
+
+COMMAND> dock
+Docked.
+COMMAND> 
+COMMAND> probe
+3 probes left
+Are you sure you want to fire a probe? y
+Arm NOVAMAX warhead? n
+Manual or automatic- aut
+Target quadrant or quadrant&sector- 8 8
+
+Ensign Chekov-  "The deep space probe is launched, Captain."
+COMMAND> 
+COMMAND> move aut 5 6 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Enterprise blocked by object at 9 - 1;
+Emergency stop required 125 units of energy.
+Collision detected
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 2 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 3 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 5 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 6 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 8 - 8."
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+
+[ANNOUNCEMENT ARRIVING...]
+[PRESS ENTER TO CONTINUE]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Message from Starfleet Command       Stardate 3533.77
+     Supernova in Quadrant 8 - 6; caution advised.
+COMMAND> 
+COMMAND> move aut 10 4
+
+COMMAND> 
+COMMAND> move aut 5 6 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 5 - 6.
+
+437 unit hit on the Enterprise from Klingon at Sector 6 - 8
+
+***CRITICAL HIT--Shields damaged.
+
+Energy left 3805    shields damaged, 100%,   torpedoes left 10
+
+Mc Coy-  "Sickbay to bridge.  We suffered 3 casualties
+   in that last attack."
+COMMAND> torp 2
+Target sector for torpedo number 1- 6 8
+Target sector for torpedo number 2- 6 7
+
+Track for torpedo number 1-  5 - 6   
+***Star at Sector 5 - 6 unaffected by photon blast.
+
+Track for torpedo number 2-  6 - 6   6 - 7   7 - 8   
+7 - 9   8 - 10   
+Torpedo missed.
+
+257 unit hit on the Enterprise from Klingon at Sector 6 - 8
+
+
+Energy left 3049    shields damaged, 100%,   torpedoes left 8
+
+Mc Coy-  "Sickbay to bridge.  We suffered 2 casualties
+   in that last attack."
+COMMAND> torp 1
+Target sector for torpedo number 1- 6 7
+
+Torpedo track- 5 - 6   
+Star at Sector 5 - 6 novas.
+***Star at Sector 4 - 6 novas.
+***Starship buffeted by nova.
+***Starship buffeted by nova.
+
+
+
+It is stardate 3536.1.
+
+Your starship has been destroyed by a nova.
+That was a great shot.
+
+The Federation will be destroyed.
+
+
+Your score --
+  0.00 Klingons per stardate                  0
+     2 stars destroyed by your action       -10
+     8 casualties incurred                   -8
+     1 ship(s) lost or destroyed           -100
+Penalty for getting yourself killed        -200
+
+TOTAL SCORE                                -317
+[PRESS ENTER TO CONTINUE]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+May the Great Bird of the Galaxy roost upon your home planet.
