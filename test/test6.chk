@@ -1,0 +1,101 @@
+sst2k: seed set to 1329942980
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 15:36:20 2012
+# Tests black-hole collision
+r
+Would you like a Short, Medium, or Long game? m
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 4809. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 8 battle cruisers.
+You have an initial allotment of 14 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 3 supporting starbases.
+Starbase locations-  8 - 5  8 - 8  3 - 2  
+
+The Enterprise is currently in Quadrant 4 - 8 Sector 1 - 3
+
+Good Luck!
+COMMAND> 
+COMMAND> probe
+4 probes left
+Are you sure you want to fire a probe? y
+Arm NOVAMAX warhead? n
+Manual or automatic- aut
+Target quadrant or quadrant&sector- 4 1
+
+Ensign Chekov-  "The deep space probe is launched, Captain."
+COMMAND> 
+COMMAND> move aut 5 1
+
+
+Enterprise blocked by object at 3 - 2;
+Emergency stop required 125 units of energy.
+Collision detected
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 7."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 6."
+COMMAND> 
+COMMAND> 
+COMMAND> move aut 6 5
+
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 5."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 4."
+COMMAND> 
+COMMAND> move aut 7 7 1 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 7 - 7.
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 3."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 2."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 1."
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+COMMAND> 
+COMMAND> move aut 6 5 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 6 - 5.
+COMMAND> 
+COMMAND> move aut 10 7
+
+
+***RED ALERT!  RED ALERT!
+***Enterprise pulled into black hole at Sector 6 - 5
+
+
+It is stardate 4811.9.
+
+Your ship is drawn to the center of the black hole.
+You are crushed into extremely dense matter.
+The Federation will be destroyed.
+
+
+Your score --
+  0.00 Klingons per stardate                  0
+     1 ship(s) lost or destroyed           -100
+Penalty for getting yourself killed        -200
+
+TOTAL SCORE                                -300
+Collision detected
+
+May the Great Bird of the Galaxy roost upon your home planet.
