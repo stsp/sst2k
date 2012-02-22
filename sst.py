@@ -2304,18 +2304,18 @@ def events():
 		    #announce()
 		    skip(1)
 		    prout(_("Lt. Uhura-  \"The deep space probe is now in Quadrant %s.\"") % game.probe.quadrant())
-	    pdest = game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j]
+            pquad = game.probe.quadrant()
+	    pdest = game.state.galaxy[pquad.i][pquad.j]
 	    if communicating():
-		chp = game.state.chart[game.probe.quadrant().i][game.probe.quadrant().j]
-		chp.klingons = pdest.klingons
-		chp.starbase = pdest.starbase
-		chp.stars = pdest.stars
+		game.state.chart[pquad.i][pquad.j].klingons = pdest.klingons
+		game.state.chart[pquad.i][pquad.j].starbase = pdest.starbase
+		game.state.chart[pquad.i][pquad.j].stars = pdest.stars
 		pdest.charted = True
 	    game.probe.moves -= 1 # One less to travel
 	    if game.probe.arrived() and game.isarmed and pdest.stars:
 		supernova(game.probe)		# fire in the hole!
 		unschedule(FDSPROB)
-		if game.state.galaxy[game.quadrant().i][game.quadrant().j].supernova: 
+		if game.state.galaxy[pquad.i][pquad.j].supernova: 
 		    return
 	elif evcode == FDISTR: # inhabited system issues distress call 
 	    unschedule(FDISTR)
