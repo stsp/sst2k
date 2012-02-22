@@ -222,7 +222,21 @@ you haven't broken anything.
 
 When you fix a bug, add the log of the game that triggered it (and
 a checkfile) to the regression tests. This is how we improve the code
-coverage of the suite.
+coverage of the suite. 
+
+Two things to do to the log before dropping it in the test directory:
+
+(a) Strip out all lines beginning with "#curses:" - these are for debugging
+the curses interface and are not needed or regression testing; removing
+them makes it easier to see the game commands.
+
+(b) Add a header comment line explaining what the log is a test for.
+It should begin with "# Tests". This is what gets echoed before each
+regression test is run.
+
+Then drop it into the test directory and "make buildregress" to create
+the check file. (Don't forget to commit and push the log and checkfile
+to the repository.)
 
 NOTES ON THE PYTHON TRANSLATION:
 
