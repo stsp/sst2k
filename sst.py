@@ -1287,7 +1287,6 @@ def fry(hit):
     # Select devices and cause damage
     cdam = []
     while ncrit > 0:
-        ncrit -= 1
         while True:
 	    j = randdevice()
 	    # Cheat to prevent shuttle damage unless on ship 
@@ -1296,6 +1295,7 @@ def fry(hit):
 	cdam.append(j)
 	extradm = (hit*game.damfac)/(ncrit*randreal(75, 100))
 	game.damage[j] += extradm
+        ncrit -= 1
     skipcount = 0
     for (i, j) in enumerate(cdam):
 	proutn(device[j])
