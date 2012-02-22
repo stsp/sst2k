@@ -5,7 +5,7 @@ sst2k: seed set to 1329940672
 
 Would you like a regular, tournament, or saved game? # SST2K version 2.1
 # recorded by esr@snark on Wed Feb 22 14:57:52 2012
-# A complete game.
+# Tests game completion (loss)
 r
 Would you like a Short, Medium, or Long game? s
 Are you a Novice, Fair, Good, Expert, or Emeritus player? n
