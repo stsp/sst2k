@@ -1,0 +1,63 @@
+# seed 1329941338
+# options 
+# SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 15:08:58 2012
+# Tests deep-space probes
+r
+s
+n
+
+
+probe
+y
+n
+a
+1 1
+
+move aut 4 7 5 5
+
+move aut 7 7 1 1
+
+torp
+2
+5 1
+5 2
+phasers
+aut
+200
+
+move aut 3 4 1 1
+
+move aut 5 2 5 5
+phasers
+aut
+900
+torp
+1
+4 2
+
+move aut 7 7
+
+move aut 7 2 5 5
+
+move aut 4 10
+
+probe
+y
+n
+a
+7 8
+
+move aut 6 5 2 2
+
+move aut 8 5 2 2
+shields down
+
+move 8 5 2 2
+warp 3
+move aut 8 5 2 2
+n
+
+move aut 6 7 2 2
+y
+n

@@ -1,0 +1,244 @@
+sst2k: seed set to 1329941338
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 15:08:58 2012
+# Tests deep-space probes
+r
+Would you like a Short, Medium, or Long game? s
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 4068. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 4 battle cruisers.
+You have an initial allotment of 7 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 3 supporting starbases.
+Starbase locations-  7 - 8  5 - 6  1 - 4  
+
+The Enterprise is currently in Quadrant 1 - 7 Sector 1 - 8
+
+Good Luck!
+COMMAND> 
+COMMAND> probe
+3 probes left
+Are you sure you want to fire a probe? y
+Arm NOVAMAX warhead? n
+Manual or automatic- a
+Target quadrant or quadrant&sector- 1 1
+
+Ensign Chekov-  "The deep space probe is launched, Captain."
+COMMAND> 
+COMMAND> move aut 4 7 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 4 - 7.
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 6."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 5."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 4."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 3."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 2."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 1."
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+COMMAND> 
+COMMAND> move aut 7 7 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+[ANNOUNCEMENT ARRIVING...]
+
+***Enterprise caught in long range tractor beam--
+Enterprise is pulled to Quadrant 2 - 2, Sector 6 - 9
+Shields raised.
+
+Enemy attack reduces shield strength to 94%,   torpedoes left 10
+COMMAND> 
+COMMAND> torp
+10 torpedoes left.
+Number of torpedoes to fire- 2
+Target sector for torpedo number 1- 5 1
+Target sector for torpedo number 2- 5 2
+
+Track for torpedo number 1-  6 - 8   6 - 7   6 - 6   
+5 - 5   5 - 4   5 - 3   5 - 2   5 - 1   
+***Commander at Sector 5 - 1 damaged-- displaced by blast to Sector 5 - 8 
+
+Track for torpedo number 2-  6 - 8   6 - 7   6 - 6   
+6 - 5   6 - 4   
+Star at Sector 6 - 4 novas.
+***Star at Sector 6 - 3 novas.
+***Star at Sector 7 - 4 novas.
+
+Enemy attack reduces shield strength to 88%,   torpedoes left 8
+COMMAND> phasers
+
+Weapons Officer Sulu-  "High-speed shield control enabled, sir."
+Manual or automatic? aut
+Phasers locked on target. Energy available: 3984.14
+124 units required. Units to fire= 200
+
+Shields lowered.
+
+108 unit hit on Commander at Sector 5 - 8
+***Commander at Sector 5 - 8 destroyed.
+
+Shields raised.
+COMMAND> 
+COMMAND> move aut 3 4 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 3 - 4.
+COMMAND> 
+COMMAND> move aut 5 2 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 5 - 2.
+
+19 unit hit on the Enterprise from Klingon at Sector 4 - 2
+
+
+Energy left 3439    shields up 80%,   torpedoes left 8
+COMMAND> phasers
+
+Weapons Officer Sulu-  "High-speed shield control enabled, sir."
+Manual or automatic? aut
+Phasers locked on target. Energy available: 2518.05
+744 units required. Units to fire= 900
+
+Shields lowered.
+
+172 unit hit on Klingon at Sector 9 - 9
+***Klingon at Sector 9 - 9 destroyed.
+98 unit hit on Klingon at Sector 4 - 2
+***Mr. Spock-  "Captain, the vessel at Sector 4 - 2
+   has just lost its firepower."
+356 expended on empty space.
+
+Shields raised.
+
+Enemy attack reduces shield strength to 80%,   torpedoes left 8
+COMMAND> torp
+8 torpedoes left.
+Number of torpedoes to fire- 1
+Target sector for torpedo number 1- 4 2
+
+Torpedo track- 5 - 4   4 - 3   
+Star at Sector 4 - 3 novas.
+***Klingon at Sector 4 - 2 destroyed.
+COMMAND> 
+COMMAND> move aut 7 7
+
+COMMAND> 
+COMMAND> move aut 7 2 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 7 - 2.
+COMMAND> 
+COMMAND> move aut 4 10
+
+COMMAND> 
+COMMAND> probe
+2 probes left
+Are you sure you want to fire a probe? y
+Arm NOVAMAX warhead? n
+Manual or automatic- a
+Target quadrant or quadrant&sector- 7 8
+
+Ensign Chekov-  "The deep space probe is launched, Captain."
+COMMAND> 
+COMMAND> move aut 6 5 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 6 - 5.
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 3."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 4."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 5."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 6."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 7."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 7 - 8."
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+COMMAND> 
+COMMAND> move aut 8 5 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Engineering to bridge--
+We haven't the energy to go that far with the shields up.
+COMMAND> shields down
+Shields lowered.
+COMMAND> 
+COMMAND> move 8 5 2 2
+(Manual movement assumed.)
+
+Helmsman Sulu- "Aye, Sir."
+
+Engineering to bridge--
+We don't have enough energy, but we could do it at warp 3.
+COMMAND> warp 3
+Helmsman Sulu- "Warp factor 3, Captain."
+COMMAND> move aut 8 5 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 267 percent of our
+  remaining time.  Are you sure this is wise?" n
+COMMAND> 
+COMMAND> move aut 6 7 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 267 percent of our
+  remaining time.  Are you sure this is wise?" y
+
+Entering Quadrant 6 - 7.
+
+
+
+It is stardate 4075.7.
+
+Your time has run out and the Federation has been
+conquered.  Your starship is now Klingon property,
+and you are put on trial as a war criminal.  On the
+basis of your record, you are acquitted.
+
+LIVE LONG AND PROSPER.
+
+
+Your score --
+  0.00 Klingons per stardate                  0
+     4 stars destroyed by your action       -20
+
+TOTAL SCORE                                 -20
+
+May the Great Bird of the Galaxy roost upon your home planet.
