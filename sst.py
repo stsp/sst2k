@@ -131,6 +131,8 @@ class Thingy(Coord):
         self.angered = False
     def angry(self):
         self.angered = True
+    def at(self, q):
+        return (q.i, q.j) == (self.i, self.j)
 
 class Planet:
     def __init__(self):
@@ -449,19 +451,14 @@ def tryexit(enemy, look, irun):
 	# avoid intruding on another commander's territory 
 	if enemy.type == 'C':
             if iq in game.state.kcmdr:
-                return False
+                return []
 	    # refuse to leave if currently attacking starbase 
 	    if game.battle == game.quadrant:
-		return False
+		return []
 	# don't leave if over 1000 units of energy 
 	if enemy.power > 1000.0:
-	    return False
-    # emit escape message and move out of quadrant.
-    # we know this if either short or long range sensors are working
-    if not damaged(DSRSENS) or not damaged(DLRSENS) or \
-	game.condition == "docked":
-	prout(crmena(True, enemy.type, "sector", enemy.location) + \
-              (_(" escapes to Quadrant %s (and regains strength).") % iq))
+	    return []
+    oldloc = copy.copy(enemy.location)
     # handle local matters related to escape
     enemy.move(None)
     game.klhere -= 1
@@ -482,7 +479,8 @@ def tryexit(enemy, look, irun):
 	    if cmdr == game.quadrant:
 		game.state.kcmdr.append(iq)
 		break
-    return True # success 
+    # report move out of quadrant.
+    return [(True, enemy, oldloc, ibq)]
 
 # The bad-guy movement algorithm:
 # 
@@ -568,7 +566,7 @@ def movebaddy(enemy):
 	    proutn("=== MOTION = %d, FORCES = %1.2f, " % (motion, forces))
 	# don't move if no motion 
 	if motion == 0:
-	    return
+	    return []
 	# Limit motion according to skill 
 	if abs(motion) > game.skill:
             if motion < 0:
@@ -612,15 +610,15 @@ def movebaddy(enemy):
 	while attempts < 20 and not success:
             attempts += 1
 	    if look.i < 0 or look.i >= QUADSIZE:
-		if motion < 0 and tryexit(enemy, look, irun):
-		    return
+                if motion < 0:
+		    return tryexit(enemy, look, irun)
 		if krawli == m.i or m.j == 0:
 		    break
 		look.i = goto.i + krawli
 		krawli = -krawli
 	    elif look.j < 0 or look.j >= QUADSIZE:
-		if motion < 0 and tryexit(enemy, look, irun):
-		    return
+		if motion < 0:
+		    return tryexit(enemy, look, irun)
 		if krawlj == m.j or m.i == 0:
 		    break
 		look.j = goto.j + krawlj
@@ -630,7 +628,7 @@ def movebaddy(enemy):
 		if game.quad[look.i][look.j] == game.ship and \
 		    (enemy.type == 'C' or enemy.type == 'S'):
 		    collision(rammed=True, enemy=enemy)
-		    return
+		    return []
 		if krawli != m.i and m.j != 0:
 		    look.i = goto.i + krawli
 		    krawli = -krawli
@@ -649,7 +647,8 @@ def movebaddy(enemy):
 	    break # done early 
     if game.idebug:
 	skip(1)
-    return (enemy, old_dist, goto)
+    # Enemy moved, but is still in sector
+    return [(False, enemy, old_dist, goto)]
 
 def moveklings():
     "Sequence Klingon tactical movement."
@@ -661,11 +660,11 @@ def moveklings():
     if game.quadrant in game.state.kcmdr:
         for enemy in game.enemies:
 	    if enemy.type == 'C':
-		tacmoves.append(movebaddy(enemy))
+		tacmoves += movebaddy(enemy)
     if game.state.kscmdr == game.quadrant:
         for enemy in game.enemies:
 	    if enemy.type == 'S':
-		tacmoves.append(movebaddy(enemy))
+		tacmoves += movebaddy(enemy)
 		break
     # If skill level is high, move other Klingons and Romulans too!
     # Move these last so they can base their actions on what the
@@ -673,7 +672,7 @@ def moveklings():
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
         for enemy in game.enemies:
             if enemy.type in ('K', 'R'):
-		tacmoves.append(movebaddy(enemy))
+		tacmoves += movebaddy(enemy)
     return tacmoves
 
 def movescom(iq, avoid):
@@ -1326,18 +1325,26 @@ def attack(torps_ok):
 	return
     # commanders get a chance to tac-move towards you 
     if (((game.quadrant in game.state.kcmdr or game.state.kscmdr == game.quadrant) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
-        for (enemy, old_dist, goto) in  moveklings():
-            if enemy.move(goto):
-                if not damaged(DSRSENS) or game.condition == "docked":
-                    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.location))
-                    if enemy.kdist < old_dist:
-                        proutn(_(" advances to "))
-                    else:
-                        proutn(_(" retreats to "))
-                    prout("Sector %s." % goto)
+        for (bugout, enemy, old, goto) in  moveklings():
+            if bugout:
+                # we know about this if either short or long range
+                # sensors are working
+                if damaged(DSRSENS) and damaged(DLRSENS) \
+                       and game.condition != "docked":
+                    prout(crmena(True, enemy.type, "sector", old) + \
+                          (_(" escapes to Quadrant %s (and regains strength).") % goto))
+            else: # Enemy still in-sector
+                if enemy.move(goto):
+                    if not damaged(DSRSENS) or game.condition == "docked":
+                        proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.location))
+                        if enemy.kdist < old:
+                            proutn(_(" advances to "))
+                        else:
+                            proutn(_(" retreats to "))
+                        prout("Sector %s." % goto)
         sortenemies()
     # if no enemies remain after movement, we're done 
-    if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing == game.quadrant and not thing.angered):
+    if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing.at(game.quadrant) and not thing.angered):
 	return
     # set up partial hits if attack happens during shield status change 
     pfac = 1.0/game.inshld
