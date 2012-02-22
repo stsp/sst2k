@@ -3863,7 +3863,7 @@ def impulse():
 	scanner.chew()
 	return
     # Make sure enough time is left for the trip 
-    game.optime = course.dist/0.095
+    game.optime = course.distance/0.095
     if game.optime >= game.state.remtime:
 	prout(_("First Officer Spock- \"Captain, our speed under impulse"))
 	prout(_("power is only 0.95 sectors per stardate. Are you sure"))
@@ -3875,9 +3875,9 @@ def impulse():
     game.ididit = True
     if game.alldone:
 	return
-    power = 20.0 + 100.0*course.dist
+    power = 20.0 + 100.0*course.distance
     game.energy -= power
-    game.optime = course.dist/0.095
+    game.optime = course.distance/0.095
     if game.energy <= 0:
 	finish(FNRG)
     return
@@ -3913,7 +3913,7 @@ def warp(wcourse, involuntary):
 	    skip(1)
 	    prout(_("Engineering to bridge--"))
 	    if not game.shldup or 0.5*wcourse.power(game.warpfac) > game.energy:
-		iwarp = (game.energy/(wcourse.dist+0.05)) ** 0.333333333
+		iwarp = (game.energy/(wcourse.distance+0.05)) ** 0.333333333
 		if iwarp <= 0:
 		    prout(_("We can't do it, Captain. We don't have enough energy."))
 		else:
