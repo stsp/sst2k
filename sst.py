@@ -532,8 +532,8 @@ def movebaddy(enemy):
 	nbaddys = (((game.quadrant in game.state.kcmdr)*2 + (game.state.kscmdr==game.quadrant)*2+game.klhere*1.23+game.irhere*1.5)/2.0)
     else:
 	nbaddys = (game.quadrant in game.state.kcmdr) + (game.state.kscmdr==game.quadrant)
-    dist1 = enemy.kdist
-    mdist = int(dist1 + 0.5) # Nearest integer distance 
+    old_dist = enemy.kdist
+    mdist = int(old_dist + 0.5) # Nearest integer distance 
     # If SC, check with spy to see if should hi-tail it 
     if enemy.type == 'S' and \
 	(enemy.power <= 500.0 or (game.condition=="docked" and not damaged(DPHOTON))):
@@ -561,7 +561,7 @@ def movebaddy(enemy):
 	    motion = ((forces + randreal(200))/150.0) - 5.0
 	else:
             if forces > 1000.0: # Very strong -- move in for kill 
-		motion = (1.0 - randreal())**2 * dist1 + 1.0
+		motion = (1.0 - randreal())**2 * old_dist + 1.0
 	    if game.condition == "docked" and (game.options & OPTION_BASE): # protected by base -- back off ! 
 		motion -= game.skill*(2.0-randreal()**2)
 	if game.idebug:
@@ -649,14 +649,7 @@ def movebaddy(enemy):
 	    break # done early 
     if game.idebug:
 	skip(1)
-    if enemy.move(goto):
-	if not damaged(DSRSENS) or game.condition == "docked":
-	    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.location))
-	    if enemy.kdist < dist1:
-		proutn(_(" advances to "))
-	    else:
-		proutn(_(" retreats to "))
-	    prout("Sector %s." % goto)
+    return (enemy, old_dist, goto)
 
 def moveklings():
     "Sequence Klingon tactical movement."
@@ -664,14 +657,15 @@ def moveklings():
 	prout("== MOVCOM")
     # Figure out which Klingon is the commander (or Supercommander)
     # and do move
+    tacmoves = []
     if game.quadrant in game.state.kcmdr:
         for enemy in game.enemies:
 	    if enemy.type == 'C':
-		movebaddy(enemy)
+		tacmoves.append(movebaddy(enemy))
     if game.state.kscmdr == game.quadrant:
         for enemy in game.enemies:
 	    if enemy.type == 'S':
-		movebaddy(enemy)
+		tacmoves.append(movebaddy(enemy))
 		break
     # If skill level is high, move other Klingons and Romulans too!
     # Move these last so they can base their actions on what the
@@ -679,8 +673,8 @@ def moveklings():
     if game.skill >= SKILL_EXPERT and (game.options & OPTION_MVBADDY):
         for enemy in game.enemies:
             if enemy.type in ('K', 'R'):
-		movebaddy(enemy)
-    sortenemies()
+		tacmoves.append(movebaddy(enemy))
+    return tacmoves
 
 def movescom(iq, avoid):
     "Commander movement helper." 
@@ -1332,7 +1326,16 @@ def attack(torps_ok):
 	return
     # commanders get a chance to tac-move towards you 
     if (((game.quadrant in game.state.kcmdr or game.state.kscmdr == game.quadrant) and not game.justin) or game.skill == SKILL_EMERITUS) and torps_ok:
-	moveklings()
+        for (enemy, old_dist, goto) in  moveklings():
+            if enemy.move(goto):
+                if not damaged(DSRSENS) or game.condition == "docked":
+                    proutn(_("*** %s from Sector %s") % (cramen(enemy.type), enemy.location))
+                    if enemy.kdist < old_dist:
+                        proutn(_(" advances to "))
+                    else:
+                        proutn(_(" retreats to "))
+                    prout("Sector %s." % goto)
+        sortenemies()
     # if no enemies remain after movement, we're done 
     if len(game.enemies) == 0 or (len(game.enemies) == 1 and thing == game.quadrant and not thing.angered):
 	return
@@ -5783,7 +5786,7 @@ def newqad():
 	    prout(_("LEAVE AT ONCE, OR YOU WILL BE DESTROYED!"))
     # Put in THING if needed
     if thing == game.quadrant:
-        Enemy(type='?', loc=dropin(),
+        Enemy(etype='?', loc=dropin(),
                   power=randreal(6000,6500.0)+250.0*game.skill)
         if not damaged(DSRSENS):
             skip(1)
@@ -5800,7 +5803,7 @@ def newqad():
 		w.j = withprob(0.5) * (QUADSIZE-1)
                 if game.quad[w.i][w.j] == '.':
                     break
-            game.tholian = Enemy(type='T', loc=w,
+            game.tholian = Enemy(etype='T', loc=w,
                                  power=randrange(100, 500) + 25.0*game.skill)
 	    # Reserve unoccupied corners 
 	    if game.quad[0][0]=='.':
