@@ -1,0 +1,157 @@
+sst2k: seed set to 1329940672
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 14:57:52 2012
+# A complete game.
+r
+Would you like a Short, Medium, or Long game? s
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): f
+
+
+It is stardate 3413. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 4 battle cruisers.
+You have an initial allotment of 7 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 3 supporting starbases.
+Starbase locations-  4 - 5  5 - 4  3 - 2  
+
+The Enterprise is currently in Quadrant 2 - 3 Sector 6 - 9
+
+Good Luck!
+COMMAND> 
+COMMAND> move aut 1 5
+
+COMMAND> 
+COMMAND> move aut 1 2 10 10
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 1 - 2.
+
+141 unit hit on the Enterprise from Klingon at Sector 6 - 5
+
+59 unit hit on the Enterprise from Klingon at Sector 2 - 9
+
+
+Energy left 4718    shields down 100%,   torpedoes left 10
+
+[ANNOUNCEMENT ARRIVING...]
+
+Message from Starfleet Command       Stardate 3414.41
+     Supernova in Quadrant 5 - 3; caution advised.
+COMMAND> torp 2
+Target sector for torpedo number 1- 2 9
+Target sector for torpedo number 2- 6 5
+
+Track for torpedo number 1-  9 - 10   8 - 10   7 - 10   
+6 - 10   5 - 9   4 - 9   3 - 9   2 - 9   
+***Klingon at Sector 2 - 9 destroyed.
+
+Track for torpedo number 2-  9 - 9   8 - 8   8 - 7   
+7 - 6   6 - 5   
+***Klingon at Sector 6 - 5 destroyed.
+COMMAND> 
+COMMAND> move aut 3 2 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 3 - 2.
+COMMAND> move aut 2 3
+
+COMMAND> dock
+Docked.
+COMMAND> 
+COMMAND> move aut 5 6
+
+COMMAND> 
+COMMAND> move aut 6 2 3 3
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 6 - 2.
+COMMAND> 
+COMMAND> move aut 8 4 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 8 - 4.
+COMMAND> 
+COMMAND> move aut 8 2 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 8 - 2.
+COMMAND> 
+COMMAND> move aut 3 3
+
+COMMAND> move aut 3 10
+
+COMMAND> 
+COMMAND> move aut 5 5 2 2
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 5 - 5.
+COMMAND> 
+COMMAND> move aut 6 2 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 134 percent of our
+  remaining time.  Are you sure this is wise?" n
+COMMAND> 
+COMMAND> warp 7
+Engineer Scott- "Aye, but our maximum safe speed is warp 6."
+COMMAND> warp 6
+Helmsman Sulu- "Warp factor 6, Captain."
+COMMAND> 
+COMMAND> move aut 2 6 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 93 percent of our
+  remaining time.  Are you sure this is wise?" y
+
+Entering Quadrant 2 - 6.
+COMMAND> 
+COMMAND> move aut 5 8 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 1600 percent of our
+  remaining time.  Are you sure this is wise?" n
+COMMAND> move aut 9 9
+
+
+First Officer Spock- "Captain, I compute that such
+  a trip would require approximately 251 percent of our
+  remaining time.  Are you sure this is wise?" y
+
+
+
+It is stardate 3421.1.
+
+Your time has run out and the Federation has been
+conquered.  Your starship is now Klingon property,
+and you are put on trial as a war criminal.  On the
+basis of your record, you are acquitted.
+
+LIVE LONG AND PROSPER.
+
+
+Your score --
+  0.00 Klingons per stardate                  0
+
+TOTAL SCORE                                   0
+
+May the Great Bird of the Galaxy roost upon your home planet.

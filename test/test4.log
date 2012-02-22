@@ -1,0 +1,48 @@
+# seed 1329940672
+# options 
+# SST2K version 2.1
+# recorded by esr@snark on Wed Feb 22 14:57:52 2012
+# A complete game.
+r
+s
+n
+f
+
+move aut 1 5
+
+move aut 1 2 10 10
+torp 2
+2 9
+6 5
+
+move aut 3 2 2 2
+move aut 2 3
+dock
+
+move aut 5 6
+
+move aut 6 2 3 3
+
+move aut 8 4 2 2
+
+move aut 8 2 2 2
+
+move aut 3 3
+move aut 3 10
+
+move aut 5 5 2 2
+
+move aut 6 2 5 5
+n
+
+warp 7
+warp 6
+
+move aut 2 6 5 5
+y
+
+move aut 5 8 5 5
+n
+move aut 9 9
+y
+n
