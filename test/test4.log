@@ -1,0 +1,25 @@
+# seed 1329869600
+# options 
+# SST2K version 2.1
+# recorded by esr@snark on Tue Feb 21 19:13:20 2012
+r
+s
+n
+
+
+move aut 4 1
+
+move aut 7 1 5 5
+torp 2
+7 4
+7 5
+phasers
+a
+300
+
+m 7 7 5 5
+
+m 2 5 2 2
+
+move 5 8 10 1
+quit

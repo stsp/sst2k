@@ -1,0 +1,109 @@
+sst2k: seed set to 1329869600
+
+
+-SUPER- STAR TREK
+
+Would you like a regular, tournament, or saved game? # SST2K version 2.1
+# recorded by esr@snark on Tue Feb 21 19:13:20 2012
+r
+Would you like a Short, Medium, or Long game? s
+Are you a Novice, Fair, Good, Expert, or Emeritus player? n
+Choose your game style (plain, almy, fancy or just press enter): 
+
+
+It is stardate 2693. The Federation is being attacked by
+a deadly Klingon invasion force. As captain of the United
+Starship U.S.S. Enterprise, it is your mission to seek out
+and destroy this invasion force of 5 battle cruisers.
+You have an initial allotment of 7 stardates to complete
+your mission.  As you proceed you may be given more time.
+
+You will have 3 supporting starbases.
+Starbase locations-  5 - 5  7 - 5  3 - 2  
+
+The Enterprise is currently in Quadrant 7 - 3 Sector 7 - 7
+
+Good Luck!
+COMMAND> 
+COMMAND> move aut 4 1
+
+COMMAND> 
+COMMAND> move aut 7 1 5 5
+
+Ensign Chekov- "Course laid in, Captain."
+
+[ANNOUNCEMENT ARRIVING...]
+
+***Enterprise caught in long range tractor beam--
+Enterprise is pulled to Quadrant 2 - 8, Sector 4 - 8
+Shields raised.
+
+33 unit hit on the Enterprise from Klingon at Sector 7 - 4
+
+
+Energy left 4764    shields up 78%,   torpedoes left 10
+COMMAND> torp 2
+Target sector for torpedo number 1- 7 4
+Target sector for torpedo number 2- 7 5
+
+Track for torpedo number 1-  5 - 7   6 - 6   6 - 5   
+7 - 4   
+***Klingon at Sector 7 - 4 destroyed.
+
+Track for torpedo number 2-  5 - 7   6 - 6   7 - 5   
+***Commander at Sector 7 - 5 damaged-- displaced by blast to Sector 5 - 8 
+
+66 unit hit on the Enterprise from Klingon at Sector 5 - 8
+
+
+Energy left 4697    shields up 70%,   torpedoes left 8
+COMMAND> phasers
+
+Weapons Officer Sulu-  "High-speed shield control enabled, sir."
+Manual or automatic? a
+Phasers locked on target. Energy available: 4497.40
+159 units required. Units to fire= 300
+
+Shields lowered.
+
+155 unit hit on Commander at Sector 5 - 8
+***Commander at Sector 5 - 8 destroyed.
+
+Shields raised.
+COMMAND> 
+COMMAND> m 7 7 5 5
+(Manual movement assumed.)
+
+Helmsman Sulu- "Aye, Sir."
+
+YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER
+AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,
+YOU WILL BE DESTROYED.
+COMMAND> 
+COMMAND> m 2 5 2 2
+(Manual movement assumed.)
+
+Helmsman Sulu- "Aye, Sir."
+
+YOU HAVE ATTEMPTED TO CROSS THE NEGATIVE ENERGY BARRIER
+AT THE EDGE OF THE GALAXY.  THE THIRD TIME YOU TRY THIS,
+YOU WILL BE DESTROYED.
+
+Entering Quadrant 4 - 7.
+
+[ANNOUNCEMENT ARRIVING...]
+
+Message from Starfleet Command       Stardate 2698.43
+     Supernova in Quadrant 6 - 6; caution advised.
+COMMAND> 
+COMMAND> move 5 8 10 1
+(Manual movement assumed.)
+
+Helmsman Sulu- "Aye, Sir."
+
+Engineering to bridge--
+We don't have enough energy, but we could do it at warp 4,
+if you'll lower the shields.
+COMMAND> quit
+
+May the Great Bird of the Galaxy roost upon your home planet.

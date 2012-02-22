@@ -7,8 +7,8 @@
 #
 if [ $1 ]
 then
-    head -n `expr $1 + 2` </usr/tmp/sst-input.log >replay.log
+    head -n `expr $1 + 2` </tmp/sst-input.log >replay.log
 else
-    mv /usr/tmp/sst-input.log replay.log
+    mv /tmp/sst-input.log replay.log
 fi
 python sst.py -t -r replay.log
