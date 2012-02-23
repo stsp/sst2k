@@ -11,7 +11,7 @@ Stas Sergeev, and Eric S. Raymond.
 See the doc/HACKING file in the distribution for designers notes and advice
 on how to modify (and how not to modify!) this code.
 """
-import os, sys, math, curses, time, readline, cPickle, random, copy, gettext, getpass
+import os, sys, math, curses, time, readline, pickle, random, copy, gettext, getpass
 
 version = "2.1"
 
@@ -3277,7 +3277,7 @@ def cgetline():
                 elif line[0] != "#":
                     break
 	else:
-	    line = raw_input() + "\n"
+	    line = input() + "\n"
     if logfp:
 	logfp.write(line)
     return line
@@ -3612,7 +3612,7 @@ def imove(icourse=None, noattack=False):
             newquadrant(noattack)
             break
         elif check_collision(w):
-            print "Collision detected"
+            print("Collision detected")
             break
         else:
             game.sector = w
@@ -5291,7 +5291,7 @@ def freeze(boss):
     except IOError:
 	prout(_("Can't freeze game as file %s") % scanner.token)
 	return
-    cPickle.dump(game, fp)
+    pickle.dump(game, fp)
     fp.close()
     scanner.chew()
 
@@ -5313,7 +5313,7 @@ def thaw():
     except IOError:
 	prout(_("Can't thaw game in %s") % scanner.token)
 	return
-    game = cPickle.load(fp)
+    game = pickle.load(fp)
     fp.close()
     scanner.chew()
     return False
@@ -5584,7 +5584,7 @@ def setup():
 	prout(_("%d stardates.") % int(game.intime))
 	proutn(_("%d starbases in ") % game.inbase)
     for i in range(game.inbase):
-	proutn(`game.state.baseq[i]`)
+	proutn(repr(game.state.baseq[i]))
 	proutn("  ")
     skip(2)
     proutn(_("The Enterprise is currently in Quadrant %s") % game.quadrant)
@@ -6081,7 +6081,7 @@ def makemoves():
 	elif cmd == "EMEXIT":		# Emergency exit
 	    clrscr()			# Hide screen
 	    freeze(True)		# forced save
-	    raise SystemExit,1		# And quick exit
+	    raise SystemExit(1)		# And quick exit
 	elif cmd == "PROBE":
 	    probe()			# Launch probe
 	    if game.ididit:
@@ -6160,7 +6160,7 @@ def crmena(stars, enemy, loctype, w):
 	buf += _("Quadrant ")
     elif loctype == "sector":
 	buf += _("Sector ")
-    return buf + `w`
+    return buf + repr(w)
 
 def crmshp():
     "Emit our ship name." 
@@ -6378,7 +6378,7 @@ if __name__ == '__main__':
                     replayfp = open(val, "r")
                 except IOError:
                     sys.stderr.write("sst: can't open replay file %s\n" % val)
-                    raise SystemExit, 1
+                    raise SystemExit(1)
                 try:
                     line = replayfp.readline().strip()
                     (leader, __, seed) = line.split()
@@ -6400,11 +6400,11 @@ if __name__ == '__main__':
             elif switch == '-x':
                 game.idebug = True
             elif switch == '-V':
-                print "SST2K", version
-                raise SystemExit, 0 
+                print("SST2K", version)
+                raise SystemExit(0) 
             else:
                 sys.stderr.write("usage: sst [-t] [-x] [startcommand...].\n")
-                raise SystemExit, 1
+                raise SystemExit(1)
         # where to save the input in case of bugs
         if "TMPDIR" in os.environ:
             tmpdir = os.environ['TMPDIR']
@@ -6455,10 +6455,10 @@ if __name__ == '__main__':
             prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
         finally:
             ioend()
-        raise SystemExit, 0
+        raise SystemExit(0)
     except KeyboardInterrupt:
         if logfp:
             logfp.close()
-        print ""
+        print("")
 
 # End.
