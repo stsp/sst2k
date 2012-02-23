@@ -4,8 +4,8 @@ sst2k: seed set to 1329979246
 -SUPER- STAR TREK
 
 Would you like a regular, tournament, or saved game? # SST2K version 2.1
-# recorded by esr@snark on Thu Feb 23 01:40:46 2012
-# Tests orbit and transport commands
+# recorded by esr@snark on Thu Feb 23 02:10:19 2012
+# Test torbit, transport, and mine commands
 r
 Would you like a Short, Medium, or Long game? m
 Are you a Novice, Fair, Good, Expert, or Emeritus player? n
@@ -25,7 +25,6 @@ Starbase locations-  2 - 7  8 - 5  3 - 6  1 - 1  7 - 1
 The Enterprise is currently in Quadrant 7 - 5 Sector 6 - 10
 
 Good Luck!
-COMMAND> 
 COMMAND> mov aut 3 6
 
 COMMAND> 
@@ -55,28 +54,24 @@ Track for torpedo number 1-  2 - 2   3 - 3   4 - 4
 
 Track for torpedo number 2-  2 - 2   
 ***Commander at Sector 2 - 2 destroyed.
-COMMAND> 
 COMMAND> warp 6
 Helmsman Sulu- "Warp factor 6, Captain."
 COMMAND> 
 COMMAND> mov aut 1 10
 
-COMMAND> 
 COMMAND> mov aut 7 8 1 1
 
 Ensign Chekov- "Course laid in, Captain."
 
 Entering Quadrant 7 - 8.
-COMMAND> 
 COMMAND> probe
 4 probes left
 Are you sure you want to fire a probe? y
 Arm NOVAMAX warhead? n
-Manual or automatic- aut
+Manual or automatic- a
 Target quadrant or quadrant&sector- 1 8
 
 Ensign Chekov-  "The deep space probe is launched, Captain."
-COMMAND> 
 COMMAND> mov aut 9 7
 
 
@@ -85,36 +80,7 @@ Lt. Uhura-  "The deep space probe is now in Quadrant 6 - 8."
 Lt. Uhura-  "The deep space probe is now in Quadrant 5 - 8."
 
 Lt. Uhura-  "The deep space probe is now in Quadrant 4 - 8."
-COMMAND> 
-COMMAND> mine
-
-Mining party not on planet.
-COMMAND> ?
-LEGAL COMMANDS ARE:
-SRSCAN       STATUS       REQUEST      LRSCAN       
-PHASERS      TORPEDO      PHOTONS      MOVE         SHIELDS      
-DOCK         DAMAGES      CHART        IMPULSE      REST         
-WARP         SCORE        SENSORS      ORBIT        TRANSPORT    
-MINE         CRYSTALS     SHUTTLE      PLANETS      REPORT       
-COMPUTER     COMMANDS     EMEXIT       PROBE        SAVE         
-FREEZE       ABANDON      DESTRUCT     DEATHRAY     DEBUG        
-MAYDAY       SOS          CALL         QUIT         HELP         
-             
-COMMAND> transport
-
-Enterprise not in standard orbit.
-COMMAND> ?
-LEGAL COMMANDS ARE:
-SRSCAN       STATUS       REQUEST      LRSCAN       
-PHASERS      TORPEDO      PHOTONS      MOVE         SHIELDS      
-DOCK         DAMAGES      CHART        IMPULSE      REST         
-WARP         SCORE        SENSORS      ORBIT        TRANSPORT    
-MINE         CRYSTALS     SHUTTLE      PLANETS      REPORT       
-COMPUTER     COMMANDS     EMEXIT       PROBE        SAVE         
-FREEZE       ABANDON      DESTRUCT     DEATHRAY     DEBUG        
-MAYDAY       SOS          CALL         QUIT         HELP         
-             
-COMMAND> ORBIT
+COMMAND> orbit
 
 Helmsman Sulu-  "Entering standard orbit, Sir."
 
@@ -125,6 +91,101 @@ COMMAND> transport
 Spock-  "Captain, we have no information on this planet
   and Starfleet Regulations clearly state that in this situation
   you may not go down."
+COMMAND> mine
+
+Mining party not on planet.
+COMMAND> transport
+
+Spock-  "Captain, we have no information on this planet
+  and Starfleet Regulations clearly state that in this situation
+  you may not go down."
+COMMAND> 
+COMMAND> mov aut 1 1
+
+Helmsman Sulu- "Leaving standard orbit."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 2 - 8."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 8."
+COMMAND> 
+COMMAND> mov aut 4 6 10 10
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 4 - 6.
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+COMMAND> 
+COMMAND> mov aut 10 7
+
+COMMAND> mov aut 7 7
+
+COMMAND> mov aut 1 1
+
+
+Enterprise blocked by object at 5 - 5;
+Emergency stop required 180 units of energy.
+Collision detected
+COMMAND> 
+COMMAND> mov aut 1 6 10 10
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 1 - 6.
+COMMAND> 
+COMMAND> probe
+3 probes left
+Are you sure you want to fire a probe? y
+Arm NOVAMAX warhead? n
+Manual or automatic- a
+Target quadrant or quadrant&sector- 1 1
+
+Ensign Chekov-  "The deep space probe is launched, Captain."
+COMMAND> 
+COMMAND> mov aut 10 1
+
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 5."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 4."
+COMMAND> 
+COMMAND> mov aut 3 3 1 1
+
+Ensign Chekov- "Course laid in, Captain."
+
+Entering Quadrant 3 - 3.
+
+LT. Uhura- "Captain, an urgent message.
+  I'll put it on audio."  CLICK
+
+INTRUDER! YOU HAVE VIOLATED THE ROMULAN NEUTRAL ZONE.
+LEAVE AT ONCE, OR YOU WILL BE DESTROYED!
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 3."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 2."
+
+Lt. Uhura-  "The deep space probe is now in Quadrant 1 - 1."
+
+[ANNOUNCEMENT ARRIVING...]
+
+Lt. Uhura-  "The deep space probe has left the galaxy."
+COMMAND> 
+COMMAND> torp 1
+Target sector for torpedo number 1- 10 10
+
+Torpedo track- 2 - 2   3 - 3   4 - 4   
+5 - 5   6 - 6   7 - 6   
+
+***Black hole at Sector 7 - 6 swallows torpedo.
+
+75 unit hit on the Enterprise from Romulan at Sector 1 - 2
+
+
+Energy left 247    shields down 100%,   torpedoes left 7
+COMMAND> 
 COMMAND> n
 LEGAL COMMANDS ARE:
 SRSCAN       STATUS       REQUEST      LRSCAN       
@@ -136,6 +197,6 @@ COMPUTER     COMMANDS     EMEXIT       PROBE        SAVE
 FREEZE       ABANDON      DESTRUCT     DEATHRAY     DEBUG        
 MAYDAY       SOS          CALL         QUIT         HELP         
              
-COMMAND> QUIT
+COMMAND> quit
 
 May the Great Bird of the Galaxy roost upon your home planet.
