@@ -1,5 +1,7 @@
 # Test-suite makefile for sst
 
+PYTHON=python
+
 all: regress
 	@echo "No diff output is good news."
 
@@ -23,7 +25,7 @@ regress:
 	    if [ ! -f $${test}.tst ] ; \
 	    then \
 		(if echo -n "$${test}: " >&2; grep 'Test' $${test}.log >&2;\
-		../sst.py -r $${test}.log >/tmp/regress 2>&1; \
+		$(PYTHON) ../sst.py -r $${test}.log >/tmp/regress 2>&1; \
 		then diff -u $${test}.chk /tmp/regress; \
 		else echo "*** Nonzero return status on $${test}!"; exit 1; fi;) \
 	    fi \
