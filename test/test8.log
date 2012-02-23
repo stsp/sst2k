@@ -1,0 +1,41 @@
+# seed 1329979246
+# options 
+# SST2K version 2.1
+# recorded by esr@snark on Thu Feb 23 01:40:46 2012
+# Tests orbit and transport commands
+r
+m
+n
+
+
+mov aut 3 6
+
+move aut 7 2 5 5
+
+move aut 8 3 1 1
+torp 2
+8 8
+8 8
+
+warp 6
+
+mov aut 1 10
+
+mov aut 7 8 1 1
+
+probe
+y
+n
+aut
+1 8
+
+mov aut 9 7
+
+mine
+?
+transport
+?
+ORBIT
+transport
+n
+QUIT
