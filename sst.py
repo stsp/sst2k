@@ -4553,7 +4553,7 @@ def beam():
     skip(1)
     prouts("WWHOOOIIIIIRRRRREEEE.E.E.  .  .  .  .   .    .")
     skip(2)
-    if withprob(0.98):
+    if not withprob(0.98):
 	prouts("BOOOIIIOOOIIOOOOIIIOIING . . .")
 	skip(2)
 	prout(_("Scotty-  \"Oh my God!  I've lost them.\""))
