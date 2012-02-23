@@ -1173,12 +1173,12 @@ def torpedo(origin, bearing, dispersion, number, nburst):
                     break
             else:
                 prout("Internal error, no enemy where expected!")
-                raise SystemExit, 1
+                raise SystemExit(1)
             return None
 	elif iquad == 'B': # Hit a base 
 	    skip(1)
 	    prout(_("***STARBASE DESTROYED.."))
-            game.state.baseq = filter(lambda x: x != game.quadrant, game.state.baseq)
+            game.state.baseq = [x for x in game.state.baseq if x != game.quadrant]
 	    game.quad[w.i][w.j] = '.'
 	    game.base.invalidate()
 	    game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase = False
@@ -2099,7 +2099,7 @@ def events():
             game.state.chart[game.battle.i][game.battle.j].starbase = False
         # Remove Starbase from galaxy 
         game.state.galaxy[game.battle.i][game.battle.j].starbase = False
-        game.state.baseq = filter(lambda x: x != game.battle, game.state.baseq)
+        game.state.baseq = [x for x in game.state.baseq if x != game.battle]
         if game.isatb == 2:
             # reinstate a commander's base attack 
             game.battle = hold
@@ -2523,7 +2523,7 @@ def nova(nov):
                     game.quad[neighbor.i][neighbor.j] = '.'
                 elif iquad == 'B': # Destroy base 
                     game.state.galaxy[game.quadrant.i][game.quadrant.j].starbase = False
-                    game.state.baseq = filter(lambda x: x!= game.quadrant, game.state.baseq)
+                    game.state.baseq = [x for x in game.state.baseq if x!= game.quadrant]
                     game.base.invalidate()
                     game.state.basekl += 1
                     newcnd()
@@ -2673,7 +2673,7 @@ def supernova(w):
 	    game.state.planets[loop].pclass = "destroyed"
 	    npdead += 1
     # Destroy any base in supernovaed quadrant
-    game.state.baseq = filter(lambda x: x != nq, game.state.baseq)
+    game.state.baseq = [x for x in game.state.baseq if x != nq]
     # If starship caused supernova, tally up destruction 
     if w != None:
 	game.state.starkl += game.state.galaxy[nq.i][nq.j].stars
@@ -3205,7 +3205,7 @@ def pause_game():
         sys.stdout.write('\n')
         proutn(prompt)
         if not replayfp:
-            raw_input()
+            input()
         sys.stdout.write('\n' * rows)
         linecount = 0
 
@@ -3277,7 +3277,7 @@ def cgetline():
                 elif line[0] != "#":
                     break
 	else:
-	    line = input() + "\n"
+	    line = eval(input()) + "\n"
     if logfp:
 	logfp.write(line)
     return line
@@ -5057,7 +5057,7 @@ def status(req=0):
 	if game.condition != "docked":
 	    newcnd()
 	prstat(_("Condition"), _("%s, %i DAMAGES") % \
-               (game.condition.upper(), sum(map(lambda x: x > 0, game.damage))))
+               (game.condition.upper(), sum([x > 0 for x in game.damage])))
     if not req or req == 3:
 	prstat(_("Position"), "%s , %s" % (game.quadrant, game.sector))
     if not req or req == 4:
@@ -5932,7 +5932,7 @@ def helpme():
 	setwnd(message_window)
 	if key == "IHEOL":
 	    return
-	cmds = map(lambda x: x[0], commands)
+	cmds = [x[0] for x in commands]
 	if scanner.token.upper() in cmds or scanner.token.upper() == "ABBREV":
 	    break
 	skip(1)
