@@ -6423,7 +6423,8 @@ if __name__ == '__main__':
                     (getpass.getuser(),socket.gethostname(),time.ctime()))
         random.seed(seed)
         scanner = sstscanner()
-        map(scanner.append, arguments)
+        for arg in arguments:
+            scanner.append(arg)
         try:
             iostart()
             while True: # Play a game 
