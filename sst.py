@@ -745,7 +745,7 @@ def supercommander():
         for (i, base) in enumerate(game.state.baseq):
             basetbl.append((i, (base - sc).distance()))
         if game.state.baseq > 1:
-            basetbl.sort(lambda x, y: cmp(x[1], y[1]))
+            basetbl.sort(key=lambda x: x[1])
         # look for nearest base without a commander, no Enterprise, and
         # without too many Klingons, and not already under attack. 
         ifindit = iwhichb = 0
@@ -5734,7 +5734,7 @@ def newkling():
 
 def sortenemies():
     "Sort enemies by distance so 'nearest' is meaningful."
-    game.enemies.sort(lambda x, y: cmp(x.kdist, y.kdist))
+    game.enemies.sort(key=lambda x: x.kdist)
 
 def newqad():
     "Set up a new state of quadrant, for when we enter or re-enter it."
