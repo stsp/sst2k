@@ -901,7 +901,7 @@ def doshield(shraise):
     if shraise:
 	action = "SHUP"
     else:
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key == "IHALPHA":
 	    if scanner.sees("transfer"):
 		action = "NRG"
@@ -960,7 +960,7 @@ def doshield(shraise):
 	game.ididit = True
 	return
     elif action == "NRG":
-	while scanner.next() != "IHREAL":
+	while scanner.nexttok() != "IHREAL":
 	    scanner.chew()
 	    proutn(_("Energy to transfer to shields- "))
         nrg = scanner.real
@@ -1086,7 +1086,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
     # Loop to move a single torpedo 
     setwnd(message_window)
     for step in range(1, QUADSIZE*2):
-        if not track.next():
+        if not track.nexttok():
             break
         w = track.sector()
 	if not w.valid_sector():
@@ -1110,7 +1110,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
             # In the C/FORTRAN version, dispersion was 2.5 radians, which
             # is 143 degrees, which is almost exactly 4.8 clockface units
             displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
-            displacement.next()
+            displacement.nexttok()
             bumpto = displacement.sector()
 	    if not bumpto.valid_sector():
 		return hit
@@ -1152,7 +1152,7 @@ def torpedo(origin, bearing, dispersion, number, nburst):
                         return None
                     proutn(crmena(True, iquad, "sector", w))
                     displacement = course(track.bearing+randreal(-2.4, 2.4), distance=2**0.5)
-                    displacement.next()
+                    displacement.nexttok()
                     bumpto = displacement.sector()
                     if not bumpto.valid_sector():
                         prout(_(" damaged but not destroyed."))
@@ -1551,7 +1551,7 @@ def torps():
 	return
     # First, get torpedo count
     while True:
-        scanner.next()
+        scanner.nexttok()
 	if scanner.token == "IHALPHA":
 	    huh()
 	    return
@@ -1576,7 +1576,7 @@ def torps():
     # Next, get targets
     target = []
     for i in range(n):
-	key = scanner.next()
+	key = scanner.nexttok()
 	if i == 0 and key == "IHEOL":
 	    break	# no coordinate waiting, we will try prompting 
 	if i == 1 and key == "IHEOL":
@@ -1763,7 +1763,7 @@ def phasers():
     # Original code so convoluted, I re-did it all
     # (That was Tom Almy talking about the C code, I think -- ESR)
     while automode == "NOTSET":
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key == "IHALPHA":
 	    if scanner.sees("manual"):
 		if len(game.enemies)==0:
@@ -1773,7 +1773,7 @@ def phasers():
 		    automode = "AUTOMATIC"
 		else:
 		    automode = "MANUAL"
-		    key = scanner.next()
+		    key = scanner.nexttok()
 	    elif scanner.sees("automatic"):
 		if (not itarg) and len(game.enemies) != 0:
 		    automode = "FORCEMAN"
@@ -1781,7 +1781,7 @@ def phasers():
 		    if len(game.enemies)==0:
 			prout(_("Energy will be expended into space."))
 		    automode = "AUTOMATIC"
-		    key = scanner.next()
+		    key = scanner.nexttok()
 	    elif scanner.sees("no"):
 		no = True
 	    else:
@@ -1811,7 +1811,7 @@ def phasers():
     if automode == "AUTOMATIC":
 	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	if key != "IHREAL" and len(game.enemies) != 0:
 	    prout(_("Phasers locked on target. Energy available: %.2f")%avail)
 	irec = 0
@@ -1824,7 +1824,7 @@ def phasers():
 	    proutn(_("%d units required. ") % irec)
 	    scanner.chew()
 	    proutn(_("Units to fire= "))
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	    if key != "IHREAL":
 		return
 	    rpow = scanner.real
@@ -1838,7 +1838,7 @@ def phasers():
 	    # chicken out 
 	    scanner.chew()
 	    return
-        key = scanner.next()
+        key = scanner.nexttok()
 	if key == "IHALPHA" and scanner.sees("no"):
 	    no = True
 	if ifast:
@@ -1919,10 +1919,10 @@ def phasers():
 		    proutn("??")
 		proutn(")  ")
 		proutn(_("units to fire at %s-  ") % crmena(False, ienm, "sector", aim))		
-		key = scanner.next()
+		key = scanner.nexttok()
 	    if key == "IHALPHA" and scanner.sees("no"):
 		no = True
-		key = scanner.next()
+		key = scanner.nexttok()
 		continue
 	    if key == "IHALPHA":
 		huh()
@@ -1942,7 +1942,7 @@ def phasers():
 		prout(_("Available energy exceeded -- try again."))
 		scanner.chew()
 		return
-	    key = scanner.next() # scan for next value 
+	    key = scanner.nexttok() # scan for next value 
 	    k += 1
 	if rpow == 0.0:
 	    # zero energy -- abort 
@@ -2286,7 +2286,7 @@ def events():
 		supercommander()
 	elif evcode == FDSPROB: # Move deep space probe 
 	    schedule(FDSPROB, 0.01)
-            if not game.probe.next():
+            if not game.probe.nexttok():
 		if not game.probe.quadrant().valid_quadrant() or \
 		    game.state.galaxy[game.probe.quadrant().i][game.probe.quadrant().j].supernova:
 		    # Left galaxy or ran into supernova
@@ -2417,7 +2417,7 @@ def wait():
     "Wait on events."
     game.ididit = False
     while True:
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key  != "IHEOL":
 	    break
 	proutn(_("How long? "))
@@ -2717,7 +2717,7 @@ def selfdestruct():
     skip(1)
     prout(_("SELF-DESTRUCT-SEQUENCE-WILL-BE-ABORTED"))
     skip(1)
-    scanner.next()
+    scanner.nexttok()
     if game.passwd != scanner.token:
 	prouts(_("PASSWORD-REJECTED;"))
 	skip(1)
@@ -3606,7 +3606,7 @@ def imove(icourse=None, noattack=False):
     # Move out
     game.quad[game.sector.i][game.sector.j] = '.'
     for m in range(icourse.moves):
-        icourse.next()
+        icourse.nexttok()
         w = icourse.sector()
         if icourse.origin.quadrant() != icourse.location.quadrant():
             newquadrant(noattack)
@@ -3693,7 +3693,7 @@ def getcourse(isprobe):
 	    navmode = "manual"
 	    key = "IHEOL"
 	    break
-        key = scanner.next()
+        key = scanner.nexttok()
 	if key == "IHEOL":
 	    proutn(_("Manual or automatic- "))
 	    iprompt = True
@@ -3701,11 +3701,11 @@ def getcourse(isprobe):
 	elif key == "IHALPHA":
             if scanner.sees("manual"):
 		navmode = "manual"
-		key = scanner.next()
+		key = scanner.nexttok()
 		break
             elif scanner.sees("automatic"):
 		navmode = "automatic"
-		key = scanner.next()
+		key = scanner.nexttok()
 		break
 	    else:
 		huh()
@@ -3727,21 +3727,21 @@ def getcourse(isprobe):
 		proutn(_("Destination sector or quadrant&sector- "))
 	    scanner.chew()
 	    iprompt = True
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	if key != "IHREAL":
 	    huh()
 	    raise TrekError
 	xi = int(round(scanner.real))-1
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key != "IHREAL":
 	    huh()
 	    raise TrekError
 	xj = int(round(scanner.real))-1
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key == "IHREAL":
 	    # both quadrant and sector specified 
 	    xk = int(round(scanner.real))-1
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	    if key != "IHREAL":
 		huh()
 		raise TrekError
@@ -3780,13 +3780,13 @@ def getcourse(isprobe):
 	    proutn(_("X and Y displacements- "))
 	    scanner.chew()
 	    iprompt = True
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	itemp = "verbose"
 	if key != "IHREAL":
 	    huh()
 	    raise TrekError
 	delta.j = scanner.real
-	key = scanner.next()
+	key = scanner.nexttok()
 	if key != "IHREAL":
 	    huh()
 	    raise TrekError
@@ -3829,7 +3829,7 @@ class course:
         self.step = 0
     def arrived(self):
         return self.location.roundtogrid() == self.final
-    def next(self):
+    def nexttok(self):
         "Next step on course."
         self.step += 1
         self.nextlocation = self.location + self.increment
@@ -3973,7 +3973,7 @@ def warp(wcourse, involuntary):
             look = wcourse.moves
             while look > 0:
                 look -= 1
-                wcourse.next()
+                wcourse.nexttok()
                 w = wcourse.sector()
                 if not w.valid_sector():
                     break
@@ -4003,7 +4003,7 @@ def warp(wcourse, involuntary):
 def setwarp():
     "Change the warp factor."
     while True:
-        key=scanner.next()
+        key=scanner.nexttok()
         if key != "IHEOL":
             break
 	scanner.chew()
@@ -4189,7 +4189,7 @@ def probe():
 	else:
 	    prout(_("Uhura- \"The previous probe is still reporting data, Sir.\""))
 	return
-    key = scanner.next()
+    key = scanner.nexttok()
     if key == "IHEOL":
         if game.nprobes == 1:
             prout(_("1 probe left."))
@@ -4201,7 +4201,7 @@ def probe():
     game.isarmed = False
     if key == "IHALPHA" and scanner.token == "armed":
 	game.isarmed = True
-	key = scanner.next()
+	key = scanner.nexttok()
     elif key == "IHEOL":
 	proutn(_("Arm NOVAMAX warhead? "))
 	game.isarmed = ja()
@@ -5104,7 +5104,7 @@ def status(req=0):
 def request():
     "Request specified status data, a historical relic from slow TTYs."
     requests = ("da","co","po","ls","wa","en","to","sh","kl","sy", "ti")
-    while scanner.next() == "IHEOL":
+    while scanner.nexttok() == "IHEOL":
 	proutn(_("Information desired? "))
     scanner.chew()
     if scanner.token in requests:
@@ -5148,21 +5148,21 @@ def eta():
 	prout(_("COMPUTER DAMAGED, USE A POCKET CALCULATOR."))
 	skip(1)
 	return
-    if scanner.next() != "IHREAL":
+    if scanner.nexttok() != "IHREAL":
 	prompt = True
 	scanner.chew()
 	proutn(_("Destination quadrant and/or sector? "))
-	if scanner.next()!="IHREAL":
+	if scanner.nexttok()!="IHREAL":
 	    huh()
 	    return
     w1.j = int(scanner.real-0.5)
-    if scanner.next() != "IHREAL":
+    if scanner.nexttok() != "IHREAL":
 	huh()
 	return
     w1.i = int(scanner.real-0.5)
-    if scanner.next() == "IHREAL":
+    if scanner.nexttok() == "IHREAL":
 	w2.j = int(scanner.real-0.5)
-	if scanner.next() != "IHREAL":
+	if scanner.nexttok() != "IHREAL":
 	    huh()
 	    return
 	w2.i = int(scanner.real-0.5)
@@ -5186,7 +5186,7 @@ def eta():
     while True:
 	scanner.chew()
 	proutn(_("Time or arrival date? "))
-	if scanner.next()=="IHREAL":
+	if scanner.nexttok()=="IHREAL":
 	    ttime = scanner.real
 	    if ttime > game.state.date:
 		ttime -= game.state.date # Actually a star date
@@ -5200,7 +5200,7 @@ def eta():
 	    break
 	scanner.chew()
 	proutn(_("Warp factor? "))
-	if scanner.next()== "IHREAL":
+	if scanner.nexttok()== "IHREAL":
 	    wfl = True
 	    twarp = scanner.real
 	    if twarp<1.0 or twarp > 10.0:
@@ -5218,7 +5218,7 @@ def eta():
 		if not wfl:
 		    return
 		proutn(_("New warp factor to try? "))
-		if scanner.next() == "IHREAL":
+		if scanner.nexttok() == "IHREAL":
 		    wfl = True
 		    twarp = scanner.real
 		    if twarp<1.0 or twarp > 10.0:
@@ -5251,7 +5251,7 @@ def eta():
 	    (scheduled(FCDBAS)<ttime+game.state.date and game.battle == w1):
 	    prout(_("The starbase there will be destroyed by then."))
 	proutn(_("New warp factor to try? "))
-	if scanner.next() == "IHREAL":
+	if scanner.nexttok() == "IHREAL":
 	    wfl = True
 	    twarp = scanner.real
 	    if twarp<1.0 or twarp > 10.0:
@@ -5277,10 +5277,10 @@ def freeze(boss):
     "Save game."
     if boss:
 	scanner.push("emsave.trk")
-    key = scanner.next()
+    key = scanner.nexttok()
     if key == "IHEOL":
         proutn(_("File name: "))
-        key = scanner.next()
+        key = scanner.nexttok()
     if key != "IHALPHA":
         huh()
         return
@@ -5299,10 +5299,10 @@ def thaw():
     "Retrieve saved game."
     global game
     game.passwd = None
-    key = scanner.next()
+    key = scanner.nexttok()
     if key == "IHEOL":
 	proutn(_("File name: "))
-	key = scanner.next()
+	key = scanner.nexttok()
     if key != "IHALPHA":
 	huh()
 	return True
@@ -5611,9 +5611,9 @@ def choose():
 	scanner.chew()
 #	if not scanner.inqueue: # Can start with command line options 
 	proutn(_("Would you like a regular, tournament, or saved game? "))
-        scanner.next()
+        scanner.nexttok()
         if scanner.sees("tournament"):
-	    while scanner.next() == "IHEOL":
+	    while scanner.nexttok() == "IHEOL":
 		proutn(_("Type in tournament number-"))
 	    if scanner.real == 0:
 		scanner.chew()
@@ -5639,7 +5639,7 @@ def choose():
 	proutn(_("What is \"%s\"? ") % scanner.token)
 	scanner.chew()
     while game.length==0 or game.skill==SKILL_NONE:
-	if scanner.next() == "IHALPHA":
+	if scanner.nexttok() == "IHALPHA":
             if scanner.sees("short"):
 		game.length = 1
 	    elif scanner.sees("medium"):
@@ -5667,10 +5667,10 @@ def choose():
 	    elif game.skill == SKILL_NONE:
 		proutn(_("Are you a Novice, Fair, Good, Expert, or Emeritus player? "))
     # Choose game options -- added by ESR for SST2K
-    if scanner.next() != "IHALPHA":
+    if scanner.nexttok() != "IHALPHA":
 	scanner.chew()
 	proutn(_("Choose your game style (plain, almy, fancy or just press enter): "))
-	scanner.next()
+	scanner.nexttok()
     if scanner.sees("plain"):
 	# Approximates the UT FORTRAN version.
 	game.options &=~ (OPTION_THOLIAN | OPTION_PLANETS | OPTION_THINGY | OPTION_PROBE | OPTION_RAMMING | OPTION_MVBADDY | OPTION_BLKHOLE | OPTION_BASE | OPTION_WORLDS)
@@ -5854,7 +5854,7 @@ def setpassword():
 	while True:
 	    scanner.chew()
 	    proutn(_("Please type in a secret password- "))
-	    scanner.next()
+	    scanner.nexttok()
 	    game.passwd = scanner.token
 	    if game.passwd != None:
 		break
@@ -5923,12 +5923,12 @@ def listCommands():
 
 def helpme():
     "Browse on-line help."
-    key = scanner.next()
+    key = scanner.nexttok()
     while True:
 	if key == "IHEOL":
 	    setwnd(prompt_window)
 	    proutn(_("Help on what command? "))
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	setwnd(message_window)
 	if key == "IHEOL":
 	    return
@@ -5986,7 +5986,7 @@ def makemoves():
 	    setwnd(prompt_window)
 	    clrscr()
 	    proutn("COMMAND> ")
-	    if scanner.next() == "IHEOL":
+	    if scanner.nexttok() == "IHEOL":
 		if game.options & OPTION_CURSES:
 		    makechart()
 		continue
@@ -6187,7 +6187,7 @@ class sstscanner:
         self.token = None
         self.real = 0.0
         self.inqueue = []
-    def next(self):
+    def nexttok(self):
         # Get a token from the user
         self.real = 0.0
         self.token = ''
@@ -6238,12 +6238,12 @@ class sstscanner:
         return int(round(scanner.real))
     def getcoord(self):
         s = Coord()
-        scanner.next()
+        scanner.nexttok()
     	if scanner.type != "IHREAL":
 	    huh()
 	    return None
 	s.i = scanner.int()-1
-        scanner.next()
+        scanner.nexttok()
 	if scanner.type != "IHREAL":
 	    huh()
 	    return None
@@ -6256,7 +6256,7 @@ def ja():
     "Yes-or-no confirmation."
     scanner.chew()
     while True:
-	scanner.next()
+	scanner.nexttok()
 	if scanner.token == 'y':
 	    return True
 	if scanner.token == 'n':
@@ -6296,7 +6296,7 @@ def debugme():
 	for i in range(NDEVICES):
 	    proutn("Kill %s?" % device[i])
 	    scanner.chew()
-	    key = scanner.next()
+	    key = scanner.nexttok()
             if key == "IHALPHA" and scanner.sees("y"):
 		game.damage[i] = 10.0
     proutn("Examine/change events? ")
@@ -6327,7 +6327,7 @@ def debugme():
 		proutn("never")
 	    proutn("? ")
 	    scanner.chew()
-	    key = scanner.next()
+	    key = scanner.nexttok()
 	    if key == 'n':
 		unschedule(i)
 		scanner.chew()
@@ -6336,7 +6336,7 @@ def debugme():
 		if i == FENSLV or i == FREPRO:
 		    scanner.chew()
 		    proutn("In quadrant- ")
-		    key = scanner.next()
+		    key = scanner.nexttok()
 		    # "IHEOL" says to leave coordinates as they are 
 		    if key != "IHEOL":
 			if key != "IHREAL":
@@ -6344,7 +6344,7 @@ def debugme():
 			    unschedule(i)
 			    continue
 			w.i = int(round(scanner.real))
-			key = scanner.next()
+			key = scanner.nexttok()
 			if key != "IHREAL":
 			    prout("Event %d canceled, no y coordinate." % (i))
 			    unschedule(i)
