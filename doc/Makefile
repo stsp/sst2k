@@ -1,6 +1,8 @@
 # From this directory, distribute the following files:
 # HACKING makehelp.py sst-doc.xml sst-layer.xsl sst.xml
 
+all: sst.doc sst.6
+
 sst.6: sst.xml
 	xmlto man sst.xml
 
