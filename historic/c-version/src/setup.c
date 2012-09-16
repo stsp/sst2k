@@ -339,12 +339,12 @@ void setup(bool needprompt)
 	if ((game.options & OPTION_WORLDS) && i < NINHAB) {
 	    game.state.planets[i].pclass = M;	// All inhabited planets are class M
 	    game.state.planets[i].crystals = absent;
-	    game.state.planets[i].known = known;
+	    game.state.planets[i].kn = known;
 	    game.state.planets[i].inhabited = i;
 	} else {
-	    game.state.planets[i].pclass = Rand()*3.0; // Planet class M N or O
-	    game.state.planets[i].crystals = Rand()*1.5;		// 1 in 3 chance of crystals
-	    game.state.planets[i].known = unknown;
+	    game.state.planets[i].pclass = (enum Pclass)(int)(Rand()*3.0); // Planet class M N or O
+	    game.state.planets[i].crystals = (enum Cry)(int)(Rand()*1.5);		// 1 in 3 chance of crystals
+	    game.state.planets[i].kn = unknown;
 	    game.state.planets[i].inhabited = UNINHABITED;
 	}
 	game.state.galaxy[w.x][w.y].planet = i;
@@ -395,7 +395,7 @@ void setup(bool needprompt)
 	proutn(_("%d starbases in "), game.inbase);
     }
     for (i = 1; i <= game.inbase; i++) {
-	proutn(cramlc(0, game.state.baseq[i]));
+	proutn(cramlc(neither, game.state.baseq[i]));
 	proutn("  ");
     }
     skip(2);
@@ -722,13 +722,13 @@ void newqad(bool shutup)
 	    game.kpower[game.nenhere] = Rand()*400.0 +100.0 +25.0*game.skill;
 	    /* Reserve unocupied corners */
 	    if (game.quad[1][1]==IHDOT)
-		game.quad[1][1] = 'X';
+		game.quad[1][1] = IHRSV;
 	    if (game.quad[1][QUADSIZE]==IHDOT)
-		game.quad[1][QUADSIZE] = 'X';
+		game.quad[1][QUADSIZE] = IHRSV;
 	    if (game.quad[QUADSIZE][1]==IHDOT)
-		game.quad[QUADSIZE][1] = 'X';
+		game.quad[QUADSIZE][1] = IHRSV;
 	    if (game.quad[QUADSIZE][QUADSIZE]==IHDOT)
-		game.quad[QUADSIZE][QUADSIZE] = 'X';
+		game.quad[QUADSIZE][QUADSIZE] = IHRSV;
 	}
     }
 
@@ -741,15 +741,15 @@ void newqad(bool shutup)
 
     // Take out X's in corners if Tholian present
     if (game.ithere) {
-	if (game.quad[1][1]=='X')
+	if (game.quad[1][1]==IHRSV)
 	    game.quad[1][1] = IHDOT;
-	if (game.quad[1][QUADSIZE]=='X')
+	if (game.quad[1][QUADSIZE]==IHRSV)
 	    game.quad[1][QUADSIZE] = IHDOT;
-	if (game.quad[QUADSIZE][1]=='X')
+	if (game.quad[QUADSIZE][1]==IHRSV)
 	    game.quad[QUADSIZE][1] = IHDOT;
-	if (game.quad[QUADSIZE][QUADSIZE]=='X')
+	if (game.quad[QUADSIZE][QUADSIZE]==IHRSV)
 	    game.quad[QUADSIZE][QUADSIZE] = IHDOT;
-    }		
+    }
 }
 
 void sortklings(void) 

@@ -34,7 +34,7 @@ void attackreport(bool curt)
 void report(void)
 /* report on general game status */
 {
-    char *s1,*s2,*s3;
+    const char *s1,*s2,*s3;
 
     chew();
     s1 = (game.thawed?_("thawed "):"");
@@ -398,7 +398,7 @@ void status(int req)
 
 void request(void)
 {
-    int req;
+    unsigned int req;
     static char requests[][3] =
 	{"da","co","po","ls","wa","en","to","sh","kl","sy", "ti"};
 

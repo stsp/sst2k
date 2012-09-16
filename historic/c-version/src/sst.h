@@ -76,6 +76,7 @@ typedef enum {
     IHMATER0 = '-',
     IHMATER1 = 'o',
     IHMATER2 = '0',
+    IHRSV = 'X',
 } feature;
 
 enum PStat {secure, distressed, enslaved};
@@ -268,7 +269,6 @@ struct game {
 	instar,		// initial stars
 	intorps,	// initial/max torpedoes
 	torps,		// number of torpedoes
-	ship,		// ship type -- 'E' is Enterprise
 	abandoned,	// count of crew abandoned in space
 	length,		// length of game
 	klhere,		// klingons here
@@ -283,6 +283,7 @@ struct game {
 	tourn,		// tournament number
 	proben,		// number of moves for probe
 	nprobes;	// number of probes available
+    feature ship;		// ship type -- 'E' is Enterprise
     double inresor,	// initial resources
 	intime,		// initial time
 	inenrg,		// initial/max energy

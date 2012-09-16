@@ -297,7 +297,7 @@ void finish(FINTYPE ifin)
 	break;
     }
     if (game.ship==IHF)
-	game.ship= 0;
+	game.ship = IHBLANK;
     else if (game.ship == IHE)
 	game.ship = IHF;
     game.alive = false;
