@@ -251,7 +251,8 @@ void ram(bool ibumpd, feature ienm, coord w)
 void torpedo(double course, double r, coord in, double *hit, int i, int n)
 /* let a photon torpedo fly */
 {
-    int l, iquad=0, ll;
+    int l, ll;
+    feature iquad;
     bool shoved = false;
     double ac=course + 0.25*r;
     double angle = (15.0-ac)*0.5235988;
@@ -389,8 +390,8 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    game.quad[w.x][w.y]=IHDOT;
 	    game.state.rembase--;
 	    game.base.x=game.base.y=0;
-	    q->starbase--;
-	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase--;
+	    q->starbase = 0;
+	    game.state.chart[game.quadrant.x][game.quadrant.y].starbase = 0;
 	    game.state.basekl++;
 	    newcnd();
 	    return;
@@ -555,7 +556,8 @@ void attack(bool torps_ok)
 /* bad guy attacks us */
 {
     /* torps_ok == false forces use of phasers in an attack */
-    int percent, loop, iquad;
+    int percent, loop;
+    feature iquad;
     bool usephasers, atackd = false, attempt = false, ihurt = false;
     double hit, pfac, dustfac, hitmax=0.0, hittot=0.0, chgfac=1.0, r;
     coord jay;
@@ -1227,7 +1229,7 @@ void phasers(void)
 	rpow = 0.0;
 	for (k = 1; k <= game.nenhere;) {
 	    coord aim = game.ks[k];
-	    int ienm = game.quad[aim.x][aim.y];
+	    feature ienm = game.quad[aim.x][aim.y];
 	    if (msgflag) {
 		proutn(_("Energy available= %.2f"),
 		       game.energy-.006-(ifast?200:0));
@@ -1338,7 +1340,8 @@ void hittem(double *hits)
 /* register a phaser hit on Klingons and Romulans */
 {
     double kp, kpow, wham, hit, dustfac, kpini;
-    int nenhr2=game.nenhere, k=1, kk=1, ienm;
+    int nenhr2=game.nenhere, k=1, kk=1;
+    feature ienm;
     coord w;
 
     skip(1);

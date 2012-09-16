@@ -78,6 +78,17 @@ typedef enum {
     IHMATER2 = '0',
 } feature;
 
+struct quadrant {
+	int stars;
+	int planet;
+#define NOPLANET	-1
+	bool starbase;
+	int klingons;
+	int romulans;
+	bool supernova;
+	bool charted;
+	enum {secure, distressed, enslaved} status;
+};
 typedef struct {
     bool snap;			// snapshot taken
     int crew,			// crew complement
@@ -98,17 +109,7 @@ typedef struct {
     coord baseq[BASEMAX+1];	// Base quadrant coordinates
     coord kcmdr[QUADSIZE+1];	// Commander quadrant coordinates
     coord kscmdr;		// Supercommander quadrant coordinates
-    struct quadrant {
-	int stars;
-	int planet;
-#define NOPLANET	-1
-	bool starbase;
-	int klingons;
-	int romulans;
-	bool supernova;
-	bool charted;
-	enum {secure, distressed, enslaved} status;
-    } galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
+    struct quadrant galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
     struct page {
 	int stars;
 	bool starbase;
@@ -401,7 +402,7 @@ extern void nova(coord);
 extern void supernova(bool, coord *);
 extern void supercommander(void);
 extern void hittem(double *);
-extern bool isit(char *);
+extern bool isit(const char *);
 extern void survey(void);
 extern void orbit(void);
 extern void sensor(void);
