@@ -427,7 +427,7 @@ extern void tracktorpedo(coord, int, int, int, int);
 extern void cgetline(char *, int);
 extern void waitfor(void);
 extern void setpassword(void);
-extern void commandhook(char *, bool);
+extern void commandhook(const char *, bool);
 extern void makechart(void);
 extern coord newkling(int);
 #ifdef BSD_BUG_FOR_BUG

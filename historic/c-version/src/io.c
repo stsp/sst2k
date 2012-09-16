@@ -315,7 +315,7 @@ void highvideo(void)
     }
 }
  
-void commandhook(char *cmd, bool before) {
+void commandhook(const char *cmd, bool before) {
 }
 
 /*

@@ -5,7 +5,7 @@
 #include "sst.h"
 
 #define DOC_NAME "sst.doc"
-	
+
 /*
 
 Dave Matuszek says:
@@ -194,12 +194,10 @@ char *device[NDEVICES];
 
 static struct 
 {
-    char *name;
+    const char *name;
     int value;
     unsigned long option;
-}
-
-commands[] = {
+} commands[] = {
 #define SRSCAN	0
 	{"SRSCAN",	SRSCAN,		OPTION_TTY},
 #define STATUS	1
@@ -288,7 +286,7 @@ commands[] = {
 static void listCommands(void) 
 /* generate a list of legal commands */
 {
-    int i, k = 0;
+    unsigned int i, k = 0;
     proutn(_("LEGAL COMMANDS ARE:"));
     for (i = 0; i < NUMCOMMANDS; i++) {
 	if (!ACCEPT(i))
@@ -304,7 +302,7 @@ static void listCommands(void)
 static void helpme(void)
 /* browse on-line help */
 {
-    int i, j;
+    unsigned int i, j;
     char cmdbuf[32], *cp;
     char linebuf[132];
     FILE *fp;
@@ -392,7 +390,7 @@ static void helpme(void)
 static void makemoves(void)
 /* command-interpretation loop */
 {
-    int key, i, v = 0;
+    unsigned int key, i, v = 0;
     bool hitme;
     clrscr();
     setwnd(message_window);
@@ -701,7 +699,7 @@ void cramen(feature i)
 /* print the name of an enemy */
 {
     /* return an enemy */
-    char *s;
+    const char *s;
 	
     switch (i) {
     case IHR: s = _("Romulan"); break;
@@ -747,7 +745,7 @@ void crmena(bool stars, feature enemy, enum loctype key, coord w)
 void crmshp(void)
 /* print our ship name */
 {
-    char *s;
+    const char *s;
     switch (game.ship) {
     case IHE: s = _("Enterprise"); break;
     case IHF: s = _("Faerie Queene"); break;
@@ -867,7 +865,7 @@ void huh(void)
     prout(_("Beg your pardon, Captain?"));
 }
 
-bool isit(char *s) 
+bool isit(const char *s) 
 /* compares s to citem and returns true if it matches to the length of s */
 {
     return strncasecmp(s, citem, max(1, strlen(citem))) == 0;
