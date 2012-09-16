@@ -1,6 +1,6 @@
 #include "sst.h"
 
-static bool tryexit(coord look, int ienm, int loccom, bool irun) 
+static bool tryexit(coord look, feature ienm, int loccom, bool irun) 
 /* a bad guy attempts to bug out */
 {
     int n;

@@ -45,13 +45,16 @@ typedef struct {int x; int y;} coord;
 #define invalidate(w)		w.x = w.y = 0
 #define is_valid(w)		(w.x != 0 && w.y != 0)
 
+enum Pclass {destroyed= -1, M=0, N=1, O=2};
+enum Cry {mined=-1, present=0, absent=1};
+enum Known {unknown, known, shuttle_down};
 typedef struct {
     coord w;
-    enum {destroyed= -1, M=0, N=1, O=2} pclass;
+    enum Pclass pclass;
     int inhabited;	/* if NZ, an index into a name array */
 #define UNINHABITED	-1
-    enum {mined=-1, present=0, absent=1} crystals; /* has crystals */
-    enum {unknown, known, shuttle_down} known;
+    enum Cry crystals; /* has crystals */
+    enum Known kn;
 } planet;
 
 typedef enum {
@@ -190,6 +193,26 @@ extern double scheduled(int);
 
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 
+enum Condit {
+	green,
+	yellow,
+	red,
+	docked,
+	dead,
+};
+enum Iscraft {
+	onship,
+	offship,
+	removed,
+};
+enum Skill {
+	SKILL_NONE,
+	SKILL_NOVICE,
+	SKILL_FAIR,
+	SKILL_GOOD,
+	SKILL_EXPERT,
+	SKILL_EMERITUS,
+};
 struct game {
     char magic[sizeof(SSTMAGIC)];
     unsigned long options;
@@ -231,26 +254,9 @@ struct game {
 	icrystl,	// dilithium crystals aboard
 	iseenit,	// seen base attack report
 	thawed;		// thawed game
-    enum {
-	green,
-	yellow,
-	red,
-	docked,
-	dead,
-    } condition;		// condition (red/yellow/green/docked)
-    enum {
-	onship,
-	offship,
-	removed,
-    } iscraft;		// 'onship' if craft on ship, 'removed' if out of game
-    enum {
-	SKILL_NONE,
-	SKILL_NOVICE,
-	SKILL_FAIR,
-	SKILL_GOOD,
-	SKILL_EXPERT,
-	SKILL_EMERITUS,
-    } skill;		// skill level
+    enum Condit condition;		// condition (red/yellow/green/docked)
+    enum Iscraft iscraft;		// 'onship' if craft on ship, 'removed' if out of game
+    enum Skill skill;		// skill level
     int inkling,	// initial number of klingons
 	inbase,		// initial number of bases
 	incom,		// initial number of commanders
