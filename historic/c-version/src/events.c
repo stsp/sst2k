@@ -637,7 +637,8 @@ void nova(coord nov)
     static double course[] =
 	{0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5};
     int bot, top, top2, hits[QUADSIZE+1][3], kount, icx, icy, mm, nn, j;
-    int iquad, iquad1, i, ll;
+    int iquad1, i, ll;
+    feature iquad;
     coord newc, scratch;
 
     if (Rand() < 0.05) {

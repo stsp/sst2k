@@ -78,6 +78,7 @@ typedef enum {
     IHMATER2 = '0',
 } feature;
 
+enum PStat {secure, distressed, enslaved};
 struct quadrant {
 	int stars;
 	int planet;
@@ -87,7 +88,12 @@ struct quadrant {
 	int romulans;
 	bool supernova;
 	bool charted;
-	enum {secure, distressed, enslaved} status;
+	enum PStat status;
+};
+struct page {
+	int stars;
+	bool starbase;
+	int klingons;
 };
 typedef struct {
     bool snap;			// snapshot taken
@@ -110,11 +116,7 @@ typedef struct {
     coord kcmdr[QUADSIZE+1];	// Commander quadrant coordinates
     coord kscmdr;		// Supercommander quadrant coordinates
     struct quadrant galaxy[GALSIZE+1][GALSIZE+1]; 	// The Galaxy (subscript 0 not used)
-    struct page {
-	int stars;
-	bool starbase;
-	int klingons;
-    } chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
+    struct page chart[GALSIZE+1][GALSIZE+1]; 	// the starchart (subscript 0 not used)
 } snapshot;				// Data that is snapshot
 
 /* game options */
