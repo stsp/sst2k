@@ -286,7 +286,7 @@ void torpedo(double course, double r, coord in, double *hit, int i, int n)
 	    continue;
 	/* hit something */
 	setwnd(message_window);
-	if (damaged(DSRSENS) && !game.condition==docked)
+	if (damaged(DSRSENS) && game.condition!=docked)
 	    skip(1);	/* start new line after text track */
 	switch(iquad) {
 	case IHE: /* Hit our ship */
