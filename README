@@ -1,16 +1,6 @@
-			README for Super Star Trek 2K
+			Super Star Trek 2K
 
 Save the Federation from the invading Klingons!  Visit exotic planets and
 strip-mine them for dilithium!  Encounter mysterious space thingies!
 This is the classic Super Star Trek game from the days of slow teletypes, 
 reloaded.
-
-The game logs user input to /tmp/sst-input.log. If you trip over a bug,
-please report it to the maintainers with the log enclosed - that enables
-us to reproduce it and rapidly fix the bug.
-
-If you enjoy this, check out other ancient games in the Retrocomputing Museum 
-at <http://www.catb.org/retro/>.
-
-      	     	     	   	   		      Eric S. Raymond
-						      November 2004
