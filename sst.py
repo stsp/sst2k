@@ -111,6 +111,7 @@ class Coord:
 
     def quadrant(self):
         #print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
+        #return self.roundtogrid() / QUADSIZE
         iq = self.roundtogrid()
         iq.i = int(iq.i/QUADSIZE)
         iq.j = int(iq.j/QUADSIZE)
@@ -2317,7 +2318,7 @@ def events():
                 pdest.charted = True
             game.probe.moves -= 1 # One less to travel
             if game.probe.arrived() and game.isarmed and pdest.stars:
-                supernova(game.probe.quadrant())                # fire in the hole!
+                supernova(game.probe.quadrant())     # fire in the hole!
                 unschedule(FDSPROB)
                 if game.state.galaxy[pquad.i][pquad.j].supernova:
                     return
