@@ -13,7 +13,7 @@ on how to modify (and how not to modify!) this code.
 """
 import os, sys, math, curses, time, readline, pickle, random, copy, gettext, getpass
 
-version = "2.1.1"
+version = "2.1"
 
 docpath  	= (".", "../doc", "/usr/share/doc/sst")
 
@@ -108,14 +108,17 @@ class Coord:
         else:
             s.j = self.j / abs(self.j)
         return s
-
     def quadrant(self):
         #print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
+<<<<<<< HEAD
         #return self.roundtogrid() / QUADSIZE
         iq = self.roundtogrid()
         iq.i = int(iq.i/QUADSIZE)
         iq.j = int(iq.j/QUADSIZE)
         return iq
+=======
+        return self.roundtogrid() / QUADSIZE
+>>>>>>> parent of 3eef073... adapted to centos
     def sector(self):
         return self.roundtogrid() % QUADSIZE
     def scatter(self):
@@ -3282,7 +3285,7 @@ def cgetline():
                 elif line[0] != "#":
                     break
         else:
-            line = str(input()) + "\n"
+            line = eval(input()) + "\n"
     if logfp:
         logfp.write(line)
     return line
@@ -3825,8 +3828,7 @@ class course:
             self.origin = cartesian(game.quadrant, origin)
         self.increment = Coord(-math.sin(self.angle), math.cos(self.angle))
         bigger = max(abs(self.increment.i), abs(self.increment.j))
-        #self.increment /= bigger
-        self.increment = Coord(self.increment.i/bigger, self.increment.j/bigger)
+        self.increment /= bigger
         self.moves = int(round(10*self.distance*bigger))
         self.reset()
         self.final = (self.location + self.moves*self.increment).roundtogrid()
