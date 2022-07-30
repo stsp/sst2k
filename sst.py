@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 sst.py -- Super Star Trek 2K
 
@@ -87,7 +87,7 @@ class Coord:
         return Coord(self.i/other, self.j/other)
     def __mod__(self, other):
         return Coord(self.i % other, self.j % other)
-    def __rdiv__(self, other):
+    def __truediv__(self, other):
         return Coord(self.i/other, self.j/other)
     def roundtogrid(self):
         return Coord(int(round(self.i)), int(round(self.j)))
@@ -3263,7 +3263,7 @@ def prouts(line):
 def cgetline():
     "Get a line of input."
     if game.options & OPTION_CURSES:
-        line = curwnd.getstr() + "\n"
+        line = curwnd.getstr().decode('utf-8') + "\n"
         curwnd.refresh()
     else:
         if replayfp and not replayfp.closed:
