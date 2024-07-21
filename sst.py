@@ -1055,7 +1055,7 @@ def collision(rammed, enemy):
     # In the pre-SST2K version, all devices got equiprobably damaged,
     # which was silly.  Instead, pick up to half the devices at
     # random according to our weighting table,
-    ncrits = randrange(NDEVICES/2)
+    ncrits = randrange(int(NDEVICES/2))
     while ncrits > 0:
         ncrits -= 1
         dev = randdevice()
@@ -5693,7 +5693,7 @@ def choose():
     game.inbase = randrange(BASEMIN, BASEMAX+1)
     game.inplan = 0
     if game.options & OPTION_PLANETS:
-        game.inplan += randrange(MAXUNINHAB/2, MAXUNINHAB+1)
+        game.inplan += randrange(int(MAXUNINHAB/2), int(MAXUNINHAB+1))
     if game.options & OPTION_WORLDS:
         game.inplan += int(NINHAB)
     game.state.nromrem = game.inrom = randrange(2 *game.skill)
