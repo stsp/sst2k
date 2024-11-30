@@ -110,7 +110,15 @@ class Coord:
         return s
     def quadrant(self):
         #print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
+<<<<<<< HEAD
+        #return self.roundtogrid() / QUADSIZE
+        iq = self.roundtogrid()
+        iq.i = int(iq.i/QUADSIZE)
+        iq.j = int(iq.j/QUADSIZE)
+        return iq
+=======
         return self.roundtogrid() / QUADSIZE
+>>>>>>> parent of 3eef073... adapted to centos
     def sector(self):
         return self.roundtogrid() % QUADSIZE
     def scatter(self):
