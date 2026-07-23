@@ -1646,16 +1646,16 @@ def deadkl(w, etype, mv):
         # Killed some type of Klingon
         game.state.galaxy[game.quadrant.i][game.quadrant.j].klingons -= 1
         game.klhere -= 1
-        if type == "C":
+        if etype == "C":
             game.state.kcmdr.remove(game.quadrant)
             unschedule(FTBEAM)
             if game.state.kcmdr:
                 schedule(FTBEAM, expran(1.0 * game.incom / len(game.state.kcmdr)))
             if is_scheduled(FCDBAS) and game.battle == game.quadrant:
                 unschedule(FCDBAS)
-        elif type == "K":
+        elif etype == "K":
             game.state.remkl -= 1
-        elif type == "S":
+        elif etype == "S":
             game.state.nscrem -= 1
             game.state.kscmdr.invalidate()
             game.isatb = 0
