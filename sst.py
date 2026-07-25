@@ -22,13 +22,22 @@ import random
 import copy
 import gettext
 import getpass
+from typing import Any, Optional, List, Tuple, Union, Callable, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import TypeAlias
 
 version = "2.1"
+
+# Global game state - declared here for type checking
+game: Gamestate  # type: ignore
+thing: Thingy  # type: ignore
+line: str  # type: ignore
 
 docpath = (".", "../doc", "/usr/share/doc/sst")
 
 
-def _(st):
+def _(st: str) -> str:
     return gettext.gettext(st)
 
 
@@ -75,86 +84,103 @@ class JumpOut(Exception):
 
 
 class Coord:
-    def __init__(self, x=None, y=None):
-        self.i = x
-        self.j = y
+    def __init__(self, x: Optional[int] = None, y: Optional[int] = None):
+        self.i: Optional[int] = x
+        self.j: Optional[int] = y
 
-    def valid_quadrant(self):
-        return self.i >= 0 and self.i < GALSIZE and self.j >= 0 and self.j < GALSIZE
+    def valid_quadrant(self) -> bool:
+        return self.i is not None and self.j is not None and 0 <= self.i < GALSIZE and 0 <= self.j < GALSIZE
 
-    def valid_sector(self):
-        return self.i >= 0 and self.i < QUADSIZE and self.j >= 0 and self.j < QUADSIZE
+    def valid_sector(self) -> bool:
+        return self.i is not None and self.j is not None and 0 <= self.i < QUADSIZE and 0 <= self.j < QUADSIZE
 
-    def invalidate(self):
-        self.i = self.j = None
+    def invalidate(self) -> None:
+        self.i = None
+        self.j = None
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return self.i is not None and self.j is not None
 
-    def __eq__(self, other):
-        return other is not None and self.i == other.i and self.j == other.j
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Coord):
+            return False
+        return self.i == other.i and self.j == other.j
 
-    def __ne__(self, other):
-        return other is None or self.i != other.i or self.j != other.j
+    def __ne__(self, other: object) -> bool:
+        if not isinstance(other, Coord):
+            return True
+        return self.i != other.i or self.j != other.j
 
-    def __add__(self, other):
-        return Coord(self.i + other.i, self.j + other.j)
+    def __add__(self, other: 'Coord') -> 'Coord':
+        return Coord(self.i + other.i if self.i is not None and other.i is not None else None,
+                     self.j + other.j if self.j is not None and other.j is not None else None)
 
-    def __sub__(self, other):
-        return Coord(self.i - other.i, self.j - other.j)
+    def __sub__(self, other: 'Coord') -> 'Coord':
+        return Coord(self.i - other.i if self.i is not None and other.i is not None else None,
+                     self.j - other.j if self.j is not None and other.j is not None else None)
 
-    def __mul__(self, other):
-        return Coord(self.i * other, self.j * other)
+    def __mul__(self, other: float) -> 'Coord':
+        return Coord(int(self.i * other) if self.i is not None else None,
+                     int(self.j * other) if self.j is not None else None)
 
-    def __rmul__(self, other):
-        return Coord(self.i * other, self.j * other)
+    def __rmul__(self, other: float) -> 'Coord':
+        return Coord(int(self.i * other) if self.i is not None else None,
+                     int(self.j * other) if self.j is not None else None)
 
-    def __div__(self, other):
-        return Coord(self.i / other, self.j / other)
+    def __div__(self, other: float) -> 'Coord':
+        return Coord(int(self.i / other) if self.i is not None else None,
+                     int(self.j / other) if self.j is not None else None)
 
-    def __mod__(self, other):
-        return Coord(self.i % other, self.j % other)
+    def __mod__(self, other: float) -> 'Coord':
+        return Coord(int(self.i % other) if self.i is not None else None,
+                     int(self.j % other) if self.j is not None else None)
 
-    def __truediv__(self, other):
-        return Coord(self.i / other, self.j / other)
+    def __truediv__(self, other: float) -> 'Coord':
+        return Coord(int(self.i / other) if self.i is not None else None,
+                     int(self.j / other) if self.j is not None else None)
 
-    def roundtogrid(self):
-        return Coord(int(round(self.i)), int(round(self.j)))
+    def roundtogrid(self) -> 'Coord':
+        return Coord(int(round(self.i)) if self.i is not None else None,
+                     int(round(self.j)) if self.j is not None else None)
 
-    def distance(self, other=None):
+    def distance(self, other: Optional['Coord'] = None) -> float:
         if not other:
             other = Coord(0, 0)
+        if self.i is None or self.j is None or other.i is None or other.j is None:
+            return 0.0
         return math.sqrt((self.i - other.i) ** 2 + (self.j - other.j) ** 2)
 
-    def bearing(self):
+    def bearing(self) -> float:
+        if self.i is None or self.j is None:
+            return 0.0
         return 1.90985 * math.atan2(self.j, self.i)
 
-    def sgn(self):
+    def sgn(self) -> 'Coord':
         s = Coord()
-        if self.i == 0:
+        if self.i is None:
             s.i = 0
         else:
-            s.i = self.i / abs(self.i)
-        if self.j == 0:
+            s.i = self.i // abs(self.i) if self.i != 0 else 0
+        if self.j is None:
             s.j = 0
         else:
-            s.j = self.j / abs(self.j)
+            s.j = self.j // abs(self.j) if self.j != 0 else 0
         return s
 
-    def quadrant(self):
+    def quadrant(self) -> 'Coord':
         # print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
         return self.roundtogrid() / QUADSIZE
 
-    def sector(self):
+    def sector(self) -> 'Coord':
         return self.roundtogrid() % QUADSIZE
 
-    def scatter(self):
+    def scatter(self) -> 'Coord':
         s = Coord()
-        s.i = self.i + randrange(-1, 2)
-        s.j = self.j + randrange(-1, 2)
+        s.i = self.i + randrange(-1, 2) if self.i is not None else None
+        s.j = self.j + randrange(-1, 2) if self.j is not None else None
         return s
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.i is None or self.j is None:
             return "Nowhere"
         return "%s - %s" % (self.i + 1, self.j + 1)
@@ -165,55 +191,55 @@ class Coord:
 class Thingy(Coord):
     "Do not anger the Space Thingy!"
 
-    def __init__(self):
+    def __init__(self) -> None:
         Coord.__init__(self)
-        self.angered = False
+        self.angered: bool = False
 
-    def angry(self):
+    def angry(self) -> None:
         self.angered = True
 
-    def at(self, q):
+    def at(self, q: Coord) -> bool:
         return (q.i, q.j) == (self.i, self.j)
 
 
 class Planet:
-    def __init__(self):
-        self.name = None  # string-valued if inhabited
-        self.quadrant = Coord()  # quadrant located
-        self.pclass = None  # could be ""M", "N", "O", or "destroyed"
-        self.crystals = "absent"  # could be "mined", "present", "absent"
-        self.known = "unknown"  # could be "unknown", "known", "shuttle_down"
-        self.inhabited = False  # is it inhabited?
+    def __init__(self) -> None:
+        self.name: Optional[str] = None  # string-valued if inhabited
+        self.quadrant: Coord = Coord()  # quadrant located
+        self.pclass: Optional[str] = None  # could be ""M", "N", "O", or "destroyed"
+        self.crystals: str = "absent"  # could be "mined", "present", "absent"
+        self.known: str = "unknown"  # could be "unknown", "known", "shuttle_down"
+        self.inhabited: bool = False  # is it inhabited?
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return self.name if self.name else ""
 
 
 class Quadrant:
-    def __init__(self):
-        self.stars = 0
-        self.planet = None
-        self.starbase = False
-        self.klingons = 0
-        self.romulans = 0
-        self.supernova = False
-        self.charted = False
-        self.status = "secure"  # Could be "secure", "distressed", "enslaved"
+    def __init__(self) -> None:
+        self.stars: int = 0
+        self.planet: Optional[Planet] = None
+        self.starbase: bool = False
+        self.klingons: int = 0
+        self.romulans: int = 0
+        self.supernova: bool = False
+        self.charted: bool = False
+        self.status: str = "secure"  # Could be "secure", "distressed", "enslaved"
 
 
 class Page:
-    def __init__(self):
-        self.stars = None
-        self.starbase = False
-        self.klingons = None
+    def __init__(self) -> None:
+        self.stars: Optional[int] = None
+        self.starbase: bool = False
+        self.klingons: Optional[int] = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s,%s,%s>" % (self.klingons, self.starbase, self.stars)
 
 
-def fill2d(size, fillfun):
+def fill2d(size: int, fillfun: Callable[[int, int], Any]) -> List[List[Any]]:
     "Fill an empty list in 2D."
-    lst = []
+    lst: List[List[Any]] = []
     for i in range(size):
         lst.append([])
         for j in range(size):
@@ -222,33 +248,33 @@ def fill2d(size, fillfun):
 
 
 class Snapshot:
-    def __init__(self):
-        self.snap = False  # snapshot taken
-        self.crew = 0  # crew complement
-        self.remkl = 0  # remaining klingons
-        self.nscrem = 0  # remaining super commanders
-        self.starkl = 0  # destroyed stars
-        self.basekl = 0  # destroyed bases
-        self.nromrem = 0  # Romulans remaining
-        self.nplankl = 0  # destroyed uninhabited planets
-        self.nworldkl = 0  # destroyed inhabited planets
-        self.planets = []  # Planet information
-        self.date = 0.0  # stardate
-        self.remres = 0  # remaining resources
-        self.remtime = 0  # remaining time
-        self.baseq = []  # Base quadrant coordinates
-        self.kcmdr = []  # Commander quadrant coordinates
-        self.kscmdr = Coord()  # Supercommander quadrant coordinates
+    def __init__(self) -> None:
+        self.snap: bool = False  # snapshot taken
+        self.crew: int = 0  # crew complement
+        self.remkl: int = 0  # remaining klingons
+        self.nscrem: int = 0  # remaining super commanders
+        self.starkl: int = 0  # destroyed stars
+        self.basekl: int = 0  # destroyed bases
+        self.nromrem: int = 0  # Romulans remaining
+        self.nplankl: int = 0  # destroyed uninhabited planets
+        self.nworldkl: int = 0  # destroyed inhabited planets
+        self.planets: List[Planet] = []  # Planet information
+        self.date: float = 0.0  # stardate
+        self.remres: int = 0  # remaining resources
+        self.remtime: int = 0  # remaining time
+        self.baseq: List[Coord] = []  # Base quadrant coordinates
+        self.kcmdr: List[Coord] = []  # Commander quadrant coordinates
+        self.kscmdr: Coord = Coord()  # Supercommander quadrant coordinates
         # the galaxy
-        self.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
+        self.galaxy: List[List[Quadrant]] = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
         # the starchart
-        self.chart = fill2d(GALSIZE, lambda i_unused, j_unused: Page())
+        self.chart: List[List[Page]] = fill2d(GALSIZE, lambda i_unused, j_unused: Page())
 
 
 class Event:
-    def __init__(self):
-        self.date = None  # A real number
-        self.quadrant = None  # A coord structure
+    def __init__(self) -> None:
+        self.date: Optional[float] = None  # A real number
+        self.quadrant: Optional[Coord] = None  # A coord structure
 
 
 # game options
@@ -298,11 +324,11 @@ SKILL_EXPERT = 4
 SKILL_EMERITUS = 5
 
 
-def damaged(dev):
+def damaged(dev: int) -> bool:
     return game.damage[dev] != 0.0
 
 
-def communicating():
+def communicating() -> bool:
     return not damaged(DRADIO) or game.condition == "docked"
 
 
@@ -453,9 +479,8 @@ class Gamestate:
         # He says the existing expression is prone to divide-by-zero errors
         # after killing the last klingon when score is shown -- perhaps also
         # if the only remaining klingon is SCOM.
-        self.state.remtime = self.state.remres / (
-            self.state.remkl + 4 * len(self.state.kcmdr)
-        )
+        denominator = self.state.remkl + 4 * len(self.state.kcmdr)
+        self.state.remtime = int(self.state.remres / denominator) if denominator != 0 else 0
 
 
 FWON = 0
@@ -517,9 +542,9 @@ def tryexit(enemy, look, irun):
     iq.i = game.quadrant.i + (look.i + (QUADSIZE - 1)) / QUADSIZE - 1
     iq.j = game.quadrant.j + (look.j + (QUADSIZE - 1)) / QUADSIZE - 1
     if not welcoming(iq):
-        return False
+        return []
     if enemy.type == "R":
-        return False  # Romulans cannot escape!
+        return []  # Romulans cannot escape!
     if not irun:
         # avoid intruding on another commander's territory
         if enemy.type == "C":
@@ -6868,10 +6893,10 @@ def randplace(size):
 
 class sstscanner:
     def __init__(self):
-        self.type = None
-        self.token = None
-        self.real = 0.0
-        self.inqueue = []
+        self.type: Optional[str] = None
+        self.token: Optional[str] = None
+        self.real: Optional[float] = 0.0
+        self.inqueue: List[str] = []
 
     def nexttok(self):
         # Get a token from the user
@@ -6919,7 +6944,8 @@ class sstscanner:
     def chew(self):
         # Demand input for next scan
         self.inqueue = []
-        self.real = self.token = None
+        self.real = None
+        self.token = None
 
     def sees(self, s):
         # compares s to item and returns true if it matches to the length of s

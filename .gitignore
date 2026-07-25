@@ -1,5 +1,25 @@
-sst.pyc
-doc/sst.6
-doc/sst.doc
-doc/sst-doc.txt
-www/sst-doc.html
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+
+# Dependencies
+.venv/
+venv/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+```
