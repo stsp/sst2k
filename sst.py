@@ -4800,11 +4800,13 @@ def mayday():
         ddist = (game.base - game.sector).distance()
     else:
         ddist = FOREVER
+        ibq = None
         for ibq in game.state.baseq:
             xdist = QUADSIZE * (ibq - game.quadrant).distance()
             if xdist < ddist:
                 ddist = xdist
         # Since starbase not in quadrant, set up new quadrant
+        assert ibq is not None
         game.quadrant = ibq
         newqad()
     # dematerialize starship
@@ -4826,6 +4828,7 @@ def mayday():
         return
     # Give starbase three chances to rematerialize starship
     probf = math.pow((1.0 - math.pow(0.98, ddist)), 0.33333333)
+    m = 0
     for m in range(1, 3 + 1):
         if m == 1:
             proutn(_("1st"))
@@ -4919,6 +4922,7 @@ def abandon():
         while True:
             # position next to base by trial and error
             game.quad[game.sector.i][game.sector.j] = "."
+            i = 0
             for i in range(QUADSIZE):
                 game.sector = game.base.scatter()
                 if (
@@ -6953,7 +6957,7 @@ class sstscanner:
     def __init__(self):
         self.type: Optional[str] = None
         self.token: Optional[str] = None
-        self.real: Optional[float] = 0.0
+        self.real: float = 0.0
         self.inqueue: List[str] = []
 
     def nexttok(self):
@@ -6987,7 +6991,7 @@ class sstscanner:
         # Treat as alpha
         self.token = self.token.lower()
         self.type = "IHALPHA"
-        self.real = None
+        self.real = 0.0
         return "IHALPHA"
 
     def append(self, tok):
@@ -7002,7 +7006,7 @@ class sstscanner:
     def chew(self):
         # Demand input for next scan
         self.inqueue = []
-        self.real = None
+        self.real = 0.0
         self.token = None
 
     def sees(self, s):
