@@ -2339,12 +2339,12 @@ def events():
         if game.alldone:
             return
         datemin = fintim
-        for l in range(1, NEVENTS):
-            if game.future[l].date < datemin:
-                evcode = l
+        for i in range(1, NEVENTS):
+            if game.future[i].date < datemin:
+                evcode = i
                 if game.idebug:
                     prout("== Event %d fires" % evcode)
-                datemin = game.future[l].date
+                datemin = game.future[i].date
         xtime = datemin - game.state.date
         game.state.date = datemin
         # Decrement Federation resources and recompute remaining time
@@ -2370,12 +2370,12 @@ def events():
         if game.condition == "docked":
             repair /= DOCKFAC
         # Don't fix Deathray here
-        for l in range(NDEVICES):
-            if game.damage[l] > 0.0 and l != DDRAY:
-                if game.damage[l] - repair > 0.0:
-                    game.damage[l] -= repair
+        for i in range(NDEVICES):
+            if game.damage[i] > 0.0 and i != DDRAY:
+                if game.damage[i] - repair > 0.0:
+                    game.damage[i] -= repair
                 else:
-                    game.damage[l] = 0.0
+                    game.damage[i] = 0.0
         # If radio repaired, update star chart and attack reports
         if radio_was_broken and not damaged(DRADIO):
             prout(_('Lt. Uhura- "Captain, the sub-space radio is working and'))
@@ -3021,12 +3021,12 @@ def kaboom():
     skip(1)
     if len(game.enemies) != 0:
         whammo = 25.0 * game.energy
-        for l in range(len(game.enemies)):
-            if game.enemies[l].power * game.enemies[l].kdist <= whammo:
+        for i in range(len(game.enemies)):
+            if game.enemies[i].power * game.enemies[i].kdist <= whammo:
                 deadkl(
-                    game.enemies[l].location,
-                    game.quad[game.enemies[l].location.i][game.enemies[l].location.j],
-                    game.enemies[l].location,
+                    game.enemies[i].location,
+                    game.quad[game.enemies[i].location.i][game.enemies[i].location.j],
+                    game.enemies[i].location,
                 )
     finish(FDILITHIUM)
 
@@ -4608,8 +4608,8 @@ def timwrp():
         # Make sure Galileo is consistant -- Snapshot may have been taken
         # when on planet, which would give us two Galileos!
         gotit = False
-        for l in range(game.inplan):
-            if game.state.planets[l].known == "shuttle_down":
+        for i in range(game.inplan):
+            if game.state.planets[i].known == "shuttle_down":
                 gotit = True
                 if game.iscraft == "onship" and game.ship == "E":
                     prout(
@@ -4836,14 +4836,14 @@ def abandon():
         while True:
             # position next to base by trial and error
             game.quad[game.sector.i][game.sector.j] = "."
-            for l in range(QUADSIZE):
+            for i in range(QUADSIZE):
                 game.sector = game.base.scatter()
                 if (
                     game.sector.valid_sector()
                     and game.quad[game.sector.i][game.sector.j] == "."
                 ):
                     break
-            if l < QUADSIZE + 1:
+            if i < QUADSIZE + 1:
                 break  # found a spot
             game.sector.i = QUADSIZE / 2
             game.sector.j = QUADSIZE / 2
@@ -4860,8 +4860,8 @@ def abandon():
     game.iscraft = "offship"  # Galileo disappears
     # Resupply ship
     game.condition = "docked"
-    for l in range(NDEVICES):
-        game.damage[l] = 0.0
+    for i in range(NDEVICES):
+        game.damage[i] = 0.0
     game.damage[DSHUTTL] = -1
     game.energy = game.inenrg = 3000.0
     game.shield = game.inshld = 1250.0
