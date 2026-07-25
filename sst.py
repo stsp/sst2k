@@ -11,7 +11,16 @@ Stas Sergeev, and Eric S. Raymond.
 See the doc/HACKING file in the distribution for designers notes and advice
 on how to modify (and how not to modify!) this code.
 """
-import os, sys, math, curses, time, readline, pickle, random, copy, gettext, getpass
+import os
+import sys
+import math
+import curses
+import time
+import pickle
+import random
+import copy
+import gettext
+import getpass
 
 version = "2.1"
 
@@ -70,11 +79,11 @@ class Coord:
     def invalidate(self):
         self.i = self.j = None
     def is_valid(self):
-        return self.i != None and self.j != None
+        return self.i is not None and self.j is not None
     def __eq__(self, other):
-        return other != None and self.i == other.i and self.j == other.j
+        return other is not None and self.i == other.i and self.j == other.j
     def __ne__(self, other):
-        return other == None or self.i != other.i or self.j != other.j
+        return other is None or self.i != other.i or self.j != other.j
     def __add__(self, other):
         return Coord(self.i+other.i, self.j+other.j)
     def __sub__(self, other):
@@ -119,7 +128,7 @@ class Coord:
         s.j = self.j + randrange(-1, 2)
         return s
     def __str__(self):
-        if self.i == None or self.j == None:
+        if self.i is None or self.j is None:
             return "Nowhere"
         return "%s - %s" % (self.i+1, self.j+1)
     __repr__ = __str__
@@ -1398,7 +1407,7 @@ def attack(torps_ok):
                 finish(FWON) # Klingons did themselves in!
             if game.state.galaxy[game.quadrant.i][game.quadrant.j].supernova or game.alldone:
                 return # Supernova or finished
-            if hit == None:
+            if hit is None:
                 continue
         # incoming phaser or torpedo, shields may dissipate it
         if game.shldup or game.shldchg or game.condition == "docked":
@@ -1588,10 +1597,10 @@ def torps():
             break
         scanner.push(scanner.token)
         target.append(scanner.getcoord())
-        if target[-1] == None:
+        if target[-1] is None:
             return
         tcourse.append(targetcheck(target[-1]))
-        if tcourse[-1] == None:
+        if tcourse[-1] is None:
             return
     scanner.chew()
     if len(target) == 0:
@@ -1600,10 +1609,10 @@ def torps():
             proutn(_("Target sector for torpedo number %d- ") % (i+1))
             scanner.chew()
             target.append(scanner.getcoord())
-            if target[-1] == None:
+            if target[-1] is None:
                 return
             tcourse.append(targetcheck(target[-1]))
-            if tcourse[-1] == None:
+            if tcourse[-1] is None:
                 return
     game.ididit = True
     # Loop for moving <n> torpedoes
@@ -2327,7 +2336,7 @@ def events():
                 # supernova'ed, and which has some Klingons in it
                 w = randplace(GALSIZE)
                 q = game.state.galaxy[w.i][w.j]
-                if not (game.quadrant == w or q.planet == None or \
+                if not (game.quadrant == w or q.planet is None or \
                       not q.planet.inhabited or \
                       q.supernova or q.status!="secure" or q.klingons<=0):
                     break
@@ -2409,7 +2418,7 @@ def events():
                     prout(_("launched a warship from %s.") % q.planet)
                 else:
                     prout(_("Uhura- Starfleet reports increased Klingon activity"))
-                    if q.planet != None:
+                    if q.planet is not None:
                         proutn(_("near %s ") % q.planet)
                     prout(_("in Quadrant %s.") % w)
 
@@ -2596,7 +2605,7 @@ def nova(nov):
 def supernova(w):
     "Star goes supernova."
     num = 0; npdead = 0
-    if w != None:
+    if w is not None:
         nq = copy.copy(w)
     else:
         # Scheduled supernova -- select star at random.
@@ -2675,7 +2684,7 @@ def supernova(w):
     # Destroy any base in supernovaed quadrant
     game.state.baseq = [x for x in game.state.baseq if x != nq]
     # If starship caused supernova, tally up destruction
-    if w != None:
+    if w is not None:
         game.state.starkl += game.state.galaxy[nq.i][nq.j].stars
         game.state.basekl += game.state.galaxy[nq.i][nq.j].starbase
         game.state.nplankl += npdead
@@ -2685,7 +2694,7 @@ def supernova(w):
     # If supernova destroys last Klingons give special message
     if (game.state.remkl + len(game.state.kcmdr) + game.state.nscrem)==0 and not nq == game.quadrant:
         skip(2)
-        if w == None:
+        if w is None:
             prout(_("Lucky you!"))
         proutn(_("A supernova in %s has just destroyed the last Klingons.") % nq)
         finish(FWON)
@@ -2771,7 +2780,7 @@ def badpoints():
             3.0*game.abandoned
     if game.ship == 'F':
         badpt += 100.0
-    elif game.ship == None:
+    elif game.ship is None:
         badpt += 200.0
     return badpt
 
@@ -3911,7 +3920,7 @@ def warp(wcourse, involuntary):
             prout(_("  is repaired, I can only give you warp 4.\""))
             return
                # Read in course and distance
-        if wcourse==None:
+        if wcourse is None:
             try:
                 wcourse = getcourse(isprobe=False)
             except TrekError:
@@ -4333,7 +4342,7 @@ def abandon():
         if not (game.options & OPTION_WORLDS) and not damaged(DTRANSP):
             prout(_("Remainder of ship's complement beam down"))
             prout(_("to nearest habitable planet."))
-        elif q.planet != None and not damaged(DTRANSP):
+        elif q.planet is not None and not damaged(DTRANSP):
             prout(_("Remainder of ship's complement beam down to %s.") %
                     q.planet)
         else:
@@ -4460,7 +4469,7 @@ def sensor():
         if game.options & OPTION_TTY:
             prout(_("Short range sensors damaged."))
         return
-    if game.iplnet == None:
+    if game.iplnet is None:
         if game.options & OPTION_TTY:
             prout(_("Spock- \"No planet in this quadrant, Captain.\""))
         return
@@ -5504,7 +5513,7 @@ def setup():
     for i in range(game.inplan):
         while True:
             w = randplace(GALSIZE)
-            if game.state.galaxy[w.i][w.j].planet == None:
+            if game.state.galaxy[w.i][w.j].planet is None:
                 break
         new = Planet()
         new.quadrant = w
@@ -5597,7 +5606,7 @@ def setup():
     clrscr()
     setwnd(message_window)
     newqad()
-    if len(game.enemies) - (thing == game.quadrant) - (game.tholian != None):
+    if len(game.enemies) - (thing == game.quadrant) - (game.tholian is not None):
         game.shldup = True
     if game.neutz:        # bad luck to start in a Romulan Neutral Zone
         attack(torps_ok=False)
@@ -5627,7 +5636,7 @@ def choose():
             if thaw():
                 continue
             scanner.chew()
-            if game.passwd == None:
+            if game.passwd is None:
                 continue
             if not game.alldone:
                 game.thawed = True # No plaque if not finished
@@ -5856,7 +5865,7 @@ def setpassword():
             proutn(_("Please type in a secret password- "))
             scanner.nexttok()
             game.passwd = scanner.token
-            if game.passwd != None:
+            if game.passwd is not None:
                 break
     else:
         game.passwd = ""
@@ -6358,7 +6367,8 @@ def debugme():
         atover(True)
 
 if __name__ == '__main__':
-    import getopt, socket
+    import getopt
+    import socket
     try:
         global line, thing, game
         game = None
