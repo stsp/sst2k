@@ -22,7 +22,7 @@ import random
 import copy
 import gettext
 import getpass
-from typing import Any, Optional, List, Tuple, Union, Callable, Dict, TYPE_CHECKING, ForwardRef
+from typing import Any, Optional, List, Tuple, Union, Callable, Dict, TYPE_CHECKING, ForwardRef, TextIO
 
 if TYPE_CHECKING:
     from typing import TypeAlias
@@ -84,9 +84,9 @@ class JumpOut(Exception):
 
 
 class Coord:
-    def __init__(self, x: Optional[float] = None, y: Optional[float] = None):
-        self.i: Optional[float] = x
-        self.j: Optional[float] = y
+    def __init__(self, x: Optional[int] = None, y: Optional[int] = None):
+        self.i: Optional[int] = x
+        self.j: Optional[int] = y
 
     def valid_quadrant(self) -> bool:
         return self.i is not None and self.j is not None and 0 <= self.i < GALSIZE and 0 <= self.j < GALSIZE
@@ -112,32 +112,32 @@ class Coord:
         return self.i != other.i or self.j != other.j
 
     def __add__(self, other: 'Coord') -> 'Coord':
-        return Coord(self.i + other.i if self.i is not None and other.i is not None else None,
-                     self.j + other.j if self.j is not None and other.j is not None else None)
+        return Coord(int(self.i + other.i) if self.i is not None and other.i is not None else None,
+                     int(self.j + other.j) if self.j is not None and other.j is not None else None)
 
     def __sub__(self, other: 'Coord') -> 'Coord':
-        return Coord(self.i - other.i if self.i is not None and other.i is not None else None,
-                     self.j - other.j if self.j is not None and other.j is not None else None)
+        return Coord(int(self.i - other.i) if self.i is not None and other.i is not None else None,
+                     int(self.j - other.j) if self.j is not None and other.j is not None else None)
 
     def __mul__(self, other: float) -> 'Coord':
-        return Coord(self.i * other if self.i is not None else None,
-                     self.j * other if self.j is not None else None)
+        return Coord(int(self.i * other) if self.i is not None else None,
+                     int(self.j * other) if self.j is not None else None)
 
     def __rmul__(self, other: float) -> 'Coord':
-        return Coord(self.i * other if self.i is not None else None,
-                     self.j * other if self.j is not None else None)
+        return Coord(int(self.i * other) if self.i is not None else None,
+                     int(self.j * other) if self.j is not None else None)
 
     def __div__(self, other: float) -> 'Coord':
-        return Coord(self.i / other if self.i is not None else None,
-                     self.j / other if self.j is not None else None)
+        return Coord(int(self.i / other) if self.i is not None else None,
+                     int(self.j / other) if self.j is not None else None)
 
     def __mod__(self, other: float) -> 'Coord':
-        return Coord(self.i % other if self.i is not None else None,
-                     self.j % other if self.j is not None else None)
+        return Coord(int(self.i % other) if self.i is not None else None,
+                     int(self.j % other) if self.j is not None else None)
 
     def __truediv__(self, other: float) -> 'Coord':
-        return Coord(self.i / other if self.i is not None else None,
-                     self.j / other if self.j is not None else None)
+        return Coord(int(self.i / other) if self.i is not None else None,
+                     int(self.j / other) if self.j is not None else None)
 
     def roundtogrid(self) -> 'Coord':
         return Coord(int(round(self.i)) if self.i is not None else None,
@@ -2869,7 +2869,8 @@ def nova(nov):
     dist = kount * 0.1
     bump_i = bump.i if bump.i is not None else 0
     bump_j = bump.j if bump.j is not None else 0
-    direc = ncourse[3 * (bump_i + 1) + bump_j + 2]
+    idx = int(3 * (bump_i + 1) + bump_j + 2)
+    direc = ncourse[idx]
     if direc == 0.0:
         dist = 0.0
     if dist == 0.0:
@@ -4343,7 +4344,7 @@ class course:
             self.origin = cartesian(game.quadrant, game.sector)
         else:
             self.origin = cartesian(game.quadrant, origin)
-        self.increment = Coord(-math.sin(self.angle), math.cos(self.angle))
+        self.increment = Coord(int(-math.sin(self.angle)), int(math.cos(self.angle)))
         assert self.increment.i is not None
         assert self.increment.j is not None
         bigger = max(abs(self.increment.i), abs(self.increment.j))
@@ -5987,12 +5988,13 @@ def freeze(boss):
     if key != "IHALPHA":
         huh()
         return
-    if "." not in scanner.token:
-        scanner.token += ".trk"
+    token = scanner.token if scanner.token is not None else ""
+    if "." not in token:
+        token += ".trk"
     try:
-        fp = open(scanner.token, "wb")
+        fp = open(token, "wb")
     except IOError:
-        prout(_("Can't freeze game as file %s") % scanner.token)
+        prout(_("Can't freeze game as file %s") % token)
         return
     pickle.dump(game, fp)
     fp.close()
@@ -6010,12 +6012,13 @@ def thaw():
     if key != "IHALPHA":
         huh()
         return True
-    if "." not in scanner.token:
-        scanner.token += ".trk"
+    token = scanner.token if scanner.token is not None else ""
+    if "." not in token:
+        token += ".trk"
     try:
-        fp = open(scanner.token, "rb")
+        fp = open(token, "rb")
     except IOError:
-        prout(_("Can't thaw game in %s") % scanner.token)
+        prout(_("Can't thaw game in %s") % token)
         return
     game = pickle.load(fp)
     fp.close()
@@ -6155,7 +6158,9 @@ def setup():
         while True:
             while True:
                 w = randplace(GALSIZE)
-                if not game.state.galaxy[w.i][w.j].starbase:
+                wi = w.i if w.i is not None else 0
+                wj = w.j if w.j is not None else 0
+                if not game.state.galaxy[wi][wj].starbase:
                     break
             contflag = False
             # C version: for (j = i-1; j > 0; j--)
@@ -6176,7 +6181,7 @@ def setup():
         if game.idebug:
             prout("=== Placing base #%d in quadrant %s" % (i, w))
         game.state.baseq.append(w)
-        game.state.galaxy[w.i][w.j].starbase = game.state.chart[w.i][w.j].starbase = (
+        game.state.galaxy[wi][wj].starbase = game.state.chart[wi][wj].starbase = (
             True
         )
     # Position ordinary Klingon Battle Cruisers
@@ -6192,18 +6197,21 @@ def setup():
         krem -= klump
         while True:
             w = randplace(GALSIZE)
+            wi = w.i if w.i is not None else 0
+            wj = w.j if w.j is not None else 0
             if (
-                not game.state.galaxy[w.i][w.j].supernova
-                and game.state.galaxy[w.i][w.j].klingons + klump <= MAXKLQUAD
+                not game.state.galaxy[wi][wj].supernova
+                and game.state.galaxy[wi][wj].klingons + klump <= MAXKLQUAD
             ):
                 break
-        game.state.galaxy[w.i][w.j].klingons += int(klump)
+        game.state.galaxy[wi][wj].klingons += int(klump)
         if krem <= 0:
             break
     # Position Klingon Commander Ships
     for i in range(game.incom):
         while True:
             w = randplace(GALSIZE)
+            assert w.i is not None and w.j is not None
             if not welcoming(w) or w in game.state.kcmdr:
                 continue
             if game.state.galaxy[w.i][w.j].klingons or withprob(0.25):
@@ -6214,6 +6222,7 @@ def setup():
     for i in range(game.inplan):
         while True:
             w = randplace(GALSIZE)
+            assert w.i is not None and w.j is not None
             if game.state.galaxy[w.i][w.j].planet is None:
                 break
         new = Planet()
@@ -6236,11 +6245,13 @@ def setup():
     # Locate Romulans
     for i in range(game.state.nromrem):
         w = randplace(GALSIZE)
+        assert w.i is not None and w.j is not None
         game.state.galaxy[w.i][w.j].romulans += 1
     # Place the Super-Commander if needed
     if game.state.nscrem > 0:
         while True:
             w = randplace(GALSIZE)
+            assert w.i is not None and w.j is not None
             if welcoming(w):
                 break
         game.state.kscmdr = w
@@ -6411,7 +6422,7 @@ def choose():
         game.options |= OPTION_ALMY
     elif scanner.sees("fancy") or scanner.sees("\n"):
         pass
-    elif len(scanner.token):
+    elif scanner.token and len(scanner.token):
         proutn(_('What is "%s"?') % scanner.token)
     game.options &= ~OPTION_COLOR
     setpassword()
@@ -6683,6 +6694,7 @@ def helpme():
         if key == "IHEOL":
             return
         cmds = [x[0] for x in commands]
+        assert scanner.token is not None
         if scanner.token.upper() in cmds or scanner.token.upper() == "ABBREV":
             break
         skip(1)
@@ -6690,6 +6702,7 @@ def helpme():
         key = "IHEOL"
         scanner.chew()
         skip(1)
+    assert scanner.token is not None
     cmd = scanner.token.upper()
     for directory in docpath:
         try:
@@ -6748,10 +6761,12 @@ def makemoves():
             setwnd(message_window)
             clrscr()
             abandon_passed = False
+            cmd = ""
             for cmd, opt in commands:
                 # commands after ABANDON cannot be abbreviated
                 if cmd == "ABANDON":
                     abandon_passed = True
+                assert scanner.token is not None
                 if cmd == scanner.token.upper() or (
                     not abandon_passed and cmd.startswith(scanner.token.upper())
                 ):
@@ -6945,7 +6960,7 @@ def expran(avrage):
     return -avrage * math.log(1e-7 + randreal())
 
 
-def randplace(size):
+def randplace(size) -> Coord:
     "Choose a random location."
     w = Coord()
     w.i = randrange(size)
@@ -7152,7 +7167,6 @@ if __name__ == "__main__":
     import socket
 
     try:
-        global line, thing, game
         game = None
         thing = Thingy()
         game = Gamestate()
@@ -7202,6 +7216,7 @@ if __name__ == "__main__":
             tmpdir = os.environ["TMPDIR"]
         else:
             tmpdir = "/tmp"
+        logfp: Optional[TextIO] = None
         try:
             logfp = open(os.path.join(tmpdir, "sst-input.log"), "w")
         except IOError:
