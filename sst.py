@@ -553,7 +553,7 @@ def tryexit(enemy, look, irun):
                 game.state.kcmdr.append(iq)
                 break
     # report move out of quadrant.
-    return [(True, enemy, oldloc, ibq)]
+    return [(True, enemy, oldloc, iq)]
 
 
 # The bad-guy movement algorithm:
