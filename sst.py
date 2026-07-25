@@ -22,7 +22,7 @@ import random
 import copy
 import gettext
 import getpass
-from typing import Any, Optional, List, Tuple, Union, Callable, Dict, TYPE_CHECKING
+from typing import Any, Optional, List, Tuple, Union, Callable, Dict, TYPE_CHECKING, ForwardRef
 
 if TYPE_CHECKING:
     from typing import TypeAlias
@@ -84,9 +84,9 @@ class JumpOut(Exception):
 
 
 class Coord:
-    def __init__(self, x: Optional[int] = None, y: Optional[int] = None):
-        self.i: Optional[int] = x
-        self.j: Optional[int] = y
+    def __init__(self, x: Optional[float] = None, y: Optional[float] = None):
+        self.i: Optional[float] = x
+        self.j: Optional[float] = y
 
     def valid_quadrant(self) -> bool:
         return self.i is not None and self.j is not None and 0 <= self.i < GALSIZE and 0 <= self.j < GALSIZE
@@ -120,24 +120,24 @@ class Coord:
                      self.j - other.j if self.j is not None and other.j is not None else None)
 
     def __mul__(self, other: float) -> 'Coord':
-        return Coord(int(self.i * other) if self.i is not None else None,
-                     int(self.j * other) if self.j is not None else None)
+        return Coord(self.i * other if self.i is not None else None,
+                     self.j * other if self.j is not None else None)
 
     def __rmul__(self, other: float) -> 'Coord':
-        return Coord(int(self.i * other) if self.i is not None else None,
-                     int(self.j * other) if self.j is not None else None)
+        return Coord(self.i * other if self.i is not None else None,
+                     self.j * other if self.j is not None else None)
 
     def __div__(self, other: float) -> 'Coord':
-        return Coord(int(self.i / other) if self.i is not None else None,
-                     int(self.j / other) if self.j is not None else None)
+        return Coord(self.i / other if self.i is not None else None,
+                     self.j / other if self.j is not None else None)
 
     def __mod__(self, other: float) -> 'Coord':
-        return Coord(int(self.i % other) if self.i is not None else None,
-                     int(self.j % other) if self.j is not None else None)
+        return Coord(self.i % other if self.i is not None else None,
+                     self.j % other if self.j is not None else None)
 
     def __truediv__(self, other: float) -> 'Coord':
-        return Coord(int(self.i / other) if self.i is not None else None,
-                     int(self.j / other) if self.j is not None else None)
+        return Coord(self.i / other if self.i is not None else None,
+                     self.j / other if self.j is not None else None)
 
     def roundtogrid(self) -> 'Coord':
         return Coord(int(round(self.i)) if self.i is not None else None,
@@ -3972,7 +3972,7 @@ def prstat(txt, data):
 # Code from moving.c begins here
 
 
-def imove(icourse=None, noattack=False):
+def imove(icourse, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
     w = Coord()
 
@@ -3999,15 +3999,19 @@ def imove(icourse=None, noattack=False):
         kinks = 0
         while True:
             kink = False
+            assert icourse.final is not None
             if icourse.final.i < 0:
                 icourse.final.i = -icourse.final.i
                 kink = True
+            assert icourse.final is not None
             if icourse.final.j < 0:
                 icourse.final.j = -icourse.final.j
                 kink = True
+            assert icourse.final is not None
             if icourse.final.i >= GALSIZE * QUADSIZE:
                 icourse.final.i = (GALSIZE * QUADSIZE * 2) - icourse.final.i
                 kink = True
+            assert icourse.final is not None
             if icourse.final.j >= GALSIZE * QUADSIZE:
                 icourse.final.j = (GALSIZE * QUADSIZE * 2) - icourse.final.j
                 kink = True
@@ -4028,6 +4032,7 @@ def imove(icourse=None, noattack=False):
         # Compute final position in new quadrant
         if trbeam:  # Don't bother if we are to be beamed
             return
+        assert icourse.final is not None
         game.quadrant = icourse.final.quadrant()
         game.sector = icourse.final.sector()
         skip(1)
@@ -4041,11 +4046,14 @@ def imove(icourse=None, noattack=False):
         iquad = game.quad[h.i][h.j]
         if iquad != ".":
             # object encountered in flight path
+            assert icourse.distance is not None
             stopegy = 50.0 * icourse.distance / game.optime
             if iquad in ("T", "K", "C", "S", "R", "?"):
                 for enemy in game.enemies:
                     if enemy.location == game.sector:
                         break
+                else:
+                    enemy = None
                 collision(rammed=False, enemy=enemy)
                 return True
             elif iquad == " ":
@@ -4093,15 +4101,19 @@ def imove(icourse=None, noattack=False):
     if game.state.date + game.optime >= scheduled(FTBEAM):
         trbeam = True
         game.condition = "red"
+        assert icourse.distance is not None
         icourse.distance = (
             icourse.distance * (scheduled(FTBEAM) - game.state.date) / game.optime + 0.1
         )
         game.optime = scheduled(FTBEAM) - game.state.date + 1e-5
     # Move out
     game.quad[game.sector.i][game.sector.j] = "."
+    assert icourse.moves is not None
     for m in range(icourse.moves):
         icourse.nexttok()
         w = icourse.sector()
+        assert icourse.origin is not None
+        assert icourse.location is not None
         if icourse.origin.quadrant() != icourse.location.quadrant():
             newquadrant(noattack)
             break
@@ -4233,20 +4245,24 @@ def getcourse(isprobe):
         if key != "IHREAL":
             huh()
             raise TrekError
+        assert scanner.real is not None
         xi = int(round(scanner.real)) - 1
         key = scanner.nexttok()
         if key != "IHREAL":
             huh()
             raise TrekError
+        assert scanner.real is not None
         xj = int(round(scanner.real)) - 1
         key = scanner.nexttok()
         if key == "IHREAL":
             # both quadrant and sector specified
+            assert scanner.real is not None
             xk = int(round(scanner.real)) - 1
             key = scanner.nexttok()
             if key != "IHREAL":
                 huh()
                 raise TrekError
+            assert scanner.real is not None
             xl = int(round(scanner.real)) - 1
             dquad.i = xi
             dquad.j = xj
@@ -4291,12 +4307,14 @@ def getcourse(isprobe):
         if key != "IHREAL":
             huh()
             raise TrekError
-        delta.j = scanner.real
+        assert scanner.real is not None
+        delta.j = int(scanner.real)
         key = scanner.nexttok()
         if key != "IHREAL":
             huh()
             raise TrekError
-        delta.i = scanner.real
+        assert scanner.real is not None
+        delta.i = int(scanner.real)
     # Check for zero movement
     if delta.i == 0 and delta.j == 0:
         scanner.chew()
@@ -4309,9 +4327,9 @@ def getcourse(isprobe):
 
 
 class course:
-    def __init__(self, bearing, distance, origin=None):
-        self.distance = distance
-        self.bearing = bearing
+    def __init__(self, bearing: float, distance: float, origin=None):
+        self.distance: float = distance
+        self.bearing: float = bearing
         if origin is None:
             self.origin = cartesian(game.quadrant, game.sector)
         else:
@@ -4326,6 +4344,8 @@ class course:
         else:
             self.origin = cartesian(game.quadrant, origin)
         self.increment = Coord(-math.sin(self.angle), math.cos(self.angle))
+        assert self.increment.i is not None
+        assert self.increment.j is not None
         bigger = max(abs(self.increment.i), abs(self.increment.j))
         self.increment /= bigger
         self.moves = int(round(10 * self.distance * bigger))
@@ -4368,12 +4388,13 @@ def impulse():
         skip(1)
         prout(_('Engineer Scott- "The impulse engines are damaged, Sir."'))
         return
+    course_obj: Optional[course] = None
     if game.energy > 30.0:
         try:
-            course = getcourse(isprobe=False)
+            course_obj = getcourse(isprobe=False)
         except TrekError:
             return
-        power = 20.0 + 100.0 * course.distance
+        power = 20.0 + 100.0 * course_obj.distance
     else:
         power = 30.0
     if power >= game.energy:
@@ -4392,7 +4413,8 @@ def impulse():
         scanner.chew()
         return
     # Make sure enough time is left for the trip
-    game.optime = course.distance / 0.095
+    assert course_obj is not None
+    game.optime = course_obj.distance / 0.095
     if game.optime >= game.state.remtime:
         prout(_('First Officer Spock- "Captain, our speed under impulse'))
         prout(_("power is only 0.95 sectors per stardate. Are you sure"))
@@ -4400,13 +4422,13 @@ def impulse():
         if not ja():
             return
     # Activate impulse engines and pay the cost
-    imove(course, noattack=False)
+    imove(course_obj, noattack=False)
     game.ididit = True
     if game.alldone:
         return
-    power = 20.0 + 100.0 * course.distance
+    power = 20.0 + 100.0 * course_obj.distance
     game.energy -= power
-    game.optime = course.distance / 0.095
+    game.optime = course_obj.distance / 0.095
     if game.energy <= 0:
         finish(FNRG)
     return
