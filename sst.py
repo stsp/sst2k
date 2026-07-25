@@ -1095,7 +1095,7 @@ def doshield(shraise):
         while scanner.nexttok() != "IHREAL":
             scanner.chew()
             proutn(_("Energy to transfer to shields- "))
-        nrg = scanner.real
+        nrg = scanner.real if scanner.real is not None else 0.0
         scanner.chew()
         if nrg == 0:
             return
@@ -2021,7 +2021,7 @@ def phasers():
             key = scanner.nexttok()
             if key != "IHREAL":
                 return
-            rpow = scanner.real
+            rpow = scanner.real if scanner.real is not None else 0.0
             if rpow > avail:
                 proutn(_("Energy available= %.2f") % avail)
                 skip(1)
@@ -2133,12 +2133,13 @@ def phasers():
                 if k == 1:  # Let me say I'm baffled by this
                     msgflag = True
                 continue
-            if scanner.real < 0:
+            real_val = scanner.real if scanner.real is not None else 0.0
+            if real_val < 0:
                 # abort out
                 scanner.chew()
                 return
-            hits[k] = scanner.real
-            rpow += scanner.real
+            hits[k] = real_val
+            rpow += real_val
             # If total requested is too much, inform and start over
             if rpow > avail:
                 prout(_("Available energy exceeded -- try again."))
@@ -2471,6 +2472,7 @@ def events():
                 unschedule(FCDBAS)
                 continue
             try:
+                ibq: Optional[Coord] = None
                 for ibq in game.state.baseq:
                     for cmdr in game.state.kcmdr:
                         if (
@@ -2487,7 +2489,8 @@ def events():
             except JumpOut:
                 pass
             # commander + starbase combination found -- launch attack
-            game.battle = ibq
+            # ibq is guaranteed to be set here because we raised JumpOut when found
+            game.battle = ibq  # type: ignore[assignment]
             schedule(FCDBAS, randreal(1.0, 4.0))
             if game.isatb:  # extra time if SC already attacking
                 postpone(FCDBAS, scheduled(FSCDBAS) - game.state.date)
@@ -2694,7 +2697,8 @@ def wait():
     if key != "IHREAL":
         huh()
         return
-    origTime = delay = scanner.real
+    delay_val = scanner.real if scanner.real is not None else 0.0
+    origTime = delay = delay_val
     if delay <= 0.0:
         return
     if delay >= game.state.remtime or len(game.enemies) != 0:
@@ -2786,6 +2790,7 @@ def nova(nov):
                     else:
                         game.state.nworldkl += 1
                     prout(crmena(True, "B", "sector", neighbor) + _(" destroyed."))
+                    assert game.iplnet is not None
                     game.iplnet.pclass = "destroyed"
                     game.iplnet = None
                     game.plnet.invalidate()
@@ -2827,9 +2832,11 @@ def nova(nov):
                 elif iquad == "K":  # kill klingon
                     deadkl(neighbor, iquad, neighbor)
                 elif iquad in ("C", "S", "R"):  # Damage/destroy big enemies
+                    ll: Optional[int] = None
                     for ll in range(len(game.enemies)):
                         if game.enemies[ll].location == neighbor:
                             break
+                    assert ll is not None
                     game.enemies[ll].power -= 800.0  # If firepower is lost, die
                     if game.enemies[ll].power <= 0.0:
                         deadkl(neighbor, iquad, neighbor)
@@ -2858,7 +2865,9 @@ def nova(nov):
                     game.enemies[ll].move(newc)
     # Starship affected by nova -- kick it away.
     dist = kount * 0.1
-    direc = ncourse[3 * (bump.i + 1) + bump.j + 2]
+    bump_i = bump.i if bump.i is not None else 0
+    bump_j = bump.j if bump.j is not None else 0
+    direc = ncourse[3 * (bump_i + 1) + bump_j + 2]
     if direc == 0.0:
         dist = 0.0
     if dist == 0.0:
@@ -2920,6 +2929,9 @@ def supernova(w):
                         break
             if num == 0:
                 break
+        else:
+            # No star found, should not happen but handle gracefully
+            ns = Coord(0, 0)
         skip(1)
         prouts(_("***RED ALERT!  RED ALERT!"))
         skip(1)
@@ -2928,7 +2940,7 @@ def supernova(w):
             proutn(_("Emergency override attempts t"))
             prouts("***************")
             skip(1)
-            stars()
+            stars()  # type: ignore[unbound-name]
             game.alldone = True
     # destroy any Klingons in supernovaed quadrant
     kldead = game.state.galaxy[nq.i][nq.j].klingons
@@ -2939,7 +2951,7 @@ def supernova(w):
         game.iscate = False
         unschedule(FSCMOVE)
         unschedule(FSCDBAS)
-    survivors = filter(lambda w: w != nq, game.state.kcmdr)
+    survivors = list(filter(lambda w: w != nq, game.state.kcmdr))
     comkills = len(game.state.kcmdr) - len(survivors)
     game.state.kcmdr = survivors
     kldead -= comkills
@@ -3517,7 +3529,7 @@ def plaque():
         _(
             "                                                 This day of %.6s %.4s, %.8s\n\n"
         )
-        % (timestring + 4, timestring + 20, timestring + 11)
+        % (timestring[4:], timestring[20:], timestring[11:])
     )
     fp.write(
         _("                                                        Your score:  %d\n\n")
@@ -3535,16 +3547,16 @@ def plaque():
 # Code from io.c begins here
 
 rows = linecount = 0  # for paging
-stdscr = None
+stdscr: Optional[curses._CursesWindow] = None
 replayfp = None
-fullscreen_window = None
-srscan_window = None
-report_window = None
-status_window = None
-lrscan_window = None
-message_window = None
-prompt_window = None
-curwnd = None
+fullscreen_window: Optional[curses._CursesWindow] = None
+srscan_window: Optional[curses._CursesWindow] = None
+report_window: Optional[curses._CursesWindow] = None
+status_window: Optional[curses._CursesWindow] = None
+lrscan_window: Optional[curses._CursesWindow] = None
+message_window: Optional[curses._CursesWindow] = None
+prompt_window: Optional[curses._CursesWindow] = None
+curwnd: Optional[curses._CursesWindow] = None
 
 
 def iostart():
@@ -3566,6 +3578,7 @@ def iostart():
             rows = 25
     else:
         stdscr = curses.initscr()
+        assert stdscr is not None
         stdscr.keypad(True)
         curses.nonl()
         curses.cbreak()
@@ -3590,6 +3603,7 @@ def iostart():
         lrscan_window = curses.newwin(5, 0, 0, 64)
         message_window = curses.newwin(0, 0, 12, 0)
         prompt_window = curses.newwin(1, 0, rows - 2, 0)
+        assert message_window is not None
         message_window.scrollok(True)
         setwnd(fullscreen_window)
 
@@ -3597,6 +3611,7 @@ def iostart():
 def ioend():
     "Wrap up I/O."
     if game.options & OPTION_CURSES:
+        assert stdscr is not None
         stdscr.keypad(False)
         curses.echo()
         curses.nocbreak()
@@ -3606,6 +3621,7 @@ def ioend():
 def waitfor():
     "Wait for user action -- OK to do nothing if on a TTY"
     if game.options & OPTION_CURSES:
+        assert stdscr is not None
         stdscr.getch()
 
 
@@ -3623,6 +3639,7 @@ def pause_game():
 
     if game.options & OPTION_CURSES:
         drawmaps(0)
+        assert prompt_window is not None
         setwnd(prompt_window)
         prompt_window.clear()
         prompt_window.addstr(prompt)
@@ -3644,6 +3661,7 @@ def skip(i):
     "Skip i lines.  Pause game if this would cause a scrolling event."
     for dummy in range(i):
         if game.options & OPTION_CURSES:
+            assert curwnd is not None
             (y, x) = curwnd.getyx()
             try:
                 curwnd.move(y + 1, 0)
@@ -3661,6 +3679,7 @@ def skip(i):
 def proutn(line):
     "Utter a line with no following line feed."
     if game.options & OPTION_CURSES:
+        assert curwnd is not None
         (y, x) = curwnd.getyx()
         (my, mx) = curwnd.getmaxyx()
         if curwnd == message_window and y >= my - 2:
@@ -4504,18 +4523,19 @@ def setwarp():
     if game.damage[DWARPEN] > 10.0:
         prout(_("Warp engines inoperative."))
         return
-    if damaged(DWARPEN) and scanner.real > 4.0:
+    warp_val = scanner.real if scanner.real is not None else 0.0
+    if damaged(DWARPEN) and warp_val > 4.0:
         prout(_("Engineer Scott- \"I'm doing my best, Captain,"))
         prout(_('  but right now we can only go warp 4."'))
         return
-    if scanner.real > 10.0:
+    if warp_val > 10.0:
         prout(_('Helmsman Sulu- "Our top speed is warp 10, Captain."'))
         return
-    if scanner.real < 1.0:
+    if warp_val < 1.0:
         prout(_('Helmsman Sulu- "We can\'t go below warp 1, Captain."'))
         return
     oldfac = game.warpfac
-    game.warpfac = scanner.real
+    game.warpfac = warp_val
     if game.warpfac <= oldfac or game.warpfac <= 6.0:
         prout(_('Helmsman Sulu- "Warp factor %d, Captain."') % int(game.warpfac))
         return
