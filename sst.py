@@ -7166,6 +7166,7 @@ if __name__ == "__main__":
     import getopt
     import socket
 
+    logfp: Optional[TextIO] = None
     try:
         game = None
         thing = Thingy()
@@ -7216,13 +7217,12 @@ if __name__ == "__main__":
             tmpdir = os.environ["TMPDIR"]
         else:
             tmpdir = "/tmp"
-        logfp: Optional[TextIO] = None
         try:
             logfp = open(os.path.join(tmpdir, "sst-input.log"), "w")
         except IOError:
             sys.stderr.write("sst: warning, can't open logfile\n")
-            sys.exit(1)
-        if logfp:
+            logfp = None
+        if logfp is not None:
             logfp.write("# seed %s\n" % seed)
             logfp.write("# options %s\n" % " ".join(arguments))
             logfp.write("# SST2K version %s\n" % version)
@@ -7265,9 +7265,11 @@ if __name__ == "__main__":
             prout(_("May the Great Bird of the Galaxy roost upon your home planet."))
         finally:
             ioend()
+            if logfp is not None:
+                logfp.close()
         raise SystemExit(0)
     except KeyboardInterrupt:
-        if logfp:
+        if logfp is not None:
             logfp.close()
         print("")
 
