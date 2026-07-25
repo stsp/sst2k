@@ -2519,6 +2519,8 @@ def events():
         elif evcode == FCDBAS:  # Commander succeeds in destroying base
             if evcode == FCDBAS:
                 unschedule(FCDBAS)
+                if game.battle is None:
+                    continue
                 if (
                     not game.state.baseq()
                     or not game.state.galaxy[game.battle.i][game.battle.j].starbase
@@ -3547,16 +3549,16 @@ def plaque():
 # Code from io.c begins here
 
 rows = linecount = 0  # for paging
-stdscr: Optional[curses._CursesWindow] = None
+stdscr = None
 replayfp = None
-fullscreen_window: Optional[curses._CursesWindow] = None
-srscan_window: Optional[curses._CursesWindow] = None
-report_window: Optional[curses._CursesWindow] = None
-status_window: Optional[curses._CursesWindow] = None
-lrscan_window: Optional[curses._CursesWindow] = None
-message_window: Optional[curses._CursesWindow] = None
-prompt_window: Optional[curses._CursesWindow] = None
-curwnd: Optional[curses._CursesWindow] = None
+fullscreen_window = None
+srscan_window = None
+report_window = None
+status_window = None
+lrscan_window = None
+message_window = None
+prompt_window = None
+curwnd = None
 
 
 def iostart():
@@ -3653,7 +3655,7 @@ def pause_game():
         proutn(prompt)
         if not replayfp:
             input()
-        sys.stdout.write("\n" * rows)
+        sys.stdout.write("\n" * int(rows))
         linecount = 0
 
 
@@ -3670,7 +3672,7 @@ def skip(i):
         else:
             global linecount
             linecount += 1
-            if rows and linecount >= rows:
+            if rows and linecount >= int(rows):
                 pause_game()
             else:
                 sys.stdout.write("\n")
@@ -3707,6 +3709,7 @@ def prouts(line):
             time.sleep(0.03)
         proutn(c)
         if game.options & OPTION_CURSES:
+            assert curwnd is not None
             curwnd.refresh()
         else:
             sys.stdout.flush()
@@ -3717,6 +3720,7 @@ def prouts(line):
 def cgetline():
     "Get a line of input."
     if game.options & OPTION_CURSES:
+        assert curwnd is not None
         line = curwnd.getstr().decode("utf-8") + "\n"
         curwnd.refresh()
     else:
@@ -3771,6 +3775,7 @@ def setwnd(wnd):
 def clreol():
     "Clear to end of line -- can be a no-op in tty mode"
     if game.options & OPTION_CURSES:
+        assert curwnd is not None
         curwnd.clrtoeol()
         curwnd.refresh()
 
@@ -3779,6 +3784,7 @@ def clrscr():
     "Clear screen -- can be a no-op in tty mode."
     global linecount
     if game.options & OPTION_CURSES:
+        assert curwnd is not None
         curwnd.clear()
         curwnd.move(0, 0)
         curwnd.refresh()
@@ -3787,6 +3793,7 @@ def clrscr():
 
 def textcolor(color=DEFAULT):
     if game.options & OPTION_COLOR:
+        assert curwnd is not None
         if color == DEFAULT:
             curwnd.attrset(0)
         elif color == BLACK:
@@ -3825,6 +3832,7 @@ def textcolor(color=DEFAULT):
 
 def highvideo():
     if game.options & OPTION_COLOR:
+        assert curwnd is not None
         curwnd.attron(curses.A_REVERSE)
 
 
@@ -3839,17 +3847,21 @@ def drawmaps(mode):
         if mode == 1:
             sensor()
         setwnd(srscan_window)
+        assert curwnd is not None
         curwnd.move(0, 0)
         srscan()
         if mode != 2:
             setwnd(status_window)
+            assert status_window is not None
             status_window.clear()
             status_window.move(0, 0)
             setwnd(report_window)
+            assert report_window is not None
             report_window.clear()
             report_window.move(0, 0)
             status()
             setwnd(lrscan_window)
+            assert lrscan_window is not None
             lrscan_window.clear()
             lrscan_window.move(0, 0)
             lrscan(silent=False)
@@ -3857,6 +3869,7 @@ def drawmaps(mode):
 
 def put_srscan_sym(w, sym):
     "Emit symbol for short-range scan."
+    assert srscan_window is not None
     srscan_window.move(w.i + 1, w.j * 2 + 2)
     srscan_window.addch(sym)
     srscan_window.refresh()
@@ -3867,6 +3880,7 @@ def boom(w):
     if game.options & OPTION_CURSES:
         drawmaps(2)
         setwnd(srscan_window)
+        assert srscan_window is not None
         srscan_window.attron(curses.A_REVERSE)
         put_srscan_sym(w, game.quad[w.i][w.j])
         # sound(500)
@@ -3916,6 +3930,7 @@ def tracktorpedo(w, step, i, n, iquad):
                 # nosound()
                 put_srscan_sym(w, iquad)
             else:
+                assert curwnd is not None
                 curwnd.attron(curses.A_REVERSE)
                 put_srscan_sym(w, iquad)
                 # sound(500)
@@ -3931,6 +3946,7 @@ def makechart():
     "Display the current galaxy chart."
     if game.options & OPTION_CURSES:
         setwnd(message_window)
+        assert message_window is not None
         message_window.clear()
     chart()
     if game.options & OPTION_TTY:
