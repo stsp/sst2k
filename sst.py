@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Any, Optional, List, Dict, Tuple, Union, cast
+from typing import Optional, List, Dict, Tuple, Union, TextIO, cast, Any
 """
 sst.py -- Super Star Trek 2K
 
@@ -77,8 +77,8 @@ class JumpOut(Exception):
 
 class Coord:
     def __init__(self, x=None, y=None):
-        self.i: Any = x
-        self.j: Any = y
+        self.i: Optional[int] = x
+        self.j: Optional[int] = y
 
     def valid_quadrant(self):
         return self.i >= 0 and self.i < GALSIZE and self.j >= 0 and self.j < GALSIZE
@@ -113,11 +113,104 @@ class Coord:
     def __div__(self, other):
         return Coord(self.i / other, self.j / other)
 
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
     def __mod__(self, other):
         return Coord(self.i % other, self.j % other)
 
     def __truediv__(self, other):
         return Coord(self.i / other, self.j / other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
 
     def __floordiv__(self, other):
         return Coord(self.i // other, self.j // other)
@@ -181,22 +274,23 @@ class Thingy(Coord):
 
 
 class Planet:
+    name: Optional[str]
     def __init__(self):
-        self.name: Any = None  # string-valued if inhabited
+        self.name: Optional[str] = None  # string-valued if inhabited
         self.quadrant = Coord()  # quadrant located
-        self.pclass: Any = None  # could be ""M", "N", "O", or "destroyed"
+        self.pclass: Optional[str] = None  # could be ""M", "N", "O", or "destroyed"
         self.crystals = "absent"  # could be "mined", "present", "absent"
         self.known = "unknown"  # could be "unknown", "known", "shuttle_down"
         self.inhabited = False  # is it inhabited?
 
-    def __str__(self):
-        return self.name or '' or '' or ''
+    def __str__(self) -> str:
+        return self.name or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or '' or ''
 
 
 class Quadrant:
     def __init__(self):
         self.stars = 0
-        self.planet = None
+        self.planet: Optional[Planet] = None
         self.starbase = False
         self.klingons = 0
         self.romulans = 0
@@ -236,14 +330,14 @@ class Snapshot:
         self.nromrem = 0  # Romulans remaining
         self.nplankl = 0  # destroyed uninhabited planets
         self.nworldkl = 0  # destroyed inhabited planets
-        self.planets = []  # Planet information
-        self.date = 0.0  # stardate
-        self.remres: Any = 0.0  # remaining resources
-        self.remtime: Any = 0.0  # remaining time
-        self.inbase: Any = 0  # initial number of bases
+        self.planets: List[Planet] = []  # Planet information
+        self.date: Optional[float] = 0.0  # stardate
+        self.remres: float = 0.0  # remaining resources
+        self.remtime: float = 0.0  # remaining time
+        self.inbase: int = 0  # initial number of bases
         self.baseq = []  # Base quadrant coordinates
         self.kcmdr = []  # Commander quadrant coordinates
-        self.kscmdr: Any = Coord()  # Supercommander quadrant coordinates
+        self.kscmdr: Coord = Coord()  # Supercommander quadrant coordinates
         # the galaxy
         self.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
         # the starchart
@@ -252,8 +346,8 @@ class Snapshot:
 
 class Event:
     def __init__(self):
-        self.date: Any = None  # A real number
-        self.quadrant = None  # A coord structure
+        self.date: Optional[float] = None  # A real number
+        self.quadrant: Optional[Coord] = None  # A coord structure
 
 
 # game options
@@ -369,24 +463,24 @@ class Enemy:
 
 class Gamestate:
     def __init__(self):
-        self.options: Any = 0  # Game options
+        self.options: int = 0  # Game options
         self.state = Snapshot()  # A snapshot structure
         self.snapsht = Snapshot()  # Last snapshot taken for time-travel purposes
-        self.quad: Any = None  # contents of our quadrant
+        self.quad: List[List[str]] = fill2d(QUADSIZE, lambda i_unused, j_unused: ".")
         self.damage = [0.0] * NDEVICES  # damage encountered
-        self.future: Any = []  # future events
+        self.future: List[Event] = []  # future events
         i = NEVENTS
         while i > 0:
             i -= 1
             self.future.append(Event())
-        self.passwd: Any = None  # Self Destruct password
-        self.enemies: Any = []
-        self.quadrant: Any = Coord()  # where we are in the large
-        self.sector: Any = Coord()  # where we are in the small
-        self.tholian: Any = None  # Tholian enemy object
-        self.base: Any = Coord()  # position of base in current quadrant
-        self.battle: Any = Coord()  # base coordinates being attacked
-        self.plnet: Any = Coord()  # location of planet in quadrant
+        self.passwd: Optional[str] = None  # Self Destruct password
+        self.enemies: List[Enemy] = []
+        self.quadrant: Coord = Coord()  # where we are in the large
+        self.sector: Coord = Coord()  # where we are in the small
+        self.tholian: Optional['Enemy'] = None  # Tholian enemy object
+        self.base: Coord = Coord()  # position of base in current quadrant
+        self.battle: Coord = Coord()  # base coordinates being attacked
+        self.plnet: Coord = Coord()  # location of planet in quadrant
         self.gamewon = False  # Finished!
         self.ididit = False  # action taken -- allows enemy to attack
         self.alive = False  # we are alive (not killed)
@@ -406,9 +500,9 @@ class Gamestate:
         self.icrystl = False  # dilithium crystals aboard
         self.iseenit = False  # seen base attack report
         self.thawed = False  # thawed game
-        self.condition: Any = None  # "green", "yellow", "red", "docked", "dead"
-        self.iscraft: Any = None  # "onship", "offship", "removed"
-        self.skill: Any = None  # Player skill level
+        self.condition: Optional[str] = "green"
+        self.iscraft: Optional[str] = "onship"
+        self.skill: Optional[int] = 0
         self.inkling = 0  # initial number of klingons
         self.inbase = 0  # initial number of bases
         self.incom = 0  # initial number of commanders
@@ -417,40 +511,40 @@ class Gamestate:
         self.instar = 0  # initial stars
         self.intorps = 0  # initial/max torpedoes
         self.torps = 0  # number of torpedoes
-        self.ship: Any = 'E'  # ship type -- 'E' is Enterprise
+        self.ship: Union[str, int] = 'E'  # ship type -- 'E' is Enterprise
         self.abandoned = 0  # count of crew abandoned in space
         self.length = 0  # length of game
         self.klhere = 0  # klingons here
         self.casual = 0  # causalties
         self.nhelp = 0  # calls for help
         self.nkinks = 0  # count of energy-barrier crossings
-        self.iplnet: Any = None  # planet # in quadrant
+        self.iplnet: Optional[int] = None  # planet # in quadrant
         self.inplan = 0  # initial planets
         self.irhere = 0  # Romulans in quadrant
         self.isatb = 0  # =2 if super commander is attacking base
-        self.tourn: Any = None  # tournament number
+        self.tourn: Optional[int] = None  # tournament number
         self.nprobes = 0  # number of probes available
-        self.inresor: Any = 0.0  # initial resources
-        self.intime: Any = 0.0  # initial time
-        self.inenrg: Any = 0.0  # initial/max energy
-        self.inshld: Any = 0.0  # initial/max shield
-        self.inlsr: Any = 0.0  # initial life support resources
-        self.indate: Any = 0.0  # initial date
-        self.energy: Any = 0.0  # energy level
-        self.shield: Any = 0.0  # shield level
-        self.warpfac: Any = 0.0  # warp speed
-        self.lsupres: Any = 0.0  # life support reserves
-        self.optime: Any = 0.0  # time taken by current operation
-        self.damfac: Any = 0.0  # damage factor
-        self.lastchart: Any = 0.0  # time star chart was last updated
-        self.cryprob: Any = 0.0  # probability that crystal will work
-        self.probe: Any = None  # object holding probe course info
-        self.height: Any = 0.0  # height of orbit around planet
-        self.score: Any = 0.0  # overall score
-        self.perdate: Any = 0.0  # rate of kills
+        self.inresor: float = 0.0  # initial resources
+        self.intime: float = 0.0  # initial time
+        self.inenrg: float = 0.0  # initial/max energy
+        self.inshld: float = 0.0  # initial/max shield
+        self.inlsr: float = 0.0  # initial life support resources
+        self.indate: float = 0.0  # initial date
+        self.energy: float = 0.0  # energy level
+        self.shield: float = 0.0  # shield level
+        self.warpfac: float = 0.0  # warp speed
+        self.lsupres: float = 0.0  # life support reserves
+        self.optime: float = 0.0  # time taken by current operation
+        self.damfac: float = 0.0  # damage factor
+        self.lastchart: float = 0.0  # time star chart was last updated
+        self.cryprob: float = 0.0  # probability that crystal will work
+        self.probe: Optional['trajectory'] = None  # object holding probe course info
+        self.height: float = 0.0  # height of orbit around planet
+        self.score: float = 0.0  # overall score
+        self.perdate: float = 0.0  # rate of kills
         self.idebug = False  # Debugging instrumentation enabled?
-        self.statekscmdr: Any = Coord()  # No SuperCommander coordinates yet.
-        self.probec: Any = Coord()
+        self.statekscmdr: Coord = Coord()  # No SuperCommander coordinates yet.
+        self.probec: Coord = Coord()
 
     def recompute(self):
         # Stas thinks this should be (C expression):
@@ -465,25 +559,193 @@ class Gamestate:
 
 
 game: Gamestate = Gamestate()
-thing: Any = Thingy()
+thing: Thingy = Thingy()
 scanner: Any = None
 stdscr: Any = None
-prompt_window: Any = None
-rows: Any = 24
-columns: Any = 80
-linecount: Any = 0
-replayfp: Any = None
-logfp: Any = None
 fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
 status_window: Any = None
 report_window: Any = None
 lrscan_window: Any = None
 srscan_window: Any = None
-message_window: Any = None
 statwin: Any = None
 pad: Any = None
 curwnd: Any = None
-device: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
+
+game: Gamestate = Gamestate()
+thing: Thingy = Thingy()
+scanner: Any = None
+stdscr: Any = None
+fullscreen_window: Any = None
+message_window: Any = None
+prompt_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Tuple[str, ...] = ()
+rows: int = 24
+columns: int = 80
+linecount: int = 0
+replayfp: Optional[TextIO] = None
+logfp: Optional[TextIO] = None
 
 FWON = 0
 FDEPLETE = 1
@@ -2234,6 +2496,38 @@ def cancelrest():
 def events():
     "Run through the event queue looking for things to do."
     ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
+    ibq = Coord()
     i = 0
     fintim = game.state.date + game.optime
     yank = 0
@@ -2738,7 +3032,12 @@ def wait():
 
 
 def nova(nov):
-    ll: Any = 0
+    ll: int = 0
+    ll: int = 0
+    ll: int = 0
+    ll: int = 0
+    ll: int = 0
+    ll: int = 0
     "Star goes nova."
     ncourse = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
     newc = Coord()
@@ -2886,11 +3185,11 @@ def supernova(w):
         nq = copy.copy(w)
     else:
         # Scheduled supernova -- select star at random.
-        num_stars = 0
+        num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_stars = 0
         nq = Coord()
         for nq.i in range(GALSIZE):
             for nq.j in range(GALSIZE):
-                num_stars += game.state.galaxy[nq.i][nq.j].stars
+                num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_num_stars += game.state.galaxy[nq.i][nq.j].stars
         if num_stars == 0:
             return  # nothing to supernova exists
         num = randrange(num_stars) + 1
@@ -3946,7 +4245,7 @@ def prstat(txt, data):
 # Code from moving.c begins here
 
 
-def imove(icourse: Any = None, noattack=False):
+def imove(icourse: Optional['trajectory'] = None, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
     enemy = None
     w = Coord()
@@ -4339,6 +4638,38 @@ class course:
 def impulse():
     "Move under impulse power."
     course: Any = None
+    course: Any = None
+    course: Any = None
+    course: Any = None
+    course: Any = None
+    course: Any = None
+    course: Any = None
+    course: Any = None
+    course = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Any = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course: Optional[trajectory] = None
+    course = None
+    course = None
+    course: Optional['trajectory'] = None
     course = None
     game.ididit = False
     if damaged(DIMPULS):
@@ -4733,6 +5064,93 @@ def probe():
 
 def mayday():
     "Yell for help from nearest starbase."
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
+    ibq = Coord()
+    m = 0
+    i = 0
     ibq = Coord()
     m = 0
     i = 0
@@ -6684,6 +7102,38 @@ def helpme():
 def makemoves():
     "Command-interpretation loop."
     cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
+    cmd = ""
     while True:  # command loop
         drawmaps(1)
         while True:  # get a command
@@ -6911,8 +7361,8 @@ def randplace(size):
 
 class sstscanner:
     def __init__(self):
-        self.type: Any = None
-        self.token: Any = ""
+        self.type: Optional[str] = None
+        self.token: Optional[str] = ""
         self.real = 0.0
         self.inqueue = []
 
@@ -6962,7 +7412,7 @@ class sstscanner:
     def chew(self):
         # Demand input for next scan
         self.inqueue = []
-        self.token: Any = ""
+        self.token: Optional[str] = ""
         self.real = 0.0
 
     def sees(self, s):
