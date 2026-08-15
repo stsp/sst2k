@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from typing import Any, Optional, List, Dict, Tuple, Union, cast
 """
 sst.py -- Super Star Trek 2K
 
@@ -76,8 +77,8 @@ class JumpOut(Exception):
 
 class Coord:
     def __init__(self, x=None, y=None):
-        self.i = x
-        self.j = y
+        self.i: Any = x
+        self.j: Any = y
 
     def valid_quadrant(self):
         return self.i >= 0 and self.i < GALSIZE and self.j >= 0 and self.j < GALSIZE
@@ -118,6 +119,9 @@ class Coord:
     def __truediv__(self, other):
         return Coord(self.i / other, self.j / other)
 
+    def __floordiv__(self, other):
+        return Coord(self.i // other, self.j // other)
+
     def roundtogrid(self):
         return Coord(int(round(self.i)), int(round(self.j)))
 
@@ -134,16 +138,16 @@ class Coord:
         if self.i == 0:
             s.i = 0
         else:
-            s.i = self.i / abs(self.i)
+            s.i = int(self.i // abs(self.i))
         if self.j == 0:
             s.j = 0
         else:
-            s.j = self.j / abs(self.j)
+            s.j = int(self.j // abs(self.j))
         return s
 
     def quadrant(self):
         # print "Location %s -> %s" % (self, (self / QUADSIZE).roundtogrid())
-        return self.roundtogrid() / QUADSIZE
+        return self.roundtogrid() // QUADSIZE
 
     def sector(self):
         return self.roundtogrid() % QUADSIZE
@@ -178,15 +182,15 @@ class Thingy(Coord):
 
 class Planet:
     def __init__(self):
-        self.name = None  # string-valued if inhabited
+        self.name: Any = None  # string-valued if inhabited
         self.quadrant = Coord()  # quadrant located
-        self.pclass = None  # could be ""M", "N", "O", or "destroyed"
+        self.pclass: Any = None  # could be ""M", "N", "O", or "destroyed"
         self.crystals = "absent"  # could be "mined", "present", "absent"
         self.known = "unknown"  # could be "unknown", "known", "shuttle_down"
         self.inhabited = False  # is it inhabited?
 
     def __str__(self):
-        return self.name
+        return self.name or '' or '' or ''
 
 
 class Quadrant:
@@ -234,11 +238,12 @@ class Snapshot:
         self.nworldkl = 0  # destroyed inhabited planets
         self.planets = []  # Planet information
         self.date = 0.0  # stardate
-        self.remres = 0  # remaining resources
-        self.remtime = 0  # remaining time
+        self.remres: Any = 0.0  # remaining resources
+        self.remtime: Any = 0.0  # remaining time
+        self.inbase: Any = 0  # initial number of bases
         self.baseq = []  # Base quadrant coordinates
         self.kcmdr = []  # Commander quadrant coordinates
-        self.kscmdr = Coord()  # Supercommander quadrant coordinates
+        self.kscmdr: Any = Coord()  # Supercommander quadrant coordinates
         # the galaxy
         self.galaxy = fill2d(GALSIZE, lambda i_unused, j_unused: Quadrant())
         # the starchart
@@ -247,7 +252,7 @@ class Snapshot:
 
 class Event:
     def __init__(self):
-        self.date = None  # A real number
+        self.date: Any = None  # A real number
         self.quadrant = None  # A coord structure
 
 
@@ -364,24 +369,24 @@ class Enemy:
 
 class Gamestate:
     def __init__(self):
-        self.options = None  # Game options
+        self.options: Any = 0  # Game options
         self.state = Snapshot()  # A snapshot structure
         self.snapsht = Snapshot()  # Last snapshot taken for time-travel purposes
-        self.quad = None  # contents of our quadrant
+        self.quad: Any = None  # contents of our quadrant
         self.damage = [0.0] * NDEVICES  # damage encountered
-        self.future = []  # future events
+        self.future: Any = []  # future events
         i = NEVENTS
         while i > 0:
             i -= 1
             self.future.append(Event())
-        self.passwd = None  # Self Destruct password
-        self.enemies = []
-        self.quadrant = None  # where we are in the large
-        self.sector = None  # where we are in the small
-        self.tholian = None  # Tholian enemy object
-        self.base = None  # position of base in current quadrant
-        self.battle = None  # base coordinates being attacked
-        self.plnet = None  # location of planet in quadrant
+        self.passwd: Any = None  # Self Destruct password
+        self.enemies: Any = []
+        self.quadrant: Any = Coord()  # where we are in the large
+        self.sector: Any = Coord()  # where we are in the small
+        self.tholian: Any = None  # Tholian enemy object
+        self.base: Any = Coord()  # position of base in current quadrant
+        self.battle: Any = Coord()  # base coordinates being attacked
+        self.plnet: Any = Coord()  # location of planet in quadrant
         self.gamewon = False  # Finished!
         self.ididit = False  # action taken -- allows enemy to attack
         self.alive = False  # we are alive (not killed)
@@ -401,9 +406,9 @@ class Gamestate:
         self.icrystl = False  # dilithium crystals aboard
         self.iseenit = False  # seen base attack report
         self.thawed = False  # thawed game
-        self.condition = None  # "green", "yellow", "red", "docked", "dead"
-        self.iscraft = None  # "onship", "offship", "removed"
-        self.skill = None  # Player skill level
+        self.condition: Any = None  # "green", "yellow", "red", "docked", "dead"
+        self.iscraft: Any = None  # "onship", "offship", "removed"
+        self.skill: Any = None  # Player skill level
         self.inkling = 0  # initial number of klingons
         self.inbase = 0  # initial number of bases
         self.incom = 0  # initial number of commanders
@@ -412,39 +417,40 @@ class Gamestate:
         self.instar = 0  # initial stars
         self.intorps = 0  # initial/max torpedoes
         self.torps = 0  # number of torpedoes
-        self.ship = 0  # ship type -- 'E' is Enterprise
+        self.ship: Any = 'E'  # ship type -- 'E' is Enterprise
         self.abandoned = 0  # count of crew abandoned in space
         self.length = 0  # length of game
         self.klhere = 0  # klingons here
         self.casual = 0  # causalties
         self.nhelp = 0  # calls for help
         self.nkinks = 0  # count of energy-barrier crossings
-        self.iplnet = None  # planet # in quadrant
+        self.iplnet: Any = None  # planet # in quadrant
         self.inplan = 0  # initial planets
         self.irhere = 0  # Romulans in quadrant
         self.isatb = 0  # =2 if super commander is attacking base
-        self.tourn = None  # tournament number
+        self.tourn: Any = None  # tournament number
         self.nprobes = 0  # number of probes available
-        self.inresor = 0.0  # initial resources
-        self.intime = 0.0  # initial time
-        self.inenrg = 0.0  # initial/max energy
-        self.inshld = 0.0  # initial/max shield
-        self.inlsr = 0.0  # initial life support resources
-        self.indate = 0.0  # initial date
-        self.energy = 0.0  # energy level
-        self.shield = 0.0  # shield level
-        self.warpfac = 0.0  # warp speed
-        self.lsupres = 0.0  # life support reserves
-        self.optime = 0.0  # time taken by current operation
-        self.damfac = 0.0  # damage factor
-        self.lastchart = 0.0  # time star chart was last updated
-        self.cryprob = 0.0  # probability that crystal will work
-        self.probe = None  # object holding probe course info
-        self.height = 0.0  # height of orbit around planet
-        self.score = 0.0  # overall score
-        self.perdate = 0.0  # rate of kills
+        self.inresor: Any = 0.0  # initial resources
+        self.intime: Any = 0.0  # initial time
+        self.inenrg: Any = 0.0  # initial/max energy
+        self.inshld: Any = 0.0  # initial/max shield
+        self.inlsr: Any = 0.0  # initial life support resources
+        self.indate: Any = 0.0  # initial date
+        self.energy: Any = 0.0  # energy level
+        self.shield: Any = 0.0  # shield level
+        self.warpfac: Any = 0.0  # warp speed
+        self.lsupres: Any = 0.0  # life support reserves
+        self.optime: Any = 0.0  # time taken by current operation
+        self.damfac: Any = 0.0  # damage factor
+        self.lastchart: Any = 0.0  # time star chart was last updated
+        self.cryprob: Any = 0.0  # probability that crystal will work
+        self.probe: Any = None  # object holding probe course info
+        self.height: Any = 0.0  # height of orbit around planet
+        self.score: Any = 0.0  # overall score
+        self.perdate: Any = 0.0  # rate of kills
         self.idebug = False  # Debugging instrumentation enabled?
-        self.statekscmdr = None  # No SuperCommander coordinates yet.
+        self.statekscmdr: Any = Coord()  # No SuperCommander coordinates yet.
+        self.probec: Any = Coord()
 
     def recompute(self):
         # Stas thinks this should be (C expression):
@@ -457,6 +463,27 @@ class Gamestate:
             self.state.remkl + 4 * len(self.state.kcmdr)
         )
 
+
+game: Gamestate = Gamestate()
+thing: Any = Thingy()
+scanner: Any = None
+stdscr: Any = None
+prompt_window: Any = None
+rows: Any = 24
+columns: Any = 80
+linecount: Any = 0
+replayfp: Any = None
+logfp: Any = None
+fullscreen_window: Any = None
+status_window: Any = None
+report_window: Any = None
+lrscan_window: Any = None
+srscan_window: Any = None
+message_window: Any = None
+statwin: Any = None
+pad: Any = None
+curwnd: Any = None
+device: Any = None
 
 FWON = 0
 FDEPLETE = 1
@@ -514,12 +541,12 @@ def welcoming(iq):
 def tryexit(enemy, look, irun):
     "A bad guy attempts to bug out."
     iq = Coord()
-    iq.i = game.quadrant.i + (look.i + (QUADSIZE - 1)) / QUADSIZE - 1
-    iq.j = game.quadrant.j + (look.j + (QUADSIZE - 1)) / QUADSIZE - 1
+    iq.i = game.quadrant.i + (look.i + (QUADSIZE - 1)) // QUADSIZE - 1
+    iq.j = game.quadrant.j + (look.j + (QUADSIZE - 1)) // QUADSIZE - 1
     if not welcoming(iq):
-        return False
+        return []
     if enemy.type == "R":
-        return False  # Romulans cannot escape!
+        return []  # Romulans cannot escape!
     if not irun:
         # avoid intruding on another commander's territory
         if enemy.type == "C":
@@ -837,7 +864,7 @@ def supercommander():
         sc = game.state.kscmdr
         for i, base in enumerate(game.state.baseq):
             basetbl.append((i, (base - sc).distance()))
-        if game.state.baseq > 1:
+        if len(game.state.baseq) > 1:
             basetbl.sort(key=lambda x: x[1])
         # look for nearest base without a commander, no Enterprise, and
         # without too many Klingons, and not already under attack.
@@ -1135,7 +1162,7 @@ def randdevice():
         wsum += w
         if idx < wsum:
             return i
-    return None  # we should never get here
+    return len(weights) - 1  # we should never get here
 
 
 def collision(rammed, enemy):
@@ -1164,7 +1191,7 @@ def collision(rammed, enemy):
     # In the pre-SST2K version, all devices got equiprobably damaged,
     # which was silly.  Instead, pick up to half the devices at
     # random according to our weighting table,
-    ncrits = randrange(int(NDEVICES / 2))
+    ncrits = randrange(NDEVICES // 2)
     while ncrits > 0:
         ncrits -= 1
         dev = randdevice()
@@ -2206,6 +2233,7 @@ def cancelrest():
 
 def events():
     "Run through the event queue looking for things to do."
+    ibq = Coord()
     i = 0
     fintim = game.state.date + game.optime
     yank = 0
@@ -2492,7 +2520,7 @@ def events():
             if evcode == FCDBAS:
                 unschedule(FCDBAS)
                 if (
-                    not game.state.baseq()
+                    not game.state.baseq
                     or not game.state.galaxy[game.battle.i][game.battle.j].starbase
                 ):
                     game.battle.invalidate()
@@ -2710,6 +2738,7 @@ def wait():
 
 
 def nova(nov):
+    ll: Any = 0
     "Star goes nova."
     ncourse = (0.0, 10.5, 12.0, 1.5, 9.0, 0.0, 3.0, 7.5, 6.0, 4.5)
     newc = Coord()
@@ -2798,7 +2827,7 @@ def nova(nov):
                         finish(FNOVA)
                         return
                     # add in course nova contributes to kicking starship
-                    bump += (game.sector - hits[-1]).sgn()
+                    bump += (game.sector - start).sgn()
                 elif iquad == "K":  # kill klingon
                     deadkl(neighbor, iquad, neighbor)
                 elif iquad in ("C", "S", "R"):  # Damage/destroy big enemies
@@ -2809,7 +2838,7 @@ def nova(nov):
                     if game.enemies[ll].power <= 0.0:
                         deadkl(neighbor, iquad, neighbor)
                         break
-                    newc = neighbor + neighbor - hits[-1]
+                    newc = neighbor + neighbor - start
                     proutn(crmena(True, iquad, "sector", neighbor) + _(" damaged"))
                     if not newc.valid_sector():
                         # can't leave quadrant
@@ -2848,21 +2877,23 @@ def nova(nov):
 
 
 def supernova(w):
+    ll = 0
     "Star goes supernova."
+    ll = 0
     num = 0
     npdead = 0
     if w is not None:
         nq = copy.copy(w)
     else:
         # Scheduled supernova -- select star at random.
-        stars = 0
+        num_stars = 0
         nq = Coord()
         for nq.i in range(GALSIZE):
             for nq.j in range(GALSIZE):
-                stars += game.state.galaxy[nq.i][nq.j].stars
-        if stars == 0:
+                num_stars += game.state.galaxy[nq.i][nq.j].stars
+        if num_stars == 0:
             return  # nothing to supernova exists
-        num = randrange(stars) + 1
+        num = randrange(num_stars) + 1
         for nq.i in range(GALSIZE):
             for nq.j in range(GALSIZE):
                 num -= game.state.galaxy[nq.i][nq.j].stars
@@ -2914,7 +2945,7 @@ def supernova(w):
         game.iscate = False
         unschedule(FSCMOVE)
         unschedule(FSCDBAS)
-    survivors = filter(lambda w: w != nq, game.state.kcmdr)
+    survivors = list(filter(lambda w: w != nq, game.state.kcmdr))
     comkills = len(game.state.kcmdr) - len(survivors)
     game.state.kcmdr = survivors
     kldead -= comkills
@@ -3492,7 +3523,7 @@ def plaque():
         _(
             "                                                 This day of %.6s %.4s, %.8s\n\n"
         )
-        % (timestring + 4, timestring + 20, timestring + 11)
+        % (timestring[4:], timestring[20:], timestring[11:])
     )
     fp.write(
         _("                                                        Your score:  %d\n\n")
@@ -3687,7 +3718,10 @@ def cgetline():
                 elif line[0] != "#":
                     break
         else:
-            line = eval(input()) + "\n"
+            try:
+                line = input() + "\n"
+            except EOFError:
+                sys.exit(0)
     if logfp:
         logfp.write(line)
     return line
@@ -3912,8 +3946,9 @@ def prstat(txt, data):
 # Code from moving.c begins here
 
 
-def imove(icourse=None, noattack=False):
+def imove(icourse: Any = None, noattack=False):
     "Movement execution for warp, impulse, supernova, and tractor-beam events."
+    enemy = None
     w = Coord()
 
     def newquadrant(noattack):
@@ -3983,6 +4018,7 @@ def imove(icourse=None, noattack=False):
             # object encountered in flight path
             stopegy = 50.0 * icourse.distance / game.optime
             if iquad in ("T", "K", "C", "S", "R", "?"):
+                enemy = None
                 for enemy in game.enemies:
                     if enemy.location == game.sector:
                         break
@@ -4302,6 +4338,8 @@ class course:
 
 def impulse():
     "Move under impulse power."
+    course: Any = None
+    course = None
     game.ididit = False
     if damaged(DIMPULS):
         scanner.chew()
@@ -4695,6 +4733,9 @@ def probe():
 
 def mayday():
     "Yell for help from nearest starbase."
+    ibq = Coord()
+    m = 0
+    i = 0
     # There's more than one way to move in this game!
     scanner.chew()
     # Test for conditions which prevent calling for help
@@ -4833,6 +4874,7 @@ def abandon():
             game.quadrant = game.state.baseq[nb]
             game.sector.i = game.sector.j = 5
             newqad()
+        i = 0
         while True:
             # position next to base by trial and error
             game.quad[game.sector.i][game.sector.j] = "."
@@ -4845,8 +4887,8 @@ def abandon():
                     break
             if i < QUADSIZE + 1:
                 break  # found a spot
-            game.sector.i = QUADSIZE / 2
-            game.sector.j = QUADSIZE / 2
+            game.sector.i = QUADSIZE // 2
+            game.sector.j = QUADSIZE // 2
             newqad()
     # Get new commission
     game.quad[game.sector.i][game.sector.j] = game.ship = "F"
@@ -6058,7 +6100,7 @@ def setup():
         for j in range(GALSIZE):
             # Can't have more stars per quadrant than fit in one decimal digit,
             # if we do the chart representation will break.
-            k = randrange(1, min(10, QUADSIZE**2 / 10))
+            k = randrange(1, min(10, QUADSIZE**2 // 10))
             game.instar += k
             game.state.galaxy[i][j].stars = k
     # Locate star bases in galaxy
@@ -6336,7 +6378,7 @@ def choose():
     game.inbase = randrange(BASEMIN, BASEMAX + 1)
     game.inplan = 0
     if game.options & OPTION_PLANETS:
-        game.inplan += randrange(int(MAXUNINHAB / 2), int(MAXUNINHAB + 1))
+        game.inplan += randrange(int(MAXUNINHAB // 2), int(MAXUNINHAB + 1))
     if game.options & OPTION_WORLDS:
         game.inplan += int(NINHAB)
     game.state.nromrem = game.inrom = randrange(2 * game.skill)
@@ -6641,6 +6683,7 @@ def helpme():
 
 def makemoves():
     "Command-interpretation loop."
+    cmd = ""
     while True:  # command loop
         drawmaps(1)
         while True:  # get a command
@@ -6868,8 +6911,8 @@ def randplace(size):
 
 class sstscanner:
     def __init__(self):
-        self.type = None
-        self.token = None
+        self.type: Any = None
+        self.token: Any = ""
         self.real = 0.0
         self.inqueue = []
 
@@ -6919,7 +6962,8 @@ class sstscanner:
     def chew(self):
         # Demand input for next scan
         self.inqueue = []
-        self.real = self.token = None
+        self.token: Any = ""
+        self.real = 0.0
 
     def sees(self, s):
         # compares s to item and returns true if it matches to the length of s
@@ -7064,8 +7108,6 @@ if __name__ == "__main__":
     import socket
 
     try:
-        global line, thing, game
-        game = None
         thing = Thingy()
         game = Gamestate()
         game.options = OPTION_ALL & ~(OPTION_IOMODES | OPTION_PLAIN | OPTION_ALMY)
